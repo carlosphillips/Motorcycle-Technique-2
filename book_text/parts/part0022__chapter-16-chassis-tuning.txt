@@ -1,0 +1,133 @@
+[part0022.xhtml] Chapter 16: Chassis Tuning
+================================================================================
+Total Control
+
+## Chapter 16: Chassis Tuning
+
+There is more to handling than just suspension setup. Chassis geometry also plays an important role. As discussed in Chapter 2: Steering, motorcycle chassis’ are designed for specific handling characteristics through the use of steering head angle, trail, and even swingarm slope. Because your idea of the ideal handling characteristics for your bike may be different from the ideas of the engineers who designed it, tailoring these specifications can make a dramatic improvement in how your bike handles. Small changes can make a big difference so don’t make too big of a change at any one time.
+
+Generally speaking, when the front end of a motorcycle is lowered or its rear is raised, the bike will steer quicker, and less effort will be required on the bars. Of course, the trade-off is less stability and often less front end grip. Therefore, any time the rear is lowered and the front is raised, stability will improve at the expense of steering quickness. There is no perfect setup for any particular bike as it really depends on how each rider likes his bike to behave.
+
+Touring and cruising riders generally prefer more stability, and sport riders like to be able to change direction quickly without having to put a ton of effort on the bars. Still, many tourers and cruisers can benefit from quicker steering than stock, and many sportbikes can benefit from slowing down the steering because they steer too quickly as delivered and can feel “nervous.” Because these adjustments must make the chassis achieve a balance between quickness and stability, it’s best to experiment in little steps to see which compromises are right for you.
+
+It’s important to note that spring preload adjustments also change ride height. Not only does preload determine what percentage of the wheel travel is available for compression vs. extension, but it also has a noticeable effect on handling. That’s why there is a range of 28% to 33% of the total wheel travel for sag instead of a set number.
+
+On the rear, swingarm angle and chain forces combine to cause stiffening or softening of the effective rear spring rate during acceleration or deceleration. This effective stiffening is called anti-squat as it “holds up” the rear end of the motorcycle during acceleration, keeping it from squatting. It is a transient (temporary) effect linked to acceleration, and the effect increases with greater acceleration.
+
+Making Changes
+
+There are several methods for changing ride height independently of spring preload. Raising the position of the front fork tubes in the triple clamp effectively lowers the front end. A somewhat similar effect to the front end geometry can be accomplished by raising the rear of the bike. Keep in mind, however, that this increases anti-squat on the rear at the same time.
+
+Raising the rear often requires the use of an aftermarket shock, as most stock rear shocks—even on sportbikes—don’t have ride height adjusters.
+
+I have often heard riders swear that after changing their brand of tires, their bikes handled differently. Some believed their bikes handled better, and others were convinced their bikes handled worse. In reality, this is often the result of different front-to-rear tire circumferences and not necessarily the tires themselves. For example, although your bike may be fitted with a 120/70-17 front and 170/60-17 rear tire, the actual measured circumferences of the front and rear tires can be quite different from brand to brand. This is very important to consider when replacing worn out tires. (The circumference of the front tire will also change the calibration of your speedometer, which has led many unsuspecting brand-swapping riders straight to traffic court.)
+
+If the new tires you selected have different circumferences from the originals, your motorcycle’s ride height can be significantly changed. If both new tires have the same relative diameters as the old ones, the handling will be closer to the original, with the difference being the inherent tire characteristics. The only way to really know a specific tire’s circumference is to measure it. One way is with a clothing tape measure.
+
+In addition to changing tire brands and, as a result, tire circumferences, changing the size of the tire—specifically the aspect ratio—can also affect ride height. For example, mounting a 120/60 tire on the front instead of a 120/70 will lower the front of the bike, reducing the rake and trail, and quickening the steering. Remember, don’t make too radical of a change to your bike’s geometry. It’s best to make very small changes so you can see if you’re headed in the right direction before going overboard.
+
+Geometry Modifications
+
+If you want to tune on your own, it is still vital to know your starting point and make known, incremental changes. Remember that it is impossible to change one thing without affecting other aspects of the suspension or geometry. Below is a simple guide for modifying your geometry.
+
+To Increase Front End Trail
+
+• Adjustable fork bottoms—move the axle back
+
+• Triple clamp offset (adjustable or fixed)—decrease offset (move the fork tubes back), 2mm increments
+
+• Larger front tire outer diameter
+
+• Raise the front end by sliding the fork tubes down in the triple clamps or increasing fork spring preload—less front end sag (increases rake), 5mm increments
+
+• Lower the rear end with shock length, rear wheel outer diameter, or running more rear sag (increases rake), 5mm increments
+
+Steering dampers, like this trick rotary unit from GPR (gprstabilizer.com), can help minimize headshake when bikes are ridden at the limit. Keep in mind that if your bike needs a steering damper to handle properly at street speeds, you probably have a suspension, misalignment, or geometry issue that needs to be addressed.
+
+To Increase Rear Anti-Squat
+
+• Raise the rear end (increase the swingarm angle) with adjustable rear shocks or frame ride height adjusters, or lengthen the shock internally
+
+• Smaller countershaft sprocket—note that this can also affect the swingarm length
+
+• Larger rear sprocket—note that this can also affect the swingarm length
+
+• Raise swingarm pivot in the frame on models with available inserts
+
+• Shorten effective swingarm length by shortening the chain or with gearing and the chain adjuster
+
+• Lower the CG by getting in a tuck
+
+• Move CG forward by sitting farther forward on the seat
+
+• Raise the front end ride height (not preferred as this has more effect on rake and trail)
+
+• Smaller rear tire outer diameter—though this generally makes only a very, very small difference
+
+A few things to keep in mind: First, more is not necessarily better. Second, when in doubt consult with the pros. Third, just because everyone else is doing it doesn’t mean it’s the best. Fourth, just because everyone else is doing it doesn’t mean it’s wrong. See last chapter’s troubleshooting section for guidance.
+
+Checking Alignment
+
+Chassis alignment that perfectly matches a manufacturer’s specifications is rare even on a brand new motorcycle. Production tolerances for frame welding, jigs, and materials all play a part in how “off” the end result is. In some cases, small deviations from the blueprint can add up, or “stack,” during the manufacturing process. Consequently, even new bikes may exhibit minor handling quirks.
+
+Frame alignment on a used bike is even more questionable. The bike may be fine, or it may have been crashed and properly repaired, but it also may have been crashed hard (or merely dropped in a parking lot) and been repaired poorly.
+
+Meet the motorcycle chiropractors—Scheibner Mega-M.A.X. (top) and G.M.D. Computrack (bottom). These competing chassis optimization companies diagnose handling problems and can make any bike corner like a pro’s. Keep in mind the problem may turn out to be the seat/handlebar interface!
+
+The lateral alignment is the only aspect of chassis geometry that is relatively easy to check. Lateral misalignment is when the rear and front tire don’t “track” in the same line and are, in fact, offset from one another. If the offset is large enough, it can cause the bike to become unstable even when it is going straight. If this is the case, you will constantly have to push on the right or left side of the handlebars to keep the bike traveling in a straight line.
+
+It should be noted that some manufacturers purposely design frames that have the front and rear wheels offset from one another, like the BMW K1200RS and many older Harley-Davidsons. This makes lateral alignment on these bikes a moot point.
+
+To check for lateral misalignment, a crude method of a “string-line” is to lay face down on the ground in front of the front wheel with your arms outstretched in front of you. Line up your left eye with the left edge of the rear tire. Then, mark the corresponding spot to the left of the front tire on the ground with your left index finger. Without moving your left hand, reposition your head so your right eye aligns with the right edge of the rear tire. Mark that spot on the ground with your right hand. When the front wheel is straight, the distance between those two points and the tire should be equal. This is not very accurate but the average person can see a 5mm to 8mm offset using this method, which is far better than many chassis are.
+
+Another alignment method makes sure the rear wheel is aligned to the swingarm pivot by measuring the distance between the swingarm pivot and axle on both sides. This does not ensure that the chassis is straight but it is often better than nothing. The best bet is for around $200, you can get your bike professionally measured at a G.M.D. Computrack or Scheibner Mega-M.A.X. center.
+
+G.M.D. Computrack and Scheibner Mega-M.A.X.
+
+Currently there are only two companies that have the means to accurately check every aspect of your bike’s chassis alignment: G.M.D. Computrack (gmdcomputrack.com) and Scheibner Mega-M.A.X. (www.scheibner.de/scheibner/en/index.php). Both have been in business for many years, have centers all over the world, and are constantly perfecting their systems of chassis measurement and optimization. I have successfully used both technologies over the years with equally impressive results.
+
+More sportbikes like this Triumph 675 are starting to come with replaceable swingarm pivots to adjust anti-squat. On this particular bike, the original pivot point was a few mm below the center point. Now it’s a few mm above center for less squat under hard acceleration.
+
+G.M.D. Computrack uses a sophisticated three-axis optical coordinate system to make incredibly precise and repeatable measurements. The Scheibner Mega-M.A.X. uses a proprietary infrared optical system to do the same. Both companies have specialized equipment to straighten a chassis back to “normal.” Similarly, their businesses are a mix of crash repair and race bike geometry setup.
+
+Perhaps the most impressive part of the two systems are the companies’ inimitable “what if” software. Once they have measured your bike, the software can tell you how a particular change, like a new tire, will affect all the bike’s geometry measurements. Combined with huge databases of previous measurements, basically chassis setups that work well for a particular motorcycle, you can get a bike setup just how you like it in very short order.
+
+These custom adjustable triple clamps use interchangeable aluminum inserts that fit into the oval shaped hole. Changing the position of the steering stem directly changes the trail without affecting the rake.
+
+For example, after noticing my Suzuki SV650 race bike didn’t seem to hold a line as precisely as the bikes of some of my competitors, I decided to get a full G.M.D. Computrack chassis optimization. By straightening a tiny twist in the frame and playing with different suspension components, ride heights, and tires sizes, I tried everything from 95mm to 105mm of trail. Eventually I settled on 101mm of trail (their original suggestion, imagine that) where the bike seemed to turn quickly but was still stable mid-corner. The results speak for themselves. Not only did I lose a full second a lap but my confidence also improved dramatically. I never crashed in a race all year. In fact, my team won the 2001 WERA National Endurance Championship in the Lightweight Class!
+
+15mm taller fork caps manufactured by Race Tech, combined with a 4mm internal increase in fork length, increased trail from 92mm to 97mm on the author’s Triumph Street Triple R. This significantly increased stability for aggressive street riding, but for track riding even more trail was added with the custom triple clamps shown.
+
+G.M.D. Computrack’s Trackmotion is a new inertia motion data recording technology. It samples 100 times per second on six discrete channels. All the turning and acceleration motions of a ride are recorded on a specially mounted iPhone. This allows you to compare the performance of different riders and bikes around a course. Both riding style and bike handling can be analyzed to discover problems and recommend improvements. Check out totalcontroltraining.net to see when it will be available in your area.
+
+Recently I built my own adult-sized supermoto chassis based on a Honda CRF150R motor, but it handled terribly on the pavement. My friends at Race Tech put the bike on their Scheibner Mega-M.A.X. and ran many “what if” scenarios to determine the fix. Their suggestion was a radically different triple clamp offset that took the trail from 78mm to 101mm. After getting the new triple clamps made, the bike handled like it was on rails. Deciding to take it out for my first mini road race, I was shocked to win both heats and both mains in dominating fashion. It was remarkable to watch how unstable the other riders’ bikes were mid-corner by comparison to my “frankenbike” chassis. After the race I noticed that they had taken stock-framed dirt bikes and pulled the fork legs up in the triple clamps to make them mimic the look of sportbikes. This meant they now had even less trail than a roadracer, which already has less than a stock dirt bike. On the other hand, I had added 23mm of trail to mine and pushed the fork legs flush to the top of the triple clamp, making my bike a veritable giant for a mini road racer. It may have looked odd by comparison, but nobody was laughing at the finish line.
+
+My current street bike, a Triumph Street Triple R, was also treated to some new longer fork caps and adjustable triple clamps (see photos). I tried many settings but eventually brought the trail from the stock 92mm to 101mm. This transformed the bike’s high-speed stability during track days. I even had custom fork bottoms made in Italy for my street-legal Aprilia SXV550 supermoto. They brought the trail up to—you guessed it—101mm. This allowed the SXV to keep up with virtually anything on tight, twisty tracks, and made it a lot less twitchy for regular street riding. Having said all this, I can’t say that 101 is some kind of magic trail number for most street and track bikes, but I can’t say that it isn’t, either.
+
+Of course, you don’t have to be a racer to benefit from a tuned chassis. Better handling and improved confidence is important to everyone. If you suspect your bike is out of alignment, or would just like to improve its handling, I highly recommend giving one of these two companies a call.
+
+The Causes of Common Handling Problems
+
+Good bike handling is part of the magic feeling of why we ride. It makes us secure, confident and able to have fun. I often get asked about what can cause the unsatisfactory degradation of a bike’s handling. It can be to the point of simple frustration to legitimate concern for riding safety.
+
+With the G.M.D. Computrack global network of chassis handling service shops, 12 motorcycle OEMs using our chassis 3D measuring system and setup procedures, and a database of 55,000 customers, I can present the real facts that are the causes of the most common handling problems. In the past decade, the motorcycle OEMs have significantly improved the factory tolerances on chassis alignment. A new focus on steering and frame geometry has provided almost every bike with decent handling characteristics for its intended use when new. So why do so many bikes have handling problems? To find that out, let’s first examine some basic principles before you try to bolt on parts that many experts say will fix the problem.
+
+The first issue to consider is a crash will almost always create a misalignment in the front suspension, frame steering head (neck), or rear swingarm. After a big crash badly damaged parts are easy to see, but the small misalignments are not. Even after the bike is “repaired,” these unidentified, damaged parts will cause handling problems.
+
+In a small crash with no visual signs of front-end damage, the rider may not feel small misalignments right away. But 500 miles later, a twist in the front end may cause uneven tire wear on one side. This is because as the bike drives the twisted front end along the road, it is constantly scrubbing the side of the tire. The constant steering correction may also give the rider a small shoulder ache. Uneven tire wear like this is often misdiagnosed as being caused by “the contour of the road,” “incorrect inflation,” etc.
+
+Another issue is the improper use of front wheel chocks. Used correctly chocks are handy, but I have seen a great deal of chock mishandling such as securing the bike by the handlebars into one. As an example, if you were sitting on your bike and a big guy straddled your front wheel and jerked on the handlebars, you would likely get very mad. In fact, that’s what happens when many bikes are incorrectly tied down in the trailer, plus flat spots can form on the tires from extended use.
+
+A small twist of 0.3 degrees in the front forks (it’s very hard to see less than a degree of twist) can cause tire issues plus stiction in the front forks, which can cause chatter. So a lot of the time both tire and front end issues can be caused from improperly transporting the bike. I have seen many revalved forks put back into twisted triples, and bent forks revalved, as well. In the last 10 years I have not seen any OEM triple clamps that are not true. The same cannot be said for some aftermarket “bling clamps.”
+
+Changing tires on any bike can be a real handling performance improvement as well as a big step backwards. The outer circumference change of these new tires can modify the amount of front wheel trail: Too much can make the steering heavy and too little can cause a loss of front-end grip.
+
+I have seen OEM tire testing and they make a big effort to get the handling in the middle of the grip window because aftermarket sales of another tire brand/model/size will inevitably vary. In racing “control tires” are becoming more commonplace. On the surface this is OK, but if the rule does not allow chassis changes to replace the loss of grip with particular models, then the tire size may make several brands uncompetitive. When motorcycle magazines compare tires in “shootouts,” if the geometry of each bike is not maintained with a given model tire, you will not get accurate results. In fact, the resultant geometry changes can often make more of a handling difference than the tires themselves. In the United States, Roadracing World and Motorcycle Technology was the first to compare apples to apples in this way.
+
+Front wheel chocks, like this trick Pit-Stop model from Condor (www.condor-lift.com), can be really useful at the track or for trailering. Unfortunately, many twisted chassis have resulted from improperly tying bikes down. Try to never use the handlebars as a tie-down point for front wheel chocks. Instead anchor the tie down on the main chassis to a point on the floor slightly in front of the upper mount. This distributes the load more evenly between the front and rear suspension, and minimizes the chance of steering head damage.
+
+Alignment of a bike can also significantly impact handling. A common comment I hear is that the swingarm marks are out. The vast majority of the time I find that if the bike has suffered any of the above issues, the marks are OK but the bike’s frame is out!
+
+If you have encountered any problems with your bike’s handling, think about how you would describe your issue and use last chapter’s troubleshooting section to get pointed in the right direction. If the problems still persist it’s best to seek professional help.
+
+—Greg McDonald

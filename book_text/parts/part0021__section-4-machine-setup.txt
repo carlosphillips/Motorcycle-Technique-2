@@ -1,0 +1,734 @@
+[part0021.xhtml] Section 4: Machine Setup
+================================================================================
+Total Control
+
+## Chapter 15: Suspension Setup
+
+Having the right suspension setup is one of the keys to riding fast and safely. No matter which shock or fork you have, they all require proper adjustment to work to their maximum potential. We covered basic suspension theory in Chapter 3: Suspension. Now it’s time to learn how to specifically set up the components. If you follow my suggested procedures, you can make remarkable improvements in your bike’s handling.
+
+Adjusting Static Sag
+
+The first step is to set the sag and determine if you have the correct-rate springs. Static sag is the distance the suspension compresses between being fully topped-out and fully loaded. This is measured with the rider on board in a riding position. Static sag is also referred to as “static ride height” or “race sag.” If you’ve ever measured sag before, you may have noticed that you can check it three or four times and get three or four different numbers, even when you haven’t changed anything. The reason this happens is due to friction in the forks, shocks, or linkage. Fortunately, Race Tech’s Paul Thede developed a method for sag measurement that compensates for frictional forces, which might otherwise alter the readings. We’ll start by setting the sag for the rear suspension.
+
+Rear Suspension
+
+Step 1: Extend the suspension completely by getting the rear wheel off the ground. Sometimes it helps to have a few friends around to accomplish this task. Bikes with centerstands will usually unload the rear suspension when on the stand. Bikes with only sidestands can carefully be rocked onto the sidestand to hold the rear wheel in the air. Most race stands will not work. Even though the wheel is off the ground, the weight of the bike is still loading the suspension through the swingarm. Using a measuring tape, read the distance from the axle to a point directly above it on the chassis. In my opinion, metric measurements are easiest to use because there are no fractions, and one millimeter is an adequate degree of accuracy. When measuring, try to hold the tape measure as close to vertical as possible as this will produce the most accurate measurement. This measurement is called “L1.” Record the L1 measurement, as this number will be used as a reference point later in the process (Figure 15.1). For heavy bikes without a centerstand, or those with non-removable saddlebags, you can use a point on the underside of the saddlebag even (front-to-back) with the rear axle to a point directly below it on the ground. Make sure the bike is perpendicular to the ground when taking these measurements as any lean angle may dramatically change them.
+
+Figure 15.1
+
+Step 2: Remove the bike from the stand and put the rider on board in a riding position. Have a third person balance the bike from the front. Next, push the rear end down about 25 millimeters, or one inch, and let it come back very slowly. Remember, the rider should be aboard and stay very still. When the suspension stops, measure the distance between the axle and the mark on the chassis that you used previously. Whatever friction is in the system will keep the bike from extending up to its true position. It is important that you do not bounce the rear end, as this will cause an inaccurate measurement. This measurement is called “L2.”
+
+Three popular rear suspension preload adjusters include hydraulic hand knobs (top), threaded collars (middle), and ramped collars (bottom). Rear rebound damping adjusters are usually found at the bottom of shocks with compression damping on the top. Check your owner’s manual to see what adjustments you have on your bike.
+
+Step 3: Have your assistant lift up the rear of the bike about 25 millimeters, or one inch, and let it down very slowly. Whatever friction is in the system will now keep the bike from settling down to its true position. Record a measurement where the suspension stops. Remember not to bounce the suspension. This measurement is called “L3.”
+
+Step 4: The correct measurement is halfway between L2 and L3. In fact, if there is no friction in the system, L2 and L3 will be the same. To get the actual sag number, find the midpoint by averaging the two numbers and subtracting them from the fully extended measurement of L1. Static Spring Sag = L1 - [(L2+L3)/2]
+
+Step 5: Adjust the spring preload using whatever method applies to your bike. Spring collars are common, and some of these need special tools to be adjusted. In a pinch, you can use a blunt chisel to unlock the locking collar and turn the main adjusting collar. Street bikes should have 28 to 33 percent of their total travel, which typically equates to 30 to 42 millimeters of sag. Road race bikes typically run 25 to 36 millimeters of sag.
+
+Sag is required in order for the suspension to extend into dips. Another way to consider sag is ride height adjustment: more sag means the suspension rides lower in the stroke, less sag means the suspension rides higher in the stroke.
+
+Choosing sag amount is a balance of trade-offs: less sag means more available lean angle, but could mean loss of traction over bumps due to suspension top-out. More sag means better suspension response over bumps, but more possibility of bottoming out.
+
+If you have too much sag, you need more preload; if you have too little sag, you need less preload. The smaller sag settings sometimes used on the track (which is generally quite smooth) are generally not desirable for street use because the suspension can’t cope with pavement irregularities found on public roads. Remember that sag is only good for a finite amount of adjustment. For instance, if there is too much sag in the suspension when maximum spring preload is used (you run out of preload adjustment range), a stiffer spring is needed. Similarly if the preload has been reduced to its minimum and there is still too little sag, it indicates that you need a softer spring rate.
+
+Front Suspension
+
+Front-end sag is measured in a similar manner to rear-end sag. However, it is much more critical to take friction into account on the front forks because it is more pronounced and has a greater effect on your measurements. This is due to the larger surface area of the seals and bushings sliding against one another on the two fork legs.
+
+Some front forks utilize novel adjusting mechanisms. A Jason DiSalvo Replica Triumph Daytona 675 (top) uses a triangular preload attachment for tool-less hand adjustments. The BMW S1000RR’s rebound damping settings are labeled from 1 to 10 and can be adjusted with the stock screwdriver-shaped ignition key.
+
+Step 1: Extend the fork completely. Sag is commonly measured from the wiper (the dust seal atop the slider) to the bottom of the triple clamp (or lower fork casting on inverted forks). You can measure from any repeatable, convenient location on the chassis and unsprung parts of the suspension. This measurement is called “L1.”
+
+Step 2: Take the bike off the side- or centerstand and put the rider on board in a riding position. Get an assistant to balance the bike from the rear, then push down on the front end and let it extend very slowly without bouncing. Where the fork slider stops, measure the sag again. This measurement is called “L2.”
+
+Step 3: Lift up on the front end and let it drop very slowly without bouncing. Where it stops, measure again. This measurement is called “L3.” Once again, L2 and L3 are different due to friction in the system caused by drag in the seals and bushings. This “Stiction Zone” is larger for telescopic front forks than for the rear suspension.
+
+Step 4: Just as with the rear suspension, halfway between L2 and L3 is where the sag would be with no drag or friction. Therefore, L2 and L3 must be averaged and subtracted from L1 to calculate true sag. Static Spring Sag = L1 - [(L2+L3)/2]
+
+Step 5: To adjust sag, use the preload adjusters, if available, or vary the length of the preload spacers inside the fork. Street bikes should have 28 to 33 percent of their total travel, which typically equates to 30 to 42 millimeters of sag. Road race bikes usually run 25 to 36 millimeters of sag.
+
+Methodology
+
+This method of checking sag takes friction into account and also allows you to check the condition of linkage and seals. The greater the difference between the measurements L2 and L3, or between the pushing down and pulling up, the worse the friction or “Stiction Zone.” A good low-friction rear suspension should have less than 3 millimeters difference. A bad system has more than 10 millimeters of difference between L2 and L3. Forks in good condition have less than 15 millimeters difference. Forks with more than 30 millimeters difference between the two measurements need to be carefully inspected and rebuilt.
+
+Figure 15.2
+Most cartridge forks have the rebound damping adjuster on the fork cap that can be adjusted with a small screwdriver. It will often be labeled with the letters “TEN” (tension) “R”, or “REB” (rebound). A few models, such as this 2010 Yamaha R1, newer FZ1s, many Moto Guzzis, and some others have one fork cap for compression labeled with a “COMP” or “C” (left cap) and the other for rebound (right cap). The preload is generally adjusted with a 12 to 14mm wrench.
+
+Using different sag amounts (within the acceptable 28 to 33 percent range) on the front and rear can have a noticeable effect on handling. More sag on the front or less sag on the rear will make the bike turn quicker. Less sag on the front or more sag on the rear will make the bike turn slower. See the Chassis Tuning chapter for information on improving handling with sag and ride height changes. Racers often use less sag to keep the bike higher off the ground for more ground clearance. Because road racers work with much heavier braking and steering forces than normally encountered on the street, they typically use stiffer spring rates and less preload.
+
+It’s important to stress that, when calculating sag, there is no magic or correct answer to the equation. You may like the feel of the bike with less or more sag than described in these guidelines. Just don’t exceed either by a large margin or you risk running out of ground clearance and/or sliding out. Your personal sag and front-to-rear sag bias will depend on several factors including type of riding, chassis geometry, track or road conditions, tire selection, and rider weight and preferences.
+
+Adjusting Rebound Damping
+
+For bikes with adjustable rebound damping, it’s a good idea to get a feel for the range of adjustment available. Beginning with the front suspension, start by counting the number of “clicks” for the current setting on both fork legs and write it down as a reference. Next, adjust the rebound to its lowest setting and push down as hard and fast as you can while holding the front brake. At the maximum amount of compression instantly relax your arms but keep the front brake applied. Pay attention to how fast the bike rebounds up. Now set the rebound to the highest setting and repeat. The difference between the two extremes should be felt as well as observed. Next adjust the rebound correctly.
+
+Ideally, the front suspension should rebound as quickly as possible and have just a slight “settle” as it returns to its free sag point. Free sag is the amount the bike compresses from fully extended under the bike weight only—without the rider on board. This is because the weight of the engine and fuel will always compress the front end a tiny amount, even without a rider.
+
+For the rear suspension, it should rebound as fast as possible but without the slightest bounce. Speed it up until it has the slightest bounce, then back it off 1 click to where the bounce disappears.
+
+Adjusting Compression Damping
+
+Because even the strongest riders can’t replicate the energy of a sharp-edged bump by pushing on the suspension, any adjustments will have to be done on actual roads by hitting real bumps. Figure 3.10 on page 45 demonstrates that the amount of compression damping that makes a rider feel the most in control on a smooth road is not the maximum traction point. That means to initially set up compression damping, you will want to adjust the compression to where you get the bike feeling the most in control, then start backing the compression off a little. Once you’ve done this, use the following troubleshooting section to fine-tune your settings.
+
+## Professional Troubleshooting
+
+In this section of the book I have compiled a list of common problems riders have with their suspension. These may be encountered on the street or track. To help understand the issues I have included diagrams that symbolize my best effort to replicate three-dimensional movement in two-dimensional space. There are three parts to the troubleshooting section: first is a quick pictorial overview of ideal suspension versus real-world expectations given current technology, second, a simple description of what happens at the extremes of possible suspension setup, and third, the common problems associated with forks and shocks on bikes.
+
+When going through possible solutions, they are listed in order of easiest or more likely and go toward less likely. For example, it might list an external adjuster change before an internal valving change. It’s a lot easier to change an adjuster than revalve internally, though the internal change might be far more likely.
+
+The professional Testing Procedure section on page 144 is presented after the Troubleshooting Scenarios. It is one of the most important parts of suspension setup. If you have a good testing procedure, you will be able to come up with good settings even as your depth of knowledge grows.
+
+Use the illustrations and information as a guide to fine-tuning your suspension and make sure to use the Testing Log on page 189 to keep track of your results. Using this guide will reduce the guesswork of achieving a perfect ride and help make suspension troubleshooting easier and fun.
+
+The ideal ride has perfect wheel contact on both the front and the back of the bump while the sprung mass maintains a perfectly level path. The best real-world suspension isn’t quite there, but this is the goal.
+
+DAMPING EXTREMES
+
+1. Too Much Rebound Damping (Packing)
+
+Figure 15.3
+
+The suspension is held down in the stroke because it cannot rebound fast enough and each bump causes additional compression. The ride becomes harsh because too much force is needed to initiate more movement. This also causes a loss of traction because of tire deflection.
+
+2. Too Little Rebound Damping (Pogoing)
+
+Figure 15.4
+
+In this scenario the suspension does not control the stored-up spring energy, which causes a pogo stick–like effect. The uncontrolled vertical movement can take the wheel off the ground and cause a loss of traction.
+
+3. Too Much Compression Damping (Harshness)
+
+Figure 15.5
+
+Here the suspension causes the wheel to deflect off the bump on impact because there is too much resistance to movement. This makes for a very harsh ride.
+
+4. Too Little Compression Damping (Bottoming)
+
+Figure 15.6
+
+The wheel moves past the crest of the bump during compression and is not able to follow the backside of the bump, causing a loss of traction. It feels mushy and can bottom easily.
+
+TROUBLESHOOTING SCENARIOS: FORKS
+
+1. Bottoms—Too Soft, Mushy
+
+Figure 15.7
+
+Ask questions:
+
+1. What kind of conditions? (G-outs, landing on jumps, face of jumps, etc.) We are determining whether the velocity is low or high.
+
+2. Does it feel good otherwise? (If yes, go to A)
+
+3. Does it feel too soft everywhere? (If yes, skip A, go to B and C)
+
+A. Oil level low—raise oil level—affects mostly the last 1/3 of travel
+
+B. Not enough low-speed compression damping
+
+C. Not enough high-speed compression damping
+
+D. Spring rate too soft
+
+E. Not enough preload
+
+F. Dirt in valving, broken valve, bent shim, burr on the piston/shim
+
+G. Cartridge rod bushing worn out (typical problem with pre-1996 KYB)
+
+H. Compression valve O-ring broken, especially if just rebuilt
+
+I. Cartridge rod not attached to cap—broken or unscrewed
+
+2. Too Stiff—Deflects, Harsh, Nervous, Twitchy
+
+Figure 15.8
+
+Ask question: Everywhere or just on square edges? (Just square-edged: see B and C)
+
+A. Too much compression damping adjustment—high-speed and/or low-speed
+
+B. Too much compression damping internally—change high-speed first, then low-speed
+
+C. Spring rate too stiff
+
+D. Too much low-speed rebound damping—packing
+
+E. Oil level too high
+
+F. See #9 (sticky forks)
+
+3. Poor Traction
+
+Figure 15.9
+
+A. Poor tire type/compound
+
+B. Too much tire pressure
+
+C. Tire pressure way too low
+
+D. Too much low-speed rebound damping
+
+E. Too much low-speed compression damping
+
+F. Not enough low-speed rebound damping
+
+G. Not enough low-speed compression damping
+
+H. Not enough weight on the front end
+
+1. Swingarm too short
+
+2. Rear axle moved up too far
+
+3. Seat too far back
+
+4. Bars too high or too far back
+
+I. See #5 (pushes, not enough trail)
+
+4. Doesn’t Turn
+
+Figure 15.10
+
+Note: This may be the most misunderstood and misdiagnosed fork symptom. It is quite often more a geometry issue than a suspension issue though these overlap. Ninety-nine percent of the time the tuner/rider drops the front end (raises the fork tubes in the triple clamps) in an attempt to cure this. His thinking is typically one of two things: either he’s trying to “weight the front end” or he is trying to decrease trail. Does dropping the front end weight the front end? Yes, but not so much as you’d notice it. This is a common misconception. As to decreasing the trail—the reason you’d want to decrease trail is because it is too difficult to turn the bars. If there is a lack of traction, you’d want to go the other way—increase the trail. Along with an increase in trail generally comes an increase in traction (grip). So, begin by asking the question:
+
+Do the bars turn easily or is it hard to turn the bars?
+
+If it is easy to turn the bars start with #3 (poor traction), then #5 (pushes)
+
+If it is hard to turn the bars go to #6 (excessive force required)
+
+A. Tire profiles too flat or too wide, rim too wide
+
+B. Riding Position—not enough weight on the front end
+
+1. Seat too low
+
+2. Bars too high
+
+C. Riding Style (not everything is the bike!)
+
+1. Rider doesn’t understand countersteering
+
+2. Not weighting the front end
+
+3. Elbow up riding style
+
+4. Sitting too far back, not weighting the front end—wrong for dirt and pavement
+
+5. Rider centerline to outside of bike centerline—wrong for pavement
+
+6. Steering with both arms—wrong for pavement (steering should be done with inside arm only)
+
+7. Not looking through turn
+
+8. Riding two-up—passenger not leaning with the bike
+
+9. Riding two-up—not enough weight on the front, too much on the rear
+
+10. Luggage added to the rear
+
+D. Wheelbase too long
+
+5. Pushes
+
+(Easy to turn the bars but the bike doesn’t turn, low traction), Steering Feels Loose, Chatters When Entering a Turn, Runs Wide Mid-Corner and Exit, Tucks (turns too quickly—this is not enough trail but not as severe as Pushing) Note: this is usually a chassis geometry problem—not enough trail
+
+A. Front end rides too low in comparison to the rear
+
+B. Raise the front end (slide fork tubes down in triple clamps)
+
+C. Lower the rear end
+
+D. Fork spring rate too soft
+
+E. Not enough fork spring preload
+
+F. Low-speed rebound too high, causing packing
+
+G. Not enough low-speed compression damping
+
+H. Increase low-speed compression damping adjustment or valving stack stiffness
+
+I. Anything that makes the rear higher than the front
+
+6. Takes excessive force to turn the bars, plenty of traction, doesn’t complete the turn
+
+Figure 15.10
+
+Note: this is a chassis geometry problem—too much trail
+
+A. Front end rides high dynamically in comparison to the rear
+
+B. Lower the front end (slide the fork tubes up in the triple clamps)
+
+C. Too much fork spring preload
+
+D. Spring rate too stiff
+
+E. Rear ride height too low
+
+F. Air pump—replace fork seals
+
+G. Anything that makes the rear lower than the front
+
+H. Too much low-speed compression damping
+
+I. Bars too narrow, uncomfortable bend
+
+J. See #9 (sticky forks)
+
+7. Dives Under Braking—(Steady State)
+
+Figure 15.12
+
+A. With telescopic forks it should! Linkage-type front ends may not dive or may even rise.
+
+B. On braking, the total dive is controlled by spring forces only (rate, preload and air slightly), not damping.
+
+C. Fork angle too flat (choppered), too much rake
+
+D. Fork springs too soft
+
+Note: Damping affects the rate of dive and “overshoot” but does not affect the front ride height after any appreciable length of time.
+
+E. Too much rear ride height
+
+1. Ride height adjuster too high
+
+2. Rear preload excessive
+
+8. Feels Loose
+
+Figure 15.13
+
+A. Not enough low-speed rebound damping
+
+B. Not enough high-speed rebound damping—big bumps only
+
+C. Not enough compression damping
+
+D. Spring rate too soft
+
+E. Steering bearings loose or worn
+
+F. Swingarm pivot or linkage bearings loose or worn
+
+G. Tire pressure too low or way too high
+
+H. Fork flex, chassis flex, swingarm flex
+
+I. Worn-out fluid
+
+J. Damping rod bushings worn out (pre-1996 KYB cartridge type forks)
+
+K. Worn-out rebound piston ring—very rare
+
+9. Sticky Forks
+
+Figure 15.14
+
+A. Misaligned fork tubes when viewed from the front (splayed out or wedged in)—axle clamp not centered (most common)
+
+B. Triple clamps bent
+
+C. Bent fork tubes
+
+D. Bent axle
+
+E. Dented sliders
+
+F. Upside-down forks with poor bushing design
+
+G. Outer tube anodizing worn through
+
+H. Air pump—replace seals, particularly at the lower triple clamp
+
+I. Seals not broken in or poor design (aftermarket)
+
+J. Seals not lubricated
+
+K. Poor quality oil
+
+L. Poorly designed fork brace or fork brace adjustment—right side up forks
+
+M. Triple clamp too tight—USD (upside-down) forks
+
+N. Misaligned fork tube height
+
+O. Forks not broken in—(twin-chamber)
+
+P. Bushings damaged from dent or worn out
+
+Q. Metal imbedded in bushings
+
+1. Preload washers not located properly—USD forks
+
+2. Aluminum preload washers
+
+3. Steel spring spacer directly on aluminum cap
+
+4. Bottom-out system needs chamfering—pre-1995 KYB cartridge forks
+
+5. Fork caps “shedding” on installation—burr on thread
+
+R. Cartridge rod bushing too tight
+
+S. Spring guide rubbing on inner diameter of spring/incorrect manufacturing or guide growing from soaking in solvent—USD forks
+
+T. Fork spring outer diameter too large—spring outer diameter grows during compression and can bind on inner diameter of fork tube
+
+10. Headshakes—(fast side-to-side movement of the bars)
+
+Figure 15.15
+
+A. Chassis not straight—twisted or offset
+
+B. Misalignment of wheels—chain adjuster marks are off
+
+C. Fork flex, chassis flex, swingarm flex
+
+D. Worn-out or loose steering bearing or binding dragging
+
+E. Not enough trail—not enough self-centering effect
+
+F. Too much trail—returns past center then re-corrects the other way quickly
+
+G. Oil level too high (street)—headshakes during braking
+
+H. Bottom-out mechanism too long or too abrupt (street)—headshakes during heavy braking
+
+I. Not enough low-speed rebound damping
+
+J. Too much rebound damping
+
+K. Too much high-speed compression damping—deflects on bumps
+
+L. Tire pressure too high or too low
+
+M. Poor tire compound or type
+
+N. Tire not mounted properly on rim, bent rim, or cord not straight
+
+O. Wheel out of balance—bent rim
+
+P. Brake rotor bent—headshakes during braking
+
+Q. Fork mounted fairing not aerodynamically balanced
+
+R. Any type of aerodynamic imbalance
+
+S. Anything that makes the front end lower than the rear decreases trail
+
+T. Too much steering swing inertia
+
+U. See #9 (sticky forks)
+
+V. Additional solutions
+
+1. Steering damper—GPR Performance has an excellent damper
+
+2. Tighten steering bearings so that they drag slightly—poor man’s steering damper
+
+11. Chatters (Patters)—(up and down wheel movement)
+
+Figure 15.16
+
+Note: This can be a vibrations/harmonics problem where the excitation (input) frequency matches the natural frequency of the suspended system. It is often confused with, and can cause, headshake.
+
+A. See #5 (pushes, not enough trail)
+
+B. Not enough rebound damping
+
+C. Not enough compression damping
+
+D. Change spring rates stiffer or softer to change natural frequency—start with stiffer
+
+E. Too much compression damping
+
+F. Too much rebound damping
+
+G. Tire pressure—too much or too little
+
+H. Tire design
+
+I. Chassis/swingarm flex
+
+J. Preload change—changes center of pressure height
+
+K. See #9 (sticky forks)
+
+12. Deflects on Square-Edged Bumps, Roots, Rocks, Expansion Joints, Square Holes, “Botts’ Dots”
+
+Figure 15.17
+
+A. Too much high-speed compression damping—either valving stack or piston orifice restriction
+
+B. Spring rate too stiff
+
+C. Too much preload
+
+D. Too much low-speed compression damping
+
+E. Too much low-speed rebound damping
+
+F. Way too soft and bottoms severely
+
+G. See #9 (sticky forks)
+
+13. Leaky Seals
+
+A. Old seals
+
+B. Nicks in tube
+
+C. Worn bushings
+
+D. Bent tube
+
+E. Improper installation
+
+F. Fork tube too smooth
+
+G. Excessive brake dust (sintered metallic pads)
+
+14. Front Tire Wear—Road Race
+
+A. Tire edge tear
+
+1. Improper tire pressure
+
+2. See #5—chassis geometry issue, not enough trail
+
+B. Tire center wear
+
+1. Too much tire pressure
+
+2. Front end chatter
+
+3. Tire out of balance
+
+4. Excessively stiff forks
+
+5. Improperly adjusted steering bearings
+
+6. Not enough turns on your way to work or exhibition of speed—too much drag racing on the way to the pub.
+
+TROUBLESHOOTING SCENARIOS: SHOCKS
+
+1. Kicks
+
+Figure 15.18
+
+Note: This is the most commonly misdiagnosed symptom on a dirt bike. This symptom is usually diagnosed as not enough rebound damping, however it is usually caused by one of two things: 1) it’s way too stiff or 2) it’s way too soft.
+
+Kicks #1—Too Stiff
+
+1. Too much high-speed compression damping
+
+2. Spring rate too stiff
+
+3. Way too much low-speed compression damping
+
+4. Too much rebound damping (not too little)
+
+5. Linkage bearings bad, tight, dry
+
+6. Too high tire pressure
+
+7. Way too much preload
+
+8. See #8 (sticky shock)
+
+Kicks #2—Too Soft Severe Bottoming (see #2, bottoms)
+
+2. Bottoms
+
+Figure 15.19
+
+A. Not enough low-speed compression damping
+
+B. Not enough high-speed compression damping (landing on jumps)
+
+C. Spring rate too soft
+
+D. Too much static sag
+
+E. Worn piston ring O-ring, piston ring, or body
+
+F. Suspension fluid worn out or poor quality (fades when shock heats up due to low viscosity index)
+
+G. Shaft seal blown
+
+H. Not enough nitrogen pressure, cavitation
+
+I. Blown bladder (usually caused by blown shaft seal)
+
+J. Bent or distorted valving shims
+
+3. Feels Loose/Shock Pumps
+
+Figure 15.20
+
+A. Not enough low-speed rebound damping
+
+B. Not enough high-speed rebound damping
+
+C. Not enough low-speed compression damping
+
+D. Spring rate too soft
+
+E. Too little preload
+
+4. Poor Traction
+
+Figure 15.21
+
+A. Too much low-speed rebound damping (main cause)
+
+B. Too much low-speed compression damping
+
+C. Not enough low-speed rebound damping (much too little)
+
+D. Not enough low-speed compression damping
+
+E. Too much tire pressure
+
+F. Poor tire type/compound
+
+G. Tire worn out
+
+H. Shock heim bearings worn out (loose)
+
+I. Linkage bearings worn out (loose)
+
+J. Spring rate too stiff
+
+K. Not enough swingarm angle—not enough anti-squat
+
+L. Too much swingarm angle—too much anti-squat
+
+M. Too much preload
+
+N. Too much rear ride height (adjuster too high)
+
+O. See #7 (sticky shock)
+
+5. Squats on Acceleration
+
+Figure 15.22
+
+A. Too little swingarm angle—not enough anti-squat
+
+B. Spring too soft
+
+C. Not enough preload (too much static sag)
+
+D. Countershaft sprocket too big—not enough anti-squat
+
+E. Rear sprocket too small—not enough anti-squat
+
+F. Compression damping too soft—changes rate of squat, not final amount of squat
+
+6. Not Tracking
+
+Figure 15.23
+
+A. Too much low-speed rebound damping—poor traction
+
+B. Too much high-speed compression damping—deflecting on square-edged bumps
+
+C. Too much low-speed compression damping—skating, poor traction
+
+D. Misaligned chassis
+
+E. See Forks #9 (sticky forks) and Shock #7 (sticky shock, front and rear)
+
+7. Sticky Shock
+
+Figure 15.24
+
+A. Linkage not maintained
+
+B. Swingarm bearings not maintained
+
+C. Shock eyelet bearings not lubed
+
+D. Floating brake rod or backing plate not lubed—common on vintage bikes with floating rear brake
+
+E. Missing or improper bearing spacers
+
+F. Bent shock shaft—usually caused by mounting bolt or clevis installed backwards
+
+8. Blown Shock Bladder
+
+A. Oil leak—shaft seal blown—caused by nicked or pitted shaft, hard-chrome worn through, old or worn-out seal
+
+B. Improperly rebuilt shock recently finished with way too little oil
+
+## TESTING PROCEDURE
+
+Because of the number of variables involved in suspension setup and the unique preferences of each rider, there is no one perfect setup for everyone. This is part of why testing is so critical. If you follow this procedure exactly and always use the testing log sheet in the appendix, you can make significant improvements in your bike’s suspension.
+
+Use this procedure on both practice and race days. The more detailed you are, the easier it will be to predict future needs when you switch locales. Remember that proper suspension setup is best achieved with a great rider/tuner team. The better your rapport and communication, the more effective you will be. If you are in the unfortunate situation of having to be both rider and tuner, go through the same process and do your best to keep an open mind.
+
+Here is a key question: when making a change does the rider feel the change or the percentage change? In other words, if you make a .5 kg/mm spring rate change, is that a lot or a little? The correct answer to this question is vital for proper suspension tuning whether it is spring, damping, or for that matter, friction. The answer is the rider feels the percentage change, not the change itself. If the original spring rate was 5kg/mm then a .5 change would be 10 percent—this is noticeable. If the original spring rate was 15kg/mm a .5 change would only be about a 3 percent change, which may not be noticeable at all. Studies have shown that the smallest change most humans can feel is 10 percent. I have found that some riders can feel as small as a 5 percent change. The point is you need to make a big enough change for riders to be able to tell. Too small a percentage change is worthless and confusing.
+
+As far as road racing is concerned, it is quite common to use up most of the fork travel during braking, but I suggest you should never bottom out metal to metal and never remove the bottom-out device. If you do there is no room for error, with the possibility of losing the front end. The rear, on the other hand, barely moves in relationship to the front. A properly set up rear end will not come close to using all the travel on most tracks.
+
+1. Before leaving for the track, record the initial settings on the testing log.
+
+2. Check and set static sag, free sag, and check your stiction zone. Remove excess friction before doing any testing.
+
+3. On the way to the track, or before, if possible, go over the testing procedure with the rider.
+
+4. It is often helpful to use last year’s bike for comparison.
+
+5. Once at the track have the rider do at least two 10-minute warm-up sessions without caring about suspension action. Have fun and get loose.
+
+6. Once the track is ready, ask the rider to do two or three laps, focusing on using the exact same lines every time and concentrating on the suspension action. Instruct the rider to ride cautiously, at 90 percent, not 100 percent. (Road racers should use tire warmers.)
+
+7. Record the rider’s initial feedback about what the bike is doing on the testing log. Ask him to decide which end of the bike is worse and start working on that end.
+
+8. Make one change at a time. This is a universal testing rule that most tuners know—and most tuners break.
+
+9. Do not tell the rider what changes you are making. If you do, you can rest assured that it will affect the results.
+
+10. Make big external changes first. Try to bracket the problem with external adjusters, but bear in mind that some adjusters don’t make much difference (particularly most original equipment shock compression adjusters).
+
+11. Record all changes and comments on the testing log in the appendix. You do not have to record all the settings at this point, just the changes. Lap times can be helpful for fine tuning, but do not rely on lap times, as too many factors affect them, including traffic and track conditions. Road race and supermoto tracks can change dramatically during the day, including wind conditions and track temperature. Be aware of the rider’s energy level.
+
+12. Have the rider test for two to three laps with each change, and no more. Any longer than this and the rider will start to make things up.
+
+13. Watch the bike on the track, taking note of the relative movement of the wheel and the chassis. The wheel should move up and down fairly quickly and the chassis should stay fairly even. Listen to the engine particularly as the rider goes over bumps. A more even rpm usually means less deflection.
+
+14. When the rider comes in, ask, “How was it?” Let him know it might be better in one area and worse in another. Let him know the change might not be big enough to tell. Avoid “leading questions” that might prompt an inaccurate response.
+
+15. If you would like to use a checklist to prompt the rider, you can use something like this:
+
+How was it on:
+
+• Square-edge bumps?
+
+• Plushness?
+
+• Traction?
+
+• Tracking straight?
+
+• Feeling of control?
+
+16. Get feedback on the symptoms, not the cause. What is it doing? Where?
+
+17. If the rider couldn’t tell, go back to the previous setting. (Sometimes the problem is very obvious when you go back to the previous setting.)
+
+18. Do your best to figure out the shaft velocity at which the problem occurs. Is it high-speed or low-speed? When making valving changes, change that part of the damping curve (A data acquisition system can be helpful here.)
+
+19. Double check the rider’s feedback by using an earlier setting to see if the feedback is consistent. Don’t tell the rider what you are doing.
+
+20. On the last test of the day, use the original settings (from the beginning of the day) to double-check your work. This one takes courage.
+
+Note: Take everything with a grain of salt. Don’t believe your eyes or your ears. Be willing to be wrong. Have fun!

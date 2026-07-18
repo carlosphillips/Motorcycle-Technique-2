@@ -1,0 +1,115 @@
+[part0014.xhtml] Chapter 8: Line Selection
+================================================================================
+Total Control
+
+## Chapter 8: Line Selection
+
+As motorcycles are single-track vehicles, meaning one tire is in front of the other and both follow the same track, they have the unique benefit of being able to alter their line through a curve. By precisely timing changes in our lane position, we can literally change the arc of the road and make it wider than it actually is. There is no perfect “line” or path of travel for every corner. Speed, road conditions, hazards, and rider skill each play a role in choosing which line to take in a particular turn. When conditions permit and there are no hazards, a good street line is described as an “outside-inside-outside” path of travel.
+
+Racers use this line on a track where conditions are very controlled to minimize the radius of the curve. By taking the straightest line through a curve, lean angle is reduced and traction is maximized. A good racer turns this extra traction into speed. On the street it is a good practice to use the same type of line, but at a lower speed, for the purpose of increasing our safety margin. The traction and ground clearance gained by taking this line will help to manage any hazards encountered.
+
+After training thousands of students, both street riders and racers, I discovered that there are three primary “line” related mistakes made when cornering. The negative consequence of all three is that it forces a wide exit on a curve. This is magnified with speed. Since most single vehicle motorcycle crashes on a curve involve a rider running wide at the exit correcting these three mistakes is critical. All can easily be corrected with a little knowledge and some self-evaluation.
+
+The first cornering problem is turning too soon. Not turning quickly enough at the entrance is the second problem. And the last problem is making numerous mid-turn corrections as you ride through the corner. I’ll discuss each of these common mistakes, errors made by both experienced and novice riders. I’ll also describe some effective lines to take given perfect conditions and will point out important line exceptions when alternative tactics must be employed.
+
+Premature Initiation
+
+Many riders grow anxious as they approach a turn. They worry about their corner entry speed, how hard to brake, and if their tires will have enough traction to see them through the turn. With all this going on inside their heads, and the corner getting closer and closer, it becomes difficult for them to wait for the appropriate time to begin the turn, and they end up initiating it prematurely or before the road curves (Figure 8.1). This is a very natural error to make because if we go straight longer it brings our line closer to the edge of the road and no one wants to get too close to that edge. We would all prefer a safety buffer from the curb, gravel shoulder, or whatever danger lurks off the side of the road. However, there are some significant benefits to delaying the turn point, and initiating the turn later.
+
+As discussed in the last chapter, it’s important to look through the turn before you enter it. This makes it even more difficult to wait for the appropriate time because your body naturally wants to go where your eyes are looking. It takes some practice to train yourself to keep going straight while you’re looking somewhere else, but it pays big dividends by the time you’re ready to exit the corner.
+
+Figure 8.1
+Premature Initiation
+The most common line selection mistake is turning too early. Not only does it restrict your ability to see around blind corners, but it forces you to run wide at the exit and limits what mid-corner corrections you can make.
+
+The good news is that by looking far through the corner, your perception of speed slows way down. This goes a long way toward reducing the anxiety you feel when approaching the turn. It also helps you relax and follow your intended line through the corner. If you look at the big picture instead of concentrating on one small area, you’ll be better able to see the entire turn and be able to consider all the possibilities for getting through it safely.
+
+Initiating too soon often happens when the rider fixates on the inside of the turn. As this “fixed” target gets closer, it is often incorrectly used as a reference point for initiating the turn. One consequence of taking a turn too early is that you will be committed to a line that takes you to the outside of the exit and leaves you little opportunity to change course mid-corner should the need arise. Turning in early forces you to the outside of the turn at the exit because you run out of room on the inside to get enough lean angle to make the turn. This means you will need to do a lot of turning after the apex of the turn, which commits you to full lean for the remainder of the turn all the way until your exit point. The apex is the part of the turn where you are closest to the inside of the curve. So an early turn point creates an early apex, which forces the line wide or requires a mid-corner steering correction.
+
+Additionally, if you are at the point of maximum lean angle and a mid-corner correction is required, you may run out of ground clearance and start scraping hard parts. This is especially serious on bikes with limited clearance, like cruisers or any bike coming in at a high rate of speed.
+
+Although a late turn-in certainly helps racers go faster around tracks, the technique is even more important in street riding. By covering more real estate before starting the actual turn, you get a better view around the corner before you decide on, and commit to, a line. As seen in Figure 8.1, your line of sight will offer a better angle to reveal things (especially in blind corners) like oncoming vehicles, things that might otherwise be discovered too late if evasive maneuvers are in order. As a general rule of thumb, it is always better to err on the side of a slow entry and faster exit than vice versa.
+
+Too high an entry speed usually causes a lot of mistakes to happen in rapid succession and can easily set off a series of events that can lead to a crash. Slowing your entry speed and going deeper into the turn will provide you with a better view of what is coming. Being able to see farther into the turn will allow you to initiate the right lean angle for the arc that you wish to carve through the entire corner and eliminate the need for any mid-turn corrections. If the corner has an increasing radius, you can get on the gas sooner and harder. If the corner has a decreasing radius, like the one shown in Figure 8.4, you still have time to adjust your plan for going through it.
+
+Figure 8.2
+Slow Steering
+Similar in its consequences to premature initiation, slow steering into a corner causes you to stay at maximum lean for an extended period of time. A quick steering input can get most of the turning done early in the corner, which allows for more line options at the exit.
+
+Slow Steering
+
+Slowly initiating a turn (Figure 8.2) when you are traveling at speed can have the same consequences as turning too soon. You risk going off the edge of the road at the exit without a second risky steering input. Slow steering does not refer to how fast you are going through a corner, but rather that the time it takes to get from full-upright to full-lean is too long. By full lean, I don’t mean the maximum lean angle that the bike can achieve, but the amount of the lean angle that the bike needs to negotiate the turn at the speed that it’s going. This causes too much time to be spent in what we call the “danger zone” of full lean, and forces the rider to the outside of the turn. It’s called the danger zone because this is the time we as motorcyclists are the most vulnerable. For this reason, we always want to minimize the amount of time we spend leaned over in the danger zone, and the number of times we get into the danger zone.
+
+Quick steering feels very awkward until you have lots of practice doing it. Many riders fear that their motorcycles will slide out from under them if pitched over with too much force into a corner. But, with the exception of slippery conditions like rain or gravel, it is extremely rare for someone to crash a bike by simply steering too quickly into a turn. This is even true of most cruisers, whose lack of ground clearance is the limiting factor in cornering speed.
+
+Turning quickly will also allow you to get back on the throttle sooner, which will help stabilize the chassis during cornering. By looking through the turn and quickly steering at the correct point on the road, you not only get the hard work out of the way sooner, but you also buy yourself time to change your intended line based on conditions.
+
+Fifty Pencing
+
+“Fifty pencing” is the term British motorcyclists use for making too many mid-corner directional changes (Figure 8.3). This is because the polygonal shape of a fifty-pence coin, with its multiple flat edges, resembles the path some riders take while traveling through a turn.
+
+Fifty pencing is a very telling sign of a beginning rider at work. A beginner doesn’t have enough experience to know how far the bike needs to be turned in order to complete a corner, so he keeps making corrections as he realizes his initial input was insufficient. A new rider often forgets to look through the turn to see where he needs to finish. By only looking where he is going to be in the next second, he will tend to steer toward that imaginary point in the corner. When he looks up, he’ll realize that he still needs to turn more to get through the corner. Therefore, he’ll initiate another correction, but again will only look at the next immediate point in the turn. He’ll find himself in the middle of an inaccurate and inefficient process.
+
+The English 50-pence coin has a multi-faceted design, which is the inspiration for the multiple-turn-points line negatively referred to as “fifty pencing.” This particular coin is from the Isle of Man and celebrates the famed Isle of Man TT race.
+
+Generally, beginners are not comfortable enough to exert the necessary turning amount all at once. Of course, plenty of experienced riders share some of these same problems to a lesser degree. One problem with fifty pencing is if you’re looking just a little bit in front of you, you are not looking down the road where the real potential hazards may be hiding.
+
+If you are having fifty-pencing problems, keep your head up. There’s no need to look at the ground—it will still be there after you complete the turn! Instead, look as far into the turn as possible. When doing so, all the imaginary turning points in your head will vanish. Upon seeing the big picture, it will be much easier to plan and follow a single arc through the corner. As an added bonus, you’ll be able to see what’s in store up ahead so you’ll be prepared. Remember that motorcycling, just like any other sport, is a numbers game. If you increase your chances of making a mistake, by about 500 percent in Figure 8.3, believe me your number is going to come up a lot sooner rather than later. Additionally, every time a new steering correction is made this puts the rider once again into the danger zone and forces the rider to the outside of the turn.
+
+Figure 8.3
+Fifty Pencing
+Having multiple mid-corner steering corrections is the mark of a beginning rider or a badly misjudged corner. It is usually caused by not looking far enough through the turn.
+
+Arc = Speed
+
+There isn’t a perfect line that works best for everyone in a given turn, but there is an “ideal” to think about when choosing your line. One of the most important things to commit to memory is the equation “Arc = Speed.” The arc, or radius of a specific turning line, is directly proportional to the amount of speed you can carry through it. In other words, the greater the arc, the faster you can travel. An arc, by definition, is still a turn. However, by eliminating the three bad habits that I mentioned earlier, you can widen your arc through any turn, thereby allowing yourself more speed, a greater margin of safety, or both.
+
+Stayin’ Safe Advanced Rider Training’s Eric Trow teaches students about line selection in one of his “chalk talks.” On-street training is one of the best ways to learn safe riding strategies.
+
+By delaying your entry point and countersteering quickly to get the bike to maximum lean as rapidly as possible, you will effectively “straighten” the turn as seen in the illustrations. Every time you make a steering input, you add some degree of risk. As a result, it’s best to minimize the total number of inputs in any given turn. As you travel through the turn, applying throttle will stabilize the suspension. As the turn opens up you can add throttle as you countersteer out of it to help to straighten the bike up and increase your exit speed. Another consequence of using a quick initial turn-in is that the length of time you must lean over will be minimized.
+
+Because every turn requires a specific amount of steering to complete, the longer it takes to do the requisite amount of steering, the more time you will spend leaning over. The more lean angle you have, the less stable the bike becomes and the worse it handles. Getting off the gas or braking while at a high lean angle will cause the bike to straighten up and run wide in the turn. These actions, combined with too much speed, are the precursors of a crash.
+
+Creating the ideal line through a turn starts with the choice of a turning point. This is the position or placement on the road where you initiate the turn by countersteering. Choosing a turning point every time you approach a turn is better than waiting for one to be forced on you either by too much speed or by not being able to see far enough into a corner. By planning ahead, you stay in control of the bike.
+
+Racetrack-based training like the Total Control Track Clinic often uses cones to help riders pick good entry, apex, and exit points. This allows students to “connect the dots” for a perfect line every time. Here the apex of turn 10 at Horsethief Mile is designated by a cone featuring that number. Numbered cones help students remember particular points on the track when receiving feedback from the instructors.
+
+Figure 8.4
+Decreasing Radius Turn
+The dreaded decreasing radius turn can bite even an experienced rider if he didn’t have plenty of lean angle in reserve. With a delayed entry, it can be safely completed with only one turning point. In the case of blind corners, if you don’t know if it is a decreasing radius, you can take either path shown but at a significantly lower speed.
+
+Because of the repetitive nature of a racetrack, turns are somewhat easier to predict. However, when navigating a curving mountain road, your turning points will be less exact than those on the track. This doesn’t mean that they should be vague. Rather, they should be specifically selected for the road conditions, your speed, and the perceived arc of the approaching turn.
+
+Locating good turning points is a skill that requires some trial-and-error and practice at slower speeds. Heading up an unfamiliar canyon road is not the best time to start experimenting with different kinds of turning points. Selecting a turning point will also teach you to avoid slow steering inputs that use up valuable real estate within a corner. Even if your decision ends up being less than ideal, choosing a turning point is always a better plan than not choosing one because it also helps keep you out of the reptile part of the brain where fear resides (see Chapter 4: Fear).
+
+Real World Lines
+
+Ideal lines are most commonly found on a racetrack. On the street, reality rules, and it offers up a variety of distractions and hazards that motorcyclists have to confront. Even roads that you are familiar with are subject to constant and unexpected change. You must be prepared for coming around a blind turn only to find loose gravel, a newly developed pothole, a car partially blocking your lane, or anything else that forces you to have to rethink your chosen line.
+
+In street riding, it’s always best to expect the unexpected. To keep from ending up in the hospital, or worse, you must have some line options in reserve. If you have too much entry speed, you’re committed to your maximum lean angle and hard parts are potentially dragging on the road. This severely limits safe directional changes because if any hazard pops up just out of your line of sight, you may not have any ground clearance and traction left to handle it.
+
+Figure 8.5
+Double Apex Turn
+Corners that require two or more apexes to navigate come in many shapes and sizes. The key is to plan as far ahead as possible in picking your turn points, before necessity forces them on you when you least expect it.
+
+Using a slower corner entry speed will allow you to safely make a mid-corner steering correction to the outside of the turn. This will also leave some lean angle in reserve so you can make steering adjustments to the inside of the corner. Committing to maximum lean angle and using high entry speeds to get you through a turn in the fastest possible time are practices best left for the track.
+
+Other Types of Turns
+
+In the real world, there are many tricky turns that require a deeper understanding of riding procedure if you want to effectively negotiate them. One of the most difficult types is a decreasing radius turn (Figure 8.4). When entering a blind turn on the street, there is always the possibility that the turn will tighten up. Two riding practices will help in negotiating this type of turn: using slower entry speeds and choosing deeper turning points.
+
+As a rule of thumb, if you are traveling through a turn and the inside and outside lines of the road appear to be coming together, this means that the radius is decreasing. If the inside and outside lines start to separate, the turn is beginning to straighten out. This signifies that the radius is increasing, and you will be able to open the throttle earlier and harder.
+
+Another non-standard type of turn is one that requires a double apex (Figure 8.5). A double apex turn, by definition, will require at least one mid-turn correction. You can readjust your line of travel by increasing pressure on the inside handlebar or by initiating a slight rolling off of the throttle. If you have to use a lot of brakes, it is probably a result of either too much entry speed or a blind turn where you did not leave enough reserve lean angle for the unexpected.
+
+Practicing Lines
+
+You can always learn something about the best line through a turn by just riding through it. But speeding up your learning curve will only happen if you take a more deliberate approach. The safest and cheapest method is to set up cones in a vacant parking lot that has good traction. By trying several different turn points and lines through your practice turn, you will quickly see what works best for your type of motorcycle and riding style. Use cones to mark brake on and off points and to indicate where to get back on the throttle. Practicing the same turn at different speeds will help you find your weaknesses and give you specific skills to address.
+
+Figure 8.6
+Linked Turns
+Multiple linked turns can be the most challenging for line selection because you have to think more than one turn ahead. A mistake on the initial turn gets amplified with each successive turn.
+
+Choosing a proper line requires mental preparation and a good view of where you’re about to turn. While it can be scary to be close to the outside of the road so deep into a turn, the resulting line provides a much greater safety margin overall.
+
+Start with a turn that has a constant radius and practice using only one steering input. After you feel comfortable with the “standard” turn, set one up with a decreasing radius or double apex. Start at slower speeds and experiment using several turn points until you feel comfortable. Try increasing your corner entry speeds gradually using the same turn points but adding a quicker steering input to compensate for the higher speed. These skills can be easily transferred to the street, and, if you can find an interesting turn without too much traffic, try placing cones on the side of the road to mark reference points for turning and braking. Having one or more of your riding buddies along will help you with feedback as others can often see what you are doing wrong and will be able to offer suggestions. This is the same process we use in the Total Control Advanced Riding Clinics, with the advantage of professional instructors to coach you through scientifically designed exercises.

@@ -1,0 +1,289 @@
+[part0007.xhtml] Section 1: Chassis Dynamics
+================================================================================
+Total Control
+
+## Chapter 1: Traction
+
+Riding a motorcycle is really an exercise in traction management. The purpose of nearly every skill discussed in this book is to maximize available traction and use the limited amounts available on a motorcycle effectively. In order to do that, it’s important to first understand what traction is and how it works. Many things affect traction; some are obvious, many are not.
+
+## TIRES
+
+Tires are the most critical part of the motorcycle because, in very simple terms, tires are friction providers. They generate friction by complying with the surface of the road to provide a “contact patch.” A contact patch occurs when the bottom of a tire flattens as it contacts the road, forming a somewhat elliptical pattern. Larger and softer tires provide a larger contact patch and greater friction. The rubber on a tire also conforms to the small peaks and valleys of the road’s surface, creating a series of microscopic interlocking “teeth” that hold the motorcycle to the road.
+
+Pressure
+
+Having an accurate tire gauge, like this one manufactured domestically by Lee Parks Design, is critical to proper tire life and traction. This particular gauge is hand tested to be within +/- 1 lb. and has information on reading dates codes on the sidewall of the tire printed on it. While dial gauges can be very accurate, they can also be easily thrown out of adjustment if they are dropped or bumped around in a toolbox. To see if your gauges are accurate, bring them to the races and ask one of the race tire vendors to check it against theirs, which are regularly calibrated and stored in protective cases.
+
+There are several factors affecting the contact patch and, ultimately, traction. Tire pressure determines how much the tire will flatten out as it contacts the road. Wide, flexible-construction tires with low air pressure generate bigger contact patches and greater friction than narrow, stiff tires with high air pressure. In some forms of competition, like observed trials and drag racing, tires are inflated to very low pressures to maximize the size of the contact patch and traction. These pressures only work there because there are no high-speed turns involved that require stiffer sidewalls.
+
+It should be noted that tire pressure is a compromise. If you have a little less pressure than stock, your weight causes the tire to deflect more, giving you a bigger contact patch. This will provide more traction but at the cost of some longevity. Conversely, a little more air pressure causes the contact patch to shrink, which gives you better tire mileage, but at a cost of some of the tire’s potential traction. Of course, at either extreme the tire can become dangerous so it’s important to always know what your tire pressure should be and keep it within a few pounds of the recommended range. On the previous page is a chart with some baseline settings. Move to the lower end for performance, the higher end for longevity. Keep in mind that tire technology is always changing so check with the manufacturer of your specific tires to get the current best practices for pressure.
+Figure 1.1
+
+General Street Tire Pressure Guidelines
+
+Standard/Sport/Sport Touring (radial & bias)*
+
+Front
+
+80/90
+
+Solo
+
+32–34
+
+2 up light
+
+32–34
+
+2 up heavy
+
+34-36
+
+Front
+
+100/80
+
+Solo
+
+32–34
+
+2 up light
+
+34–35
+
+2 up heavy
+
+35–36
+
+Front
+
+110/70–120/90
+
+Solo
+
+34–36
+
+2 up light
+
+36–38
+
+2 up heavy
+
+36–38
+
+Front
+
+130/60–150/80
+
+Solo
+
+34–36
+
+2 up light
+
+36–38
+
+2 up heavy
+
+38–40
+
+Rear
+
+100/90–110/90
+
+Solo
+
+34–36
+
+2 up light
+
+36–38
+
+2 up heavy
+
+38–40
+
+Rear
+
+120/80–130/90
+
+Solo
+
+36–38
+
+2 up light
+
+38–40
+
+2 up heavy
+
+40–42
+
+Rear
+
+140/70–200/50
+
+Solo
+
+36–40
+
+2 up light
+
+38–42
+
+2 up heavy
+
+40–42
+
+*Racing/Track days/Advanced riding schools should subtract 4–6 lbs. from above.
+
+Full-dress Touring Tires with reinforced construction
+
+Front
+
+Solo
+
+38–40
+
+2 up light
+
+40–41
+
+2 up heavy
+
+42–43
+
+Rear
+
+Solo
+
+44
+
+2 up light
+
+46
+
+2 up heavy
+
+48–50
+
+The problem with running a low-pressure tire is that the load capacity of the tire is reduced, and the internal friction of the tire is increased, generating heat. This causes the tire temperature to rise, sometimes to dangerous levels. Road racers use small increases in tire pressure, as little as a half a pound at a time, to adjust the temperature of a tire. For street riding, it is very important not to stray too far from the manufacturers’ recommended tire pressures as tires have been designed to provide the correct amount of contact patch and flexing at a given load and pressure.
+
+Temperature
+
+The temperature of a tire also helps determine the amount of traction it will provide. As a tire gets hotter, the rubber becomes more compliant and has a greater ability to interlock with the tarmac, providing greater traction. This increased traction continues until the rubber exceeds its design temperature and begins to degrade. At this point, the tire may begin to leach oil, or its tread may separate from the carcass, or worse yet, both conditions may occur simultaneously. How many times have you heard a racer in an interview say his tires got “greasy” or “blistered?” What he’s really saying is that his tires got too hot.
+
+Racers and track day riders use tire warmers like these from Chicken Hawk Racing to “preheat” their tires before heading out on the track. This is because racing tires are designed to work at extremely high temperatures and they can actually have less traction than street tires at lower temperatures.
+
+Conversely, when tires are cold, the rubber becomes hard and doesn’t conform to the peaks and valleys of the road surface as well as when the tires are warm, significantly reducing grip. This is especially true of race compound tires. Pushing too hard on cold tires has caused me and nearly every racer I know to crash. It’s also been responsible for a lot of crashes on the street, especially when street bikes are equipped with DOT race tires, which are race-compound tires that have been cut with a tread so that they meet the minimum standards of the Department of Transportation for street use. This does not mean they are a good choice on the street. To the contrary, they not only make poor choices for the street, many track day riders who are not in the “fast group” actually get better traction out of street compound tires on the track because they cannot get the racing tires up to their optimum temperature. Current street tires achieve their maximum grip at a much lower temperature than race tires, which must be extremely hot to be at their best. This is why roadracers use tire warmers to “preheat” their tires before that first lap on the track. You’ll also notice both car and motorcycle roadracers swerving back and forth (scrubbing) on the warm-up lap to add additional heat by way of internal belt flexing of the tires.
+
+Compound
+
+Tires range in compound from super-sticky “qualifying” race tires to rock-like touring tires that provide extra-long life. What is not obvious, however, is that the compound and compliance of a tire changes with time. As tires are heated and cooled from riding and parking, they become harder. Racers refer to this process as a “heat cycle,” and it is especially pronounced with soft racing tires, which are only optimized for 6–7 heat cycles before they lose a significant amount of possible traction. This is also why racers put tire warmers back on their bikes as soon as they come off the track. If they can keep the tires warm all day without letting them cool down, the tires will have only gone through one heat cycle even though it was several times on and off the track. That way they can get more than one day or weekend out of a set of tires.
+
+Figure 1.2
+Gaining popularity these days are multiple compound tires. These “best-of-both-worlds” designs use a harder compound in the middle for better mileage and softer compounds on the edges for maximum grip at high lean angles.
+
+Age
+
+Tires also become harder by just sitting in a warehouse or garage. This is something to keep in mind when those cheap, closeout tires in the magazine ads tempt you. Those tires may be fine, but then again they may have sat in a warehouse for so long that they’ve metaphorically turned to stone. It’s best to think of tires, much like the produce at your local grocery store, as a perishable item. From the moment they’re “born” they start to go bad—just like those brown bananas. This is also known as dry rot and at its extremes can cause the tire to crack or even fail. Fortunately, tire manufacturers put a manufacturing date on every tire to let you know its age. Unfortunately, they put it in code, and they never tell you how to read the code. So let’s understand how to read the code so you can figure out the age of any tire.
+
+All tires sold for street use in North America have a four-digit code after a bunch of letters and numbers starting with the letters DOT on the tire’s sidewall as shown. DOT stands for Department of Transportation. The first two digits are the week that the tire was manufactured and the last two indicate the year. For example, the number 3214 would mean that the tire was made in the 32nd week of 2014. As a general rule, tires used on a sportbike are good for about two years from the date of manufacture, sport-touring tires are good for three years, and touring and cruising tires are good for around four years. The reason cruiser and touring tires are good for longer than sportbike tires is because those bikes are ground-clearance limited as opposed to traction limited. In other words, those bikes will start dragging hard parts long before the tires run out of traction, so they can afford to be a little older (read harder) and still have an adequate amount of traction available given the limits imposed by their restricted ground clearance.
+
+Figure 1.3
+Here’s how to “crack the code” of all those numbers and letters on your tire’s sidewall. Most importantly, the last four digits in the oval represent when the tire was manufactured.
+
+Size
+
+Perhaps the most confusing part of tires is sizing. And the tire manufacturers don’t do us any favors by having very little consistency from one tire to the next with regards to their specifications. The first thing we need to understand, therefore, is how to read the tire codes on the sidewall of the tire. The first number, in this case 160, is the approximate width in millimeters of the part of the tire that potentially touches the ground. Manufacturers are permitted approximately a 5 percent variance from standard so one manufacturer’s 150 might actually be wider than another’s 160. The shape, or profile, of the tire will also affect the total width of the tire. For instance, supermoto tires have very tall shapes, which means that they can get more usable rubber on the ground at full lean and still fit in the narrow confines of a moto-x swingarm.
+
+The second number is the aspect ratio. In other words, what percentage of the width that we just specified is taken up with the height or sidewall of the tire. In this case the tire’s height is 60 percent of 160mm. As an example the tuner-type street-racer cars that look like they have thin little rubber bands for tires, have a very low aspect ratio. By contrast, tractors use very high aspect ratio tires. It should be noted that, generally speaking, lower aspect ratio tires have comparatively better grip, but when they reach their maximum adhesion, they begin to slide out more rapidly.
+
+Figure 1.4
+The only thing that is missing from the tire size code is the rim width, and that is critical information.
+
+Higher ratio tires are, therefore, more forgiving when they begin to slide.
+
+Unfortunately when a bike is at its maximum lean angle, the suspension is angled in the worst position to deal with the vertical loads of bumps and dips. This is why MotoGP bikes that achieve the highest lean angles need slightly more sidewall flex to act as a secondary suspension system. They are typically in the 60 percent–65 percent aspect ratio range, whereas some race cars have incredibly low aspect ratios in the 30 percent–40 percent range.
+
+The first letter represents the speed rating of the tires, or the maximum safe operation speed. In our example a V rating is good for 149 mph. Regardless of what kind of bike you ride or how fast you ride it, you always want to make sure the tires are rated for at least the top speed your motorcycle is capable of, even if you never ride it at that speed. It’s worth noting that in Germany, for example, it is considered a serious crime to get caught riding faster than the speed rating of your tires. In other words, you can legally ride 150 mph on the Autobahn, but you better not do it on H rated (130 mph) tires. Other popular speed ratings include S (112 mph), and W (150+ mph).
+
+The next letter “R” means radial. Most bikes use radials nowadays, though some cruisers and tourers still use belted-bias tires and will have a letter B instead. The last number, in this case 17, represents the rim diameter in inches.
+
+Unfortunately tire-sizing codes on the sidewall of the tire don’t specify which rim width a particular tire was designed for. As an example I’ve seen some 160/60-17 tires made for 4.0-inch-wide rims and others made for up to 5.5-inch-wide rims. They all say the same thing on the sidewall, but very bad things happen when you put, say, a tire made for a 4.5-inch-wide rim on a 5.5-inch-wide rim. You can get it to fit, but now the profile of the tire has been flattened out to the degree that you can literally run right off of the edge of the tire. Just as bad, and much more common, is putting a tire made for say a 5.0 inch rim on a 4.5 inch rim such as in the picture on page 19. You can squeeze it on the rim, but now the far edges of the tire can’t be used for traction. In either case, when one tire is a significantly different shape than the other, wobbles and weaves can result as the speeds increase, creating a very dangerous situation.
+
+An all-too-common problem with tire sizing is knowing what rim width is appropriate. In the example above, rider Frank on his SV650 is achieving impressive lean angles with a stock-sized 160/60VR17 tire mounted on the rear. Or is it? This particular tire was sold by a reputable company, but the employees didn’t realize it was designed specifically for a 5.0 inch rim. When put on the 4.5 inch stock rim, it became so pinched that the “chicken strips,” the part of the tire that hasn’t been used yet, were angled to the point where the bike would literally have to be crashed for them to touch the ground. This means that at the point of maximum lean, the contact patch becomes dangerously small. See Figure 1.5.
+
+Even tire size recommendations from motorcycle manufacturers can be problematic because different brands of tires may not meet the requirements of the specific bike and riding conditions. For example; there are lots of tires of the correct size that will fit a Suzuki Hayabusa or Kawasaki ZX-14, but how many of those have the correct speed rating for that bike? Another example is a Gold Wing or Electra-Glide. Again there are multiple tires that have the correct size, but the right tire would also have to have the correct load rating for the weight of a fully loaded dresser. To avoid these types of issues, always follow the tire manufacturers’ recommendations when it comes to selecting tires for your motorcycle. The tire manufacturers do a lot of testing and won’t recommend a particular tire for your bike until they are sure it will work safely.
+
+Of course, if traction were the only consideration in choosing tires, the best tires would be the biggest ones on very wide rims. As we’ve seen, the size of the tires affects not only traction, but handling as well. As you put larger tire/wheel combinations on a motorcycle, the traction will increase. However, the ease of steering will decrease. The correct tire sizes provide the best compromise between traction and handling. Keep in mind that the tire size that provides the best handling isn’t always the same size as the stock size. Sometimes manufacturers mount rear tires that are too wide for stylistic reasons—fat rear tires look cool. For example, some sportbikes that come with 190 mm-wide tires can actually handle better with a 180mm, provided it’s designed to work on the same width rim. Similarly any cruiser that has tires in excess of 200 mm wide is surely sacrificing some handling for aesthetics.
+
+Profile
+
+Just as important as the correct size is choosing an appropriate tire profile. It is not only important for traction, but can significantly affect the way your bike handles. If you’ve ever tried different brands or models of tire on the same bike, you know how differently each one can feel. At the risk of oversimplifying profiles, there are two basic shapes that tires fall into: Round and V-shaped (see Figure 1.6 on page 21).
+
+These profiles are available on virtually all types of tires from touring to racing. As you might imagine, round-shaped profiles are very consistent from side to side and often very confidence-inspiring because they turn predictably. V-shaped profiles, by contrast, make the same bike turn in quicker, and have a larger contact patch for more traction at full lean. There is no perfect profile but you will absolutely prefer one profile to another on a particular bike.
+
+You can use your choice of profile to help improve the way your bike handles. For instance, if your bike feels too twitchy and nervous, a more rounded-profile tire will help slow things down and stabilize the chassis. Conversely, if your motorcycle is a little sluggish and slow to turn in, a V-shaped profile will help speed things up and make it physically easier to turn. Online forums are a good starting point to gauge how a particular tire profile affects a particular bike. Remember that things like suspension setup and chassis geometry changes like ride height are all interconnected with tire choices, and each will affect the other in terms of overall handling.
+
+Figure 1.5
+Notice how the same tire on three different rim widths has very different sized contact patches. On a too-narrow rim (top) only part of the tire’s width can be effectively used and the contact patch shrinks. The correct rim size (middle) maximizes the size and placement of the contact patch resulting in the most traction possible. A too-wide rim (bottom) forces the contact patch to be tiny at high lean angles and may prevent the tire’s bead from properly seating, possibly causing slippage or air leakage. For the same reasons, automotive tires should never be used on two- or three-wheeled motorcycles that lean.
+
+The profile of a tire also determines how much traction will be available at specific lean angles. For instance, a tire with a rounded profile will have relatively equal amounts of traction at any lean angle. On the other hand, a tire with a more triangular profile will have less traction when it is on the pointy part of the tire during acceleration, but more traction in the corners when it is at full lean.
+
+One bad thing about motorcycle tires is they do not wear evenly across the surface. If you ride primarily on highways, you will wear out the center of the tires faster than the edges. If you ride on the track or aggressively in the twisties, you will wear out the tires’ edges first. Because of this uneven wear, a tire’s profile changes over time, adversely affecting traction and handling.
+
+Tread
+
+Tires all have different tread patterns to help with traction in different conditions.
+
+The purpose of the tread pattern is to both help tires heat up as well as displace water, dust, and small debris in the road. What actually gives tires traction, however, is the friction created when the rubber touches the ground. Therefore, the more rubber, the more traction. This is why road race and drag race bikes use tires called “slicks,” which have no tread at all, to maximize the surface area of the rubber on the road. Unfortunately, all the rules change when there is a bunch of water or dust on the road. The water needs to get out of the way to keep the bike from aquaplaning on top of it. The water is channeled into the tread so the tire can touch the ground and maintain traction. The worse the conditions, the more tread you want. The better the conditions, the less tread. This is why cruiser and touring tires that will often see more adverse conditions have more tread versus the “fair-weather” designed tires of sportbikes that are optimized for maximum traction in the dry. Interestingly, road racing tires made just for wet weather have even more tread than touring tires, but are so soft to create traction that they will literally self-destruct if ridden in the dry for more than 20 minutes.
+
+Figure 1.6
+Tire profiles can significantly alter the way your bike handles. Shown are two current Bridgestone DOT racing tires (R10R on the left and 003R on the right) with rounded and triangular profiles, respectively. Racers choose the best shape for them depending on the bike they are on or the track they are at.
+
+## Road and Weather Conditions
+
+The condition of the road is just as important as the tires when determining the amount of traction. Surface hazards like water, dust, oil, cracks, or painted lines can drastically reduce traction. When encountering such obstacles, some tires are more forgiving than others as we just discussed. It is also important to note that traction varies depending on the type of pavement used on a road’s surface. Asphalt generally provides better traction than concrete, but that can change depending on the surface texture. For example, I’ve ridden on polished concrete that was slipperier than dirt. I’ve also raced on “grated” concrete that stuck like glue but wore out tires at twice the rate of asphalt. Similarly the weather can have a huge impact on traction with rain, snow, and wind, the usual culprits. The ambient and road temperatures equally play into the traction mix.
+
+Three different types of tires have unique tread patterns. Sportbike tires (left) have minimal tread for optimum traction at the limit on dry days. Dual-sport tires have large groves in them to help “bite” into dirt (middle). Touring tires have lots of tread to help displace water and other debris on the road in adverse conditions.
+
+Figure 1.7
+Tread in a tire allows the rubber to cut through water and small debris on the road. Racing “slicks” begin to aquaplane on top of the water, which is why they are used only in dry conditions.
+
+## Suspension
+
+The condition, quality, and tuning of your suspension have a profound impact on the available traction, as well. In fact, the suspension system’s most important job isn’t isolating you from the bumps in the road, it’s keeping the tires firmly on the tarmac by applying even pressure at all times. If there is too little pressure, the friction coefficient will be insufficient to maintain traction. Conversely, if there is too much pressure, the rubber can tear away from the tire causing a skid.
+
+If the suspension is improperly maintained or tuned (see Chapter 15: Suspension Setup), the wheels will move up and down too fast or slow to keep steady pressure on the constantly changing road surface. This can easily lead to a loss of contact with the pavement. No matter how good your tires are, if they don’t touch the pavement, they won’t provide any grip.
+
+## Traction Pie
+
+Not only must you be concerned about the amount of traction available, you must also be able to manage it well. In order to understand this concept better, imagine that traction is a sliced pie, and there are several outside forces (Acceleration, Deceleration, and Cornering) constantly vying for their share. Let’s say that we have 10 slices of available traction in our pie. If you let Cornering have all 10 slices you will have none left for Acceleration and Deceleration. That might be OK assuming you don’t need Deceleration’s services. Of course, if you give eight slices of pie to Cornering and attempt to have Deceleration stop you in a hurry, you may run out of pie and fall. The moral of the story is to always keep some spare pie for any unexpected guests.
+
+## Decelerating
+
+Tires generally produce more grip as the load on them increases. This is why the front brake is so important, especially on a sportbike. The weight carried by the front wheel increases as you decelerate. Shorter wheelbases and higher centers of gravity make this effect more pronounced. Because the weight carried by the front wheel increases under braking, more front brake can be used than would be possible without the weight transfer. As a result, the rear brake on most sportbikes becomes useless under hard braking as the rear wheel lightly skims over—or even lifts completely off—the ground.
+
+## Cornering
+
+Things get a little more complicated when cornering is involved. During hard turns, Cornering demands a large share of the pie. If you need to speed up or slow down quickly, you must make sure Cornering has left enough pie to share with Acceleration or Deceleration or you will run out of pie, which of course means you will soon become intimate with Road Surface.
+
+It’s actually possible to lose control of the front end of the bike when taking a corner. This can occur when you suddenly close the throttle, perhaps as a result of fear. As you close the throttle, the engine acts as a brake (this is called compression braking), slowing the rear wheel, which causes the motorcycle to pitch forward. The front wheel now has more weight pressing down on it. Normally that would provide increased traction, but in this situation, the front wheel must also support a larger portion of the cornering load. Unfortunately the increase in traction from the greater pressure is less than the additional cornering load put on the tire. This results in a net loss of traction, which can cause the front tire to wash out. Put another way, the front tire’s appetite becomes bigger than the amount of pie available. Too much trail braking (see Chapter 11: Braking) has a similar effect.
+
+Figure 1.8
+The three basic forces we put into a bike are always trying to use up the finite amount of traction available. Learning how to balance them is key to achieving Total Control.
+
+## Accelerating
+
+When you accelerate, weight is transferred from the front wheel to the rear. If the weight transfers quickly enough, the front wheelies off the ground as witnessed in many forms of motorsports. When accelerating out of a corner (especially a slower one) with a powerful sportbike, it is easy to use the throttle to ask for more pie than is available. When this happens, the rear wheel “spins up,” and the motorcycle begins to rotate in the yaw (left to right or vice versa) axis. The natural survival response is to stop this occurrence by closing the throttle. Unfortunately, although this action will restore traction to the sliding rear tire, it will do it so rapidly that it may result in the rider being thrown over the “high side” of the motorcycle. High siding is basically the conversion of forward speed to rotational speed, which acts like a catapult and launches the rider. In other words, high siding is the quickest way to meet what Gonzo journalist Hunter S. Thompson calls “Mr. Sausage Creature.”
+
+## Lean Angle
+
+Lean angle also affects grip, but not for the reasons you might think. As mentioned earlier, at higher lean angles motorcycle suspension becomes less efficient because the moving parts are no longer perpendicular to the forces being applied to them. In essence, the spring rates become progressively stiffer, and the sideways forces cause sliding parts to flex against one another causing additional friction. To counter these inefficiencies, motorcycle engineers design in a “tuned” amount of chassis and tire flex. This is helpful because at maximum lean the frame and tire sidewalls are at a better angle to absorb bumps in the road than the suspension system. Unfortunately, despite the engineers’ best efforts, the total pie available still gets slightly smaller as lean angles increase.
+
+The composite center of gravity, or CG, of the rider and the bike also affects lean angle. The composite CG is the combination of the rider’s CG and the bike’s CG. The farther the rider’s CG is to the inside of the turn, the smaller the lean angle needed for a given radius and speed. This is why racers hang off in the turns. Basically, riders can increase traction by reducing the bike’s lean angle. And they can reduce the lean angle by repositioning the CG (see Chapter 2: Steering) and reducing the amount of time spent at full lean (see Chapter 8: Line Selection).
+
+## Traction Management
+
+As you can see, there are many things that affect traction. Learning to manage them all might sound overwhelming at first. However, by reading the following chapters, you can learn exactly what you need to know, without being bogged down by overly sophisticated academic theories. Just stay focused on each of the drills as you do them, and traction will take care of itself.

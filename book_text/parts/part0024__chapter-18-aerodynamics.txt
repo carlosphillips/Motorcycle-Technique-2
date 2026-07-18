@@ -1,0 +1,76 @@
+[part0024.xhtml] Chapter 18: Aerodynamics
+================================================================================
+Total Control
+
+## Chapter 18: Aerodynamics
+
+When it comes to going fast on motorcycles, most of the technical talk centers on engines and suspension systems. But there is an equally important factor that is almost an afterthought: aerodynamics.
+
+Aerodynamics is a branch of a larger engineering discipline called fluid mechanics. It concentrates on how objects, like airplanes and motorcycles, move through the air. The purpose of fluid mechanics is to design vehicles that travel faster and more efficiently. The engineers achieve this by creating shapes that require less force to displace a given volume of air as they move through it.
+
+In Formula One car racing, effective aerodynamics is so prized aerodynamicists are the highest paid engineers on the team. In fact, the top experts command seven-figure salaries! This is because even small improvements in aerodynamics are equivalent to large increases in horsepower.
+
+Today’s motorcycle designs are starting to take aerodynamics more seriously in an attempt to enhance both performance and rider comfort. Ultimately, however, marketers generally determine the shapes of motorcycle bodywork based on looks rather than engineers determining the shapes for performance gains. This is because a motorcycle has to look cool to sell well. The truth is that a truly aerodynamic motorcycle like the Buell RW750 looks more like a bland Boeing 737 than a sexy Ducati 1199 Panigale. There have been a few exceptions like John Britten’s namesake V1000, so at least there’s hope other manufacturers can build more bikes that offer both superior looks and performance.
+
+Pressure vs. Velocity
+
+Before you can discuss what constitutes an aerodynamic shape, you must understand how airflow works. Airflow utilizes the concepts of pressure and velocity, which are inversely proportional to one another. As a bike displaces the air that it moves through, that air must get around the bike in the same way water flows around a rock in the middle of a stream. For example, air that hits in the middle of the fairing builds up pressure until it can make its way around the outside of the fairing. This is why ram air systems pull their charge from the leading edge of the fairing. It’s like getting extra air for free because it’s under pressure. Just like a pressurized scuba tank can hold a lot of air in a little bit of space.
+
+Tucking in behind a fairing is not a comfortable position to be in at low speeds but it makes a real difference in straight-line performance.
+
+Because the air making its way around the motorcycle has a longer distance to travel than the surrounding air, it must accelerate to keep up. This acceleration causes the pressure to drop, creating a vacuum effect. Anywhere pressure builds up, there will automatically be a lower-pressure area opposite it. This behavior can be likened to having a vacuum cleaner acting in the low pressure area pulling it backwards. Aircraft use this principle to fly. By shaping the wings with a longer curve on top than underneath, the air on top of the wing must accelerate to cover the longer distance and meet up with the air on the other side. This creates low pressure on top of the wing which, in turn, causes lift. As a result, the planes are “sucked” into the sky.
+
+The use of aerodynamic humps on leathers is de riguer these days. They help fill in some of the low-pressure area behind the rider’s helmet and smooth the shape of the rider’s back. While they won’t add much, if any, top speed to the bike, they do minimize the amount of drag on the helmet, which can significantly reduce neck fatigue.
+
+On a motorcycle, the low-pressure area is generally behind it. In this case, the term “aerodynamic drag” makes sense because the vacuum causes the bike to feel like it’s dragging something behind it, limiting its acceleration and top speed.
+
+Aerodynamic drag is measured in numeric form as a coefficient of drag, or Cd, and must be measured in a wind tunnel. Unfortunately, aerodynamic drag does not increase in a linear fashion. It increases at the square of the speed (V2). For example, a Yamaha TZ750 racer requires 21 horsepower to achieve 100 miles per hour. To hit 200 miles per hour, it would need 168 horsepower. And 300 miles per hour would require 567 horsepower! As you can see, a small aerodynamic improvement can equal quite a bit of horsepower.
+
+Reducing Aerodynamic Drag
+
+The classic teardrop shape takes the path of least resistance through the air. Generally speaking, this is what an aerodynamic vehicle must resemble to minimize aerodynamic drag. Because two-wheelers lean into turns, there are also stability issues that go beyond the aerodynamic shape. This is the main reason we no longer see the “dustbin” fairings that dominated racing in the 1950s. For the purpose of this chapter, however, I will concentrate on the basics of aerodynamic drag.
+
+Figure 18.1
+It’s virtually impossible to find a modern sportbike with an aerodynamic tail section. Shown from above is a 2003 Ducati 999 with rider aboard. As you can see on the rider’s left side, the tail is too narrow to keep the airflow attached, forming drag-inducing, turbulent “eddies.” The flat back, Kamm-style fix, as proposed on the opposite side in blue, follows the “7-degree rule” of converging at no more than 7 degrees per side to keep the air attached for minimum drag. This type of improvement made on both sides should provide a 2–5 mph increase in top speed. The under seat exhaust also helps fill in the low-pressure area behind the bike.
+
+One of the most important factors relating to aerodynamic drag on a motorcycle is frontal area. Frontal area is simply the surface area facing the direction of movement as viewed from the front of the vehicle. To compare the frontal area of two vehicles, simply take frontal pictures of each one from exactly the same location. To mean something in the real world, include a rider in the measurements. It’s important to use the same rider in actual riding gear on both bikes in a standard racer’s tuck. Next, lay a piece of graph paper over each photograph and draw an outline around the bike. By calculating how many squares (including partial squares) are contained within the outline, you can come up with a rough approximation of how the models compare in terms of relative frontal area. When it comes to frontal area, less is better.
+
+Figure 18.2
+Aerodynamic testing is now able to be done on the computer. This image is a horizontal slice of the Erik Buell Racing (EBR) 1190RX with the rider at 100mph. The top view represents the flow velocities and pattern at that one 2-D plane shown by the line in the side view. EBR has been using the evolving versions of such software for a decade, and a few years ago reached the point where it is more accurate than a real wind tunnel, as it provides far more discreet data on what is affecting pressure and velocity, and is much faster.
+
+If frontal area were the only thing guiding aerodynamics, the smallest fairings would be the best choice for every motorcycle. However, the actual shape of the bodywork is just as important as the frontal area in determining how much aerodynamic drag the bike will produce.
+
+As mentioned earlier, the ideal body shape resembles a teardrop. Its widest section should be approximately one third of the way back on the bike and should be the same width as the widest part of the rider’s shoulders. Its tail should start at the widest part of the rider’s hips and converge at no more than a 14-degree included angle. Based on wind tunnel research, 7 degrees per side is the maximum angle you can close an airstream without causing separation. As soon as the air separates, it becomes turbulent and causes drag. It should be noted that, in talking with many Bonneville top-speed racers, an 8-degree included angle, or an angle of 4 degrees per side, is said to be a more realistic number given the myriad factors encountered in real world conditions.
+
+Unfortunately, if a bike followed these ideal parameters, it would be much too long to be practical and would have a sharp and dangerous tail section. The best way around this dilemma is to imagine the correct shape and then cut off the back of the tail at the back of the rear tire. This is known as a Kamm tail, named after the man who first thought of it. The Kamm tail tricks the air into acting almost like the tail was still there. Bell used a similar design on a racing helmet that Eddie Lawson used to win the Daytona 200.
+
+Effective motorcycle design also uses the rider’s body as an active part in the bike’s aerodynamics, filling in the space between the fairing and the tail section. Erik Buell’s original 1983 RW750 two-stroke road racer used this principle and is still considered one of the most aerodynamic racing motorcycles ever built.
+
+In 1996, as part of a magazine article examining the aerodynamic effectiveness of sportbikes, I commissioned Jim Reed and Charlie Moore to see what kind of top speed improvements we could make without a wind tunnel by simply applying the principles discussed here. The results were astounding. With three simple aerodynamic enhancements, we increased the top speed of a 1992 Honda CBR600F2 by over 11.3 miles per hour. First, we cut the gas tank down a little to help flatten the rider’s back. Second, we removed the entire lower fairing. And finally, we created a tail section similar to the one used on the Buell RW750. To help put this in perspective, the equivalent speed increase would have required over 20 additional horsepower. I can only imagine what we could have accomplished if we had the time and money to create a proper fairing back then.
+
+The radical $35,000 Benelli Tornado minimizes cooling drag by positioning the radiator under the seat and ducting fresh air to it. When the bike is not moving, two fans under the taillight help keep things cool by creating a vacuum to suck air through the radiator.
+
+Cooling Drag
+
+One of the biggest aerodynamic problems current sportbikes have is making room for the huge radiators required to keep them cool. More specifically, the problem is the placement of the radiators. By putting them behind the front wheel, much of the cooling air gets blocked, necessitating huge surface areas to compensate for the lack of flow. The increase in aerodynamic drag caused by the engine’s cooling system is called cooling drag.
+
+Open-wheel and prototype race cars use seemingly tiny radiators to effectively deal with much higher heat loads than bikes do because they’re positioned to optimize airflow. A much better position for the radiator on a motorcycle is under the seat, so long as air can be ducted to it. A few prototype race bikes, like the Britten, have successfully used this type of a system with a relatively small radiator. A primary benefit of this setup is a considerably smaller frontal area.
+
+Unfortunately, with the exception of the $35,000 Benelli Tornado, most mainstream manufacturers haven’t embraced this technology yet, Interestingly, Harley-Davidson developed a trick under-seat radiator setup for its ill-fated Nova project in the 1970s, but it never saw production.
+
+In order to reduce the cooling drag on a traditional radiator setup, internal ducts are needed. This is because drag is created when the air that goes through the radiator finds its way around the engine and eventually gets past the bike. The idea is to capture as much air as possible from behind the radiator and direct it in as straight a path as possible back into the airstream.
+
+Erik Buell recommends running the internal ducting into a reverse NACA duct as far back on the fairing as possible. The 7-degree rule applies here, as well, so you want to make sure the final duct releases the hot air out of the fairing at no more than a 7-degree angle. The good news is that the high-speed, low-pressure air going around the outside of the fairing will actually help suck the hot air out of the radiator, dramatically increasing its efficiency. If you can somehow seal the system, its efficiency will increase greatly.
+
+Believe it or not, some WWII fighter planes had such aerodynamically efficient cooling systems that the cold air flowing through the hot radiators actually developed thrust! Although I don’t think a motorcycle cooling system can be that efficient, I would estimate that you could reduce cooling drag by up to 80 percent by following the suggestions above.
+
+Rider Drag
+
+I realize many of you do not have the time or wherewithal to make some of these radical modifications to your bike, but the goal of these lessons is to teach the importance of aerodynamic drag on performance and examine how your body position contributes to it. One of the best things you can do to improve the straight line performance of your bike is to practice getting your body out of the airflow. In fact, many beginning track riders lose as much as 7 or 8 miles per hour of top speed on the straights because they are not getting their heads down correctly.
+
+Figure 18.3
+Comparing the frontal areas on different bikes is easy. Simply take a picture of them from the front with an outfitted rider on board (to establish a constant scale for the photo, use the same focal length, same height and same distance to the subject), and lay graph paper on the photo. By counting the number of squares (including partial ones) that are covered by bike or rider, you can make an accurate comparison. While you can see Ducati did a pretty good job of keeping the rider out of the airstream on the 999, there is still room for improvement. The upper fairing should be wider and taller to cover the rider’s knee pucks, hands, and shoulders. Also the rear brake pedal should be farther inboard because it forces the rider’s toe into the airstream. A taller windscreen would also help reduce neck fatigue without adding frontal area.
+
+The easiest way to gauge the effectiveness of your body position is to stand your bike vertically in front of a mirror and get on it wearing all your normal riding gear. Next, crouch down, look at where your body is sticking out beyond the fairing (if it has one), and figure out how much you can minimize the protrusions. This is also a good time to think about what modifications you could make to cover up more of your exposed parts. A larger windscreen could be one helpful addition. Of course, you might also see the benefits of a diet at this point.
+
+Comfort is another consideration when looking at your bike’s aerodynamics. If the wind blast from that oddly shaped fairing is rattling your head around, or the low-pressure area caused by that barn-door windshield feels like it’s sucking your helmet off your head, you now have enough basic understanding of the forces at work to make some meaningful hypotheses about how to fix them. Sometimes, even in a racing situation, a change that improves rider comfort can be worthwhile even if it slightly reduces aerodynamic efficiency. This is because the net result will be significantly less fatigue, and this can really improve your ability to control the motorcycle.

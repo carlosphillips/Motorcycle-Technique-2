@@ -1,0 +1,88 @@
+figure	title	chapter	page	pixels	figure_file
+1.2		Section 1: Chassis Dynamics	17	1000x903	fig-01.02.jpeg
+1.3		Section 1: Chassis Dynamics	17	1000x414	fig-01.03.jpeg
+1.4		Section 1: Chassis Dynamics	18	815x571	fig-01.04.jpeg
+1.5		Section 1: Chassis Dynamics	20	675x1000	fig-01.05.jpeg
+1.6		Section 1: Chassis Dynamics	21	1000x614	fig-01.06.jpeg
+1.7		Section 1: Chassis Dynamics	22	1000x526	fig-01.07.jpeg
+1.8		Section 1: Chassis Dynamics	23	1000x826	fig-01.08.jpeg
+2.1		Chapter 2: Steering	25	797x1000	fig-02.01.jpeg
+2.2		Chapter 2: Steering	26	620x1000	fig-02.02.jpeg
+2.3		Chapter 2: Steering	27	1000x770	fig-02.03.jpeg
+2.4		Chapter 2: Steering	27	1000x741	fig-02.04.jpeg
+2.5		Chapter 2: Steering	28	1000x776	fig-02.05.jpeg
+2.6		Chapter 2: Steering	29	1000x733	fig-02.06.jpeg
+2.7		Chapter 2: Steering	29	1000x942	fig-02.07.jpeg
+2.8		Chapter 2: Steering	30	1000x929	fig-02.08.jpeg
+2.9		Chapter 2: Steering	31	912x1000	fig-02.09.jpeg
+3.1		Chapter 3: Suspension	36	910x448	fig-03.01.jpeg
+3.2		Chapter 3: Suspension	37	1000x783	fig-03.02.jpeg
+3.3		Chapter 3: Suspension	38	1000x686	fig-03.03.jpeg
+3.4		Chapter 3: Suspension	39	1000x686	fig-03.04.jpeg
+3.5		Chapter 3: Suspension	39	1000x682	fig-03.05.jpeg
+3.6		Chapter 3: Suspension	40	1000x673	fig-03.06.jpeg
+3.7		Chapter 3: Suspension	41	1000x824	fig-03.07.jpeg
+3.8		Chapter 3: Suspension	42	1000x681	fig-03.08.jpeg
+3.9		Chapter 3: Suspension	44	1000x750	fig-03.09.jpeg
+3.10		Chapter 3: Suspension	45	1000x749	fig-03.10.jpeg
+4.1		Section 2: Mental Dynamics	52	1000x398	fig-04.01.jpeg
+4.2		Section 2: Mental Dynamics	52	1000x795	fig-04.02.jpeg
+8.1	Premature Initiation	Chapter 8: Line Selection	76	1000x667	fig-08.01__premature-initiation.jpeg
+8.2	Slow Steering	Chapter 8: Line Selection	77	1000x667	fig-08.02__slow-steering.jpeg
+8.3	Fifty Pencing	Chapter 8: Line Selection	78	1000x664	fig-08.03__fifty-pencing.jpeg
+8.4	Decreasing Radius Turn	Chapter 8: Line Selection	80	1000x867	fig-08.04__decreasing-radius-turn.jpeg
+8.5	Double Apex Turn	Chapter 8: Line Selection	81	1000x728	fig-08.05__double-apex-turn.jpeg
+8.6	Linked Turns	Chapter 8: Line Selection	82	590x1000	fig-08.06__linked-turns.jpeg
+9.1		Chapter 9: Throttle Control	86	1000x271	fig-09.01.jpeg
+10.1		Chapter 10: Shifting	92	1000x579	fig-10.01.jpeg
+10.2	Downshift Sequence	Chapter 10: Shifting	94	957x1500	fig-10.02__downshift-sequence.jpeg
+11.1		Chapter 11: Braking	101	1000x618	fig-11.01.jpeg
+12.1		Chapter 12: Body Positioning	107	1000x486	fig-12.01.jpeg
+12.2		Chapter 12: Body Positioning	111	997x736	fig-12.02.jpeg
+12.3		Chapter 12: Body Positioning	111	1000x619	fig-12.03.jpeg
+12.4		Chapter 12: Body Positioning	113	881x1000	fig-12.04.jpeg
+12.5		Chapter 12: Body Positioning	113	1000x904	fig-12.05.jpeg
+12.6		Chapter 12: Body Positioning	114	929x1000	fig-12.06.jpeg
+12.7		Chapter 12: Body Positioning	114	1000x667	fig-12.07.jpeg
+12.8		Chapter 12: Body Positioning	115	1000x732	fig-12.08.jpeg
+12.9		Chapter 12: Body Positioning	115	1000x719	fig-12.09.jpeg
+12.10		Chapter 12: Body Positioning	116	998x755	fig-12.10.jpeg
+12.11	10 Steps Timing	Chapter 12: Body Positioning	117	1164x1320	fig-12.11__10-steps-timing.jpeg
+13.1		Chapter 13: Low-Speed Turns	120	1000x979	fig-13.01.jpeg
+15.1		Section 4: Machine Setup	129	1000x429	fig-15.01.jpeg
+15.2		Section 4: Machine Setup	132	998x563	fig-15.02.jpeg
+15.3		Section 4: Machine Setup	133	1000x326	fig-15.03.jpeg
+15.4		Section 4: Machine Setup	134	1000x288	fig-15.04.jpeg
+15.5		Section 4: Machine Setup	134	1000x301	fig-15.05.jpeg
+15.6		Section 4: Machine Setup	134	1000x270	fig-15.06.jpeg
+15.7		Section 4: Machine Setup	135	1000x288	fig-15.07.jpeg
+15.8		Section 4: Machine Setup	135	1000x340	fig-15.08.jpeg
+15.9		Section 4: Machine Setup	136	1000x260	fig-15.09.jpeg
+15.10		Section 4: Machine Setup	136	1000x261	fig-15.10.jpeg
+15.10		Section 4: Machine Setup	137	1000x261	fig-15.10__image00367.jpeg
+15.12		Section 4: Machine Setup	137	1000x267	fig-15.12.jpeg
+15.13		Section 4: Machine Setup	138	1000x514	fig-15.13.jpeg
+15.14		Section 4: Machine Setup	138	1000x303	fig-15.14.jpeg
+15.15		Section 4: Machine Setup	139	1000x736	fig-15.15.jpeg
+15.16		Section 4: Machine Setup	140	1000x517	fig-15.16.jpeg
+15.17		Section 4: Machine Setup	140	1000x612	fig-15.17.jpeg
+15.18		Section 4: Machine Setup	141	1000x296	fig-15.18.jpeg
+15.19		Section 4: Machine Setup	142	1000x288	fig-15.19.jpeg
+15.20		Section 4: Machine Setup	142	1000x311	fig-15.20.jpeg
+15.21		Section 4: Machine Setup	142	1000x278	fig-15.21.jpeg
+15.22		Section 4: Machine Setup	143	1000x229	fig-15.22.jpeg
+15.23		Section 4: Machine Setup	143	1000x259	fig-15.23.jpeg
+15.24		Section 4: Machine Setup	144	1000x580	fig-15.24.jpeg
+17.1		Chapter 17: Ergonomics	157	1000x884	fig-17.01.jpeg
+17.2		Chapter 17: Ergonomics	159	1000x662	fig-17.02.jpeg
+18.1		Chapter 18: Aerodynamics	164	949x1000	fig-18.01.jpeg
+18.2		Chapter 18: Aerodynamics	165	1000x577	fig-18.02.jpeg
+18.3		Chapter 18: Aerodynamics	167	646x1000	fig-18.03.jpeg
+19.1		Section 5: Rider Setup	171	883x896	fig-19.01.jpeg
+19.2		Section 5: Rider Setup	171	735x1000	fig-19.02.jpeg
+19.3		Section 5: Rider Setup	171	1000x421	fig-19.03.jpeg
+19.4		Section 5: Rider Setup	171	1000x430	fig-19.04.jpeg
+19.5		Section 5: Rider Setup	172	1000x543	fig-19.05.jpeg
+19.6		Section 5: Rider Setup	172	1000x567	fig-19.06.jpeg
+19.7		Section 5: Rider Setup	173	882x1000	fig-19.07.jpeg
+19.8		Section 5: Rider Setup	173	622x1000	fig-19.08.jpeg

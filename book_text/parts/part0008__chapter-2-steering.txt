@@ -1,0 +1,109 @@
+[part0008.xhtml] Chapter 2: Steering
+================================================================================
+Total Control
+
+## Chapter 2: Steering
+
+Because motorcycles are single-track vehicles, they lack static balance and must lean to turn. Steering a motorcycle is a much more complex process than steering a multi-track vehicle like an automobile because of this. In order to understand how to steer a motorcycle, you first need to understand steering geometry.
+
+Rake and Trail
+
+You’ve probably read magazine articles that give the “rake” and “trail” measurements of the latest model, but what do these numbers really mean?
+
+Rake and trail are interrelated values that define the amount of caster of the front wheel. To understand caster, look at any shopping cart. Or, if you’re sitting in an office chair reading this book, take a look at the wheels on the chair. You’ll notice that the steering axis of each wheel is mounted off-center from the wheel axle. No matter how you push the shopping cart or office chair, the wheel always follows the steering axis of the wheel. This effect is called caster.
+
+Figure 2.1
+
+Rake and trail determine the amount of caster a motorcycle has. Rake is the angle from vertical of the steering axis measured in degrees. Trail is a linear measurement. If you could extend the steering axis from the steering head of the frame down to the ground and then drop a plumb line from the front axle, the distance between the point the line from the steering axis intersected the ground and the point the plumb line touched the ground would be the trail in millimeters.
+
+Think of trail as a “correcting wrench” that steers the tire back in the direction of travel. The tire always wants to follow behind the steering axis in the same way crooked wheels straighten out as soon as you push a shopping cart forward. More trail has the same effect as a longer wrench handle. In other words, when the wheel gets out of line, the trail wrenches it back in line.
+
+Given the same triple-clamp offset, the trail is positively correlated to the rake. In other words, the more rake you have, the more trail exists. Generally speaking, sportbikes and dirt bikes have steeper rakes and shorter trails for quick maneuvering, while tourers and cruisers have greater amounts of rake and trail to promote straight-line stability.
+
+Other Geometry
+
+The wheelbase of a bike affects the steering as well. A longer wheelbase makes the bike more stable and a shorter wheelbase makes steering faster and easier. Another factor involved is the height of the center of gravity. The higher the center of gravity (CG) the less lean angle is required to negotiate a turn if all other factors are constant. The width of the tire and even the shape of the tire will also affect the lean angle required for a particular curve. Rake, trail, wheelbase, tires, and the combined CG of the bike, rider, and any luggage are all involved in determining how the bike handles and corners. For most riders if we load the bike, change tires, or adjust the suspension we don’t consider how that will affect the geometry of the bike. We may inadvertently make the bike steer poorly. Similarly when we change tire brands or models, what we are feeling as far as the handling is concerned is oftentimes a geometry change as much as it is a tire difference.
+
+Figure 2.2
+
+Countersteering vs. Body Steering
+
+As long as I have been riding, a debate has raged between proponents of countersteering and proponents of rider lean, or body steering. It has been my experience that you can, indeed, make fine course corrections using only rider weight shifts while in the middle of a turn. However, rider weight shifts are incapable of resulting in rapid directional changes. This was scientifically proven with Keith Code’s “No B.S. Bike Trainer.” The trainer utilized a second set of handlebars rigidly affixed to the frame along with a throttle. Riders found it was impossible to make quick or accurate steering inputs by shifting only their body weight. Body steering may make a fine supplemental steering technique, but it can never be the primary force for directional changes.
+
+How Countersteering Works
+
+Simply put, countersteering is applying pressure to the inside handlebar in the direction of the intended turn and pushing forward. By “inside” handlebar, I mean the bar that’s on the same side to which you are turning. At first, this may seem counter-intuitive as you are turning the front wheel of the bike in the direction opposite of where you want to travel. By steering the wheel in the opposite direction, the bike wants to tip to the inside. This is a result of the centrifugal force created by the turning. Interestingly enough, pushing the handlebar down has almost no effect. If you think about pushing the bar forward, you will get quicker turns with less effort than if you try to push down.
+
+Many people assume the term countersteering means that the wheel must cross the bike’s centerline for countersteering to happen. The wheel simply needs to track some amount to the outside of the current path of travel. Although the wheel does, indeed, cross the center and point the opposite way when initiating a turn from an upright position, in slow, tight corners with a larger steering angle, the wheel may never cross the center.
+
+Figure 2.3
+Wider tires have a much larger “lever effect” on the steering when hitting rocks or other obstacles than narrow tires, causing unwanted directional changes. This is part of why front tires are narrower than rear tires and why off-road bikes use narrower tires than their on-road counterparts.
+
+Automobiles (or sidecars or trikes) don’t fall over when they are steered into a turn because they are multi-tracked. The second “track” of wheels that is located toward the outside of the vehicle’s center of gravity counters the effects of centrifugal force by transferring weight laterally to the outside wheels. When cornering hard in a car, you can feel the effect of centrifugal force. Newton’s first law of motion is “Every object in a state of uniform motion tends to remain in that state of motion unless an external force is applied to it.” That external force is the car turning in a tighter line.
+
+So while it feels like you are being thrown to the outside of the turn, what’s actually happening is the outside of the vehicle pushes the outside of your body to the inside of the turn. Meanwhile your body is “trying” to continue going straight but is being redirected by the car’s new path.
+
+Figure 2.4
+Wider tires require more lean angle for the same speed than narrower tires due to the contact patch offset from the bike’s centerline.
+
+It should be noted that too much centrifugal force will eventually cause a vehicle to flip over as sometimes happens with tall, narrow sport utility vehicles. Of course, that’s assuming the SUV has enough traction to keep from sliding. Conversely, a motorcycle has no outside wheel to support the lateral weight transfer caused by the centrifugal force so it falls in the opposite direction of the steering.
+
+Figure 2.5
+The higher the bike’s CG the less lean angle is needed due to the contact patch offset from the bike’s centerline. Narrower tires with a smaller contact patch offset have less of a lean-angle effect from CG height changes.
+
+Riding a motorcycle is a balancing act. When you lean over, gravity tries to pull the bike into the ground. At the same time, centrifugal force tries to throw you to the outside of the turn. By moving your body weight to the inside of the turn, as racers do when they “hang off,” you’re helping gravity do its job. Your body shift reduces the amount of countersteering force needed to maintain a given line. This is why top racers make it look so easy going around turns. It is easy on their bodies, because they’re giving the gravitational force a longer “lever” to counter the effects of centrifugal inertia.
+
+The farther you can move your body to the inside of the turn, the less lean angle is needed for a given speed and radius. Once you find the correct combined center of gravity (CG) of the rider and machine, virtually no steering effort is required on the bars to maintain a given line. The picture was taken during a wet race at Summit Point, WV with three riders on SV650s going through a similar arc at a similar speed. Notice how the author’s bike (#311) is leaned over less than the other two due to a combined CG that is closer to the inside of the turn. This allows for earlier and harder application of the throttle on the exit and greater ground clearance.
+
+As you’ve learned, countersteering the motorcycle causes it to lean and ultimately turn. The reason the bike leans over has to do with physics. When you push forward (let’s say on the left grip) the front tire momentarily tracks out to the right. Because the front tire is turned out to the right, and inertia continues to push the bike straightforward in line with the rear tire, the out-of-alignment wheels make the bike start falling over (leaning) to the left.
+
+The quicker you push on the inside bar, the faster the motorcycle will lean; the longer you hold pressure, the farther it will lean. Once the bike is leaned over it goes around a turn to the left because of the rounded shape of the tires. When the bike is leaning, the outside edge of the contact patch has a larger circumference than the inside edge of the contact patch. That difference in circumference causes the motorcycle to roll in a curve because the taller outside edge must roll faster per revolution to keep up with the smaller inside edge. The more the bike is leaned over, the greater the circumference differential and the tighter the line. As an example of this, take a Styrofoam coffee cup, lean it on its side and push it forward. It will roll around in the direction of the bottom of the cup, or the smaller circumference. When you get to the intended lean angle, you simply release some or all of the pressure on the bar, and the bike will hold a particular radius around the turn. After reaching your intended lean angle, the self-correcting (castering) effect of the trail and gyroscopic precession keep the bike on the intended line. At this point, the physics get a little more complicated.
+
+Figure 2.6
+Countersteering, or a quick steering input counter to the direction you want to go, is the primary action that causes the bike to begin leaning into the turn. This happens because the front and rear wheels are temporarily facing in different directions, which unbalances the bike causing it to begin falling. Once that happens, the castor effect of the trail causes the front tire to steer into the turn and maintain a clean line. After the bike is in the turn, slow direct-steering movements can be used to tighten or widen the line. The rate of change of the steering inputs determines if the result will be direct steering (slow) or countersteering (quick).
+
+Gyroscopic Precession
+
+As a motorcycle travels down the road, it actually moves in a nearly undetectable low-amplitude weave, even when the rider thinks it is going straight. This is due to a multitude of factors like wind, uneven pavement, and tire profiles, the elastic properties of tire rubber, and the constantly changing weight distribution from rider and suspension movements.
+
+Figure 2.7
+
+When this happens, the bike begins to fall to one side, and a phenomenon known as gyroscopic precession causes the wheel to turn into the direction of the fall. At this point, centrifugal force pushes the motorcycle in the opposite direction. This process is repeated over and over, creating a low-amplitude weave.
+
+Figure 2.8
+
+Working in tandem with gyroscopic precession is gyroscopic momentum, which is caused by the motorcycle’s spinning wheels. To understand these phenomena, you will need to perform a simple experiment. Hold a bicycle wheel in front of you by the axle and have a partner spin the wheel so that the top moves away from you. Now try to steer the wheel to the left. Notice how it resists your input and tilts to the right. Next have your partner spin the wheel again. This time, lean the wheel to the left as if it is entering a curve. Notice that the wheel tends to turn left into the direction of lean. This turning effect is gyroscopic precession. This precession also helps the bike lean over when you make a steering input, but according to chassis design guru Tony Foale (tonyfoale.com) it is a minor force compared to moving the contact patch out from under the bike during countersteering.
+
+The gyroscopic momentum increases with wheel weight, wider weight distribution, and rotational speed. This is the reason steering becomes more difficult as the bike goes faster and the reason why racers buy lightweight wheels to improve cornering. On the plus side, increased wheel speed improves chassis stability, which is why you can take your hands off the bars at highway speeds without falling over, but cannot do this at super-slow parking-lot speeds. While I have seen stunter Jason Britton perform no-handed, low-speed wheelies, this is not something mere mortals should ever attempt.
+
+Countersteering vs. Direct Steering
+
+I have just described countersteering, which can be summed up very simply as push right, go right and push left, go left to initiate a turn. There is also another form of steering, which you are most familiar with when the bike is going very slow, below approximately 12 to 15 miles per hour. At these low speeds the motorcycle rides like a bicycle, and you simply point the front tire in the direction you wish to go. While it’s easiest to see at these slow speeds, direct steering can also happen at higher road speeds. The difference lies in how quickly you make the steering input. A relatively quick steering input causes the effect of countersteering and adjusts the lean angle of the bike and therefore adjusts the line. However, if we put very gentle, slow steering inputs into the handlebars then we get the direct steering result. This is easiest to experiment with on a track with a big, long sweeping curve. You will find that a quick countersteer makes the bike lean to enter the curve, and then once leaned over and in the curve, very small, precise adjustments to the line can be made by direct steering. If you are using both arms to steer, you will probably be using too much force to notice this subtle technique.
+
+Figure 2.9
+
+Steering Technique
+
+Perhaps the single most significant technique we teach in Total Control is to use only your inside arm to steer once you’ve entered the corner. This includes both pushing and pulling when appropriate. I recommend this because it’s extremely difficult for both arms to put reverse inputs into opposite ends of the bars in precise unison while simultaneously allowing enough “give” in the steering for the trail and gyroscopic precession to do their thing.
+
+Motorcycle simulators have been tried in various forms and levels of sophistication. They can be very useful for body position training but none have been able to accurately simulate the effects of steering as of this writing. The most sophisticated version used by the author (upper left) has been tried in the armed forces without much success. While it does a decent job simulating accelerating, braking, and shifting, its steering process is not even remotely accurate, and can have the effect of teaching bad muscle memory to new riders before they even get on a real bike for the first time.
+
+That advice may sound strange, but in my Total Control Advanced Riding Clinics the single biggest hindrance my students have in holding a tight line is that both arms are fighting for control of the steering. The problem is easy to spot by looking at how tense riders’ arms get as they stiffen and rise away from the gas tank.
+
+Although I originally came up with this theory while watching a video of my students in action, I proved its validity the hard way while participating in one of Freddie Spencer’s High-Performance Riding Schools back in 1998. As I approached a turn that was giving me problems, one that had me almost running off the outside, I decided to test my hypothesis and just let my inside arm do all the work. And, boy, did it ever work. In fact, initiating the turn at the exact same position on the track, even with substantially less effort on the bars, I turned so much quicker that I ran off the inside of the track and actually crashed. I was obviously on to something.
+
+Ever since I incorporated the “steering with only the inside arm” technique into the curriculum, my students have been making amazing breakthroughs. As soon as the students stop arm-wrestling with themselves for control of the handlebars, their bikes become much more efficient turning machines.
+
+Freed from the conflicting inputs of the two arms, the bike is allowed to do what it was engineered to do, turning smoother and much quicker at the given speed. In fact, the moment the student releases pressure from the outside arm, the bike immediately wants to run off the inside of the course. Many students end up making a dramatic bobble to keep from running off the inside as they compensate for the newfound steering ability. As they practice the technique and become more proficient, students learn to use the throttle to help counter lean angle by increasing or decreasing speed. In addition, their lines become smooth, and their riding begins to appear effortless. Eventually, they enter “the zone” we talk about later in this book.
+
+I have actually had professional car racers tell me they do a similar thing when racing in the rain. By having one hand dominate the steering, they can allow the vehicle to do whatever self-corrective “wiggling” it needs to do as it struggles for traction in the wet.
+
+To exit the corner, simply reverse the process and countersteer in the opposite direction with the outside hand. For example, to exit a right-handed corner, push on the left grip. You’ll find that the bike will stand up. Accelerating can produce the same effect because you are creating additional centrifugal force to prop you up. Generally speaking, a combination of the two will work best. The steering input puts a side force on the front tire and when the throttle picks the bike up the side force is on the back tire. By using both steering and the throttle to stand up the bike you spread the side force out across both tires so you are less likely to exceed traction limits on one tire or the other.
+
+As you have learned, there are many forces at work during the steering process. Fortunately, many of them take care of themselves, just like the wheels on that shopping cart. The most important thing to remember about steering is that the more skillfully you use your body’s weight as a lever, the less force you will need to apply to the controls, and the more precise your steering will become. The techniques in this book are designed to teach you exactly that.
+
+E Ticket Ride: How Low Can You Go?
+
+One of the most interesting vehicles I ever rode was this 1997 prototype of Dan Gurney’s Alligator recumbent motorcycle. It was low and light with a big Honda single engine. I was out riding with some friends and happened to be getting gas at the same time as Dan. Of course, I jumped at the chance to ride such a curious beast when he offered. As a prototype it was exotic and sounded great as it snarled to life. The intake track was close to my body so I could almost feel the air being sucked into the large carb. Once underway, I noticed how quickly the bike would lean side-to-side. It initially seemed like it could out-corner almost anything … until the corners started coming Although it was great fun, I was startled by how much it wanted to lean but didn’t want to turn. I believe this is one of the main reasons recumbent motorcycles have never taken off.
+
+This was exactly the same problem Freddie Spencer had with the original Honda NSR500 GP bike in 1983. It had the heavy fuel tank down low underneath the engine and the relatively lightweight two-stroke expansion chambers up high under a faux fuel tank cover. Because the bike’s CG was so low, it required huge amounts of lean angle to accomplish an adequate amount of turning. Meanwhile his competitors could go the same speed with less lean angle—hence the change to a more conventional layout the next year. Similarly when Ducati started dominating World Superbike Racing in the early 1990s, part of the reason was the relatively high center of gravity of its big twins. From that point forward, chassis designers have been focusing on centralizing mass rather than lowering it. As an example, the new EBR sportbikes have made mass centralization a primary goal. For the same reason figure skaters turn faster as they pull their arms in and centralize their mass.
