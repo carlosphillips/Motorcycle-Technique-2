@@ -22,8 +22,9 @@ SVG builders (**06**); the road model, occluders, and rider-eye sight results
    the viewer never re-derives physics.
 3. Compare mode: how N lines step together, station-lock vs time-lock, and the
    blind-corner compare as the canonical use.
-4. The POV view: camera model, flat-world pinhole projection, draw order,
-   occlusion, the limit-point marker, the sight band, and honesty placards.
+4. The POV view: camera model, the `look` toggle, flat-world pinhole projection,
+   draw order, occlusion, the limit-point marker (never dropped), the sight band,
+   and honesty placards.
 5. Viewer surfaces: layout, scenario loading, sharing, and the read-mostly stance.
 
 ---
@@ -87,9 +88,13 @@ contract does not name the rasterizer.
 
 A hard rule with the same force as the colour law: **every quantity the viewer
 displays is either a recorded field of the result envelope or the return value of
-a pure core function** (`stateAt`, `sightFrom`, unit conversions from
-`core` units helpers). The viewer performs no arithmetic on physics values beyond
-unit formatting. This is what makes the HUD trustworthy: a number on screen is the
+a pure core function** (`stateAt`, `sightFrom`, `correctiveShot`, unit conversions
+from `core` units helpers). The viewer performs no arithmetic on physics values
+beyond unit formatting. One restriction sharpens the `sightFrom` case: the viewer
+may call `sightFrom` only for **hypothetical eyes** — positions not on any
+recorded line (what-if cursor drags off the path); for any instant on a line, the
+recorded per-sample sight is authoritative and re-derivation is forbidden
+(**05** §1). This is what makes the HUD trustworthy: a number on screen is the
 engine's number, not the UI's reconstruction of it. (The one apparent exception,
 the friction-ellipse widget, draws the *recorded* normalized components from the
 Sample record — **05** — precisely so the viewer does not recompute them.)
@@ -112,14 +117,28 @@ physics and controls at any point" a literal drag of a slider.
   frame-step buttons advance one HUD refresh (±0.1 s) and one recorded sample
   (± one Sample) respectively. Playback is a scheduled scrub — it moves the same
   cursor the drag moves; there is no second animation pathway.
-- **Named jump points.** The events array of the result envelope (**05**) is
-  rendered as labelled ticks on the timeline: brake onset, turn-in, steering
-  complete, apex (emergent, hence a *measured* tick, never an input), roll-on,
-  exit, and terminal events — crash instant, stop, and the run-wide/road-end
-  pair (`run_wide_detect`, `road_end` in **05**'s closed Event kinds; "run-off"
-  is an *outcome* class, not an event). Clicking a tick jumps
-  the cursor there. These are free — the engine already emits them — and they turn
-  "step to the apex" from a hunt into a click.
+- **Named jump points — events-only.** The stepper's named jump targets are
+  exactly the result's `events` array (**05** §5's closed kinds), rendered as
+  labelled ticks on the timeline; clicking a tick lands the scrubber at the
+  event's interpolated `t`. No other bookmark source exists — plan-action starts
+  already surface as events (`brake_start`, `turn_in`, `position_start`, …), so
+  "plan stations" would be a redundant second pathway. Ticks worth naming:
+  `apex` (emergent, hence a *measured* tick, never an input — one tick per
+  recorded apex, labelled `apex#2` on a double-apex corner); **`release`** — the
+  heading-capture commitment release (**02** §3.1), carried by every committed
+  line, which makes "step to the instant the exit unwind begins" a click;
+  **`correction`** — the corrective shot-start bookmark ("step to where the save
+  had to start", **04**); `run_wide_detect` — the outward corridor crossing; and
+  the terminal events `crash`, `off_road`, `stop`, `road_end` ("run-off" is an
+  *outcome* class, never an event). These are free — the engine already emits
+  them — and they turn "step to the apex" from a hunt into a click.
+
+**Probe jump targets (D45, gated).** When a `CommitmentReport` is attached, the
+stepper offers jump targets `probe#1..#N` per corner, read from the report and
+**never** from `events` — the event kind set stays closed and the
+marker-from-event law is untouched, because the fan is road ink rather than a
+marker. `tau_close_s` (D44) is likewise **not** an event and **not** a named jump
+target; events remain the sole jump source and `C-BOOKMARKS` is unaffected.
 
 ### 3.2 Linked views
 
@@ -144,10 +163,10 @@ A persistent panel, refreshed per cursor move, in neutral (non-verdict) colours:
 | Group | Read-out | Source |
 |---|---|---|
 | Motion | `v` (km/h), heading `psi` (deg), curvature `kappa` (1/m) with equivalent radius | Sample |
-| Lean | `phi` (deg) vs the rider profile's roll-rate cap; a small lean-angle dial | Sample + config |
+| Lean | `phi` (deg) vs the rider profile's roll-rate cap; a small lean-angle dial; a **stand-up chip** showing `stand_up_dps`, rendered only when nonzero; **`a_noreturn`** ("brake ceiling at lean: 5.4 m/s²"), "—" when upright (`a_noreturn_ms2` null) | Sample + config + derived (**05** §4) |
 | Grip | live **friction-ellipse widget**: current `(a_long, a_lat)` normalized against the ellipse at local `mu`; margin number = `grip` | Sample (recorded components, **05**) |
-| Controls | commanded vs delivered: `cmd_a` against achieved `a_long`, with a **clip badge** when the ellipse limited the command; `cmd_lean` vs `phi`; `roll_rate` in use; the `action_id` of the active plan action, shown by its id and kind | Sample |
-| Sight | `sight_m` vs `ssd_m`, margin in metres; a **deficit badge** (red) when `ssd_m > sight_m`; limit-point trend (opening/closing) | Sample |
+| Controls | commanded vs delivered: `cmd_a` against achieved `a_long`, with a **clip badge** when the ellipse limited the command; `cmd_lean` vs `phi`; `roll_rate` in use; the live `steer_state` (`track \| commit \| unwind \| position`, **02** §3.1); the `action_id` / `lat_action_id` of the active plan action(s), shown by id and kind | Sample |
+| Sight | the safety compare in rider-path metres (D16): `sight_ride_m` vs `ssd_m`, margin = `sight_margin_m`; a **deficit badge** (red) when `ssd_m > sight_ride_m`; `sight_m` alongside (centreline basis — the cross-line-comparable number and the trend's source); limit-point trend (opening/closing/steady) | Sample + derived |
 | Verdict | line role, outcome, and — when the cursor crosses a check's evidence station — the relevant doctrine check id | envelope |
 
 The "commanded vs delivered" row is the teaching payload of Tier 1R (**02**): at a
@@ -156,10 +175,81 @@ ellipse-clipped delivery, and the widening line, in one glance.
 
 ### 3.4 Terminal states
 
-A line that ends early (crash, road-end/run-off, stop) freezes at its terminal sample with
-a terminal badge; the scrubber region beyond its end is shaded for that line. The
-cursor remains draggable across the full scenario extent so surviving lines in
-compare mode keep stepping.
+A line that ends early freezes at its terminal sample with a terminal badge keyed
+to `terminated.reason` (**05** §2's closed set: `crash | off_road | stopped |
+road_end | max_time | max_dist`); the scrubber region beyond its end is shaded
+for that line, keyed to the same reason. The `off_road` badge carries the placard
+text *"left the road — off-road behaviour not modelled"* — the trajectory ends at
+the bracketed edge crossing (**02** §7, **03** §2), so the frozen glyph sits
+exactly on the road edge, never in the grass. The cursor remains draggable across
+the full scenario extent so surviving lines in compare mode keep stepping.
+
+### 3.5 The corrective ghost (stepper-only)
+
+For a corner that ran wide, the verdict's `corrective` block (**05** §6.3) records
+whether a fixed-policy save was feasible; the shadow trajectory itself is never
+shipped (D18). The stepper offers a **corrective ghost** toggle (off by default):
+when enabled, the viewer recomputes the shadow via the pure core function
+`correctiveShot(lineResult)` (**08** §7.1) — a §2.4-legal call, the engine's own
+counterfactual, never a UI reconstruction — and draws it from the `correction`
+bookmark onward as a ghost overlay on the topdown and in the POV, at ghost
+opacity and visually distinct from compare-mode ghosts (it is a counterfactual,
+not a line of the figure; §5.6). On a `wide` corner the ghost is the save —
+roll to reserve, back inside the corridor at `corrective.returned.s`; on a
+`runoff` corner whose shot integrated, it is the failed attempt run to its own
+termination — `fail_reason` made visible. **The ghost is clipped at the shadow's
+return station `s*` in both cases** (**04** §4b.4): the shadow is a probe over a
+bounded horizon, and the design asserts nothing about the constant-`phiReserve`
+arc past the return, so drawing it would be drawing unspecified output. The
+ghost's legend carries **04** §4c.7's lean-only disclosure sentence verbatim.
+When `corrective` is null, or the shot
+never became integrable (`fail_reason = "departed_before_reaction"`), there is
+no shadow and the toggle is inert for that line. The recompute is one bounded
+extra engine run, inside the recompute budget (**09**). The ghost is
+**stepper-only**: it never appears in exported figures — the exported picture is
+always the uncorrected consequence, the book's own red ink (D18; **06**).
+
+### 3.6 The save-window overlay (stepper-only)
+
+A toggle beside the corrective-ghost toggle, **off by default**, per line. When
+on, the viewer calls the pure core function `saveWindow(lineResult)` (**08**
+§7.1) once per toggle — not per frame — and for each corner whose
+`corrective ≠ null` and whose `status ∈ {resolved, open_at_end}` draws:
+
+- a neutral **save-window glyph** at the projected `s_close_m` on that line (an
+  open ring with a tick, deliberately distinct from the ring apex marker and from
+  the corrective ghost's stroke), with a one-line neutral leader label
+  `save window closed · s = 34.2 m`;
+- one **timeline tick** on the scrubber at `tau_close_s`, in the overlay register
+  and visually distinct from event ticks;
+- one **HUD row** in the Verdict group: `save window: closes in 0.4 s` before
+  `tau_close_s`, `save window: closed 0.6 s ago` after, plus the static line
+  `reaction budget −0.6 s vs react 1.0 s`. This is the countdown, and it is where
+  the drama lives: a number that ticks as the cursor moves. On `open_at_end` the
+  HUD row instead reads `save window: still open at the horizon`, because
+  `tau_close_s = τ_last` is the scanned horizon rather than an observed closure
+  (**04** §4b.5) and a countdown to it would assert a closure the scan never saw;
+- the **04** §4b.7 placard, beside every displayed scalar, always.
+
+`status ∈ {intermittent, never_open}` → the placard and the status sentence
+replace all of the above and **no scalar is drawn**; the rider id and the policy
+block remain readable in the overlay's detail panel, because a refusal that
+concealed which controller refused would be a worse object than the one it
+replaced (**04** §4b.5). `status = "not_applicable"` → the toggle is inert for
+that corner. When the shadow itself is drawn it is **clipped at `s*`**, exactly
+as §3.5's ghost is.
+
+**No line ink is modulated anywhere, in any view** — `quality` remains the single
+total colour function per line (D9). **No exported figure changes**: the overlay
+is stepper-only, and `C-SAVEWIN-NO-INK` asserts the exported SVG is
+byte-identical with the toggle on and off. **No POV representation**: the POV
+consumes true geometry and per-sample recorded channels only, and a scalar from
+an out-of-line counterfactual has no honest POV form. **No controls-strip
+channel**: `t_to_horizon` is by construction slope −1 and carries exactly one
+scalar; `renderControls(lineResult, window?, cursor?)` keeps its signature.
+
+All displayed values are precision-clamped to `HORIZON_DISPLAY_DP` (**04**
+§4b.5), asserted by `C-SAVEWIN-HUD`.
 
 ---
 
@@ -202,7 +292,8 @@ same blind corner twice — geometry-optimal vs **visibility-governed** (hold wi
 speed capped to stop-within-sight) — load both lines in one envelope, station-lock,
 and scrub the approach. The HUD sight row and the POV limit point tell the story
 sample by sample: the wide line's `sight_m` opens earlier, its deficit badge
-clears sooner, and the POV shows the road unrolling from behind the hedge earlier.
+(`ssd_m` vs `sight_ride_m`, the rider-path basis — D16) clears sooner, and the
+POV shows the road unrolling from behind the hedge earlier.
 No prose in the course made this argument as directly as thirty seconds of this
 scrub.
 
@@ -226,8 +317,9 @@ geometry (**03**):
   lane edges, centreline);
 - occluders: footprint polygons (**03** owns kinds and placement; heights are
   presentation-only and owned *here* — see the per-kind table in §5.3);
-- sight: `sight_m`, `ssd_m`, `limit_x, limit_y` — **rider-eye** results per D4,
-  recorded on the Sample.
+- sight: `sight_m`, `sight_ride_m`, `ssd_m`, `limit_x, limit_y` — **rider-eye**
+  results per D4, recorded on the Sample — plus `stateAt.derived.ssd_station_m`
+  for the deficit band (§5.3 item 5).
 
 The POV consumes **true geometry only**. The diagram projection (**06**) never
 touches this view — a first-person frame rendered from compressed geometry would
@@ -241,17 +333,54 @@ Per frame, from the focused Sample:
 - **Eye** at world `(x, y)` raised to `eye_height_m = 1.4` (TUNING — an eyes-above
   -road height for a seated rider; body position is out of scope per D5, so the
   eye rides the bike's reference point).
-- **Yaw** = `psi` (the bike's heading; target fixation and head-turn modelling are
-  out of scope).
-- **Roll** = `phi` — the whole image rotates with lean, so the horizon tilts
-  exactly as much as the bike leans. This is the POV's signature honesty: the
-  horizon angle *is* the lean readout.
+- **Yaw** — set by the **`look` mode**, a closed two-value camera toggle, pure
+  presentation over recorded per-sample data:
+
+  ```
+  look = "heading" (default) | "limit_point"
+  ```
+
+  - **`heading`** — yaw = `psi`, the bike's heading. The default, because the
+    POV's stated job is "where the rider is pointed" and a mistake line must not
+    imply its rider looked through the turn.
+  - **`limit_point`** — the yaw law:
+
+    ```
+    bearing = atan2(limit_y − y, limit_x − x)   // world bearing, eye → recorded limit point
+    yaw     = psi + clamp(wrapDeg(bearing − psi), −LOOK_MAX_DEG, +LOOK_MAX_DEG)
+    ```
+
+    with `LOOK_MAX_DEG = 70` (TUNING, range 60–90 — the maximum head-turn from
+    the bike's heading) and `wrapDeg` shortest-arc in (−180, 180]. Every input
+    (`x, y, psi, limit_x, limit_y`) is a recorded Sample field (**05** §2.1);
+    interpolated queries use **05**'s pinned `linear` rule for
+    `limit_x`/`limit_y` — no new recording is required. Because the recorded
+    limit point can jump between samples (occluder-edge release), the yaw under
+    `limit_point` may step visibly. That is honest — the limit point *does*
+    jump — and the clamp bounds the swing; no smoothing state is introduced
+    (it would break frame purity, §5.5).
+
+  `look` is a **camera control, not a gaze model**: it never enters `sightFrom`
+  (the eye is positional only), never touches a verdict, a check, `result_hash`,
+  or any recorded field. Gaze *behaviour* is out of scope — a placarded refusal
+  (01 §8, typed `na` reason `"rider gaze behaviour not modelled"`); the `look`
+  toggle is a camera control over recorded data, not a rider model. Spellings:
+  `look?` in the ViewSpec (**06** §2.1), `look=` on the scene `view:` line
+  (**04** §7), `--look` on the CLI (**08**), and the viewer toggle (§6.1);
+  unknown values are rejected `SCHEMA` (closed set, D8).
+- **Roll** = `phi` in **both** `look` modes — the head rides the bike: the whole
+  image rotates with lean, so the horizon tilts exactly as much as the bike
+  leans. This is the POV's signature honesty: the horizon angle *is* the lean
+  readout.
 - **Pinhole projection** with horizontal field of view `fov_deg = 60` (TUNING);
   focal length follows from the canvas width. Near-plane distance
-  `near_m = 0.5` (TUNING).
+  `near_m = 0.5` (TUNING). Marker inset `CHEVRON_INSET = 0.05 ×
+  min(frame_w, frame_h)` (TUNING — the frame-boundary inset that keeps a clamped
+  limit-point marker fully visible; §5.3 item 7).
 
-Projection of a ground point `p`: translate by the eye, rotate by `−psi` into the
-camera frame (axes: forward, lateral); a point at forward distance `F > near_m`
+Projection of a ground point `p`: translate by the eye, rotate by `−yaw` (the
+active `look` mode's yaw, above) into the camera frame (axes: forward, lateral);
+a point at forward distance `F > near_m`
 and lateral offset `L` projects to screen position
 
 ```
@@ -277,30 +406,100 @@ Painter's algorithm, far to near, fixed:
    model (the LUT ahead of the current station), not merely to `sight_m` — sight
    is enforced by occlusion, not by truncating the world.
 3. **Lane markings** — centreline and lane-edge polylines, projected the same way.
+3b. **The continuation fan (D45, gated)** — between lane markings (3) and
+   occluders (4). Each admissible member's two road edges are extruded and drawn
+   far-to-near at `POV_FAN_ALPHA = 0.12` (TUNING), **before** the occluder quads,
+   so the occluder extrusion paints over the fan and the fan disappears behind
+   the hedge exactly as the real road does; portions re-emerging past the hedge's
+   lateral edge remain visible, which is the point. The limit-point marker (D40,
+   stage 7) draws on top, unconditional and unchanged. A neutral chip names the
+   pack, the escape rider's `short_name`, and the counts, per **06** §2.7's count
+   grammar. Frame purity holds: the fan is a pure function of
+   `(result, cursor, prior)` with no smoothing state. Whether the stage draws at
+   all is decided by the ViewSpec `fan` key (`auto | off | <probe index>`, owned
+   by **06** §2.1): `auto` resolves on **iff** a `CommitmentReport` is attached to
+   the loaded envelope, resolving it never invokes an engine run, and a
+   requested-but-absent report draws the typed refusal placard, verbatim:
+   *"fan requested; this envelope carries no commitment report (re-run with
+   `--commitment`)."* This document is the owning declaration of that string
+   (**06** §2.1 names §5.3 as owner and does not restate it). Unlike the
+   corrective ghost (§3.5) and the save-window overlay (§3.6), which are
+   stepper-only, `fan` is persisted and rendered into exports — it is a rendering
+   of a declared input world, not a viewer-local aid. Because `auto` resolves off
+   with no report attached, and no committed book scene carries one, G7 is
+   unaffected.
 4. **Occluders** — each footprint polygon extruded vertically to its kind's
-   presentation height (owned here, all TUNING: `hedge 1.8 m`, `wall 1.2 m`,
-   `bank 1.5 m`, `vehicle 1.5 m` — tall enough that every kind fully occludes the
-   1.4 m eye, consistent with **03**'s binary is-opaque optical model)
-   and drawn as filled quads, sorted far-to-near. Paint order does the doctrinal
-   work: **the road beyond the hedge is painted, then the hedge is painted over
-   it** — the road visibly disappears behind the occluder, which *is* the
-   blind-corner visual the tool exists to show.
+   presentation height (owned here, all TUNING: `hedge 1.8 m`, `wall 2.0 m`,
+   `bank 1.8 m`, `vehicle 1.8 m`) and drawn as filled quads, sorted far-to-near.
+   **Occlusion invariant (normative):** every occluder kind's presentation
+   height must exceed `eye_height_m` (1.4 m) by at least
+   `POV_OCCLUDE_CLEAR_M = 0.4 m` (TUNING) — a POV in which the eye sees over any
+   occluder would contradict **03**'s binary is-opaque optical model; that is a
+   spec violation, not a tuning choice. The heights above satisfy it by
+   construction (at 1.8 m the `vehicle` reads as a van/SUV — the honest height
+   for a footprint the plan-view model says fully occludes; its extrusion faces
+   per **03** §4's derived heading, own-lane `+s`, oncoming `−s`). Paint order
+   does the doctrinal work: **the road beyond the hedge is painted, then the
+   hedge is painted over it** — the road visibly disappears behind the occluder,
+   which *is* the blind-corner visual the tool exists to show.
 5. **Sight band** — the road surface from the current station to `s + sight_m`
-   carries a faint neutral tint ("what you can see"); when `ssd_m > sight_m`, the
-   band from `s + sight_m` to `s + ssd_m` is tinted red — *the road you would need
+   carries a faint neutral tint ("what you can see" — station basis is correct
+   here: the tint paints road surface). The deficit judgment is rider-path-based
+   (D16): when `ssd_m > sight_ride_m`, a red band runs from `s + sight_m` to
+   `derived.ssd_station_m` — the station the rider's own path reaches after
+   `ssd_m` of path length (`stateAt`, **05** §4) — *the road you would need
    to see to stop, and cannot*. Both bands are surface tints, under the path
    overlay.
 6. **Path overlay** — the focused line's samples ahead of the cursor, projected
    onto the ground and stroked in the line's verdict colour (D9). Toggleable;
    ghosts of other lines render at ghost opacity (§5.6).
-7. **Limit-point marker** — the projected `(limit_x, limit_y)` drawn as a chevron
-   on the road surface, badged with the trend (opening/closing) from the sight
-   channel. When the limit point is the far edge of an occluder, the chevron sits
-   at its base — visually "the corner of the hedge", which is exactly what a
-   rider's limit point is.
+7. **Limit-point marker** — unconditional, with a closed two-state presentation:
+
+   ```
+   markerState = "placed" | "clamped"        (closed set; appears in the frame draw list)
+   ```
+
+   Per frame, transform the sample's recorded `(limit_x, limit_y, 0)`: translate
+   by the eye `(x, y, eye_height_m)`, rotate by `−yaw` (yaw per the active `look`
+   mode, §5.2) into camera axes `(F forward, L lateral)`; then:
+   - **If `F > near_m`:** project per §5.2 and rotate `(u, v)` by `−phi` about
+     the principal point → final frame point `p`. If `p` lies inside the **inset
+     rectangle** `R_inset` — the frame rectangle shrunk on all sides by
+     `CHEVRON_INSET` (§5.2; the inset keeps the clamped glyph fully visible) —
+     then `markerState = "placed"`: a chevron at `p` on the road surface, badged
+     with the trend (opening/closing/steady) from the sight channel. When the
+     limit point is the far edge of an occluder, the chevron sits at its base —
+     visually "the corner of the hedge", which is exactly what a rider's limit
+     point is.
+   - **Otherwise (`p ∉ R_inset`, or `F ≤ near_m`):** `markerState = "clamped"`.
+     The direction ray runs from the principal point `P0` through `p` when the
+     projection exists (`F > near_m`); when `F ≤ near_m`, through
+     `rotate(−phi)` of the pre-roll direction `(sign(L), 0)` — "the limit point
+     is off to the left/right at eye level". Both branches give a unit direction
+     `d̂` in final frame coordinates. The **clamped chevron position** is the
+     intersection of the ray `P0 + k·d̂ (k > 0)` with the boundary of `R_inset`
+     (unique, because `P0` is interior). An **arrowhead** on the chevron's
+     outward side points along `d̂` — the direction the gaze must turn to bring
+     the true limit point into frame. The arrow exists **iff**
+     `markerState = "clamped"`: its presence *is* the off-frame signal (arrow
+     length 1.2 × chevron size, a renderer style constant, presentation-only).
+     The trend badge stays attached to the chevron in both states — the
+     mid-corner "opening" cue is readable even while the point is off-frame.
+
+   **Invariant (normative):** every POV frame of every line contains exactly one
+   limit-point marker — there is no sample at which the POV silently drops its
+   teaching device. (The rule, not the `fov_deg` constant, is what keeps the cue
+   on screen: at `book90` mid-corner the limit-point bearing is 36.8° against a
+   30° half-frame, and frame roll only makes it worse; no plausible widening
+   fixes that.) Under `look: limit_point` the marker is near frame-centre by
+   construction; the clamp rule still covers the residual case where the
+   `LOOK_MAX_DEG` clamp leaves it outside.
 8. **HUD strip** — a slim neutral-colour overlay repeating the core HUD numbers
-   (`v`, `phi`, `sight_m` vs `ssd_m`, clip badge) so a full-screen POV scrub needs
-   no side panel.
+   (`v`, `phi`, `sight_ride_m` vs `ssd_m`, clip badge) so a full-screen POV scrub
+   needs no side panel. Under `look: limit_point` the strip carries a mode chip
+   (`look: limit point`) plus a small **heading tick** on the horizon line
+   marking where `psi` points, so the head-turn amount is always disclosed
+   in-frame — a rotated camera must not read as a rotated bike.
 
 ### 5.4 Honesty placards
 
@@ -310,13 +509,19 @@ encounters vertical geometry. The placard rule exists for the boundary case wher
 an author *asks* for a book figure whose subject is vertical (a crest brow): the
 correct output is a refusal panel in the POV frame — "vertical sight geometry not
 modelled" — never a faked hill. The placard is a rendered element, not an error:
-the rest of the scenario remains scrubable.
+the rest of the scenario remains scrubable. Gaze is the same placard class: any
+check or scenario feature that would require a gaze *model* answers with the
+typed `na` reason `"rider gaze behaviour not modelled"` (01 §8) — never a
+fabricated gaze; the `look` toggle (§5.2) is the honest partial substitute.
 
 ### 5.5 Frame stepping and future rasterizers
 
 The POV has no animation loop of its own: it is a pure function
-`frame(result, lineId, cursor) → canvas draw list`, invoked by the stepper on
-every cursor move. This is what keeps it trivially steppable, and it is the seam
+`frame(result, lineId, cursor, look) → canvas draw list`, invoked by the stepper
+on every cursor move. The draw list's limit-point entry carries `markerState`
+(`"placed" | "clamped"`) and, when clamped, the arrow direction — a presentation
+shape, not a wire contract, but pinned so tests can assert it (**09**).
+This is what keeps it trivially steppable, and it is the seam
 for the future: the same camera model and draw list can target WebGL (or an
 offscreen rasterizer for CLI export of POV frame sequences, **08**) without any
 change to the state contract or the sight machinery.
@@ -327,7 +532,9 @@ In compare mode, non-focused lines project as ghost path overlays (their own
 verdict colours, ghost opacity) and — under `time` lock — as ghost bike markers at
 their own `(x, y)`: the ghost race seen from inside the focused rider's helmet.
 Under `station` lock ghost markers are suppressed (two riders at the same station
-would overlap absurdly); only the ghost paths draw.
+would overlap absurdly); only the ghost paths draw. The corrective ghost (§3.5)
+is a third overlay class — a counterfactual, not a line of the figure — and
+renders visually distinct from both.
 
 ---
 
@@ -338,9 +545,11 @@ would overlap absurdly); only the ghost paths draw.
 One workstation page:
 
 - **Left:** `topdown` with its mode toggle (`true` | `diagram`).
-- **Right:** `pov` (expandable to full-width).
-- **Bottom:** `controls` strip with the linked cursor, the timeline scrubber, and
-  the named-event ticks.
+- **Right:** `pov` (expandable to full-width), with its `look` toggle
+  (`heading` | `limit_point`, §5.2) beside the path-overlay toggle.
+- **Bottom:** `controls` strip with the linked cursor, the timeline scrubber,
+  the named-event ticks, the corrective-ghost toggle (§3.5), and the
+  save-window overlay toggle beside it (§3.6).
 - **Side:** the HUD panel, the line legend (role, verdict colour, focus control),
   and the lock toggle (`station` | `time`).
 
@@ -366,8 +575,9 @@ recomputed on entry (§2.1):
 ### 6.3 Read-mostly, and why
 
 The viewer is **read-mostly**: it offers view-level state only — cursor, focus,
-lock mode, view toggles, line visibility, `true`/`diagram` mode — and no scenario
-editing. Authoring lives in the CLI, the programmatic API, and scene text
+lock mode, view toggles (`look`, `fan`, path overlay, the corrective ghost, the
+save-window overlay), line
+visibility, `true`/`diagram` mode — and no scenario editing. Authoring lives in the CLI, the programmatic API, and scene text
 (**04**, **08**).
 
 Rationale, carried from the prior design and still sound: a second authoring
@@ -393,6 +603,16 @@ must not add a second physics or a drawn line.
 | Viewer proven tolerance-equal to CLI (G6′) via one shared classic-script core | Same guarantee, ESM mechanism; import-graph lint + tolerance test in **09** |
 | Static SVG as the product | Static SVG as an export (**06**, **08**); the interactive surface is the product |
 
-What is deliberately preserved: one core with no second physics; the viewer as a
-pure consumer; lean never hand-drawn; colour reserved for verdict quality; honest
-refusal placards instead of faked geometry.
+**Carried:** one core with no second physics; the viewer as a pure consumer;
+lean never hand-drawn; colour reserved for verdict quality; honest refusal
+placards instead of faked geometry; the events-only jump-point law, unchanged by
+either new overlay.
+
+**Changed:** the corrective ghost is clipped at the shadow's return station `s*`
+(§3.5) and its legend carries **04** §4c.7's lean-only disclosure sentence
+verbatim.
+
+**New:** the save-window overlay (§3.6) and its clipping rule; POV draw-order
+stage 3b, the continuation fan, with `POV_FAN_ALPHA` and the ViewSpec `fan` key
+cross-referenced to **06** §2.1; probe jump targets (§3.1). All are out of hash,
+off by default, and absent from every committed book scene.
