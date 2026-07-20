@@ -88,10 +88,16 @@ exist anywhere in the road model (D4/D5): the world is flat. A scenario that nee
 vertical geometry is refused at validation with an honest placard
 (`OUT_OF_SCOPE`, reason `vertical_geometry_not_modelled`), never approximated.
 
-**Super-tight geometry is refused by sweep content.** A corner is refused
-`OUT_OF_SCOPE` (`super_tight_geometry`) iff the swept angle accumulated over the
-stations where the local radius `r(s) ≤ R_UTURN_MAX = 15 m` is itself
-`≥ SWEEP_UTURN_MIN = 170°` (taper `r` linear in swept angle for this test). On
+**Super-tight geometry is refused by sweep content.** A corner `c` is refused
+`OUT_OF_SCOPE` (`super_tight_geometry`) iff the swept angle accumulated **over the
+stations of `c`** where the local radius `r(s) ≤ R_UTURN_MAX = 15 m` is itself
+`≥ SWEEP_UTURN_MIN = 170°`. **The quantifier is per corner, never per road** —
+corners are minted per curved segment (above), so a road may carry far more than
+170° of tight sweep in total without any one corner doing so. `bookEsses` is the
+corpus's own witness: four `R 12 ^75` corners is **300° of sweep, every metre of
+it at `r = 12 ≤ R_UTURN_MAX`**, so a road-level reading would refuse a committed
+book figure (8.6) at validation. `02-physics-model.md` §7 restates this rule and
+defers to this sentence as the owning statement (taper `r` linear in swept angle for this test). On
 constant arcs this reduces exactly to the carried rule (`angle_deg ≥ 170°` and
 `r ≤ 15 m`); on tapers it measures actual U-turn-regime content — `R 16>9 ^130`
 spends 111.4° at `r ≤ 15` (in scope), a book-faithful teardrop `R 30>9 ^210`
@@ -227,7 +233,7 @@ book's 45–80 km/h prose speeds use realistic roads plus the diagram projection
 | `bookDecreasing` | **L** | `lane 3.5 \| S 10 \| L 16>9 ^130 \| S 14` | 34 km/h | decreasing-radius trap (fig 8.4) |
 | `bookEsses` | **R** | `lane 3.5 \| S 8 \| R 12 ^75 \| S 6 \| L 12 ^75 \| S 6 \| R 12 ^75 \| S 6 \| L 12 ^75 \| S 10` | 32 km/h | four linked alternating turns, link straights sized to the hand-flip budget (fig 8.6) |
 | `bookHairpin` | R | `lane 3.5 \| S 10 \| R 10 ^150 \| S 12` | 28 km/h | road-speed hairpin (no Chapter-8 ink to match) |
-| `bookBlind` | **L** (inherits `book90`) | `book90` geometry + `hedge inside c1 -6x26 margin=1.2 depth=2.5` | 32 km/h | blind corner, limit point, hold-wide (fig 8.1's blind variant) |
+| `bookBlind` | **L** | `lane 3.5 \| S 16 \| L 12 ^140 \| S 16` + `hedge inside c1 -6x36 margin=1.2 depth=2.5` | 34 km/h | blind corner, limit point, hold-wide (Ch. 8's blind-corner argument; **not** fig 8.1's geometry — see the note below) |
 | `bookDoubleApex` | **L** | `lane 3.5 \| S 10 \| L 12 ^70 \| L 24 ^40 \| L 12 ^70 \| S 12` | 30 km/h | double-apex compound (fig 8.5): two touch corners bridged by an opening — the shape that rewards two apexes |
 
 Notes:
@@ -251,6 +257,70 @@ Notes:
   `r ≤ 15 m` < 170°.
 - `bookBlind`'s occluder line is byte-identical under any hand flip — the live
   demonstration that the side vocabulary is hand-relative.
+- **bookBlind stopped inheriting `book90`, and the reason is a fact about
+  `blind(c)` rather than a tuning preference.** `blind(c)` is
+  `s_limit < s_end(c)` at the corner's `turn_in`
+  (`01-scope-and-doctrine.md` §A.2). Because the eye is the rider's own position
+  (§5.1), **`blind(c)` is a per-line predicate** despite being written as a
+  function of the corner: the same corner can be blind for one line and not for
+  another. Both readings matter below and are reported separately.
+
+  For a band occluder sitting outside the road edge, whether the limit point falls
+  short of the corner exit rises steeply with the corner's **swept angle**. At
+  `r = 12` with `bookBlind`'s hedge, the fraction of (turn-in × lane-position)
+  cells satisfying `blind(c)` is:
+
+  | sweep | 90° | 100° | 110° | 120° | 130° | 140° |
+  |---|---|---|---|---|---|---|
+  | cells blind | 0 % | 4 % | 33 % | 59 % | 81 % | **100 %** |
+
+  (Computed at `r = 12`, not across the band — radius moves this far less than
+  sweep does. It is a steep curve rather than a threshold; "≈ 115°" below names
+  where it crosses half, not a cliff.)
+
+  **On the hold-wide line — the doctrinal line, and `rider.start.f`'s default of
+  `1.0` — no 90° corner is blind at any legal hedge margin**, across
+  `margin ∈ [0, 1.2]` and `r ∈ {9, 12, 12.7}`. That is the claim that forces the
+  reshape, and it is narrower than "no 90° corner can be blind", which is **false**:
+  at `margin ≤ 0.5` a 90° corner at `r = 12` *is* blind on a **cut-in** line — by
+  0.10 m at `margin = 0.5`, rising to **1.35 m at `margin = 0`** (1.70 m at
+  `r = 12.7`).
+
+  That near-miss is worth stating rather than burying, because it is the exact
+  pathology the fixture must avoid. Holding wide *opens* the sight line, so on a
+  marginal corner `blind(c)` comes out **true for the bad line and false for the
+  good one** — and since `hold_wide_for_sight` is `na` unless `blind(c)`
+  (`01-…md` §A.3 check 11), the check that exists to reward holding wide would go
+  `na` precisely when the rider holds wide. A fixture tuned to that knife edge
+  would grade the doctrine backwards. `^140` puts every cell on both lines well
+  inside blind, which is why the sweep and not the hedge had to move.
+
+  The old `book90`-derived `bookBlind` was not blind on either line: `blind(c1)`
+  read `false`, `hold_wide_for_sight` returned `na`, and the `BLIND_RESERVE_DEG`
+  cap never applied. The approach straight lengthens `12 → 16 m`
+  because the hold-wide `position` action needs `L_req = 13.8 m` at 34 km/h, and
+  the entry rises `32 → 34 km/h` (matching `book90`) because at 32 km/h the 35°
+  blind cap is unreachable inside the corridor: it needs `R = 11.503 m` against a
+  corridor floor of `12.40 m`, so the maximum in-corridor lean is 33.0° and check
+  8 could never fire. At 34 km/h the cut-in line leans 36.3° and fails while the
+  hold-wide line leans 31.1° and passes — which is the teaching.
+
+  The cost is honest and is recorded rather than hidden: `bookBlind` is no longer
+  fig 8.1's geometry, so it illustrates Ch. 8's blind-corner *argument* rather
+  than a specific figure's ink. `book90` is unchanged and keeps figs 8.1–8.3.
+  None of the six committed book-figure scenes used `bookBlind`, so no baked
+  figure moves.
+
+  **`fx-esses-blind` (`09-verification-and-testing.md` §3.5) has the same defect
+  and cannot be repaired the same way.** Its base is `bookEsses`, whose legs are
+  `R 12 ^75` — far below the threshold — and `bookEsses` is committed ink
+  (fig 8.6) that must not be reshaped. Every test hosted on it
+  (`P-VIS-MARGIN-MONOTONE`, `A-CHAIN-VIS-FULL`) currently runs on a corner where
+  `blind(c)` is false. Re-homing it is an open decision, recorded in `09-…md` §3.5 rather
+  than silently resolved here.
+
+  Both facts are executable: `review/verify/fixture_geometry.py` re-derives them
+  from the DSL strings and fails if the design's numbers drift.
 
 ---
 
@@ -348,9 +418,10 @@ key=val := lateral/kind params only (margin=, depth=, mu=, width=…)
   (`SCHEMA`, `lane_requires_vehicle`) — vision-blocking bands live off the
   carriageway by design.
 
-So `hedge inside c1 -6x26 margin=1.2 depth=2.5` (bookBlind) ≡
-`hedge inside entry:c1 -6x26 margin=1.2 depth=2.5`, spanning entry−6 m →
-entry+20 m. All placements resolve to absolute geometry at validation.
+So `hedge inside c1 -6x36 margin=1.2 depth=2.5` (bookBlind) ≡
+`hedge inside entry:c1 -6x36 margin=1.2 depth=2.5`, spanning entry−6 m →
+entry+30 m — which covers the whole 29.32 m arc of `bookBlind`'s `^140` corner
+plus 6 m of approach. All placements resolve to absolute geometry at validation.
 
 ### 4.1 Occluder wire shape
 
@@ -932,7 +1003,7 @@ computed only when the commitment pass runs.
 
 ---
 
-## 7a. The continuation envelope (D45 — designed, gated on `S-CONT-SEPARATION`)
+## 7a. The continuation envelope (D45 — designed, gated on `S-CONT-SEPARATION-v2`)
 
 ### 7a.1 What it is, and what is not claimed
 
@@ -981,7 +1052,7 @@ ContinuationPack = {
   escape_rider: "brake_reserve_escape",     // MUST name a 04 §4c registry id; never defines one
   envelope: {
     kappa_max_1pm:        { value: 0.14285714285714285, units: "1/m",   source: "TUNING" },
-    dkappa_ds_max_1pm2:   { value: 0.0025,              units: "1/m^2", source: "TUNING" },
+    dkappa_ds_max_1pm2:   { value: 0.005,               units: "1/m^2", source: "TUNING" },
     kappa_step_max_1pm:   { value: 0.14285714285714285, units: "1/m",   source: "TUNING" },
     member_sweep_max_deg: { value: 150.0,               units: "deg",   source: "TUNING" },
     member_curve_max_m:   { value: 120.0,               units: "m",     source: "TUNING" },
@@ -1063,6 +1134,46 @@ pack literal `0.1111` is *less* than it and the containment gate fails on the ve
 road the taper was tuned to admit. Envelope bounds are therefore shipped at
 binary64 precision and compared with `EPS_KAPPA_ENV_1PM` of slack.
 
+**All three envelope bounds are pinned from below by the corpus, and the rate
+bound was the one that was wrong.** For a `taper r1>r2 ^θ`, `r` is linear in swept
+angle (§7a.4's split rule), so
+
+```
+dκ/ds = (r1 − r2) / (θ_rad · r³)      — maximised at the tight end, r = r2
+```
+
+`bookDecreasing`'s own `L 16>9 ^130` therefore runs
+`7 / (2.26893 · 729) = 0.004232 1/m²` over the last 5.52 m of its 28.36 m taper
+(the bound is crossed at `r = 10.726 m`) — **1.69× the `0.0025` this pack shipped
+before this amendment**. `P-CONT-ENVELOPE-CONTAINS-ACTUAL` would have failed on a
+committed preset, and the honest-refusal path would have fired
+(`envelope_contains_actual: false`, no fan, every count `null`) on precisely the
+decreasing-radius trap that best exemplifies the feature's own thesis. The bound
+is raised to **`0.005`**, which dominates the corpus maximum with 18 % of margin;
+`C30-DR`'s `R 40>25` taper is nowhere near it either — its tight end runs
+`15/(θ_rad·25³) ≤ 0.001` for any sweep at or above 60°, and `02-…md` §8 does not
+pin its sweep, so no exact figure is quotable here.
+
+**Normative:** *every envelope bound is a lower bound set by the corpus, never a
+free constant. Adding or reshaping a preset obliges a re-check of all three —
+`|κ|`, the interior boundary step, and `dκ/ds` — against every road the corpus
+contains. `review/verify/fixture_geometry.py` computes all three from the DSL
+strings and is the executable form of this obligation.*
+
+**Normative — `kappa_step_max_1pm` and `kappa_max_1pm` are coupled and move
+together.** `E(s_L)` bounds the initial step by `kappa_step_max_1pm`, while
+§7a.4's ladder produces a step of at most `kappa_max_1pm`. Those are different
+constants that happen to be equal today, and the containment proof depends on the
+equality: raising `kappa_max_1pm` alone to `1/4` makes the `σ = +1` rung step
+`0.1667` against an unchanged `0.1429` bound, so the generator would emit members
+outside the envelope the placard names — the exact defect the hand-frame ladder
+was introduced to remove. *Any change to `kappa_max_1pm` must raise
+`kappa_step_max_1pm` to at least match it, and the pack schema check asserts
+`kappa_step_max_1pm ≥ kappa_max_1pm`.* This matters because `kappa_max_1pm` is
+**not** fenced from above by containment (`09-…md` §3.4a): containment is a lower
+bound, so the constant can be raised to buy refutations, and the only real fences
+are this coupling and the grid's `|{k_refuted}| ≥ 3` condition.
+
 **Consequence, stated plainly:** past a totally blind limit point the envelope is
 wide and the fan opens hard. That is not over-fanning; it is the epistemic state
 of a rider who genuinely cannot see. The fan narrows for exactly two reasons: the
@@ -1091,18 +1202,63 @@ of the ladder onto one byte-identical road (every rung clamps at
 `κ_L = kappa_max_1pm` exactly, makes *"the turn may tighten"* literally
 inexpressible.
 
+**The ladder is evaluated in the hand frame, not against `sign(κ_L)`.** Let
+`hand ∈ {+1, −1}` be the **governing corner's hand** (§2's governing-corner rule:
+the corner containing `s_L`, else the nearest corner downstream, else the last
+corner) — `+1` for a right-hander under `02-physics-model.md` §2's curvature sign convention. Everything below is
+computed on the hand-framed curvature `κ̃ := κ·hand`, which is `≥ 0` through the
+corner and, crucially, is **defined when `κ_L = 0`**:
+
 ```
-κ_L      = road curvature at s_L, signed, in the rider's travel frame
-h_toward = kappa_max_1pm·sign(κ_L) − κ_L        // headroom toward the ceiling of κ_L's own sign
-h_away   = κ_L + kappa_max_1pm·sign(κ_L)        // headroom to the opposite ceiling
-κ0(σ)    = κ_L + σ·ladder_reach·( σ·sign(κ_L) > 0 ? h_toward : h_away )
-κ_m(u)   = clamp( κ0(σ) + σ·dkappa_ds_max_1pm2·(u − s_L),
+hand     = governing corner's hand ∈ {+1, −1}        // never sign(κ_L)
+κ̃_L      = κ_L · hand                                // ≥ 0 in the corner, 0 on a straight
+h(σ)     = σ > 0 ? kappa_max_1pm − κ̃_L               // headroom toward the envelope ceiling
+                 : κ̃_L                               // headroom back to straight
+κ̃0(σ)    = κ̃_L + σ·ladder_reach·h(σ)
+κ̃_m(u)   = clamp( κ̃0(σ) + σ·dkappa_ds_max_1pm2·(u − s_L),
                   −kappa_max_1pm, +kappa_max_1pm )
+κ_m(u)   = κ̃_m(u) · hand
 ```
+
+`σ = +1` is *"it tightens to the envelope ceiling"*; `σ = −1` is *"it
+straightens"*; hand reversal past the limit point is reachable, but only through
+the **rate** clause over distance — never as a step at `s_L`, because no real road
+snaps from one hand to the other at a point.
+
+Three properties hold by construction, and each replaces a defect the earlier
+`sign(κ_L)` formulation carried:
+
+1. **Hand symmetry.** `{κ₀(σ)}` on a left-hander is exactly `−{κ₀(σ)}` on its
+   mirror. The earlier form keyed the `h_toward`/`h_away` branch on
+   `σ·sign(κ_L) > 0`, which silently swapped the branches with hand: on a
+   left-hander `σ > 0` selected the *opposite-ceiling* headroom — `−0.226190`
+   against the intended `−0.059524`, **3.80×** the right magnitude — so `σ = +1/3, +2/3, +1` all clamped to `−kappa_max_1pm` and collapsed
+   onto **one byte-identical road** — the exact failure this paragraph opens by
+   promising to prevent. Every book preset except `bookEsses` and `bookHairpin`
+   is a left-hander, so the collapse hit `bookBlind`, the fixture the D45 spike
+   is gated on.
+2. **Definedness on a straight.** `sign(0) = 0` made `h_toward = h_away = 0`, so
+   at a limit point on a straight *all seven* rungs returned `κ₀ = 0` and the fan
+   was a single road. In the hand frame `κ̃_L = 0` still gives a spread over
+   `σ > 0`, and the `σ < 0` rungs remain distinct through their ramp rates.
+3. **Every rung lies inside `E(s_L)`.** The step is
+   `|κ̃0(σ) − κ̃_L| = |σ|·h(σ) ≤ max(kappa_max_1pm − κ̃_L, κ̃_L) ≤ kappa_max_1pm`,
+   so the members the fan draws are members of the envelope the placard names.
+   The earlier form's `h_away` branch reached `−kappa_max_1pm·sign(κ_L)`, a step
+   of `|κ_L| + kappa_max_1pm` — `0.2262` against a `0.1429` bound on a right-hand
+   `r = 12` corner. Two of seven rungs were **outside the declared envelope**, and
+   they were the two that refuted unconditionally (an instantaneous hand reversal
+   at street speed leaves the corridor whatever the rider does), so the count the
+   report headlines was floored by roads that were not in the probe set.
+
+`P-CONT-MEMBERS-DISTINCT` is asserted on `road_dsl`, not on `κ₀`: on a straight
+the `σ < 0` rungs share `κ₀ = 0` but differ in ramp rate, hence in spelled taper,
+hence in `road_dsl`.
 
 `kappa_step_max_1pm` is read by §7a.3 **only**; the generator never reads it.
 `kappa_max_1pm` is `1/7`, not `1/9`: `1/9` is `bookDecreasing`'s own minimum
-radius (§3.1), so at `1/9` the preset sits on the ceiling and `h_toward = 0`.
+radius (§3.1), so at `1/9` the preset sits on the ceiling and the tightening
+headroom `h(σ>0)` is zero.
 
 **The curved tail is budgeted in swept angle.** Integrate `|κ_m|` from `s_L` and
 terminate the curved tail at the **first** of
@@ -1115,13 +1271,18 @@ version is recorded because it is the cautionary case: at a `1/9` ceiling with a
 `book90` sweeps **573°** — all refused `OUT_OF_SCOPE/super_tight_geometry` by §2
 under D21's `≥ SWEEP_UTURN_MIN at r ≤ 15 m` rule. Six of seven rungs vanished and
 the drawn fan contained the actual road plus one road that got *easier*: the
-exact negation of the feature's thesis. Retuning the length alone cannot repair
-it — honouring the curvature ceiling caps the tail at 26.7 m, below what the
-escape needs to brake from 32 km/h at `escape_decel_mss` after `t_react_s`.
-Budgeting the angle and letting the runout carry the distance repairs both ends at
-once: at `r = 7 m`, 150° is 18.3 m curved plus 60 m straight; the escape from
-32 km/h needs 8.9 + 13.2 = 22.1 m and from 55 km/h needs 15.3 + 39.0 = 54.3 m,
-both inside 78 m.
+exact negation of the feature's thesis — which is on its own sufficient to kill
+the arc-length budget. A second reason once given here — that honouring the
+curvature ceiling caps the tail at 26.7 m, "below what the escape needs" — is
+**withdrawn as false**: 26.7 m is *above* what the escape needs at every speed the
+corpus rides (21.4 m at 32 km/h, 23.6 m at 34), so it never argued against
+retuning the length. Budgeting the angle and letting the runout carry the distance repairs both ends at
+once: at `r = 7 m`, 150° is 18.3 m curved plus 60 m straight, i.e. 78.3 m of
+member. Against that, a coasting escape needs 23.6 m from `bookBlind`'s 34 km/h
+and 53.5 m from 55 km/h (both to `v_floor_ms`, `02-…md` §7) — comfortably inside
+78 m, which is the only thing this budget argument needs. Those two figures are
+**illustrative sizing, not a fixture reach**: per `04-…md` §4d a reach quote is
+meaningful only alongside a named line and probe, and neither is named here.
 
 **Spelling** (ordinary DSL, no special composer path):
 
@@ -1140,6 +1301,29 @@ both inside 78 m.
 budgeted in swept angle strictly below `SWEEP_UTURN_MIN` (§2); a member that
 still trips `super_tight_geometry` after the cap is dropped, counted in
 `members_out_of_scope`, and named in the report.*
+
+**`members_out_of_scope` is always zero *under §2's per-corner quantifier*, and
+that quantifier is the load-bearing assumption.** §2 refuses a corner whose swept
+angle accumulated where `r ≤ R_UTURN_MAX` reaches `SWEEP_UTURN_MIN = 170°`, and
+corners are minted **per curved segment** (§2). A member's curved tail is capped
+at `member_sweep_max_deg = 150°` and its clamped-arc continuation mints its own
+corner, so no member corner reaches 170° at any value of `kappa_max_1pm` — the
+truncated actual corner does not merge with the tail.
+
+**Under a road-level reading the conclusion inverts, which is why the quantifier
+had to be pinned.** A `bookBlind` member is a truncated `^140` corner at `r = 12`
+(itself `≤ R_UTURN_MAX`) plus a 150° tail at `r ≤ 7`; summed over the road that is
+178°/206°/234° for a limit point 20/40/60 % through the corner — refused
+near-universally, and `members_out_of_scope` would be near-total on the flagship
+fixture. `02-physics-model.md` §7 previously stated the rule without scoping and
+has been aligned to §2, which is the owning statement. Note that
+`bookDoubleApex` does **not** discriminate between the two readings and must not
+be cited as if it did: its middle segment is `r = 24 > R_UTURN_MAX`, so the
+`r ≤ 15` filter already drops it and the remaining `70 + 70 = 140° < 170°` clears
+under both. `kappa_max_1pm` is therefore not bounded from above by
+§2 at all. The drop path stays in the spec so that a future change to either
+constant fails loudly instead of silently drawing a refused road, but it must be
+asserted unreachable (`A-AN-SWEEP-BUDGET`) rather than exercised by a golden.
 
 Members are addressed **by index `σ`, never by corner id** — member roads re-mint
 `c1, c2, …` under the ordinary parser rule (§2), and nothing downstream reads a
@@ -1174,14 +1358,34 @@ occlusion the filter discards nothing and the fan is the declared ladder in
 full.**
 
 The claim that this mechanises Parks' edge-convergence cue is **deleted, not
-softened**. It was false: members are C1-continuous with the actual road at
-`s_L`, so centrelines diverge quadratically — 1.4 cm at one sample step, 12.5 cm
-at `s_L + 1.5 m` — against a shadow depth growing linearly at `sin θ` per metre
-(`θ ≈ 24°` on a representative blind corner). Under first-blocked semantics every
-member is blocked at the same station as the actual road, so `s_limit(m) = s_L`
-exactly and `admissible ≡ true` on the whole domain where the fan is drawn. A test
-whose non-vacuity guard sits on the occluder-free case proves nothing, because
-there the fan is empty.
+softened**. It was false: members share position and heading with the actual road
+at `s_L` but step in curvature, so centrelines separate as `½·Δκ·d²`. For the
+`σ = +1` member on a `κ_L = 1/12` corner, `Δκ = kappa_max_1pm − κ_L = 0.0595`,
+giving **0.74 cm at one 0.5 m sample step and 6.7 cm at `s_L + 1.5 m`**; taking
+`Δκ` at its widest (`kappa_max_1pm` itself, i.e. a limit point on a straight)
+gives **1.79 cm and 16.07 cm**. Both bracket the same conclusion, and neither is
+the pair this paragraph carried before (1.4 cm / 12.5 cm), which back-solves
+exactly to the **retired** `kappa_max_1pm = 1/9` and survived the amendment that
+replaced it. Against those, shadow depth grows linearly at `sin θ` per metre;
+`θ ≈ 24°` is reproducible at exactly one probe cell — the widest line at the last
+probe, i.e. the *least* blind cell on the fixture — while the median across the
+probe ladder is 36–44°, so `24°` is a real number carrying a false adjective and
+is restated here as the **best case for the filter**, not the representative one.
+
+Under first-blocked semantics every member is blocked at the same station as the
+actual road, so `s_limit(m) = s_L` exactly and `admissible ≡ true` on the whole
+domain where the fan is drawn. A test whose non-vacuity guard sits on the
+occluder-free case proves nothing, because there the fan is empty.
+
+**The re-emergence channel is weaker than `EPS_LAT_SEEN_M` admits.** The filter's
+third clause discards a member whose lateral displacement exceeds
+`EPS_LAT_SEEN_M = 1.0 m` where the rider actually saw road. At the divergence rate
+above, the `σ = +1` member does not reach 1.0 m of separation until ≈ 3.7 m past
+`s_L` (and ≈ 5.8 m at the `κ_L = 1/12` rate). Re-emerged tarmac appearing closer
+than that is inside the tolerance and prunes nothing, so the channel is narrower
+than "wherever road re-emerges" — it is "wherever road re-emerges more than about
+four metres past the limit point" on a straight, and about 5.8 m at the
+`κ_L = 1/12` rate that actually obtains mid-corner.
 
 Cardinality is therefore variable per station and both counts are recorded:
 `k_admissible(s) ∈ [1, K_MEMBERS + 1]`, `k_refuted(s) ∈ [0, k_admissible]`.
@@ -1307,22 +1511,73 @@ one of which is sufficient:
    4 corners × 3 lines` — an order of magnitude past `C-RECOMPUTE-BUDGET`'s
    100 ms. `na`-when-not-computed is forbidden, because `ok`, `quality` and
    `result_hash` may not depend on a viewer toggle (D38, G6).
-2. **Collinearity, in the fail direction, as a theorem.** On `bookBlind`,
-   `hold_wide_for_sight` is `na` unless `blind(c)`; `lean_ceiling` failing on a
-   blind corner means `φ > BLIND_RESERVE_DEG`, i.e. `v² > 6.87·R_line`, and the
-   `σ = +1` member at `r = 7` (the ceiling member, §7a.4: `kappa_max_1pm = 1/7`)
-   then demands 12.76 m/s² at `R_line = 13` against
-   `aLatMax = 9.81` — not holdable at any lean. So **check 8 fail ⇒
-   `k_refuted ≥ 1`**, unconditionally. The refutation adds zero information in the
-   fail direction.
-3. **Collinearity, in the pass direction, and against the wrong checks.**
-   `stop_within_sight`'s clean-pass region on `bookBlind` (`v ≤ ~6.5 m/s`) sits
-   entirely below the refutation threshold (`~7.2 m/s`), so the band where
-   `k_refuted > 0` and the sight triad passes cleanly is empty unless *warn*
-   counts as pass — in which case it is a 1.3 m/s slice of one knob. The one
-   genuine independent channel is lane-position margin at the limit point, which
-   duplicates `out_in_out` and `exit_containment`, not the visibility triad the
+2. **Collinearity in the fail direction — the *stated* theorem is invalid, and
+   the true relation is stronger.** The version this section carried argued that
+   on `bookBlind` a `lean_ceiling` fail implies `φ > BLIND_RESERVE_DEG`, hence
+   `v² > 6.87·R_line`, hence the `σ = +1` member at `r = 7` demands 12.76 m/s² at
+   `R_line = 13` against `aLatMax = 9.81`, hence **check 8 fail ⇒
+   `k_refuted ≥ 1`** unconditionally. That derivation fails three ways and is
+   retracted: it uses `G·tan 35° = 6.869` (the *cap*) as the fail bar when the
+   fail bar is `phiMax`; it is conditional on `R_line > 9.997 m` rather than
+   unconditional; and a check-8 fail *at the probe* means the ridden line is
+   already outside the escape corridor, so `04 §4d`'s `start_ok` is false and the
+   probe reports `k_refuted := null` — not `≥ 1`. The correct statement is
+   narrower and points the other way: check-8 failure suppresses the count
+   entirely rather than forcing it positive.
+3. **Collinearity with `stop_within_sight`, which is the binding relation.**
+   `k_refuted > 0` requires the escape to *reach past* `s_limit` — `04 §4d` grades
+   `escaped(m)` over the divergent span `s > s_L` only, so if the escape
+   terminates on `v < v_floor_ms` before `s_L` the divergent span is empty, all
+   four conditions hold vacuously, and every member is escaped by construction.
+   That reachability condition is
+   `v·t_react_s + v²/(2·escape_decel_mss) > sight_ride_m` — which is exactly
+   `stop_within_sight` (§5.2) re-evaluated with `a_ssd` swapped from the `alert`
+   model's **7.0 m/s²** to `escape_decel_mss = **3.0 m/s²**` — modulo two caveats
+   that keep the two from being the same function: `ssd` assumes constant speed
+   through the reaction then constant deceleration, whereas §4d phase 0 integrates
+   the *ridden plan*, so reach is line-dependent; and reach terminates at
+   `v_floor_ms`, not at zero.
+
+   The set relation runs the **opposite** way from a first reading, and the
+   direction matters:
+
+   ```
+   {check 10 fails} = {ssd@7.0 > sight}  ⊆  {reach@3.0 > sight}  ⊇  {k_refuted > 0}
+   ```
+
+   `k_refuted > 0` is therefore *not* a subset of check-10 failure — it is
+   contained in a **superset** of it, which is exactly why it **can** fire in a
+   band where check 10 passes cleanly. That band is not narrow: at 34 km/h it runs
+   from `sight = 15.82 m` (where check 10 starts failing) out to `23.64 m` (where
+   the escape stops reaching), a width of **7.8 m ≈ 49 % of `ssd@7.0`**; at 32 and
+   28 km/h it is **47 %** and **42 %**. All three are computed with reach
+   terminating at `v_floor_ms` (`02-…md` §7); a reach computed to `v = 0` gives
+   systematically larger figures and must not be mixed with these. Set `escape_decel_mss = 7.0` and the channel collapses
+   into check 10 outright. The
+   earlier numbers offered here (`clean-pass v ≤ ~6.5 m/s`, `refutation ~7.2 m/s`)
+   are retracted: they back-solve to `sight_ride_m ≈ 14.5–15.2 m` against ≥ 24 m
+   of actual fixture geometry, and are wrong by roughly 60 %. The one channel not
+   gated by that constant is lane-position margin at the limit point, which
+   duplicates `out_in_out` and `exit_containment` — not the visibility triad the
    check was justified against.
+
+   **Consequence for the feature, not just the check.** Two things are true at
+   once and neither should be dropped. *Against* the feature: the band in which
+   `k_refuted` can say anything check 10 does not is bounded by the distance
+   between two TUNING constants (7.0 and 3.0), neither of which the book warrants,
+   so the channel's independence is a **tuning artifact rather than a physical
+   fact** — it exists because someone chose 3.0. *For* the feature: that band is
+   wide (≈ 49 % of `ssd`), not the sliver an earlier draft of this section
+   asserted, so a direction-(A) witness — `k_refuted > 0` with checks 2, 8, 9 and
+   10 all passing cleanly — is **not** ruled out by the arithmetic and may well
+   exist.
+
+   No such witness has yet been constructed. Until one is, the channel should be
+   read as a picture rather than a measurement; if one is, the honest description
+   is "a measurement of a declared escape policy", never "a measurement of the
+   road". Constructing it, or failing to, is condition 2 of
+   `S-CONT-SEPARATION-v2` (`09 §3.4a`) and the single question the gate exists to
+   answer.
 
 Striking it is a simplification, not a concession: it retires the
 pack-family-reaches-grading objection, the D12 tension, and the
@@ -1331,7 +1586,7 @@ pack-family-reaches-grading objection, the D12 tension, and the
 
 ### 7a.11 What survives regardless of the spike
 
-`S-CONT-SEPARATION` (`09-verification-and-testing.md` §3.4a) gates the build of
+`S-CONT-SEPARATION-v2` (`09-verification-and-testing.md` §3.4a) gates the build of
 this section, and its expected result is recorded there, in advance, with the
 arithmetic that supports it. That expectation is owned by §3.4a and is not
 restated here.
@@ -1427,5 +1682,5 @@ the wire-closure fields `slew_mss`, `freeze_steer_s`, and
 `bookDoubleApex` preset; the rubric selector (`config.rubric`); the stopping-
 distance comparison as a first-class per-sample field; the multi-line Figure
 object with role/verdict decoupling; the continuation envelope (§7a) as design of
-record, gated on `S-CONT-SEPARATION`; `truncateAt` as a road-layer primitive; the
+record, gated on `S-CONT-SEPARATION-v2`; `truncateAt` as a road-layer primitive; the
 continuation pack format and its five typed refusals.

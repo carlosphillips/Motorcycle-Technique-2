@@ -732,58 +732,150 @@ constants belong to `02-physics-model.md`.
   the clamp case is pinned on a runoff fixture. (`sight_ride_m` — rider-path
   metres — is the sole basis for every sight-vs-stopping judgment, D16.)
 
-### 3.4a Continuation-envelope tests (D45 — gated on `S-CONT-SEPARATION`)
+### 3.4a Continuation-envelope tests (D45 — gated on `S-CONT-SEPARATION-v2`)
 
 Every test in this subsection runs **at promotion only**; none gates any shipped
 phase.
 
-**`S-CONT-SEPARATION` — the one-day arithmetic spike that authorises the build.**
-No implementation of `03-roads-scenarios-and-visibility.md` §7a,
-`04-solver-and-authoring.md` §4d or the fan begins until this spike passes.
-Method, fixed in advance so the result cannot be tuned into existence:
+**`S-CONT-SEPARATION` is retired and replaced by `S-CONT-SEPARATION-v2`.** The
+retired spike is recorded here rather than deleted, because *why* it could not
+decide the question is the most useful thing the audit produced.
 
-1. Fix the ladder exactly as `03-…md` §7a.4 specifies it: `kappa_max_1pm = 1/7`,
-   `ladder_reach = 1.0`, `dkappa_ds_max_1pm2 = 0.0025`,
-   `member_sweep_max_deg = 150`, `member_runout_m = 60`, the seven-rung `σ` array
-   unchanged.
-2. Fix the escape exactly as `04-…md` §4d and §4c.3 specify it: `t_react_s` from
-   the `street` profile, `phiReserve` target, `escape_decel_mss = 3.0`,
-   reserve-bounded grading over the divergent span only.
-3. Compute `k_refuted` at `bookBlind`'s **commitment probe** for the `vis=none`
-   geometric line and the `vis=cautious` governed line, both at 32 km/h. No
-   render, no report schema, no CLI — arithmetic and a spike script.
+**Why the retired spike could not authorise a build.** It computed `k_refuted` at
+`bookBlind`'s commitment probe for a `vis=none` and a `vis=cautious` line, both at
+32 km/h, and passed on `k_refuted(none) > k_refuted(cautious)` together with
+`0 < k_refuted(none) < k_admissible`. Four independent defects, any one
+sufficient:
 
-**Pass condition: demonstrated separation.**
-`k_refuted(vis=none) > k_refuted(vis=cautious)` at the commitment probe, **and**
-`0 < k_refuted(vis=none) < k_admissible` — the count must be neither floored nor
-saturated on the flagship fixture. Anything else is a fail, including "both 0"
-and "both saturate": a count that is constant across the corpus carries no signal
-and the feature is a fan-shaped assertion.
+1. **It ran on a degenerate fan.** `03-…md` §7a.4's pre-amendment ladder keyed its
+   headroom branch on `sign(κ_L)`, which collapsed the tightening half to one
+   byte-identical road on left-handers (5 distinct rungs of 7) and to a single
+   road at `κ_L = 0` (1 of 7). `bookBlind` is a left-hander. The test that catches
+   this, `P-CONT-MEMBERS-DISTINCT`, ran **at promotion — after the gate it should
+   precede**. Fixed in §7a.4; now asserted at step 0 below.
+2. **It ran on a fixture that was not blind.** `bookBlind` was `book90` geometry,
+   and no 90° corner in the proportion band is blind on the hold-wide line at any
+   legal hedge margin (`03-…md` §3.1, which also records the cut-in-line
+   counterexample at `margin ≤ 0.5`). `blind(c1)` read `false`, so
+   `hold_wide_for_sight` was `na`, the 35° cap never applied, and the commitment
+   probe the spike names may not have existed.
+   Fixed by the `^140` reshape.
+3. **The speed limb was dead.** The V1 governor binds only where
+   `vis_margin · ssd ≤ sight_ride_m` fails; at 32 km/h on the old fixture that
+   needed `sight_ride_m < 14.53 m` against ≥ 24 m of geometry. `vis=cautious` and
+   `vis=none` solved to the **same speed**, so `k_refuted(none) > k_refuted(cautious)`
+   could only be satisfied by noise, and `A-SSD-GOVERNOR` passed by equality.
+4. **Two integers cannot be diagnosed.** The spike recorded no `s_L`, no
+   `sight_ride_m`, no `κ_L`, no check verdicts. A "both 0" result is
+   uninterpretable between *no signal*, *escape too short to reach `s_L`*, *ladder
+   collapsed*, and *`blind(c1)` false* — and the audit's finding is that all four
+   were true at once.
 
-**The expected result, recorded honestly and in advance: undetermined.**
-Discrimination requires, as a necessary condition, `1/kappa_max_1pm < R_res` at
-probe speed. With `kappa_max_1pm = 1/7` (`03-…md` §7a.2, and §7a.4 on why `1/7`
-and not `1/9`) that is **7.00 m against 9.47 m on `bookBlind` — 2.47 m, about
-26 % of margin**, comfortably clear of the escape's own 3.0 m/s². The necessary
-condition therefore passes with room, and an earlier draft of this section which
-computed the same comparison at 9.00 m — the retired `1/9` ceiling — and
-concluded "no separation, a knife edge" **was wrong and is recorded as wrong
-here**; the arithmetic never supported it.
+Two claims the retired text made are **withdrawn as wrong**, not merely
+superseded:
 
-What the corrected arithmetic supports is weaker than either claim. Clearing the
-necessary condition is not sufficient: the pass condition above additionally
-demands that the two lines' counts actually *differ* and that neither floors at 0
-nor saturates at `k_admissible`, and nothing in the arithmetic predicts which of
-those three outcomes the corpus produces. Containment simultaneously pins
-`kappa_max_1pm` from below at the corpus maximum curvature, so the constant
-cannot be moved to buy margin without breaking
-`P-CONT-ENVELOPE-CONTAINS-ACTUAL` — the feature is still not tunable into
-success. The expectation recorded in advance is therefore **genuinely
-undetermined**, which is the whole reason the feature is gated on a measurement
-rather than shipped on an argument. `03-…md` §7a.9's tuning-sensitivity
-concession stands unchanged; §7a.11's summary of the recorded expectation must
-read "undetermined", not "no separation". The spike exists because one day
-answers a question worth twelve to fourteen.
+- *"the necessary condition is `1/kappa_max_1pm < R_res` at probe speed."*
+  `R_res = 9.4756 m` against 7.00 m is arithmetically right, but it is not the
+  binding condition. `04-…md` §4d grades `escaped(m)` over the **divergent span
+  `s > s_L` only**; if the escape terminates on `v < v_floor_ms` before reaching
+  `s_L`, that span is empty, all four conditions hold vacuously, and every member
+  is escaped by construction. The binding condition is therefore
+  **reach ≥ `s_L − s_probe`**, and reach is line-dependent (`04-…md` §4d). The
+  retired text's "comfortably clear of the escape's own 3.0 m/s²" also compares
+  metres against m/s² and derives nothing.
+- *"containment pins `kappa_max_1pm` from below … the feature is still not tunable
+  into success."* Containment pins it from **below**, at the corpus maximum
+  `1/9 = 0.1111`. Buying separation means moving it **up** — tighter members, more
+  refutations — and a lower bound never obstructs that, so **containment does not
+  fence the constant in the direction that matters**. The anti-tuning argument had
+  the sign backwards.
+
+  Two real fences exist, and neither is containment. (i) `E(s_L)` bounds the
+  initial step by `kappa_step_max_1pm`, while `03-…md` §7a.4 property 3 proves the
+  ladder's step `≤ kappa_max_1pm`; these coincide only because both are `1/7`
+  today. Raising `kappa_max_1pm` alone to `1/4` makes the `σ = +1` rung step
+  `0.1667` against a `0.1429` step bound and **breaks containment** — the two
+  constants must move together, which is now stated normatively in `03-…md`
+  §7a.3. (ii) Driving `kappa_max_1pm` up far enough saturates `k_refuted` and
+  fails pass condition 1 (`|{k_refuted}| ≥ 3`). So the fence comes from the grid
+  and from the step/ceiling coupling, **not** from containment. That the specific
+  sequence `1/7, 1/6, 1/5, 1/4` raises `k_refuted` monotonically is asserted, not
+  computed; `S-CONT-SEPARATION-v2` measures it rather than assuming it, which is
+  why the gate sweeps constants instead of pinning one.
+
+---
+
+**`S-CONT-SEPARATION-v2` — the replacement gate.** No implementation of
+`03-…md` §7a, `04-…md` §4d or the fan begins until this passes. Three steps; the
+first two are arithmetic and cost hours, not days.
+
+**Step 0 — prerequisites, no engine code.** Each is a spec obligation already
+discharged in this amendment, re-asserted here as a gate:
+
+- the amended hand-frame ladder (`03-…md` §7a.4) yields 7 distinct `road_dsl` on
+  every corpus corner and on a limit point falling on a straight, and every rung
+  lies inside `E(s_L)`'s step bound;
+- all three envelope bounds dominate the corpus (`03-…md` §7a.3);
+- `blind(c)` holds at the solved turn-in on every fixture that hosts a visibility
+  test — which `fx-esses-blind` currently **fails** (see §3.5);
+- `fx-hedge-gap` is authored with explicit geometry, or deleted and its three
+  predicates re-homed.
+
+`review/verify/fixture_geometry.py` computes all of these from the DSL strings.
+
+**Step 1 — the sight measurement, which nothing else can substitute for.** Run
+`compose` + `sightFrom` on `bookBlind` and print `s_ti`, `s_limit`,
+`sight_ride_m`, `κ_L` and `blind(c1)` at all five probe stations, for `f = 0.0`
+and `f = 1.0`, on both the `vis=none` and `vis=cautious` solves. No member
+generator, no escape, no pack. **Every remaining question is downstream of where
+`s_L` lands**, so this runs first and may terminate the effort on its own: if
+`s_L` falls past the corner exit, `κ_L = 0` and there is nothing left to spike.
+
+**Step 2 — the grid.** Report `k_refuted(none)`, `k_refuted(cautious)`,
+`k_admissible`, the reachable `σ` set, and the verdicts of checks 2, 8, 9 and 10
+**per cell**, over `escape_decel_mss ∈ {2.5, 3.0, 4.0}` × the full probe ladder ×
+both lines, on `bookBlind`, `bookDecreasing` and `bookHairpin`.
+
+**Pass condition — all three required:**
+
+1. **More than one bit.** `|{k_refuted}| ≥ 3` over the `escape_decel_mss = 3.0`
+   grid. A metric taking two values is a boolean wearing an integer's clothes.
+2. **A non-collinearity witness.** At least two cells with **identical**
+   check-verdict tuples for checks 2, 8, 9, 10 and **different** `k_refuted`.
+   This is the condition the retired spike never tested and the one that decides
+   whether the channel is a measurement or a picture — `03-…md` §7a.10 reason 3
+   shows `{k_refuted > 0} ⊆ {reach@3.0 > sight} ⊇ {check 10 fails}` — so `k_refuted`
+   *can* fire where check 10 passes, over a band ≈ 49 % of `ssd` wide at 34 km/h,
+   and whether the corpus actually populates that band is the open question.
+3. **Sign stability under the pin.** `sign(k_refuted(none) − k_refuted(cautious))`
+   is constant across the three `escape_decel_mss` cells. A difference that
+   inverts with a TUNING constant is an artifact of that constant.
+
+**Fail includes:** `k_refuted` constant across the grid; `k_refuted` a function of
+the check-verdict tuple; a sign that flips with the pin; and any cell reporting
+`k_refuted := null` from `¬start_ok` that the pass condition would otherwise have
+counted — a case the retired condition failed to enumerate at all.
+
+**The expected result, recorded in advance: most likely fail at step 1;
+genuinely undetermined on condition 2.** Step 1 is the confident half — if `s_L`
+lands past the corner exit the fan has nothing to work with, and that was true of
+the fixture before the reshape. Condition 2 is the honest half, and an earlier
+draft of this section was **wrong to predict it would fail**. That draft reasoned
+that `k_refuted > 0` lives inside the gap between `a_ssd = 7.0` and
+`escape_decel_mss = 3.0` and called the gap thin. It is not thin: at 34 km/h it
+spans `sight ∈ (15.82, 23.64) m`, a width of **≈ 49 % of `ssd@7.0`**
+(`03-…md` §7a.10 reason 3). A direction-(A) witness is therefore not excluded by
+the arithmetic, and whether one exists on the corpus is exactly what condition 2
+measures. What remains true regardless is the *interpretation*: a witness found
+inside that band demonstrates independence from the rubric, but independence
+purchased by a TUNING constant rather than by physics — so passing condition 2
+authorises the build while still obliging the placard to describe `k_refuted` as
+a property of a declared escape policy. **The cost side of the retired text's "one day answers a
+question worth twelve to fourteen" is withdrawn as unsourced** — no estimation
+basis for either figure exists in `design/` or `review/`, and step 3 of the
+retired method excluded only render, schema and CLI, leaving the ladder, the
+speller, the probe ladder, `E_c` and the grading law all to be prototyped. Steps 0
+and 1 above are hours; step 2 is the only part that needs engine surface.
 
 **Property tests.**
 
@@ -801,10 +893,18 @@ answers a question worth twelve to fourteen.
   `|κ_m(u)| > |κ_L|` over its whole curved tail. Without it the feature cannot
   state its own thesis.
 - **`P-CONT-MEMBERS-DISTINCT`** — `|{distinct Member.road_dsl}| = k_probed` at
-  every probe on every committed fixture. (Note for the record: with
-  `dkappa_ds_max_1pm2 = 0.0025` against ≤ 0.0317 of headroom, tightening members
-  re-converge on the `r = 7` arc within ~13 m; distinctness is concentrated in
-  the leading span, and the 150° cap truncates most of the converged tail.)
+  every probe on every committed fixture. **Promoted: this also runs as a step-0
+  arithmetic check in `S-CONT-SEPARATION-v2` (§3.4a), on the seven spelled strings
+  and no engine.** It is the test that would have caught the pre-amendment
+  ladder's sign bug, and running it only at promotion meant it sat downstream of
+  the gate it should have guarded. (Note for the record: tightening members
+  re-converge on the `r = 1/kappa_max_1pm` arc within roughly
+  `headroom / dkappa_ds_max_1pm2` metres — at `κ_L = 1/12` that is ≤ 0.0595 of
+  headroom against a rate of 0.005, so ~12 m; distinctness is concentrated in the
+  leading span and the 150° cap truncates most of the converged tail. On a limit
+  point falling on a straight the `σ < 0` rungs share `κ₀ = 0` and are distinct
+  **only** through their ramp rates — which is why this predicate is asserted on
+  `road_dsl` and never on `κ₀`.)
 - **`P-CONT-FILTER-TWO-SIDED`** — on `fx-hedge-gap`, at the commitment probe,
   ≥ 1 member with `σ < 0` **and** ≥ 1 with `σ > 0` are inadmissible. The filter is
   proven two-sided where it can act at all.
@@ -878,12 +978,25 @@ answers a question worth twelve to fourteen.
 
 **Golden fixtures.**
 
-- **`fx-hedge-gap`** — NEW committed fixture: `bookBlind` with the hedge
-  shortened so road re-emerges past its lateral edge. The only fixture on which
-  the consistency filter is non-vacuous, and the host for
-  `P-CONT-FILTER-TWO-SIDED`, `P-CONT-CONSISTENT`'s non-vacuity guard and
-  `P-CONT-MONOTONE-SIGHT`.
-- **`G-COMMIT-BLIND`** — `bookBlind` at 32 km/h, `vis=none` geometric line vs
+- **`fx-hedge-gap`** — NEW committed fixture, **unconstructible as previously
+  specified and blocking `S-CONT-SEPARATION-v2` step 0.** The whole definition was
+  "`bookBlind` with the hedge shortened so road re-emerges past its lateral
+  edge" — no span, margin, depth or offset. Shortening a band's *span*
+  monotonically **removes** blocking rather than creating a re-emergence gap; a
+  54-cell sweep over the shortened-span family found zero cells in which road
+  re-emerges past the lateral edge. Since this is "the only fixture on which the
+  consistency filter is non-vacuous", three predicates
+  (`P-CONT-FILTER-TWO-SIDED`, `P-CONT-CONSISTENT`'s non-vacuity guard,
+  `P-CONT-MONOTONE-SIGHT`) currently rest on a fixture that does not exist.
+
+  Re-emergence needs a **gap in the band**, not a shorter band: two `hedge`
+  segments with clear station between them, or a `wall` whose lateral edge the
+  sight line clears. Authoring it obliges explicit geometry — anchor, offset,
+  span and margin for each segment — pinned here and verified by
+  `review/verify/fixture_geometry.py` before any predicate is hosted on it. Until
+  then the three predicates are **blocked, not merely pending**, and the honest
+  reading is that the filter has no non-vacuous witness anywhere in the corpus.
+- **`G-COMMIT-BLIND`** — `bookBlind` at 34 km/h, `vis=none` geometric line vs
   `vis=cautious`: pins `k_admissible`, `k_refuted`, `filter_effective` and
   `escape_status` at each of the `PROBE_LADDER_N` probes on both lines, plus the
   worst member's `σ` and `refute_reason`. Design pin: the governed line's
@@ -986,9 +1099,25 @@ honest quantifier.
   retained for `accept=best_failing`).
 - `A-SSD-GOVERNOR` — `bookBlind` solved `vis=cautious` under the lean-aware `ssd`
   converges within `vis_max_iterations`, and its governed entry speed is ≤ the
-  upright-`ssd` solve's (monotone-conservative).
+  upright-`ssd` solve's (monotone-conservative). **OPEN — this assertion is
+  satisfied by equality and is therefore currently vacuous.** On the pre-reshape
+  fixture the governor never bound at all (≥ 24 m of sight against `ssd` 14.53 m),
+  so `≤` held trivially and the test witnessed nothing. Two obligations follow,
+  and neither is covered by `S-CONT-SEPARATION-v2`, which is promotion-only while
+  this is a shipped-phase gate: (a) determine whether the governor binds on the
+  reshaped `bookBlind` at 34 km/h — if it does not, this gate needs a fixture
+  where it does; (b) once it does, assert the governed speed is **strictly
+  less than** the ungoverned solve's, the same repair `A-RECIPE-K` received
+  (`08-…md` §6(k)). A monotone-conservative bound that is never exercised is the
+  same defect class as the catalogued vacuity errors.
 - `A-VIS-HOLD-REACH` — on `bookBlind` + `vis=cautious`, the generated hold's
-  `position` action passes validation under the governed `v_cmd`; on `bookEsses`
+  `position` action passes validation under the governed `v_cmd`. **OPEN — same
+  vacuity defect as `A-SSD-GOVERNOR`, for a different reason.** V2 emits a hold
+  **for each blind corner** (`04-…md` §6), so on the pre-reshape `bookBlind`,
+  where `blind(c1)` was false, V2 emitted **no hold at all** and "the generated
+  hold passes validation" was vacuously true. After the reshape `blind(c1)` holds,
+  so the assertion should now bite — but it must first assert that a hold **was
+  generated**, before asserting anything about it validating; on `bookEsses`
   + `vis=cautious`, the emitted wire plans contain **no** position/turn_in
   overlap and still validate (the zero-gap branch emits no wire action below
   `MIN_POS_DD_M`).
@@ -997,6 +1126,38 @@ honest quantifier.
 `hedge inside cN 0x12 margin=1.5 depth=4` for N = 1..4, entry 32 km/h (geometry
 TUNING; gaps sized so `vis_hold_f` is reachable under the 03 §6.1 lateral
 budget).
+
+> **OPEN — `fx-esses-blind` does not satisfy `blind(c)` on any of its four
+> corners, and cannot be repaired the way `bookBlind` was.** Per `03-…md` §3.1,
+> whether a band occluder makes a corner blind is governed by **swept angle**, and
+> the threshold at book proportions is ≈ 115°. `bookEsses` legs are `R 12 ^75` —
+> far below it — and no `margin`/`depth`/`span` choice compensates, because moving
+> a roadside band only ever *reduces* blocking. Re-derived over turn-in × lane
+> position, zero cells satisfy `s_limit < s_end(c)`.
+>
+> This is not a D45 problem: `P-VIS-MARGIN-MONOTONE` and `A-CHAIN-VIS-FULL`
+> currently run on corners where `blind(c)` is false, so anything they assert
+> about `hold_wide_for_sight` or the blind lean cap is `na`-driven.
+>
+> **The governor is a separate question and must not be folded into this one.**
+> V1 evaluates `vis_margin · ssd ≤ sight_ride_m` **unconditionally**
+> (`04-…md` §6) — it does not read `blind(c)`. Whether it binds on
+> `fx-esses-blind` depends only on whether `sight_ride_m` falls below
+> `vis_margin · ssd` somewhere on the chain, which has not been computed and is
+> **open**. The old `bookBlind`'s governor inertness had this second cause
+> (≥ 24 m of sight against 14.53 m of `ssd`), not the `blind(c)` one, and
+> conflating the two is how `A-SSD-GOVERNOR` came to look adequately witnessed.
+> After the reshape, `P-VIS-MARGIN-MONOTONE`'s two named fixtures differ:
+> `bookBlind` now satisfies `blind(c)`, `fx-esses-blind` does not.
+>
+> **`bookEsses` must not be reshaped**: it is committed ink (fig 8.6, `A-ESSES-GATE`),
+> and its `S 6` links are pinned to the hand-flip budget. The repair is therefore
+> a **new chained fixture**, not an edit to this one — a linked pair of ≥ 130°
+> same-or-alternating-hand corners carrying the hedges, hosting the chained
+> visibility assertions, with `bookEsses` retained unchanged for the figure and
+> for the flip-budget tests. Sizing it is an open decision recorded here rather
+> than resolved silently; `review/verify/fixture_geometry.py` is the check any
+> candidate must pass.
 
 - `A-CHAIN-VIS-FULL` — on `fx-esses-blind`, `chainedSolve` with `vis=cautious`
   returns a line that (i) passes `stop_within_sight` at every station of the
@@ -1876,7 +2037,7 @@ quantifiers; CLI and cold-start acceptance (§3.6); and the phase gates (§10).
 Added by the D42–D45 amendment: the counterfactual property block (§3.4) and its
 disclosure tests; the standing-ladder suite and `F-STANDING-WARN` (§4); the
 save-window suite and the `tau_close_s` tolerance row (§3.2); §3.4a and the
-`S-CONT-SEPARATION` spike; the `analysis` effect class (§8.1);
+`S-CONT-SEPARATION-v2` spike; the `analysis` effect class (§8.1);
 `A-PACK-PROVENANCE`.
 
 **Struck at ratification (tombstoned, never shipped):** `out_available` and its
@@ -1904,7 +2065,7 @@ member until its phase arrives (the phase-gating law).
 | **v0.1 — the figure spine** | Analytic-acceptance layer green, then first bless (§3.2a); golden numerics (§3.2); the mistake oracle (§4); `P-DETERMINISM` / `P-EXPORT-DETERMINISM`; all six book-figure scenes bake, pass the proportion gate in `diagram` mode (`A-ESSES-GATE`), land near the bands in `true` mode, and carry green judge records (`T-JUDGE-RECORD`); recipes (a), (b), (e), (f) as acceptance tests (`A-RECIPE-A/B/E/F`); the D8 effectuality suite over the v0.1 schema (§8.1); the D42 counterfactual layer: `P-CF-PRECONDITION`, `P-CF-LITERALISED`, `P-COUNTERFACTUAL-CLOSED`, `P-COUNTERFACTUAL-NAMED`, `P-CORR-CONSTANT-SPEED`, `A-CORR-EXPLAIN` (extended), `A-CF-REGISTRY-CLOSED`, `A-CF-DEAD-REASON`, `A-PACK-PROVENANCE`, `G-CORR-RIDER`, `G-CF-PRECONDITION-TABLE`; and `C-SAVEWIN-NO-INK` as a regression sentinel against the six baked book figures, where it passes trivially because the `save-window` verb does not yet exist. |
 | **v0.2 — inspection** | `C-STATEAT-LAWS`; `C-HUD-EQUALS-STATEAT`; `C-BOOKMARKS`; `C-ONE-CORE`; `C-RECOMPUTE-BUDGET` (as scoped in §6.1); recipe (c) end to end including `serve` (`A-RECIPE-C`); `G-STANDING-BITES`; `G-STANDING-NO-HASH-MOVE`; `A-STANDING-WARN-BAND`; `A-STANDING-RESERVED`; `A-STANDING-LADDER-CUMULATIVE`; `A-STANDING-REFUSAL`; `A-RESERVE-CHECKS-RESOLVE`; `A-LADDER-PROSE`; `A-STANDING-TOMBSTONE`; `C-SAVEWIN-HUD`; `C-SAVEWIN-CLIP`; `C-SAVEWIN-NO-INK`; `C-SAVEWIN-REFUSE-COARSE`; `C-SAVEWIN-BUDGET`; `G-SAVEWIN-GRID`; `A-SAVEWIN-PLACARD`; `A-SAVEWIN-VERB`. |
 | **v0.3 — immersion** | `C-POV-LIMIT-CONSISTENT`; `C-POV-TRUE-GEOMETRY`; `C-COMPARE`; per-view boot smoke tests (§6). |
-| **deferred, design kept** | Each deferred design carries its own gates, pre-written below and run at promotion; the diagram projection's gates (§5) run when its implementation lands. The continuation envelope (D45) is gated on `S-CONT-SEPARATION` (§3.4a); its full gate list is §3.4a and runs at promotion, in two tranches: `A-AN-TRUNCATE`, `A-AN-MEMBER-KAPPA`, `A-AN-SWEEP-BUDGET`, `P-CONT-*`, `P-COMMIT-*`, `P-ESCAPE-HONEST`, `A-CONT-PACK-DATA-ONLY`, `A-COMMIT-VERB`, `G-TRUNCATE`, `G-COMMIT-*`, `C-COMMIT-BUDGET`, `C-COMMIT-BAKE-BUDGET`, `C-COMMIT-NO-CHECK` at report-only promotion; `A-COMMIT-PROSE`, `J9`, `A-FAN-NO-ENGINE`, `A-RECIPE-K`, `T-COLDSTART` at render promotion. |
+| **deferred, design kept** | Each deferred design carries its own gates, pre-written below and run at promotion; the diagram projection's gates (§5) run when its implementation lands. The continuation envelope (D45) is gated on `S-CONT-SEPARATION-v2` (§3.4a); its full gate list is §3.4a and runs at promotion, in two tranches: `A-AN-TRUNCATE`, `A-AN-MEMBER-KAPPA`, `A-AN-SWEEP-BUDGET`, `P-CONT-*`, `P-COMMIT-*`, `P-ESCAPE-HONEST`, `A-CONT-PACK-DATA-ONLY`, `A-COMMIT-VERB`, `G-TRUNCATE`, `G-COMMIT-*`, `C-COMMIT-BUDGET`, `C-COMMIT-BAKE-BUDGET`, `C-COMMIT-NO-CHECK` at report-only promotion; `A-COMMIT-PROSE`, `J9`, `A-FAN-NO-ENGINE`, `A-RECIPE-K`, `T-COLDSTART` at render promotion. |
 
 D42 is a v0.1 gate because its sole reachable rider ships in v0.1: the corrective
 shot is v0.1 machinery, so the registry, the precondition and the disclosure

@@ -801,8 +801,12 @@ surfacing at run time is a linelab bug — typed `INTERNAL`, exit 4
 
 **Refusals (placard policy, `01-scope-and-doctrine.md` §8):** super-tight
 geometry is refused at validation by **sweep content**: `OUT_OF_SCOPE /
-super_tight_geometry` iff the swept angle accumulated over the stations where
-the local radius `r(s) ≤ R_UTURN_MAX = 15 m` is ≥ `SWEEP_UTURN_MIN = 170°`. On
+super_tight_geometry` iff, **for some single corner** `c`, the swept angle
+accumulated over the stations of `c` where the local radius
+`r(s) ≤ R_UTURN_MAX = 15 m` is ≥ `SWEEP_UTURN_MIN = 170°`. The quantifier is
+per corner, not per road — corners are minted per curved segment
+(`03-…md` §2), so a road may accumulate more than 170° of tight sweep in total
+without any one corner doing so. `03-…md` §2 is the owning statement. On
 constant arcs this reduces exactly to the carried rule; on tapers it is
 decidable and measures actual U-turn-regime content (`bookDecreasing`
 `R 16>9 ^130` spends 111.4° at r ≤ 15 → in scope; a true `R 10 ^180` hairpin

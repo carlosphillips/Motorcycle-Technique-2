@@ -1232,7 +1232,7 @@ accident of the detect predicate.
 ### 4c.3 `brake_reserve_escape` — the lean-and-brake rider
 
 Declared here, **implementation gated** behind D45's arithmetic spike
-`S-CONT-SEPARATION`. The registry is closed at two ids from the moment D42 lands;
+`S-CONT-SEPARATION-v2`. The registry is closed at two ids from the moment D42 lands;
 in any phase where D45 is unimplemented the *reachable* set is exactly
 `{"lean_only_reserve"}` and `P-COUNTERFACTUAL-CLOSED` asserts the subset, not the
 equality. A CLI or wire token naming `brake_reserve_escape` before D45 ships is
@@ -1303,7 +1303,7 @@ Against the shipped presets, at the speeds those presets actually ride:
 |---|---|---|---|---|---|
 | `book90`, entry speed | 12 | 34 | 9.444 | 10.70 | 0.89 |
 | `book90`, solved turn-in (`01-…md` A.3's worked figure) | 12 | 30 | 8.333 | **8.33** | **0.69** |
-| `bookBlind` | 12 | 32 | 8.889 | 9.48 | 0.79 |
+| `bookBlind` | 12 | 34 | 9.444 | 10.70 | 0.89 |
 | `bookEsses` | 12 | 32 | 8.889 | 9.48 | 0.79 |
 | `bookHairpin` | 10 | 28 | 7.778 | **7.25** | **0.73** |
 | `bookDecreasing`, tightened exit (r2) | 9 | 34 | 9.444 | 10.70 | 1.19 |
@@ -1460,7 +1460,7 @@ disclosure strings.
 
 ---
 
-## 4d. The commitment escape (`E_c`) — D45, gated on `S-CONT-SEPARATION`
+## 4d. The commitment escape (`E_c`) — D45, gated on `S-CONT-SEPARATION-v2`
 
 `E_c` is not `correctiveShot`. It has no `run_wide_detect` trigger (undefined on
 a counterfactual road where no drift has begun), and it **brakes**, because the
@@ -1482,6 +1482,21 @@ The control law — target lean, roll rate, `a_cmd` — is §4c.3's and is not
 restated here. Same pure stepper, same `dt_s`, run-wide slice active.
 Corner-relative plan actions are resolved **before** the member road exists;
 nothing resolves a corner-relative anchor against member geometry.
+
+**Phase 0 is determinate but line-dependent, and the escape's reach is therefore
+not a constant.** "Integrate it unchanged" means the rider keeps doing whatever
+the ridden plan commanded — which at a probe near turn-in may be trailing brake,
+coast, or roll-on depending on the line. The resulting *reach* — the station at
+which the escape terminates on `v < v_floor_ms` — moves accordingly. On
+`bookBlind` at 34 km/h the span across plausible phase-0 commands is
+**20.2 m (plan braking at −1.0) to 27.5 m (plan on throttle at +1.0)**, against a
+coasting reach of 23.6 m — all three terminating at `v_floor_ms = 2.0`
+(`02-…md` §7), not at `v = 0`. That is a ±15 % band on the single quantity that decides
+whether the divergent span is non-empty at all (§4d's span split), so:
+
+**Normative:** *no document may quote an escape reach without naming the line and
+the probe it was computed at. `03 §7a` and `09 §3.4a` state reach only alongside
+`sight_ride_m` at the same station, never as a fixture-level constant.*
 
 **Grading is split by span, and this is the whole of the repair.**
 
@@ -1776,7 +1791,7 @@ lines:                                              # required, 1..N entries: "n
   good:    ride entry=34 turnIn=auto
   bad:     mistake premature:early_by_m=6
   wide:    ride entry=34 vis=cautious role=alternative
-occluders: hedge inside c1 -6x26 margin=1.2         # optional, one per line (bare id = entry: sugar, 03 §4)
+occluders: hedge inside c1 -6x36 margin=1.2         # optional, one per line (bare id = entry: sugar, 03 §4)
 hazards:   gravel outside c1 +8x3 mu=0.4            # optional, one per line
 marks:     auto                                     # optional MarkSpec (default auto: ideal-line marks)
 labels:                                             # optional callouts, road + event-feature anchors
@@ -1873,7 +1888,7 @@ diagnosis (and the corrective verdict block deciding it was not a save —
 control.
 
 **R3 — Blind-corner visibility compare.** `preset bookBlind` → `solve({road,
-entry_kmh: 32})` (vis=none) and `solve({road, entry_kmh: 32, vis: "cautious"})` →
+entry_kmh: 34})` (vis=none) and `solve({road, entry_kmh: 34, vis: "cautious"})` →
 two lines whose per-sample sight channels (`sight_m` for cross-line
 comparability, `sight_ride_m` against `ssd_m` for the safety judgment) quantify
 the hold-wide teaching; figure renders both with sight rays and the occluded

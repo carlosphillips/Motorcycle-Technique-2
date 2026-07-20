@@ -444,13 +444,78 @@ Sibling documents must conform to all of them.
   seen *displaced where road re-emerged past an occluder's lateral edge*, and it is provably inert
   under total occlusion, which the report discloses per probe (`filter_effective`) and the placard
   states. The design of record is complete and normative now; **implementation is authorised only
-  by the one-day arithmetic spike `S-CONT-SEPARATION`** (`09 §3.4a`), which must demonstrate
-  `k_refuted(vis=none) > k_refuted(vis=cautious)` and `0 < k_refuted(vis=none) < k_admissible` at
-  `bookBlind`'s commitment probe. Specified in `03 §7a`, `04 §4c`/`§4d`, `05 §6.5`,
+  by `S-CONT-SEPARATION-v2`** (`09 §3.4a`) — see D46, which retires the original spike and its
+  pass condition. Specified in `03 §7a`, `04 §4c`/`§4d`, `05 §6.5`,
   `06 §2.2`/`§2.4`/`§2.7`/`§3.1`, `07 §5.3`, `08 §3`/`§4`/`§5`, `09 §3.4a`. *Supersedes* the briefed
   "refutation-only checks and the `commit_within_sight` independence gate", which is withdrawn in
   full; and *supersedes* D29's `result_hash` exclusion list, which gains `commitment`
   (`{result_hash, diagnosis, cache, skew, commitment}`, `05` §8.3).
+
+- **D46 — The visibility corpus was inert, the D45 ladder was sign-broken, and the spike that
+  gated D45 could not have decided anything. All three are repaired; D45 stays deferred.**
+  An adversarial audit (2026-07-19) re-derived the geometric claims in `design/` from the DSL
+  strings rather than reading them, and found the load-bearing ones false. **(1) `bookBlind` was
+  not blind.** It was `book90` geometry, and `blind(c)` (`01 §A.2`) is `s_limit < s_end(c)`; the
+  minimum achievable `s_limit` was 32.50 m against `s_end = 30.85 m` (swept over turn-in `entry−4 … s_end` × the corridor). Widening the turn-in sweep further *does* reach
+  blind on a cut-in line — 30.00 m from `entry−8`, 28.75 m from station 0 — which is the same
+  cut-in-only effect described below, never a hold-wide one. Blindness under a roadside
+  band occluder rises steeply with **swept angle** (half-crossing ≈ 115° at book proportions), so
+  **no 90° corner in the band is blind on the hold-wide line at any legal hedge margin** — and at
+  `margin ≤ 0.5` a 90° corner *is* blind on a **cut-in** line — marginally at 0.5 (0.10 m), by
+  1.35 m at `margin = 0` — which would make
+  `blind(c)` true for the bad line and false for the good one and invert
+  `hold_wide_for_sight`'s applicability. Avoiding that knife edge, not merely reaching blindness,
+  is what forces the reshape. With `blind(c1)` false,
+  `hold_wide_for_sight` returned `na`, the `BLIND_RESERVE_DEG` cap never applied (it needed
+  `R = 11.503 m` inside a 12.40 m corridor floor), and **V2 emitted no hold-wide `position` action
+  at all** — it generates one per *blind* corner (`04 §6`), so the mechanism the whole fixture
+  exists to demonstrate was absent. That third consequence also made `A-VIS-HOLD-REACH` vacuous,
+  now recorded OPEN alongside `A-SSD-GOVERNOR` (`09 §3.5`). Separately — and *not* via `blind(c)`, which the
+  V1 governor does not read — the governor never bound either, because the fixture had more sight
+  (≥ 24 m) than stopping distance (14.53 m), so `A-SSD-GOVERNOR` passed by equality. `bookBlind` is reshaped to
+  `lane 3.5 | S 16 | L 12 ^140 | S 16` at 34 km/h with `hedge inside c1 -6x36`; it no longer
+  inherits `book90`, which is unchanged and keeps figs 8.1–8.3. **No committed book-figure scene
+  used `bookBlind`, so no baked figure moves.** `fx-esses-blind` has the same defect and is
+  recorded as OPEN in `09 §3.5` — `bookEsses` is committed ink and must not be reshaped, so it
+  needs a new chained fixture rather than an edit. **(2) The §7a.4 ladder branched on
+  `sign(κ_L)`**, which flipped its semantics with hand: on left-handers three rungs clamped onto
+  one byte-identical road (the exact collapse the headroom ladder was introduced to prevent), on
+  right-handers two rungs stepped outside the pack's own `kappa_step_max_1pm`, and at `κ_L = 0` all
+  seven collapsed to one. Every *left-hand* preset was hit — `book90`, `bookBlind`, `bookDecreasing`, `bookDoubleApex` — including
+  `bookBlind`, the fixture the gate runs on; `bookEsses` and `bookHairpin` are right-handers and took
+  the other half of the bug (two rungs stepping outside `kappa_step_max_1pm`). The ladder is re-expressed in the
+  **hand frame** — `σ = +1` tightens to the ceiling, `σ = −1` straightens, hand reversal reachable
+  only through the rate clause — which restores hand symmetry, definedness on a straight, and
+  containment of every rung. **(3) `dkappa_ds_max_1pm2 = 0.0025` excluded `bookDecreasing`**, whose
+  own taper runs `0.004232` (1.69×), so `P-CONT-ENVELOPE-CONTAINS-ACTUAL` would have failed on the
+  decreasing-radius trap itself; raised to `0.005`, and all three envelope bounds are now normatively
+  lower bounds set by the corpus. **(4) `S-CONT-SEPARATION` is retired** and replaced by
+  `S-CONT-SEPARATION-v2`: a step-0 arithmetic gate, a sight measurement that may terminate the
+  effort on its own, and a grid over `escape_decel_mss` whose decisive condition is a
+  **non-collinearity witness** — two cells with identical check-verdict tuples and different
+  `k_refuted`. Two claims in the retired text are withdrawn as **wrong**, not superseded: the
+  necessary condition was reach-vs-`s_L`, not `1/kappa_max < R_res`; and the argument that
+  containment made the feature untunable had the **sign backwards** — containment is a lower bound, so raising
+  `kappa_max_1pm` buys separation — subject to the step/ceiling coupling now normative in `03 §7a.3`
+  and to the grid's saturation fence, which are the two real limits (`09 §3.4a`). `§7a.10`'s collinearity reasons 2 and 3 are
+  likewise retracted and restated: `k_refuted > 0` requires the escape to reach past `s_limit`,
+  which is close to `stop_within_sight` re-evaluated at 3.0 m/s² instead of 7.0. The set relation
+  runs `{check 10 fails} ⊆ {reach@3.0 > sight} ⊇ {k_refuted > 0}` — so `k_refuted` sits inside a
+  **superset** of check-10 failure, not a subset of it, and it therefore **can** fire where check 10
+  passes cleanly, over a band ≈ 49 % of `ssd` wide at 34 km/h. An intermediate draft of this entry
+  claimed the reverse and called the band thin; both are withdrawn. What survives is the
+  *interpretation*: that band is bounded by two TUNING constants, so any independence it shows is
+  purchased by a choice rather than by physics. **D45's deferral is unchanged; its expected outcome
+  is "likely fail at step 1, genuinely undetermined on the non-collinearity witness"** — firmer than
+  the retired "undetermined" on the sight measurement, and honestly open on the question that
+  decides the feature. The "one day answers a question worth twelve to fourteen" cost claim is withdrawn
+  as unsourced. The load-bearing geometric assertions above are executable: `review/verify/fixture_geometry.py`
+  re-derives the blindness sweep, the envelope bounds, the ladder and the reach band from the DSL and
+  fails on drift. It does **not** yet cover `fx-hedge-gap`, `C30-DR`, `L_req`, or `R_res`, which remain
+  prose-only — the standing obligation being that a visibility
+  assertion on a corner where `blind(c)` is false does not fail, it passes vacuously.
+  *Supersedes* D45's spike and pass condition, `03 §3.1`'s `bookBlind` row and `book90`
+  inheritance, `03 §7a.2`'s rate bound, and `03 §7a.4`'s ladder.
 
 ---
 
@@ -481,7 +546,7 @@ imports.
 | **v0.1 — the figure spine** | `core/`, `road/`, `sight/`, `plan/` (validation + controller), `solve/` (solve, suggestTurnIn, chainedSolve, mistake compiler), `render/` top-down in `true` mode, the true-scale book presets, `cli/` verbs `run solve mistake figure render check schema explain export` | G1, G4, G6, G7, G8 (via true-scale presets), and G5's authoring/sharing half | analytic-acceptance layer green, then first bless; golden numerics; mistake oracle; `P-DETERMINISM` / `P-EXPORT-DETERMINISM`; all six book-figure scenes bake, pass the proportion gate in `true` mode, and pass the vision judge; CLI recipes (a), (b), (e), (f) as acceptance tests; the D8 effectuality suite over the v0.1 schema; the D42 counterfactual layer (`04` §4c) — registry closedness, the rider precondition and its two discharge routes, literalise-first, disclosure prose, and the pack-provenance test (`P-CF-PRECONDITION`, `P-CF-LITERALISED`, `P-COUNTERFACTUAL-CLOSED`, `P-COUNTERFACTUAL-NAMED`, `P-CORR-CONSTANT-SPEED`, `A-CORR-EXPLAIN`, `A-CF-REGISTRY-CLOSED`, `A-CF-DEAD-REASON`, `A-PACK-PROVENANCE`, `G-CORR-RIDER`, `G-CF-PRECONDITION-TABLE`); `C-SAVEWIN-NO-INK` as a regression sentinel against the six baked book figures, where it passes trivially because the `save-window` verb does not yet exist |
 | **v0.2 — inspection** | viewer app with stepper + HUD, the `state` CLI verb (`stateAt`), `serve`, the `controls` strip with linked cursor, `sweep`; the `standing` ladder (`05` §6.4) as a pure exported function plus `check --standing`; the save-window analysis (`04` §4b) — the `save-window` CLI verb and the stepper overlay, both off by default and out of hash | G2, G3, and G5's inspection half | `C-STATEAT-LAWS`; `C-HUD-EQUALS-STATEAT`; `C-BOOKMARKS`; `C-ONE-CORE`; `C-RECOMPUTE-BUDGET` (as re-scoped by 09); recipe (c) end to end including `serve`; `G-STANDING-BITES`; `G-STANDING-NO-HASH-MOVE`; `A-STANDING-WARN-BAND`; `A-STANDING-RESERVED`; `A-STANDING-LADDER-CUMULATIVE`; `A-STANDING-REFUSAL`; `A-RESERVE-CHECKS-RESOLVE`; `A-LADDER-PROSE`; `A-STANDING-TOMBSTONE`; `C-SAVEWIN-HUD`; `C-SAVEWIN-CLIP`; `C-SAVEWIN-NO-INK`; `C-SAVEWIN-REFUSE-COARSE`; `C-SAVEWIN-BUDGET`; `G-SAVEWIN-GRID`; `A-SAVEWIN-PLACARD`; `A-SAVEWIN-VERB` |
 | **v0.3 — immersion** | POV view + `pov` render target, compare mode + `compare` verb | G9 | `C-POV-LIMIT-CONSISTENT`; `C-POV-TRUE-GEOMETRY`; `C-COMPARE`; per-view boot smoke tests |
-| **deferred, design kept** | the diagram projection *implementation* (design unchanged in 06) — lands when realistic-road figures (roads authored at prose scale rather than from the book presets) actually appear; the `fit` front door (`04` §deferred, post-v1); the `--jitter` ensemble mode (`08` §deferred, v2); **the continuation envelope (D45)** — design of record complete in `03` §7a / `04` §4d, build authorised only by the arithmetic spike `S-CONT-SEPARATION` (`09` §3.4a), then landing report-only in an inspection phase and rendering in an immersion phase; permanently evidence-only, out of hash, off by default, and absent from every committed book scene | — | each deferred design carries its own gates, pre-written in its owning doc |
+| **deferred, design kept** | the diagram projection *implementation* (design unchanged in 06) — lands when realistic-road figures (roads authored at prose scale rather than from the book presets) actually appear; the `fit` front door (`04` §deferred, post-v1); the `--jitter` ensemble mode (`08` §deferred, v2); **the continuation envelope (D45)** — design of record complete in `03` §7a / `04` §4d, build authorised only by the gate `S-CONT-SEPARATION-v2` (`09` §3.4a), then landing report-only in an inspection phase and rendering in an immersion phase; permanently evidence-only, out of hash, off by default, and absent from every committed book scene | — | each deferred design carries its own gates, pre-written in its owning doc |
 
 **v1.0** is v0.3 complete with every gate green — the point at which G1–G9 all
 hold and D1's destination is reached. Nothing after v0.1 may change the result
@@ -641,7 +706,7 @@ solver mode; and, from D42–D45, the closed counterfactual registry with its st
 precondition and literalise-first rule (`04` §4c), the `standing` ladder over a
 finished line (`05` §6.4), the out-of-hash reserve-lean save window (`04` §4b), and
 the continuation envelope (`03` §7a / `04` §4d), which is designed in full here and
-gated on the arithmetic spike `S-CONT-SEPARATION` before any of it is built.
+gated on the gate `S-CONT-SEPARATION-v2` before any of it is built.
 
 `extract/` remains in the repository as the historical design record; where a
 sibling document is silent, the prior design's choice is a reasonable default, but

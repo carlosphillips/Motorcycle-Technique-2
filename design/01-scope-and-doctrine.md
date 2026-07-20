@@ -507,6 +507,8 @@ exit sample        the sample at the RECORDED exit event (§4.1's heading-captur
                    with no exit event, corner end
 blind(c)           ⇔ at c's turn_in event, s_limit < s_end(c): the rider cannot
                    yet see the corner exit from the turn-in point (rider-eye, D4)
+                   — SATISFIABILITY IS A GEOMETRIC CONSTRAINT ON THE FIXTURE, not
+                   a property of the occluder: see the note below
 steering input     a maximal rising run of |cmd_lean| toward the corner's hand
                    with rise > SI_HYST = 1.5° (TUNING) — measured on the
                    COMMANDED channel, so stand-up disturbances (su_sustained +
@@ -522,6 +524,47 @@ danger_dwell_s     per corner, seconds, EVIDENCE ONLY: total time within W_c
                    verdict field; feeds NO parks-street/2 check (lean_ceiling
                    grades the peak; this records the exposure time)
 ```
+
+**`blind(c)` is not satisfiable by adding an occluder to an arbitrary corner, and
+it is a per-line predicate.** The eye is the rider's own position (`03-…md` §5.1),
+so the same corner may be blind for one line and sighted for another — holding
+wide opens the sight line, which is the whole teaching.
+
+For a band occluder (`hedge`/`wall`/`bank` — all of which sit *outside* the road
+edge by design, `03-…md` §4), whether the sight chord reaches past the corner exit
+rises steeply with the corner's **swept angle**. Radius moves it far less:
+shrinking the corner shrinks the sight geometry with it. `depth` is inert — only
+the band's inner face matters — while `margin` is not negligible, since bringing
+the face closer does block more. **On the hold-wide line no 90° corner in the
+proportion band is blind at any legal margin**; on a cut-in line at
+`margin ≤ 0.5` a 90° corner can be blind, by a few tens of centimetres.
+(`03-…md` §3.1 tabulates the curve and the margin sweep.)
+
+Corners near that boundary must be avoided rather than tuned to, because
+`blind(c)` then comes out true for a cut-in line and false for a hold-wide one —
+which makes `hold_wide_for_sight` go `na` exactly when the rider does the right
+thing.
+
+The consequence is a standing obligation, because **three** doctrine surfaces go
+`na` or inert when `blind(c)` is false: `hold_wide_for_sight` (check 11), the
+`BLIND_RESERVE_DEG` cap on `lean_ceiling` (check 8), and — most consequentially —
+**V2's hold-wide generation**, which emits its `position` action *for each blind
+corner* (`04-…md` §6), so on a corner that is not blind it emits nothing at all
+and the doctrine has no mechanism.
+
+(The V1 sight governor is **not** among them: it evaluates
+`vis_margin · ssd ≤ sight_ride_m` unconditionally, `04-…md` §6, and goes inert for
+the separate reason that a fixture may simply carry more sight than stopping
+distance. The two causes must not be conflated — doing so is how both
+`A-SSD-GOVERNOR` and `A-VIS-HOLD-REACH` came to look adequately witnessed,
+`09-…md` §3.5.)
+
+**Normative:** *any fixture authored to exercise blind-corner doctrine must be
+shown to satisfy `blind(c)` at its solved turn-in before a test is hosted on it. A
+visibility assertion on a corner where `blind(c)` is false does not fail — it
+passes vacuously, which is worse.* `review/verify/fixture_geometry.py` is the
+executable form of this obligation; `09-…md` §3.5 records `fx-esses-blind` as
+currently failing it.
 
 The commanded-channel rule is the load-bearing Tier-1R re-derivation: v1 counted
 humps of delivered `|phi(s)|`, which under the run-wide slice would count a

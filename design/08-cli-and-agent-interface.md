@@ -686,14 +686,24 @@ fig 8.5 figure adds the believed-road companion of recipe (i)'s mechanism;
 recipe (h) sweeps its window. Pinned as `A-RECIPE-J`.
 
 **(k) "Show why holding wide before a blind corner is worth it."** Two solves on
-`bookBlind` — a `vis=none` geometric line and a `vis=cautious` governed line —
-then `linelab commitment <envelope> --line <id> --at corners` on each, and read
-`k_refuted` off the table at the commitment probe. The governed line refutes
-fewer continuations from the same station: the doctrine's payoff as a count,
-beside the standing placard. Asserted by `A-RECIPE-K`; a goal-phrased form joins
-the `T-COLDSTART` battery. Gated with D45 — until promotion the `commitment`
-verb rejects `SCHEMA` with `deferred: "continuation envelope (D45)"` (§7.2), and
-the recipe rides with it.
+`bookBlind` at 34 km/h — a `vis=none` geometric line and a `vis=cautious`
+governed line — then `linelab commitment <envelope> --line <id> --at corners` on
+each, and read `k_refuted` off the table at the commitment probe. The governed
+line refutes fewer continuations from the same station: the doctrine's payoff as a
+count, beside the standing placard. Asserted by `A-RECIPE-K`; a goal-phrased form
+joins the `T-COLDSTART` battery. Gated with D45 — until promotion the
+`commitment` verb rejects `SCHEMA` with
+`deferred: "continuation envelope (D45)"` (§7.2), and the recipe rides with it.
+
+**The recipe's premise is itself gated.** "The governed line refutes fewer
+continuations" presumes the V1 governor moves the entry speed on this fixture at
+all; on the pre-amendment `bookBlind` it did not (binding needed
+`sight_ride_m < 14.53 m` against ≥ 24 m of geometry, so both lines solved to the
+same speed). `S-CONT-SEPARATION-v2` step 1 (`09-…md` §3.4a) measures whether it
+moves on the reshaped fixture. Until that returns, this recipe's headline
+sentence is a hypothesis, and `A-RECIPE-K` must assert the two lines' entry speeds
+**differ** before it asserts anything about their counts — otherwise it passes by
+equality.
 
 ---
 
