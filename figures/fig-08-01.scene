@@ -1,0 +1,12 @@
+# Fig 8.1 — premature turn point: turning in too soon runs the exit wide.
+road:      preset book90
+lines:
+  good:    ride entry=34 turnIn=auto
+  bad:     mistake premature
+occluders: vehicle oncoming exit:c1 +5
+marks:     turn_point
+labels:
+  turn_point@bad  "premature turn point"
+  apex@good       "late apex — sight and exit"
+view:      mode=diagram window=auto
+note:      "Turn in too soon and the geometry points the exit wide — toward the oncoming vehicle."

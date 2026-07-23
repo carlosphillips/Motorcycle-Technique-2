@@ -1,0 +1,11 @@
+# Fig 8.6 — the esses: one early turn-in ruins the line through every corner after.
+# `premature@all` applies the early turn-in at every corner; its per-corner peak
+# lean strictly increases across the chain — the book's error amplification.
+# orient=90 is authored (bookEsses's elongation is below the auto-portrait
+# threshold) so A-ESSES-GATE's manifest records orient: 90.
+road:      preset bookEsses
+lines:
+  good:    ride entry=32 turnIn=auto
+  bad:     mistake premature@all
+view:      mode=diagram orient=90
+note:      "Each corner wider than the last — an early turn-in compounds through the sequence."

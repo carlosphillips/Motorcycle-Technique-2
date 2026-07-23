@@ -1,0 +1,11 @@
+# Fig 8.2 — slow steering: a long roll from upright to full lean runs deep and wide.
+# `slow_steer` is a roll-rate cap: it keeps the SAME turn-in station as the ideal
+# line, so the two turn-point markers coincide and collapse to one green glyph
+# (A-FIG82-SINGLEMARK).
+road:      preset book90
+lines:
+  good:    ride entry=34 turnIn=auto
+  bad:     mistake slow_steer
+marks:     turn_point
+view:      mode=diagram window=auto
+note:      "Same turn-in point, but the slow roll to full lean eats corner angle — the line runs deep."

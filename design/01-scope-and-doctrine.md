@@ -568,8 +568,9 @@ distance. The two causes must not be conflated — doing so is how both
 shown to satisfy `blind(c)` at its solved turn-in before a test is hosted on it. A
 visibility assertion on a corner where `blind(c)` is false does not fail — it
 passes vacuously, which is worse.* `review/verify/fixture_geometry.py` is the
-executable form of this obligation; `09-…md` §3.5 records `fx-esses-blind` as
-currently failing it.
+executable form of this obligation; `09-…md` §3.5 hosts the visibility chain on
+`fx-chain-blind`, sized to satisfy it on the doctrinal hold-wide line (it retired
+`fx-esses-blind`, which failed it).
 
 The commanded-channel rule is the load-bearing Tier-1R re-derivation: v1 counted
 humps of delivered `|phi(s)|`, which under the run-wide slice would count a

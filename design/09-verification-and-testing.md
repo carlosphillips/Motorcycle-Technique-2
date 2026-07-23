@@ -905,7 +905,8 @@ discharged in this amendment, re-asserted here as a gate:
   lies inside `E(s_L)`'s step bound;
 - all three envelope bounds dominate the corpus (`03-…md` §7a.3);
 - `blind(c)` holds at the solved turn-in on every fixture that hosts a visibility
-  test — which `fx-esses-blind` currently **fails** (see §3.5);
+  test — including `fx-chain-blind` on its doctrinal hold-wide line (§3.5), the
+  fix for the retired `fx-esses-blind`'s wrong-line blindness;
 - `fx-hedge-gap` is authored with explicit geometry, or deleted and its three
   predicates re-homed.
 
@@ -1127,9 +1128,10 @@ and 1 above are hours; step 2 is the only part that needs engine surface.
   inside the corner; whether `k_refuted` then fires (the escape reaching past `s_L`)
   is the open question `S-CONT-SEPARATION-v2` measures, so this gate — like the rest
   of the commitment channel — reaches non-vacuity only where that spike passes.
-- **`G-COMMIT-ESSES`** — `fx-esses-blind`: ≥ 1 admissible member with **opposite
-  hand** to the actual continuation at corner 1's probe — the hand-reversal
-  representability a `hand_continues` lock would have destroyed.
+- **`G-COMMIT-ESSES`** — `bookEsses` (its alternating hands are required here;
+  the same-hand `fx-chain-blind` cannot host this): ≥ 1 admissible member with
+  **opposite hand** to the actual continuation at corner 1's probe — the
+  hand-reversal representability a `hand_continues` lock would have destroyed.
 - **`G-COMMIT-ENTRY`** — a chained fixture whose early probes fall inside the
   previous corner: pins at least one probe with
   `escape_status = "probe_outside_reserve_at_entry"`, `k_refuted: null`, every
@@ -1150,7 +1152,7 @@ and 1 above are hours; step 2 is the only part that needs engine surface.
   warm-cache all-lines recompute on the largest committed figure is unchanged and
   `C-RECOMPUTE-BUDGET` does not move. (ii) One on-demand probe (8 members) on
   `bookBlind` ≤ 40 ms on the pinned runtime.
-- **`C-COMMIT-BAKE-BUDGET`** — the full ladder on `fx-esses-blind` ≤ 25 s cold: a
+- **`C-COMMIT-BAKE-BUDGET`** — the full ladder on `fx-chain-blind` ≤ 25 s cold: a
   regression tripwire, not an interactivity promise, with the honest "roughly
   doubles the largest bake" recorded in the manifest.
 - **`A-FAN-NO-ENGINE`** — loading and rendering a scene with `fan: auto` performs
@@ -1175,7 +1177,7 @@ and 1 above are hours; step 2 is the only part that needs engine surface.
 ### 3.5 Solver-intent and visibility tests (D10, D22)
 
 Every test below states its quantifier. `P-CONSTRAINT-BINDING` runs on the R6
-fixture family with fuzzed *constraint values* (road fixed); all others are
+fixture (`R 12 ^90 @34`) with fuzzed *constraint values* (road fixed); all others are
 fixtures-only — each evaluation is a full solve, and several of the properties
 are false under adversarial outside/oncoming occluders, so fixture scoping is the
 honest quantifier.
@@ -1189,21 +1191,23 @@ honest quantifier.
   returns the byte-identical line.
 - `P-ACCEPT-GRADE` — a best_failing-returned plan re-run via `run` yields the
   identical verdict: acceptance policy never touches grading.
-- `P-ACCEPT-CONSTRAINT` — **run on the R6 fixture family under
-  `accept=best_failing`** (the corpus's only constraint-carrying fixture; run with a
-  hard-binding constraint while the line *fails on other criteria*, so
-  `best_failing` returns a failing line whose constraint-satisfaction is exactly
-  what must be checked): no best_failing return ever violates an authored constraint
-  — a relaxed accept policy must not quietly surface a constraint *violator*
-  (`04 §4.8` keeps violators as `NO_SOLUTION`, never a returned line), which extends
-  `P-CONSTRAINT-BINDING` to the relaxed policy. Without this explicit R6 × `best_failing` pairing the quantifier —
+- `P-ACCEPT-CONSTRAINT` — **run on `F-CONSTRAINT-HARD` (`R 25 ^90 @55`) under
+  `accept=best_failing`**: at 55 km/h the inside line needs 47.37° > `phiMax` 45°
+  (`fixture_geometry.py`), so a hard-binding `f`-constraint on a line that *fails
+  on lean* is the natural best-failing case — `best_failing` returns a failing line
+  whose constraint-satisfaction is exactly what must be checked. No best_failing
+  return ever violates an authored constraint — a relaxed accept policy must not
+  quietly surface a constraint *violator* (`04 §4.8` keeps violators as
+  `NO_SOLUTION`, never a returned line), which extends `P-CONSTRAINT-BINDING` to
+  the relaxed policy. Hosting it here — not on `R6`, the comfortable `R 12 ^90 @34`
+  line that never goes best-failing — makes the quantifier
   `{lines returned under best_failing}` ∩ `{sources carrying an authored
-  constraint}` — is **empty**, since R6 was otherwise exercised only by
-  `P-CONSTRAINT-BINDING` under `accept=clean`. *(R6's road is double-defined across
-  `04 §5` and `08 §6(f)` — see the note at §5.1 / the census; this gate uses the
-  `04 §5` constraint fixture `P-CONSTRAINT-BINDING` runs on.)*
+  constraint}` non-empty, resolving both the empty domain and the former `R6` road
+  double-definition: `R6` is now solely the `04 §5` `R 12 ^90 @34` fixture
+  `P-CONSTRAINT-BINDING` runs on, and `A-RECIPE-F`'s `R 25 ^90 @55` road is
+  `F-CONSTRAINT-HARD`.
 - `P-VIS-MARGIN-MONOTONE` — **named fixtures only** (`bookBlind`,
-  `fx-esses-blind`), never fuzzed: raising `vis_margin` (all else fixed) never
+  `fx-chain-blind`), never fuzzed: raising `vis_margin` (all else fixed) never
   lowers the solved line's minimum sight margin and never raises its governed
   entry speed. Edge pin: where a raised `vis_margin` governs speed below
   `v_floor`, the expected result is a typed `NO_SOLUTION` with sub-reason
@@ -1264,59 +1268,55 @@ honest quantifier.
   overlap and still validate (the zero-gap branch emits no wire action below
   `MIN_POS_DD_M`).
 
-*The chained-visibility pair.* Fixture `fx-esses-blind` := `bookEsses` +
-`hedge inside cN 0x12 margin=1.5 depth=4` for N = 1..4, entry 32 km/h (geometry
-TUNING; gaps sized so `vis_hold_f` is reachable under the 03 §6.1 lateral
-budget).
+*The chained-visibility fixture.* `fx-chain-blind` := `lane 3.5 | S 16 | L 12 ^140
+| S 18 | L 12 ^140 | S 16`, entry **39 km/h**, `hedge inside c1,c2 margin=0.3
+depth=2.5`, solved `vis=cautious` with `vis_margin = 1.2` (geometry TUNING;
+`review/verify/fixture_geometry.py` `check_chain_vis` proves every claim below).
+A **same-hand** pair of ≥ 130° corners: both legs are left-handers, so `inside`
+stays across the centreline and holding wide *opens* sight on every corner — so
+`blind(c)` holds on the **doctrinal (hold-wide, `start.f = 1.0`) line**, not merely
+the cut-in line. `fx-chain-blind-tight` is the identical fixture with the
+inter-corner straight shortened to **`S 12`** — the budget-limited variant below.
 
-> **OPEN — `fx-esses-blind`'s recorded diagnosis was wrong in *kind*, and it
-> still cannot be repaired the way `bookBlind` was.** The prior reading — `blind(c)`
-> false on all four corners, zero blind cells — holds only for the *left*-handed
-> legs. `bookEsses` alternates hands, and `03:219` pins that `hand=` does **not**
-> move the traffic side, so on its *right*-handed legs (`c1`, `c3`) the `inside`
-> band lands on the rider's **own** side of the centreline. Re-derived on `c1`
-> standalone (`review/verify/fixture_geometry.py` check 8), the right-handed leg
-> has **6/220 blind cells** (min `s_limit` 22.25 m vs `s_end` 23.71 m) — every one
-> on the **cut-in** line, none on the hold-wide line. That is an *applicability
-> inversion* (`blind(c)` true for the bad line and false for the doctrinal one —
-> the same failure as the D46 exemplar-1 inversion), **not** the clean not-blind
-> the record claimed, and the prescribed repair (mint a new ≥ 130° fixture) does
-> not address it. Swept angle still governs — `R 12 ^75` is far below the ≈ 115°
-> half-crossing threshold and no `margin`/`depth`/`span` compensates on the
-> *left*-handers, where moving a roadside band only ever *reduces* blocking — but
-> the honest reading is that the fixture is blind **on the wrong line**, not
-> sighted. *(The mechanism is reconstructed for `c1` standalone; the sweep's
-> 45/220-per-corner four-corner figure remains prose-only.)*
->
-> This is not a D45 problem: `P-VIS-MARGIN-MONOTONE` and `A-CHAIN-VIS-FULL`
-> currently run on corners where `blind(c)` is false, so anything they assert
-> about `hold_wide_for_sight` or the blind lean cap is `na`-driven.
->
-> **The governor is a separate question and must not be folded into this one.**
-> V1 evaluates `vis_margin · ssd ≤ sight_ride_m` **unconditionally**
-> (`04-…md` §6) — it does not read `blind(c)`. Whether it binds on
-> `fx-esses-blind` depends only on whether `sight_ride_m` falls below
-> `vis_margin · ssd` somewhere on the chain, which has not been computed and is
-> **open**. The old `bookBlind`'s governor inertness had this second cause
-> (≥ 24 m of sight against 14.53 m of `ssd`), not the `blind(c)` one, and
-> conflating the two is how `A-SSD-GOVERNOR` came to look adequately witnessed.
-> After the reshape, `P-VIS-MARGIN-MONOTONE`'s two named fixtures differ:
-> `bookBlind` now satisfies `blind(c)`, `fx-esses-blind` does not.
->
-> **`bookEsses` must not be reshaped**: it is committed ink (fig 8.6, `A-ESSES-GATE`),
-> and its `S 6` links are pinned to the hand-flip budget. The repair is therefore
-> a **new chained fixture**, not an edit to this one — a linked pair of ≥ 130°
-> same-or-alternating-hand corners carrying the hedges, hosting the chained
-> visibility assertions, with `bookEsses` retained unchanged for the figure and
-> for the flip-budget tests. Sizing it is an open decision recorded here rather
-> than resolved silently; `review/verify/fixture_geometry.py` is the check any
-> candidate must pass.
+**Why this shape (the sizing was an open decision; each number is forced, and
+`check_chain_vis` verifies it).** This fixture replaces the retired `fx-esses-blind`,
+whose diagnosis was wrong *in kind*: `bookEsses` alternates hands and `03:219` pins
+that `hand=` does not move the traffic side, so on its right-handed legs the `inside`
+band sat on the rider's own side and `blind(c)` came out true only on the **cut-in**
+line — an applicability inversion (D46 exemplar-1), never the clean not-blind the
+old record claimed. `bookEsses` is committed ink (fig 8.6, `A-ESSES-GATE`, links
+pinned to the flip budget) and must not be reshaped, so the repair is this new
+fixture, not an edit to it.
 
-- `A-CHAIN-VIS-FULL` — on the new ≥ 130° chained blind fixture (the
-  `fx-esses-blind` replacement, sized per the OPEN block above and
-  `fixture_geometry.py`), **not** the current `fx-esses-blind`, and **with
-  `vis_margin = 1.2` pinned** so V1 actually binds (at the default `1.0` the
-  governor is inert — `≈ 11 %` headroom — and each of the three clauses is
+- **^140, R12, same-hand (both left).** Swept angle governs blindness (`03 §3.1`):
+  ^140 is 100 % blind at R12. Both legs are left-handers because a right leg
+  *re-introduces* the inversion — on it the hold-wide line is **blinder** than the
+  cut-in line (checker witness: 14.25 m vs 18.25 m), grading the doctrine backwards.
+  Hand-reversal coverage stays on `bookEsses` (`G-COMMIT-ESSES`), retained unchanged.
+- **Entry 39 km/h.** `blind(c)` and governor-binding are *separate* (V1 evaluates
+  `vis_margin · ssd ≤ sight_ride_m` unconditionally, `04 §6`; it never reads
+  `blind(c)`). On the sight-*opening* hold-wide line the corner is blind (exit
+  hidden) yet still sees ≈ 23.25 m — more than `ssd` at 34 km/h — so V1 stays inert
+  there at the old speed. It binds at the pinned `vis_margin = 1.2` only once
+  `1.2 · ssd` exceeds that sight, which needs entry ≈ 38–40 km/h. At 39 km/h
+  `sight_ride / ssd = 23.25 / 20.74 = 1.121 ∈ [1.0, 1.2)` — bound at 1.2, inert at
+  1.0 — while the cut-in line stays ridable (lean 44.0° < `phiMax` 45°). The window
+  is narrow: the proportion band caps `R ≤ 12.7 m`, and the cut-in line reaches
+  `phiMax` at ≈ 40 km/h. The exact km/h is an engine-in-the-loop calibration;
+  `fixture_geometry.py` brackets it to 38–40.
+- **Gaps `S 18` / `S 12`.** `L_req(0.27, 39) = 15.8 m`, so `S 18` makes the full
+  hold reachable (`dd_max = 0.44 m > target`, `A-CHAIN-VIS-FULL`); `S 12` gives
+  `dd_max = 0.17 m ∈ [MIN_POS_DD_M, target)` — a non-zero but **budget-limited**
+  hold (`A-CHAIN-VIS-BUDGET`), where a zero gap would emit no hold and empty the
+  "monotone across each span" quantifier.
+
+After the retirement, `P-VIS-MARGIN-MONOTONE`'s two named fixtures are `bookBlind`
+(which satisfies `blind(c)` since its ^140 reshape) and `fx-chain-blind`.
+
+- `A-CHAIN-VIS-FULL` — on `fx-chain-blind` (defined above; the `S 18` full-hold
+  gap), **with `vis_margin = 1.2` pinned** so V1 actually binds
+  (`sight_ride / ssd = 1.121`, so the governor moves the entry speed at 1.2 but is
+  inert at the default `1.0`, where each of the three clauses would be
   independently no-op): `chainedSolve` with `vis=cautious` returns a line that
   (i) passes `stop_within_sight` at every station of the chain — V1
   (`vis_margin · ssd(v, phi).ssd_m ≤ sight_ride_m`) is unconditional, and every
@@ -1331,11 +1331,11 @@ budget).
   (`A-LINK-FLIP`'s fixture): there the inter-corner spans are **0 m**, so
   `T_cmd = 0`, `dd_max` collapses below `MIN_POS_DD_M`, **no hold is emitted**, and
   the "monotone across each span" universal quantifies over the empty set — the
-  budget carve-out it exists to test never fires. Its correct home is a chained
-  blind fixture whose inter-corner spans are **short enough that the 03 §6.1
-  lateral budget binds** (`budget_limited: true`) **but non-zero so a hold is
-  emitted** (a tight-gap variant of the new ≥ 130° chained fixture above; sizing
-  recorded there, checked by `fixture_geometry.py`). On it the gate asserts the
+  budget carve-out it exists to test never fires. Its correct home is
+  **`fx-chain-blind-tight`** (the `S 12` variant above), whose inter-corner spans
+  are **short enough that the 03 §6.1 lateral budget binds** (`dd_max = 0.17 m <
+  target`, `budget_limited: true`) **but non-zero so a hold is emitted**
+  (`dd_max ≥ MIN_POS_DD_M`); sizing checked by `fixture_geometry.py`. On it the gate asserts the
   budget carve-out itself — the solver report marks each hold `budget_limited:
   true`; achieved `f` is monotone toward the target across each inter-corner span;
   the release condition is evaluated from the **actual** position (the reached
@@ -1416,7 +1416,7 @@ walk-through the educational-test rule (§8) demands:
   proportion gate passes; manifest shows hourglass/ring/dot markers and per-line
   sight rays (occluder present); `T-JUDGE-RECORD` satisfied for the exported
   figure.
-- `A-RECIPE-F` (constraint recipe, R6): satisfiable arm — verdict `constraints`
+- `A-RECIPE-F` (constraint recipe, `F-CONSTRAINT-HARD` = `R 25 ^90 @55`): satisfiable arm — verdict `constraints`
   block records `satisfied: true`, non-negative margin, tightest station;
   refusal arm (a tightened variant fixture) — exit 3,
   `NO_SOLUTION`/`constraint_unmet` naming the constraint id and worst station.
@@ -1815,11 +1815,16 @@ mode** must already land near the proportion bands. If a preset needs violent
 compression to pass the gate, the preset is wrong, not the projection.
 
 The round-trip includes the portrait chain numerically: `A-ESSES-GATE` — the
-shipped fig-8.6 scene exports in diagram mode with gate verdict `pass`; the
-manifest records `orient: 90`; `road_ink ≥ 0.25`; and the same scene in `true`
-mode still lands near the bands. Portrait multi-corner figures pass via 06's
-auto-orientation and aspect-floor padding — the gate itself never moves, and a
-stretched figure is never "disclosed" into acceptability.
+shipped fig-8.6 scene (`figures/fig-08-06.scene`, which pins `view: orient=90`)
+exports in diagram mode with gate verdict `pass`; the manifest records `orient: 90`
+(**authored**, not left to auto-orientation — `bookEsses`'s elongation 1.153 sits
+below the 1.25 auto threshold, so the scene fixes the heading); `road_ink ≥ 0.20`
+(the **portrait multi-corner floor**, 06 TUNING — a four-corner true-scale ess is
+genuinely sparse, measured 0.21 in diagram mode, so it floors at 0.20 rather than
+the single-corner 0.25); and the same scene in `true` mode still lands near the
+bands. Portrait multi-corner figures pass via 06's aspect-floor padding — the gate
+never moves for single-corner figures, and a stretched figure is never "disclosed"
+into acceptability.
 
 ### 5.4 Annotation and ink verification
 
@@ -1841,8 +1846,10 @@ against pixels:
   ties** (06's coincident-collapse rule), and the ideal line is green; a `red`
   assertion here **contradicts the colour law** and is unsatisfiable (the
   marker-collapse golden below agrees: "topmost-draw-order colour"). *(The fig-8.2
-  scene roster itself is still undefined in `design/` — see the book-figure-scene
-  gap, §10 / §4-of-the-sweep.)*
+  scene is `figures/fig-08-02.scene`: `book90` + a `good` ride + a `slow_steer`
+  mistake under `marks: turn_point`; `slow_steer` is a roll-rate cap that does not
+  move the turn-in station, so the two lines' turn-point markers coincide and
+  collapse to the one green glyph this gate asserts.)*
 - `A-FIG83-MARKS` — the fig 8.3 scene with `marks: turn_point`: the green line
   carries exactly 1 hourglass, the fifty_pence line exactly `facets`
   hourglasses, zero rings/dots.

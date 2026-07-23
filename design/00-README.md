@@ -478,9 +478,9 @@ Sibling documents must conform to all of them.
   (≥ 24 m) than stopping distance (14.53 m), so `A-SSD-GOVERNOR` passed by equality. `bookBlind` is reshaped to
   `lane 3.5 | S 16 | L 12 ^140 | S 16` at 34 km/h with `hedge inside c1 -6x36`; it no longer
   inherits `book90`, which is unchanged and keeps figs 8.1–8.3. **No committed book-figure scene
-  used `bookBlind`, so no baked figure moves.** `fx-esses-blind` has the same defect and is
-  recorded as OPEN in `09 §3.5` — `bookEsses` is committed ink and must not be reshaped, so it
-  needs a new chained fixture rather than an edit. **(2) The §7a.4 ladder branched on
+  used `bookBlind`, so no baked figure moves.** `fx-esses-blind` had the same defect; `09 §3.5`
+  retires it for `fx-chain-blind` (a new same-hand ≥130° chained fixture, sized against
+  `fixture_geometry.py`), leaving `bookEsses` — committed ink — untouched. **(2) The §7a.4 ladder branched on
   `sign(κ_L)`**, which flipped its semantics with hand: on left-handers three rungs clamped onto
   one byte-identical road (the exact collapse the headroom ladder was introduced to prevent), on
   right-handers two rungs stepped outside the pack's own `kappa_step_max_1pm`, and at `κ_L = 0` all

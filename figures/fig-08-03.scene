@@ -1,0 +1,15 @@
+# Fig 8.3 — fifty-pencing: many partial steering corrections instead of one input.
+# `fifty_pence` replaces the single turn-in with `facets` (6) steering inputs, the
+# first one early — so the green line carries 1 turn-point hourglass and the red
+# line 6 (A-FIG83-MARKS), and `bad`'s first turn_in precedes `good`'s
+# (A-FIG83-TOPOLOGY).
+road:      preset book90
+lines:
+  good:    ride entry=34 turnIn=auto
+  bad:     mistake fifty_pence
+marks:     turn_point
+labels:
+  turn_point#1@bad  "first of six inputs"
+  apex@good         "one smooth input"
+view:      mode=diagram window=auto
+note:      "Six steering inputs where one would do — the faceted line the book calls fifty-pencing."

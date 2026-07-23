@@ -936,13 +936,104 @@ def check_applied_repairs():
          "check 1's two PASSes: not blind at the doctrinal turn-in, blind at an early one.")
 
 
+def check_chain_vis():
+    print("\n15. fx-chain-blind — the >=130-degree same-hand chained-visibility fixture  [09 §3.5]")
+    print("    lane 3.5 | S 16 | L 12 ^140 | S <gap> | L 12 ^140 | S 16, entry 39 km/h,")
+    print("    hedge inside c1,c2 margin=0.3 depth=2.5, vis_margin 1.2. Each leg is a single")
+    print("    L 12 ^140 corner (blindness already proven at every cell by check 1); this check")
+    print("    adds the governor binding, the gap regimes, and the same-hand justification.")
+    R, SW, ENTRY_S = 12.0, 140.0, 16.0
+    v = 39 / 3.6
+    pt, se = road(ENTRY_S, R, SW)
+    poly = hedge_polygon(pt, ENTRY_S - 6.0, ENTRY_S + 30, 0.3, 2.5)      # left leg, margin 0.3
+
+    # (a) blind on the DOCTRINAL hold-wide (f=1.0) line across the turn-in band
+    blind_doc = True
+    ti = ENTRY_S - 4.0
+    while ti <= ENTRY_S + 4.0 + 1e-9:
+        sl = sight_from(pt, poly, ti, 1.0, se + 30)
+        blind_doc &= (sl is not None and sl < se)
+        ti += 0.5
+    check("each ^140 leg is blind on the DOCTRINAL hold-wide line (fixes fx-esses-blind's inversion)",
+          blind_doc, "same-hand left legs keep `inside` across the centreline, so hold-wide is "
+          "blind, not merely the cut-in line")
+
+    # (b) governor: min sight_ride on the hold-wide line vs vis_margin * ssd
+    msr, s_eye = math.inf, ENTRY_S - 4.0
+    while s_eye < se:
+        sl = sight_from(pt, poly, s_eye, 1.0, se + 30)
+        if sl is not None:
+            msr = min(msr, sl - s_eye)
+        s_eye += 0.5
+    phi_wide = math.atan(v * v / (G * (R + BIKE_MARGIN + (LANE_W - 2 * BIKE_MARGIN))))
+    ssd_m = ssd(v, phi_wide)
+    ratio = msr / ssd_m
+    check("V1 governor BINDS at vis_margin=1.2 on the hold-wide line, and is inert at 1.0",
+          1.0 <= ratio < 1.2,
+          f"sight_ride {msr:.2f} m / ssd {ssd_m:.2f} m = {ratio:.3f} in [1.0, 1.2) — bound at 1.2, "
+          f"inert at 1.0 (blind(c) alone leaves V1 inert; the entry speed is what makes it bind)")
+
+    # (c) the cut-in reference line stays ridable at 39 km/h
+    lean_cut = math.degrees(math.atan(v * v / (G * (R + BIKE_MARGIN))))
+    check("cut-in line stays ridable at 39 km/h (lean < phiMax 45)", lean_cut < 45.0,
+          f"cut-in lean {lean_cut:.1f} deg; the window ceiling is ~40 km/h (cut-in reaches 45), "
+          f"the floor ~38 (below it V1 no longer binds at 1.2)")
+
+    # (d) gap regimes: S 18 full hold; S 12 budget-limited but non-zero
+    A_LAT, K_REACH, MIN_DD = 0.8, 1.2, 0.10
+    T_ROLL = math.atan(A_LAT / G) / math.radians(50.0)
+    target = 0.1 * (LANE_W - 2 * BIKE_MARGIN)
+    L_req = 2 * v * (math.sqrt(K_REACH * target / A_LAT) + T_ROLL)
+    dd = lambda gap: A_LAT * max(0.0, (gap / v) / 2 - T_ROLL) ** 2
+    check("FULL variant `S 18` makes the hold reachable (gap >= L_req)", 18.0 >= L_req,
+          f"L_req(0.27, 39) = {L_req:.2f} m <= 18 m; dd_max(S 18) = {dd(18.0):.3f} m > target {target:.2f}")
+    check("BUDGET variant `S 12` is budget-limited but non-zero (MIN_POS_DD_M <= dd < target)",
+          MIN_DD <= dd(12.0) < target,
+          f"dd_max(S 12) = {dd(12.0):.3f} m in [{MIN_DD}, {target:.2f}) -> a hold is emitted, "
+          f"budget_limited; a zero gap would emit none and empty the monotone-span quantifier")
+    check("stays in scope and holds the proportion band",
+          SW < 170.0 and 0.55 <= 2 * LANE_W / R <= 0.9,
+          f"sweep {SW:.0f} < 170; road:radius = {2 * LANE_W / R:.3f}")
+
+    # (e) same-hand is required: a right leg inverts (hold-wide blinder than cut-in)
+    ptR, seR = road(ENTRY_S, R, SW, hand="R")
+    polyR = hedge_polygon(ptR, ENTRY_S - 6.0, ENTRY_S + 30, 0.3, 2.5, side=+1)
+    w = sight_from(ptR, polyR, ENTRY_S, 1.0, seR + 30)
+    c = sight_from(ptR, polyR, ENTRY_S, 0.0, seR + 30)
+    check("SAME-HAND is required: a right leg inverts (hold-wide sees LESS than the cut-in line)",
+          w is not None and c is not None and w < c,
+          f"right-hander: hold-wide s_limit {w:.2f} < cut-in {c:.2f} -> `hold_wide_for_sight` would "
+          f"grade the doctrine backwards; hand-reversal coverage stays on bookEsses (G-COMMIT-ESSES)")
+
+
+def check_constraint_hard():
+    print("\n16. F-CONSTRAINT-HARD — R 25 ^90 @55 (was mislabeled R6; now A-RECIPE-F + "
+          "P-ACCEPT-CONSTRAINT)  [09 §3.5, 08 §6(f)]")
+    v = 55 / 3.6
+    R = 25.0
+    # right-hander: offset d right-of-travel is toward the arc centre -> ride radius R - d
+    d_inside = BIKE_MARGIN + (LANE_W - 2 * BIKE_MARGIN)   # 3.10 m, the tight lane edge
+    d_outer = BIKE_MARGIN                                 # 0.40 m, the wide lane edge
+    lean_in = math.degrees(math.atan(v * v / (G * (R - d_inside))))
+    lean_out = math.degrees(math.atan(v * v / (G * (R - d_outer))))
+    check("the inside line is UNRIDABLE at 55 km/h (needs > phiMax 45)", lean_in > 45.0,
+          f"R_ride {R - d_inside:.1f} m -> {lean_in:.2f} deg > 45 (matches 09's 47.37) — so a "
+          f"hard f-constraint on a lean-failing line is the natural best-failing case")
+    check("a ridable wide line still exists (the solve is not vacuously all-NO_SOLUTION)", lean_out < 45.0,
+          f"R_ride {R - d_outer:.1f} m -> {lean_out:.2f} deg < 45; the f>=0.6 'stay wide' constraint "
+          f"is what rescues ridability")
+    note("R6 and F-CONSTRAINT-HARD are two different fixtures (the former double-definition)",
+         "R6 = R 12 ^90 @34 (P-CONSTRAINT-BINDING, comfortable, constraint merely reshapes); "
+         "F-CONSTRAINT-HARD = R 25 ^90 @55 (A-RECIPE-F + P-ACCEPT-CONSTRAINT, at the lean ceiling).")
+
+
 if __name__ == "__main__":
     print("linelab — geometric claims in design/, re-derived from the DSL")
     print("Checks 1-5 audit D46 (2026-07-19); 6-9 the vacuity sweep (2026-07-20);")
-    print("10-13 the four formerly-uncovered quantities + the Q1/Q2 turn-in fix in")
-    print("check 1 (2026-07-22). STILL prose-only: the full four-corner fx-esses-blind")
-    print("chain (check 8 does c1 standalone) and the six book-figure SCENES, which")
-    print("design/ never defines (path strings only). Do not read a clean run as full cover.")
+    print("10-13 the four formerly-uncovered quantities + the Q1/Q2 turn-in fix in check 1")
+    print("(2026-07-22); 15-16 the roadblock resolutions (2026-07-23) — fx-chain-blind and")
+    print("F-CONSTRAINT-HARD. The six book-figure scenes are now authored (figures/*.scene);")
+    print("baking them needs the engine, so this checker still covers geometry only.")
     print("=" * 68)
     check_blind_fixture()
     check_blind_lean_cap()
@@ -958,6 +1049,8 @@ if __name__ == "__main__":
     check_l_req()
     check_fx_hedge_gap()
     check_applied_repairs()
+    check_chain_vis()
+    check_constraint_hard()
     print("\n" + "=" * 68)
     if _fail:
         print(f"{len(_fail)} assertion(s) contradict the design of record:")

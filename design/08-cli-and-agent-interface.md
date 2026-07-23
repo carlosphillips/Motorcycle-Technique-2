@@ -616,11 +616,13 @@ linelab figure figures/fig-08-01.scene --out out/
 ```
 where the scene text (**03** §8) names the `book90` road preset (a left-hander,
 per its book-ink hand default), an ideal line, a `premature` mistake line, and
-the hedge occluder. Expect: a figure equivalent to the book's Fig 8.1 — green
-delayed-turn line, red `premature` line (the same words the book prints beside
-it), hourglass turn-point markers (coincident markers collapse per **06** §3.1),
-dashed sight rays to each line's limit point (rays render because the figure has
-an occluder, anchored at each line's first `turn_in` — **06** §3.1), and the
+an oncoming-vehicle occluder (the wide `premature` line runs toward it — the
+book's own danger; `A-FIG81-VEHICLE`). Expect: a figure equivalent to the book's
+Fig 8.1 — green delayed-turn line, red `premature` line (the same words the book
+prints beside it), hourglass turn-point markers (coincident markers collapse per
+**06** §3.1), dashed sight rays to each line's limit point (rays render because
+the figure has an occluder, anchored at each line's first `turn_in` — **06**
+§3.1), and the
 `role · quality (outcome)` legend — in book proportions via the diagram
 projection.
 

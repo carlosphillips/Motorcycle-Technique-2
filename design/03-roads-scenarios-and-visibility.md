@@ -251,8 +251,9 @@ Notes:
   same-hand run of `linked_next` corners), so `style=double_apex` targets
   `c1..c3` by default (`04-solver-and-authoring.md`). Total sweep 180°;
   per-segment sweeps ≤ 70° with `r ≥ 12 m` — clears the super-tight refusal with
-  margin. Its book figures (8.4/8.5) are full-width roads: 7 m carriageway / R12
-  touch corners = 0.58, inside the proportion band at true scale.
+  margin. Its book figure (8.5) is a full-width road: 7 m carriageway / R12
+  touch corners = 0.58, inside the proportion band at true scale. (fig 8.4 is the
+  decreasing-radius `bookDecreasing`, a different preset.)
 - **bookHairpin** clears the sweep-content cut (§2): 150° of sweep at
   `r ≤ 15 m` < 170°.
 - `bookBlind`'s occluder line is byte-identical under any hand flip — the live
@@ -315,13 +316,13 @@ Notes:
   None of the six committed book-figure scenes used `bookBlind`, so no baked
   figure moves.
 
-  **`fx-esses-blind` (`09-verification-and-testing.md` §3.5) has the same defect
-  and cannot be repaired the same way.** Its base is `bookEsses`, whose legs are
+  **`fx-esses-blind` (`09-verification-and-testing.md` §3.5) had the same defect
+  and could not be repaired the same way.** Its base was `bookEsses`, whose legs are
   `R 12 ^75` — far below the threshold — and `bookEsses` is committed ink
-  (fig 8.6) that must not be reshaped. Every test hosted on it
-  (`P-VIS-MARGIN-MONOTONE`, `A-CHAIN-VIS-FULL`) currently runs on a corner where
-  `blind(c)` is false. Re-homing it is an open decision, recorded in `09-…md` §3.5 rather
-  than silently resolved here.
+  (fig 8.6) that must not be reshaped. It is **retired** and replaced by
+  `fx-chain-blind` — a new same-hand pair of `L 12 ^140` corners (`09-…md` §3.5) that
+  is blind on the doctrinal hold-wide line — with `P-VIS-MARGIN-MONOTONE` and
+  `A-CHAIN-VIS-FULL` re-homed onto it; `bookEsses` is left untouched.
 
   Both facts are executable: `review/verify/fixture_geometry.py` re-derives them
   from the DSL strings and fails if the design's numbers drift.
