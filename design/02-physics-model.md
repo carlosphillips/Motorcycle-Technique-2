@@ -883,10 +883,15 @@ the fixtures don't hold.
 - **`C30-squeeze`** — mid-corner brake to 2.0 m/s² at `slew 4`:
   `phi_dot_su ≡ 0`, line tightens — "gently squeezing on the brake mid-corner"
   pinned as expressible.
-- **`C30-heldbrake`** — mid-corner commanded −8.0 m/s², default slew, held to
-  termination, target lean held (`c = 1`): predicate (W) becomes true and stays
-  true; `kappa` non-increasing while it holds; lane fraction moves outward;
-  outcome in the run-wide class; **no crash**.
+- **`C30-heldbrake`** — explicit-plan fixture in the **clipped-widening regime**
+  (the sustained-hold twin of `C30-deeplean`): onset lean 40° (R30 steady,
+  `v ≈ 15.7 m/s`), start `f = 0` (inside), commanded −8.0 m/s² at default slew held
+  to termination — above `a_long_avail ≈ 5.3 m/s²`, so the command clips throughout.
+  Predicate (W) becomes true and stays true over the whole hold; `kappa`
+  non-increasing while it holds; lane fraction moves **outward** across the entire
+  hold; outcome in the run-wide class; **no crash**. (At −8.0 from the ordinary C30
+  corner speed the lean was too shallow to clip — the line moved *inward* to
+  `off_road`, outward excursion identically zero.)
 - **`C30-deeplean`** — explicit-plan fixture: lean 40°, `v ≈ 15.7` (R30 steady
   state), commanded −9.0 held: `clipped = true`, `b_dem − b_del ≈ 3.7 m/s²`,
   sustained `phi_dot_su < 0`, path widens, no crash (§5.3's headline case,

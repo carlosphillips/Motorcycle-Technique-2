@@ -279,12 +279,16 @@ Notes:
   where it crosses half, not a cliff.)
 
   **On the hold-wide line — the doctrinal line, and `rider.start.f`'s default of
-  `1.0` — no 90° corner is blind at any legal hedge margin**, across
-  `margin ∈ [0, 1.2]` and `r ∈ {9, 12, 12.7}`. That is the claim that forces the
-  reshape, and it is narrower than "no 90° corner can be blind", which is **false**:
-  at `margin ≤ 0.5` a 90° corner at `r = 12` *is* blind on a **cut-in** line — by
-  0.10 m at `margin = 0.5`, rising to **1.35 m at `margin = 0`** (1.70 m at
-  `r = 12.7`).
+  `1.0` — no 90° corner is blind at any legal hedge margin *at the doctrinal
+  turn-in***, across `margin ∈ [0, 1.2]` and `r ∈ {9, 12, 12.7}`. That is the claim
+  that forces the reshape, and it is narrower than "no 90° corner can be blind",
+  which is **false** on two counts: at `margin ≤ 0.5` a 90° corner at `r = 12` *is*
+  blind on a **cut-in** line — by 0.10 m at `margin = 0.5`, rising to **1.35 m at
+  `margin = 0`** (1.70 m at `r = 12.7`); and because `blind(c)` is single-turn-in,
+  sweeping the turn-in down to `entry−7` at a small margin the **hold-wide** line
+  too can go blind at the wide band edge, by up to ≈ 1.2 m at `r = 12.7,
+  margin = 0` (`review/verify/fixture_geometry.py` check 1). Neither touches the
+  `^140` reshape, which is blind on both lines at every turn-in ≤ 20.5 m.
 
   That near-miss is worth stating rather than burying, because it is the exact
   pathology the fixture must avoid. Holding wide *opens* the sight line, so on a

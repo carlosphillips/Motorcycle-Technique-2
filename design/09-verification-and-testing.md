@@ -135,15 +135,18 @@ its own homework, and the suite would thereafter detect only drift, never
 correctness.
 
 Analytic fixtures (committed under `verify/analytic/`; all `profile: street`,
-`mu: 1.0`, `use_full_width: true`, wide carriageway `lane 8` so containment and
-off-road termination never interfere with the physics under test):
+`mu: 1.0`; the point-mass fixtures use `use_full_width: true` and a wide carriageway
+`lane 8` so containment and off-road termination never interfere with the physics
+under test. The **one exception is `A-AN-SOLVER-KISS`** below, deliberately
+corridor-mode on `C30`'s own `lane 3.5` road, because its purpose is to exercise the
+corridor / lane-fraction search that `use_full_width` would switch off):
 
 | Test | Fixture | Road / plan | Closed-form expectation | Tolerance |
 |---|---|---|---|---|
 | `A-AN-RADIUS` | `F-AN-CIRCLE` | `lane 8 \| S 10 \| R 30 ^270 \| S 10`, start `d=0`, entry `42.17 km/h` (= `sqrt(G·30·tan 25°)` = 11.715 m/s), plan: `turn_in {lean_deg: 25}` at `entry:c1`, `throttle accel=0` at `entry:c1` | On the steady span (from `turn_in + 2·(25°/roll_rate)` to arc end): `kappa = G·tan(phi)/v²` per sample; path radius `1/kappa = 30.000 m`; a circle fitted to `(x, y)` samples has `r = 30.00 m` | identity ≤ 1e-9 relative; `1/kappa` ± 0.001 m; fitted radius ± 0.01 m |
-| `A-AN-BRAKE` | `F-AN-BRAKE` | `lane 8 \| S 400`, entry `100 km/h` (27.778 m/s), plan: `brake decel=3.0` at `at_s=50`, held | `stopped` termination at `s* = 50 + (v0² − v_floor²)/(2·3.0) = 177.93 m`; `v(t) = v0 − 3.0·t` at every raw sample before the floor | `s*` ± 0.01 m; `v(t)` ≤ 1e-9 relative |
+| `A-AN-BRAKE` | `F-AN-BRAKE` | `lane 8 \| S 400`, entry `100 km/h` (27.778 m/s), plan: `brake decel=3.0` at `at_s=50`, held (default `slew_mss = A_SLEW_DEFAULT = 6.0`) | the brake command is **slew-limited** (`02-…md` §3), so the closed form carries the ramp term: from brake onset `t_b` it ramps `0 → −3.0` over `t_r = 3.0/slew = 0.5 s`; during the ramp `v(t) = v0 − (slew/2)·(t − t_b)²`, and after it `v(t) = v1 − 3.0·(t − t_b − t_r)` with `v1 = v0 − 3.0²/(2·slew) = 27.028 m/s`; `stopped` termination at `s* = 50 + [v0·t_r − slew·t_r³/6] + (v1² − v_floor²)/(2·3.0) = 50 + 13.764 + 121.083 = 184.85 m`. (The pre-amendment form `s* = 177.93 m`, `v(t) = v0 − 3.0·t` omitted the default slew and was **unsatisfiable** by a correct engine — off by 6.91 m on `s*` alone; `review/verify/fixture_geometry.py` check 6.) | `s*` ± 0.01 m; `v(t)` ≤ 1e-9 relative |
 | `A-AN-ROLL` | `F-AN-ROLL` | `lane 8 \| S 200`, entry `54 km/h` (15 m/s), plan: `turn_in {lean_deg: 30}` at `at_s=20` | ramp duration `30°/roll_rate = 0.600 s`; interior ramp slope = `roll_rate` (50°/s street); zero overshoot; `phi` holds at 30° after arrival; `\|phi_dot\| ≤ roll_rate` throughout (stand-up inactive: `a_cmd = 0`) | duration ± 2·dt (± 0.010 s); slope ± 0.5 °/s; overshoot ≤ 0.01° |
-| `A-AN-RK4` | `F-AN-ACCEL` | `lane 8 \| S 400`, entry `36 km/h` (10 m/s), plan: `throttle accel=2.0` at `at_s=0` | `v(t) = 10 + 2t`, `x(t) = 10t + t²` (RK4 is exact on polynomial dynamics — any deviation is a stage-weight/dt wiring bug), `v(s) = sqrt(100 + 4s)` at resampled stations | ≤ 1e-9 relative, all three |
+| `A-AN-RK4` | `F-AN-ACCEL` | `lane 8 \| S 400`, entry `36 km/h` (10 m/s), plan: `throttle accel=2.0` at `at_s=0` (default `slew_mss = A_SLEW_DEFAULT = 6.0`) | the throttle command is **slew-limited** (`02-…md` §3): it ramps `0 → 2.0` over `t_r = 2.0/slew = 0.3333 s`. During the ramp `a(t) = slew·t`, `v(t) = 10 + (slew/2)·t² = 10 + 3t²`, `x(t) = 10t + (slew/6)·t³ = 10t + t³`; after it (`t > t_r`) `v1 = 10 + (slew/2)·t_r² = 10.3333 m/s`, `v(t) = v1 + 2.0·(t − t_r)`, `x(t) = x(t_r) + v1·(t − t_r) + (t − t_r)²`, and `v(s)` follows from the piecewise `x(t)`. RK4 is exact on each polynomial arc (cubic-in-`t` during the ramp, quadratic after) — any deviation is a stage-weight/dt wiring bug. (The pre-amendment forms `v(t) = 10 + 2t`, `x(t) = 10t + t²` assumed constant `a = 2.0` from `t = 0` and ignored the same default slew — **unsatisfiable**, ~3.2e7× the 1e-9 band; `fixture_geometry.py` check 6.) | ≤ 1e-9 relative, all limbs |
 
 Four further analytic entries attach to the counterfactual layer and the
 continuation envelope. The first ships with the corrective shot; the last three
@@ -161,11 +164,14 @@ are **gated** (D45) and run only at promotion (§3.4a):
   `t_r = 0.807 s`; at `v = 12 m/s`, ramp heading `= 14.605°` and `R = 17.27 m`.
   This is a legal hand-computed expectation under D35.
 - **`A-AN-TRUNCATE`** (D45, gated) — `truncateAt` on
-  `lane 8 | S 10 | R 30 ^270 | S 10` at 20 stations: composed length equals the
-  requested `s` to ≤ 1e-9 relative; the truncated road's dense lookup is
-  byte-identical to the parent's on `[0, s]`; the taper split matches the
-  closed-form quadratic of `03-roads-scenarios-and-visibility.md` §7a.4 to
-  ≤ 1e-9.
+  `lane 8 | S 10 | R 30 ^270 | S 10` **and on `bookDecreasing`'s road** (whose
+  `R 16>9 ^130` clothoid carries a real taper token) at 20 stations each: composed
+  length equals the requested `s` to ≤ 1e-9 relative; the truncated road's dense
+  lookup is byte-identical to the parent's on `[0, s]`; the taper split matches the
+  closed-form quadratic of `03-roads-scenarios-and-visibility.md` §7a.4 to ≤ 1e-9.
+  **The taper-split limb (iii) is empty on `R 30 ^270`, which is a pure arc with no
+  taper token — it needs `bookDecreasing`'s clothoid, where a split lands inside a
+  taper.**
 - **`A-AN-MEMBER-KAPPA`** (D45, gated) — for every `σ` on every preset, the
   composed member's `κ(u)` matches `03-…md` §7a.4's `κ_m(u)` to ≤ 1e-6 1/m
   except inside `R_FLAT_M` clamping spans, which are asserted to be exactly the
@@ -210,6 +216,37 @@ committed fixtures and asserts byte equality (it runs in the normal suite, so 02
 can never claim numbers the fixtures don't hold). Correctness is anchored outside
 the engine (analytic layer + design-pin bounds), and 02's worked-numbers claim is
 *true by generation*.
+
+**The analytic layer must touch the solver at least once.** The five `A-AN-*`
+fixtures above all carry authored plans (`use_full_width`, `d = 0`) that invoke
+the solver **zero times** — no corridor, lane-fraction, turn-in or apex search
+runs — so on the analytic layer alone a solver that produces a systematically
+wrong *line* still passes the green-gate that precedes the first bless. One
+closed-form **solver** assertion closes this:
+
+- **`A-AN-SOLVER-KISS`** — `C30` (`R 30 ^90`) solved with the default out-in-out
+  solver in **corridor mode** (**not** `use_full_width`; the header exception): the
+  apex sample kisses the corridor's inner edge — `f_apex ≤ KISS_TOL_F` (`= 0.05`,
+  the doctrinal kiss band) — a geometric ground truth re-derived from the road DSL,
+  **not** a value read back from `solved.plan`. The bound is the kiss *band*, not a
+  tighter `eps_f`: a correct clean apex lands anywhere in `[0, KISS_TOL_F]`, so
+  pinning `f_apex = 0 ± 0.01` would make this gate itself **unsatisfiable** — the
+  very failure class §3.2a's analytic layer exists to catch. This is the one
+  pre-bless assertion that actually exercises corridor + lane-fraction + turn-in +
+  apex search; a solver whose apex falls short of the inside (`f_apex > KISS_TOL_F`)
+  or reads its own stored constant back fails here before it can be blessed. Read on
+  the raw pre-emission samples, like every `A-AN-*`.
+
+**The bless refusal is a named test with a negative arm, not prose.** Step 3's
+mechanical refusal is *verified*, not merely stated:
+
+- **`A-BLESS-REFUSES`** — with a deliberately reddened analytic layer (one
+  `A-AN-*` expectation or one `D-BOUNDS` pin forced to fail in a throwaway
+  fixture), `bless` exits `3` and writes **no** golden fixture and **no**
+  `02 §8.1` block; with the layer green it exits `0` and writes them. The
+  negative arm is what proves the green-gate cannot be routed around — the
+  bootstrap procedure's step-3 mechanical refusal (above) is otherwise a claim no
+  test exercises.
 
 ### 3.2 Golden numerics
 
@@ -263,10 +300,20 @@ tests but never replace the blessed fixture.
 - `C30-squeeze` — mid-corner brake to 2.0 m/s² at `slew 4`: `phi_dot_su ≡ 0`, the
   line tightens — "gently squeezing on the brake mid-corner" pinned as
   expressible.
-- `C30-heldbrake` — mid-corner commanded −8.0 m/s², default slew, held to
-  termination, target lean held (`c = 1`): the clipped-regime predicate (W)
-  becomes true and stays true; `kappa` non-increasing while it holds; lane
-  fraction moves outward; outcome in the run-wide class; no crash.
+- `C30-heldbrake` — **explicit-plan fixture in the clipped-widening regime** (the
+  sustained-hold twin of `C30-deeplean`): onset lean 40° (R30 steady at
+  `v ≈ 15.7 m/s`, so `a_long_avail ≈ 5.3 m/s²`), start `f = 0` (inside, so the
+  widening has corridor to run into), commanded `−8.0 m/s²` at default slew **held
+  to termination** — above `a_long_avail`, so the command clips throughout and
+  `b_dem > b_del`. Asserts: the clipped-regime predicate (W) becomes true and
+  **stays** true over the whole hold; `kappa` non-increasing while it holds; **lane
+  fraction moves *outward* across the entire hold**; outcome in the run-wide class;
+  no crash. (The prior fixture commanded `−8.0` from the ordinary C30 corner speed,
+  where the lean was too shallow to clip: the line moved *inward* and terminated
+  `off_road`, so the outward excursion the doctrine's sustained-hold half depends on
+  was identically zero at every cell of the `f₀ × onset-lean` sweep. Widening in
+  this regime is engine-blessed like every golden; if it does not appear it is an
+  engine/doctrine finding under the oracle's iron rule, never an edited pin.)
 - `C30-deeplean` — explicit-plan fixture: `lean 40°`, `v ≈ 15.7 m/s` (R30 steady
   state), commanded −9.0 m/s² held: asserts `clipped = true`,
   `b_dem − b_del ≈ 3.7 m/s²`, sustained `phi_dot_su < 0`, the path widens, no
@@ -299,10 +346,16 @@ tests but never replace the blessed fixture.
 
 - `G-POS-REACH` — `FX-POS-STRAIGHT` (§8.1) at 28/34/50 km/h variants: the
   soundness link between the reachability predicate and the tracker law — every
-  variant the validator *accepts* completes (`position_complete` fires inside the
-  window), and the achieved displacement at window end ≥ the `dd_max/K_REACH`
-  prediction. The reachability formula is thereby pinned to the engine, not
-  asserted.
+  variant the validator *accepts* has `requested Δd ≤ dd_max` (the move is within
+  the window's physical capacity) and completes (`position_complete` fires inside
+  the window) with achieved displacement `≥ requested Δd − eps_m`; and a variant
+  the validator *rejects* emits `position_shortfall`, never a silent under-move.
+  The lower bound is the *requested* move the predicate admitted — **not**
+  `dd_max/K_REACH`, which is the reachability *ceiling* (`≈ 21.89 m` at 34 km/h,
+  `8×` the `2.70 m` corridor and `12×` the `1.89 m` request) and can never be a
+  lower bound on any in-corridor line. The reachability formula is thereby pinned
+  to the engine — a move the predicate calls reachable is delivered, one it calls
+  unreachable is typed — not asserted against an unsatisfiable bound.
 
 *Misjudgment and double apex:*
 
@@ -513,8 +566,15 @@ constants belong to `02-physics-model.md`.
   the unbraked twin.
 - `P-RUNWIDE-UPRIGHT` (restated against the analytic layer) — on `F-AN-BRAKE` and
   `F-AN-ACCEL` (`phi = 0` throughout) every sample matches the closed-form pure
-  point-mass prediction to ≤ 1e-9 relative: the slice's upright contribution is
-  proven zero against arithmetic, not against a toggled twin.
+  point-mass prediction to ≤ 1e-9 relative. **But at `phi = 0` the stand-up term
+  is killed by its `tanh(|phi|/PHI0)` envelope identically (`phi_dot_su ≡ 0`), so
+  this limb alone cannot distinguish a correct slice from one that was deleted.**
+  A third analytic fixture `F-AN-NEARUPRIGHT` holds `|phi| = 1.9°` steady — where
+  the envelope is `tanh(1.9°/PHI0_DEG) = tanh(1.9/5) = 0.36`, non-zero — and
+  asserts the path's lateral deviation from the no-slice point-mass prediction
+  stays `≤ eps_m = 0.05 m`: the one gate that actually **exercises** the slice's
+  contribution just outside the leaned regime and **bounds** it, rather than
+  reading it as zero by construction.
 - `P-RUNWIDE-MONOTONE` — at fixed lean and `Δa`, exit lateral deviation is
   monotone non-decreasing in slew `r` over `[10, 80] m/s³`; at fixed `r`,
   monotone in `Δa`. Stated domain: `slew ∈ [SLEW_MIN, SLEW_MAX]`,
@@ -576,9 +636,13 @@ constants belong to `02-physics-model.md`.
   launch-state condition is asserted, and the test asserts that none is
   *imposed* — a future implementation that quietly applied the strict guard to
   `brake_reserve_escape` fails here. The test additionally asserts the arithmetic
-  that motivates the law: on every shipped preset at its solved turn-in speed
-  except `bookDecreasing`'s tightened exit, `R_res(v) / R_road ∈ [0.65, 0.90]`,
-  so an in-corridor launch provably closes on the inside edge. Directional, not
+  that motivates the law: on every shipped preset at its solved turn-in speed,
+  `R_res(v) / R_road < 1` — the reserve-lean circle is tighter than the road, so an
+  in-corridor launch provably closes on the inside edge. On the governing corners
+  the ratio is `∈ [0.65, 0.90]`, with two known exceptions: `bookDecreasing`'s
+  tightened exit (`1.19`, the one case *above* 1 — flagged, not benign) and
+  `bookDoubleApex`'s opening middle corner (`0.35`, even tighter — the safe
+  direction). Directional, not
   merely defensive: a future consumer that launches the lean-only rider from a
   contained line under the strict predicate fails this test at once.
 - `P-CF-LITERALISED` — every counterfactual invocation in the corpus receives a
@@ -623,10 +687,16 @@ constants belong to `02-physics-model.md`.
   zero-instance result, the returned rung is ≤ 3 and `reserved_blocked_by` names
   that member with the matching reason. The refusal-laundering path the struck
   `sight_ok` opened is closed and pinned closed.
-- `P-STANDING-RUBRIC-SENSITIVE` — under a threshold-perturbed variant pack,
-  `standing` results may change while `outcome` is byte-identical. The deliberate
-  mirror of `P-OUTCOME-RUBRIC-FREE`: it makes the rubric-awareness of the ladder
-  falsifiable rather than asserted.
+- `P-STANDING-RUBRIC-SENSITIVE` — under the **named** variant pack
+  `PACK-STANDING-SHIFT` (the shipped pack with the `lean_ceiling` reserve
+  threshold **loosened** by a stated delta — `phiReserve` scaled to `0.90·mu`
+  from `0.85·mu`), `F-STANDING-WARN`'s `standing` rung **changes from 3 to 4**
+  (the reserve is no longer eaten, so `reserved_blocked_by` empties) while
+  `outcome` stays byte-identical `contained`. The deliberate mirror of
+  `P-OUTCOME-RUBRIC-FREE`, restated as a *witnessed* change on a named fixture
+  with a stated pack delta — not the possibility-claim "results **may** change",
+  which is a tautology (`∃`-over-packs `∨ True`) that any engine passes,
+  including one whose ladder never reads the rubric.
 - `P-STANDING-STAMPED` — every emitted `StandingReport` carries a non-empty
   `rubric`, `checks_version`, `reserve_checks` echoed from the loaded pack (never
   re-derived), and the placard string verbatim.
@@ -673,9 +743,16 @@ constants belong to `02-physics-model.md`.
   `SCHEMA/scan_ds_too_coarse` rather than run.
 - `P-SAVEWIN-REFUSES` — `transition_count > 1 ⇒` the returned object contains
   none of `tau_close_s`, `s_close_m`, `reaction_budget_s`. Asserted structurally
-  on field presence. Complementary to `P-COUNTERFACTUAL-NAMED`, which asserts
-  that `rider`, `predicate`, `policy` and `placard` **are** present on the same
-  object: the two tests partition the fields and neither weakens the other.
+  on field presence. **The antecedent `transition_count > 1` is produced by exactly
+  one status, `intermittent`, whose only fixture `G-SAVEWIN-INTERMITTENT` is
+  explicitly unbuilt (`09 L380`) — so this implication is vacuously true on the
+  committed corpus.** It is therefore restated existentially and **gates D44
+  promotion**: the suite must carry ≥ 1 committed witness with `transition_count > 1`
+  (i.e. `G-SAVEWIN-INTERMITTENT` must be built) on which the field-absence holds;
+  until it does, D44 does not promote on this gate. Complementary to
+  `P-COUNTERFACTUAL-NAMED`, which asserts that `rider`, `predicate`, `policy` and
+  `placard` **are** present on the same object: the two tests partition the fields
+  and neither weakens the other.
 - `P-SAVEWIN-DETERMINISM` — same envelope twice → deep-equal `SaveWindow`;
   cross-runtime tolerance-equality with **exact** equality on `status` and
   `transition_count` (discrete fields must not flip). `saveWindow` is
@@ -711,7 +788,15 @@ constants belong to `02-physics-model.md`.
 
 - `P-MISJUDGE-PREFIX` — an accepted misjudge line's samples are byte-identical to
   the believed-world run's for `s < s_divergence_m` (same start, same literalized
-  plan, same geometry ⇒ same integration).
+  plan, same geometry ⇒ same integration). **Hosted on a fixture whose divergence
+  falls at a *later* corner** — `F-BELIEVED-CHAIN`, a two-corner road whose believed
+  and actual roads agree through `c1` and diverge only at `c2` — so the
+  byte-identical prefix contains **curved** stations, not only the straight
+  approach. On the single-corner `F-BELIEVED-90` (`book90` + underread
+  `r_believed = 16`) the roads differ from the corner onset, so `s_divergence_m`
+  sits at the corner start and the prefix has **zero curved stations** — a
+  same-straight-integration triviality that never exercises the `s_divergence_m` /
+  `kappa_gap` it underwrites.
 - `P-MISJUDGE-IDENTITY` — fuzzed believed roads equal to the actual road are
   rejected `INEFFECTUAL`; fuzzed hand-flips are rejected `OUT_OF_SCOPE`.
 
@@ -754,12 +839,15 @@ sufficient:
    this, `P-CONT-MEMBERS-DISTINCT`, ran **at promotion — after the gate it should
    precede**. Fixed in §7a.4; now asserted at step 0 below.
 2. **It ran on a fixture that was not blind.** `bookBlind` was `book90` geometry,
-   and no 90° corner in the proportion band is blind on the hold-wide line at any
-   legal hedge margin (`03-…md` §3.1, which also records the cut-in-line
-   counterexample at `margin ≤ 0.5`). `blind(c1)` read `false`, so
-   `hold_wide_for_sight` was `na`, the 35° cap never applied, and the commitment
-   probe the spike names may not have existed.
-   Fixed by the `^140` reshape.
+   and no 90° corner in the proportion band is blind on the hold-wide line **at the
+   solved (doctrinal) turn-in** (`03-…md` §3.1). That universal holds *only* there:
+   `blind(c)` is single-turn-in, and sweeping the turn-in down to `entry−7` at a
+   small margin the hold-wide line *can* go blind at the wide band edge (by up to
+   ≈ 1.2 m — `review/verify/fixture_geometry.py` check 1), and `§3.1` also records
+   the cut-in-line counterexample at `margin ≤ 0.5`. At its solved turn-in
+   `blind(c1)` read `false`, so `hold_wide_for_sight` was `na`, the 35° cap never
+   applied, and the commitment probe the spike names may not have existed.
+   Fixed by the `^140` reshape, which is blind at *every* turn-in ≤ 20.5 m.
 3. **The speed limb was dead.** The V1 governor binds only where
    `vis_margin · ssd ≤ sight_ride_m` fails; at 32 km/h on the old fixture that
    needed `sight_ride_m < 14.53 m` against ≥ 24 m of geometry. `vis=cautious` and
@@ -824,12 +912,17 @@ discharged in this amendment, re-asserted here as a gate:
 `review/verify/fixture_geometry.py` computes all of these from the DSL strings.
 
 **Step 1 — the sight measurement, which nothing else can substitute for.** Run
-`compose` + `sightFrom` on `bookBlind` and print `s_ti`, `s_limit`,
-`sight_ride_m`, `κ_L` and `blind(c1)` at all five probe stations, for `f = 0.0`
-and `f = 1.0`, on both the `vis=none` and `vis=cautious` solves. No member
-generator, no escape, no pack. **Every remaining question is downstream of where
-`s_L` lands**, so this runs first and may terminate the effort on its own: if
-`s_L` falls past the corner exit, `κ_L = 0` and there is nothing left to spike.
+`compose` + `sightFrom` **on all three step-2 fixtures (`bookBlind`,
+`bookDecreasing`, `bookHairpin`)** and print `s_ti`, `s_limit`, `sight_ride_m`,
+`κ_L` and `blind(c1)` at all five probe stations, for `f = 0.0` and `f = 1.0`, on
+both the `vis=none` and `vis=cautious` solves. No member generator, no escape, no
+pack. **Every remaining question is downstream of where `s_L` lands**, so this runs
+first and may terminate the effort on its own: if `s_L` falls past the corner exit,
+`κ_L = 0` and there is nothing left to spike. **Run on `bookBlind` alone this
+kill-switch has an empty failure domain** — `s_L` lands at most 41.00 m against
+`s_end = 45.32 m`, a 4.32 m margin at every cell, so it can never fire; the other
+two step-2 fixtures are what give it a domain (the flaw that made the retired spike
+undecidable, inherited if step 1 stays single-fixture).
 
 **Step 2 — the grid.** Report `k_refuted(none)`, `k_refuted(cautious)`,
 `k_admissible`, the reachable `σ` set, and the verdicts of checks 2, 8, 9 and 10
@@ -888,10 +981,18 @@ and 1 above are hours; step 2 is the only part that needs engine surface.
   `null` under the placard *"road geometry outside the declared continuation
   envelope"*. Honest refusal, never a silent fan. **This test runs before a line
   of render code.**
-- **`P-CONT-TIGHTENING-ADMISSIBLE`** — at every commitment probe on every
-  committed occluder-bearing fixture, ≥ 1 admissible member satisfies
-  `|κ_m(u)| > |κ_L|` over its whole curved tail. Without it the feature cannot
-  state its own thesis.
+- **`P-CONT-TIGHTENING-ADMISSIBLE`** — **re-homed onto a dedicated tight-radius
+  fixture (`r ≤ 7.8 m`, i.e. `|κ_L| ≥ 0.9·κ_max`)** and **strengthened to "the
+  tightening member survives the filter"**: at every commitment probe, the
+  tightening member (`σ = +1`, whose `κ₀ = κ_max` by construction) **survives the
+  consistency filter** and satisfies `|κ_m(u)| > |κ_L|` over its whole curved tail.
+  On the shipped corpus (max `|κ_L| = 0.111 < κ_max = 0.143`) the bare existential
+  is witnessed *unconditionally* by that pinned `σ = +1` rung, under total
+  occlusion where `admissible ≡ true` — so it keeps passing through a filter that
+  wrongly discarded every *other* member, and discriminates only at `r ≤ 7.8 m`,
+  which no preset reaches. Making the filter actually *act* on the member is what
+  turns the thesis into a measurement. Without it the feature cannot state its own
+  thesis.
 - **`P-CONT-MEMBERS-DISTINCT`** — `|{distinct Member.road_dsl}| = k_probed` at
   every probe on every committed fixture. **Promoted: this also runs as a step-0
   arithmetic check in `S-CONT-SEPARATION-v2` (§3.4a), on the seven spelled strings
@@ -990,12 +1091,24 @@ and 1 above are hours; step 2 is the only part that needs engine surface.
   `P-CONT-MONOTONE-SIGHT`) currently rest on a fixture that does not exist.
 
   Re-emergence needs a **gap in the band**, not a shorter band: two `hedge`
-  segments with clear station between them, or a `wall` whose lateral edge the
-  sight line clears. Authoring it obliges explicit geometry — anchor, offset,
-  span and margin for each segment — pinned here and verified by
-  `review/verify/fixture_geometry.py` before any predicate is hosted on it. Until
-  then the three predicates are **blocked, not merely pending**, and the honest
-  reading is that the filter has no non-vacuous witness anywhere in the corpus.
+  segments with clear station between them. **Now authored** (threading verified by
+  `review/verify/fixture_geometry.py` check 13): on `bookBlind`'s road
+  (`lane 3.5 | S 16 | L 12 ^140 | S 16`, entry 34 km/h), the shipped `-6x36` band
+  split by a 4 m **entrance** gap over stations 14–18 —
+
+  ```
+  hedge inside c1 -6x4  margin=1.2 depth=2.5    # stations 10–14
+  hedge inside c1 +2x28 margin=1.2 depth=2.5    # stations 18–46
+  ```
+
+  This threads: `blind(c1)` still holds (`s_L = 39.5 m < s_end = 45.32 m`) while the
+  road **re-emerges past the lateral edge** over ≈ 53.5–61.0 m, so the consistency
+  filter finally has a re-emergence to act on. The gap must be at the **entrance**:
+  a mid-corner gap (centre ≥ 24 m) is geometrically inert — the 140° wrap holds far
+  targets behind the band — and shortening a single band's span never opens a gap
+  (it only moves first-blocked later; the design's 0-of-54-cell result). With this
+  authored, `P-CONT-FILTER-TWO-SIDED`, `P-CONT-CONSISTENT`'s non-vacuity guard and
+  `P-CONT-MONOTONE-SIGHT` are hosted on a fixture that exists.
 - **`G-COMMIT-BLIND`** — `bookBlind` at 34 km/h, `vis=none` geometric line vs
   `vis=cautious`: pins `k_admissible`, `k_refuted`, `filter_effective` and
   `escape_status` at each of the `PROBE_LADDER_N` probes on both lines, plus the
@@ -1004,10 +1117,16 @@ and 1 above are hours; step 2 is the only part that needs engine surface.
   `k_refuted < k_admissible` on that line — at least one admissible member
   survives, rather than the admissible set having merely emptied. If either stops
   holding it is an engine or tuning bug, never a patched pin.
-- **`G-COMMIT-PREMATURE`** — `F-ORACLE-90` good vs `premature`: pins
-  `k_refuted(premature) > k_refuted(good)` at the commitment probe and that the
-  good line's worst member is refuted for `member_corridor_exceeded` rather than
-  `member_crash`.
+- **`G-COMMIT-PREMATURE`** — **`bookBlind`** (occluder-bearing, the reshaped D46
+  fixture) good vs `premature`: pins `k_refuted(premature) > k_refuted(good)` at the
+  commitment probe and that the good line's worst member is refuted for
+  `member_corridor_exceeded` rather than `member_crash`. **Re-homed off the
+  occluder-free `F-ORACLE-90`** (`book90`, `s_L = 46.85 m = road end`), where the
+  commitment channel has literally nothing to grade and the contrast was a strict
+  inequality between two zeros. On `bookBlind`, `blind(c1)` holds and `s_L` lands
+  inside the corner; whether `k_refuted` then fires (the escape reaching past `s_L`)
+  is the open question `S-CONT-SEPARATION-v2` measures, so this gate — like the rest
+  of the commitment channel — reaches non-vacuity only where that spike passes.
 - **`G-COMMIT-ESSES`** — `fx-esses-blind`: ≥ 1 admissible member with **opposite
   hand** to the actual continuation at corner 1's probe — the hand-reversal
   representability a `hand_continues` lock would have destroyed.
@@ -1070,8 +1189,19 @@ honest quantifier.
   returns the byte-identical line.
 - `P-ACCEPT-GRADE` — a best_failing-returned plan re-run via `run` yields the
   identical verdict: acceptance policy never touches grading.
-- `P-ACCEPT-CONSTRAINT` — no best_failing return ever violates an authored
-  constraint (extends `P-CONSTRAINT-BINDING` to the relaxed policy).
+- `P-ACCEPT-CONSTRAINT` — **run on the R6 fixture family under
+  `accept=best_failing`** (the corpus's only constraint-carrying fixture; run with a
+  hard-binding constraint while the line *fails on other criteria*, so
+  `best_failing` returns a failing line whose constraint-satisfaction is exactly
+  what must be checked): no best_failing return ever violates an authored constraint
+  — a relaxed accept policy must not quietly surface a constraint *violator*
+  (`04 §4.8` keeps violators as `NO_SOLUTION`, never a returned line), which extends
+  `P-CONSTRAINT-BINDING` to the relaxed policy. Without this explicit R6 × `best_failing` pairing the quantifier —
+  `{lines returned under best_failing}` ∩ `{sources carrying an authored
+  constraint}` — is **empty**, since R6 was otherwise exercised only by
+  `P-CONSTRAINT-BINDING` under `accept=clean`. *(R6's road is double-defined across
+  `04 §5` and `08 §6(f)` — see the note at §5.1 / the census; this gate uses the
+  `04 §5` constraint fixture `P-CONSTRAINT-BINDING` runs on.)*
 - `P-VIS-MARGIN-MONOTONE` — **named fixtures only** (`bookBlind`,
   `fx-esses-blind`), never fuzzed: raising `vis_margin` (all else fixed) never
   lowers the solved line's minimum sight margin and never raises its governed
@@ -1082,9 +1212,17 @@ honest quantifier.
   chained, satisfies the mode's acceptance predicate on its self-verified run
   (this property, not any convergence claim, is what the visibility mode
   guarantees).
-- `P-VIS-BOUNDED` — the visibility mode performs ≤ `vis_max_iterations` solve
+- `P-VIS-BOUNDED` — the visibility mode performs ≤ `vis_max_iterations` (4) solve
   passes and terminates in a passing line or a typed refusal — never an
-  unverified line, never a loop.
+  unverified line, never a loop. Both refusal arms of the closed `04 §4.10`
+  registry carry a **committed witness fixture**, because the passing arm reaches
+  exactly 1 iteration on every named fixture, so without these the refusal arm is
+  a dead branch the `§8` no-dead-error-names rule forbids: `FX-VIS-FLOOR` =
+  `bookBlind` + `vis=cautious` at `vis_margin = 12` (> the 10.94 edge threshold,
+  `fixture_geometry.py` check 7 basis), whose governed speed falls below `v_floor`
+  → `NO_SOLUTION`/`vis_speed_below_model_floor`; and `FX-VIS-UNSAT`, a blind
+  fixture whose `vis_margin` is raised until no iterate passes within
+  `vis_max_iterations` → `NO_SOLUTION`/`vis_unsatisfiable_within_bound`.
 - `P-APEX-TARGET-TYPED` — on `bookDecreasing`, the returned line's `apex_pct`
   exceeds the decreasing-radius late bar; the ranking never prefers a candidate
   failing the applicable late-apex check (property over fuzzed taper roads).
@@ -1097,19 +1235,23 @@ honest quantifier.
   touches, pinned touch stations/percents/f; on `bookDecreasing` the same call
   yields `NO_SOLUTION`/`no_two_touch_line` (with the best-failing candidate
   retained for `accept=best_failing`).
-- `A-SSD-GOVERNOR` — `bookBlind` solved `vis=cautious` under the lean-aware `ssd`
-  converges within `vis_max_iterations`, and its governed entry speed is ≤ the
-  upright-`ssd` solve's (monotone-conservative). **OPEN — this assertion is
-  satisfied by equality and is therefore currently vacuous.** On the pre-reshape
-  fixture the governor never bound at all (≥ 24 m of sight against `ssd` 14.53 m),
-  so `≤` held trivially and the test witnessed nothing. Two obligations follow,
-  and neither is covered by `S-CONT-SEPARATION-v2`, which is promotion-only while
-  this is a shipped-phase gate: (a) determine whether the governor binds on the
-  reshaped `bookBlind` at 34 km/h — if it does not, this gate needs a fixture
-  where it does; (b) once it does, assert the governed speed is **strictly
-  less than** the ungoverned solve's, the same repair `A-RECIPE-K` received
-  (`08-…md` §6(k)). A monotone-conservative bound that is never exercised is the
-  same defect class as the catalogued vacuity errors.
+- `A-SSD-GOVERNOR` — `bookBlind` solved `vis=cautious` **with `vis_margin = 1.4`**
+  (pinned on the scenario) under the lean-aware `ssd` converges within
+  `vis_max_iterations`, and its governed entry speed is **strictly less than** the
+  ungoverned (`vis=none`) solve's. **The `vis_margin` pin is load-bearing and must
+  precede the strict comparison.** The reshaped `bookBlind` at 34 km/h carries as
+  little as `≈ 23.5 m` of sight against a lean-aware `ssd` of `≈ 17.0 m` on the
+  binding (cut-in) line, so the V1 governor first binds at `vis_margin ≥ 1.378`
+  (min sight / max `ssd` across the solved lines; `review/verify/fixture_geometry.py`
+  check 7); at the default `vis_margin = 1.0` it is **inert** — governed = ungoverned
+  — and a strict `<` there would convert a silent pass into a silent *failure*.
+  Pinning `vis_margin = 1.4` puts the scenario just inside the binding regime, so
+  the governed solve is genuinely constrained and the strict inequality has a
+  witness. This resolves the prior OPEN obligations, neither covered by
+  `S-CONT-SEPARATION-v2` (promotion-only, while this is a shipped-phase gate):
+  (a) the governor does **not** bind on the reshaped fixture at the default margin
+  — hence the pin; (b) with it binding, the governed speed is strictly less than
+  the ungoverned solve's, the same repair `A-RECIPE-K` received (`08-…md` §6(k)).
 - `A-VIS-HOLD-REACH` — on `bookBlind` + `vis=cautious`, the generated hold's
   `position` action passes validation under the governed `v_cmd`. **OPEN — same
   vacuity defect as `A-SSD-GOVERNOR`, for a different reason.** V2 emits a hold
@@ -1127,13 +1269,24 @@ honest quantifier.
 TUNING; gaps sized so `vis_hold_f` is reachable under the 03 §6.1 lateral
 budget).
 
-> **OPEN — `fx-esses-blind` does not satisfy `blind(c)` on any of its four
-> corners, and cannot be repaired the way `bookBlind` was.** Per `03-…md` §3.1,
-> whether a band occluder makes a corner blind is governed by **swept angle**, and
-> the threshold at book proportions is ≈ 115°. `bookEsses` legs are `R 12 ^75` —
-> far below it — and no `margin`/`depth`/`span` choice compensates, because moving
-> a roadside band only ever *reduces* blocking. Re-derived over turn-in × lane
-> position, zero cells satisfy `s_limit < s_end(c)`.
+> **OPEN — `fx-esses-blind`'s recorded diagnosis was wrong in *kind*, and it
+> still cannot be repaired the way `bookBlind` was.** The prior reading — `blind(c)`
+> false on all four corners, zero blind cells — holds only for the *left*-handed
+> legs. `bookEsses` alternates hands, and `03:219` pins that `hand=` does **not**
+> move the traffic side, so on its *right*-handed legs (`c1`, `c3`) the `inside`
+> band lands on the rider's **own** side of the centreline. Re-derived on `c1`
+> standalone (`review/verify/fixture_geometry.py` check 8), the right-handed leg
+> has **6/220 blind cells** (min `s_limit` 22.25 m vs `s_end` 23.71 m) — every one
+> on the **cut-in** line, none on the hold-wide line. That is an *applicability
+> inversion* (`blind(c)` true for the bad line and false for the doctrinal one —
+> the same failure as the D46 exemplar-1 inversion), **not** the clean not-blind
+> the record claimed, and the prescribed repair (mint a new ≥ 130° fixture) does
+> not address it. Swept angle still governs — `R 12 ^75` is far below the ≈ 115°
+> half-crossing threshold and no `margin`/`depth`/`span` compensates on the
+> *left*-handers, where moving a roadside band only ever *reduces* blocking — but
+> the honest reading is that the fixture is blind **on the wrong line**, not
+> sighted. *(The mechanism is reconstructed for `c1` standalone; the sweep's
+> 45/220-per-corner four-corner figure remains prose-only.)*
 >
 > This is not a D45 problem: `P-VIS-MARGIN-MONOTONE` and `A-CHAIN-VIS-FULL`
 > currently run on corners where `blind(c)` is false, so anything they assert
@@ -1159,24 +1312,37 @@ budget).
 > than resolved silently; `review/verify/fixture_geometry.py` is the check any
 > candidate must pass.
 
-- `A-CHAIN-VIS-FULL` — on `fx-esses-blind`, `chainedSolve` with `vis=cautious`
-  returns a line that (i) passes `stop_within_sight` at every station of the
-  chain — V1 (`vis_margin · ssd(v, phi).ssd_m ≤ sight_ride_m`) is unconditional,
-  and every sight-vs-ssd comparison reads `sight_ride_m`; (ii) over each corner's
-  hold window holds `f ≥ vis_hold_f − f_tol` (`f_tol = 0.05`, TUNING) until that
+- `A-CHAIN-VIS-FULL` — on the new ≥ 130° chained blind fixture (the
+  `fx-esses-blind` replacement, sized per the OPEN block above and
+  `fixture_geometry.py`), **not** the current `fx-esses-blind`, and **with
+  `vis_margin = 1.2` pinned** so V1 actually binds (at the default `1.0` the
+  governor is inert — `≈ 11 %` headroom — and each of the three clauses is
+  independently no-op): `chainedSolve` with `vis=cautious` returns a line that
+  (i) passes `stop_within_sight` at every station of the chain — V1
+  (`vis_margin · ssd(v, phi).ssd_m ≤ sight_ride_m`) is unconditional, and every
+  sight-vs-ssd comparison reads `sight_ride_m`; (ii) over each corner's hold
+  window holds `f ≥ vis_hold_f − f_tol` (`f_tol = 0.05`, TUNING) until that
   corner's release station — the fixture's gaps are sized so the full hold is
-  reachable, and the recorded hold equals the computed value, never silently
-  less; (iii) at each hold-release station satisfies `trend = opening ∧
-  sight_ride_m ≥ vis_margin · ssd_m`.
-- `A-CHAIN-VIS-BUDGET` — on the named zero-gap `bookEsses` variant fixture
-  (`A-LINK-FLIP`'s fixture): asserts the budget carve-out itself — the solver
-  report marks each hold `budget_limited: true`; achieved `f` is monotone toward
-  the target across each inter-corner span; the release condition is evaluated
-  from the **actual** position (the reached `f`, never the unreached target); V1
-  still holds at every station. Consumes the per-corner record
-  `verdict.sight.holds: [{corner_id, target_f, achieved_f, budget_limited,
-  hold_release_s}]` (05 §6.3; the field spells `hold_release_s` — `release_s` is
-  the per-commitment member of `corners[].turn_ins[]`).
+  reachable **and the line is forced off `start.f`, so the band clause is not
+  satisfied by a line that never leaves `f = 1.0`** — and the recorded hold equals
+  the computed value, never silently less; (iii) at each hold-release station
+  satisfies `trend = opening ∧ sight_ride_m ≥ vis_margin · ssd_m`.
+- `A-CHAIN-VIS-BUDGET` — re-homed **off** the zero-gap `bookEsses` variant
+  (`A-LINK-FLIP`'s fixture): there the inter-corner spans are **0 m**, so
+  `T_cmd = 0`, `dd_max` collapses below `MIN_POS_DD_M`, **no hold is emitted**, and
+  the "monotone across each span" universal quantifies over the empty set — the
+  budget carve-out it exists to test never fires. Its correct home is a chained
+  blind fixture whose inter-corner spans are **short enough that the 03 §6.1
+  lateral budget binds** (`budget_limited: true`) **but non-zero so a hold is
+  emitted** (a tight-gap variant of the new ≥ 130° chained fixture above; sizing
+  recorded there, checked by `fixture_geometry.py`). On it the gate asserts the
+  budget carve-out itself — the solver report marks each hold `budget_limited:
+  true`; achieved `f` is monotone toward the target across each inter-corner span;
+  the release condition is evaluated from the **actual** position (the reached
+  `f`, never the unreached target); V1 still holds at every station. Consumes the
+  per-corner record `verdict.sight.holds: [{corner_id, target_f, achieved_f,
+  budget_limited, hold_release_s}]` (05 §6.3; the field spells `hold_release_s` —
+  `release_s` is the per-commitment member of `corners[].turn_ins[]`).
 - `A-LINK-FLIP` — the zero-gap `bookEsses` variant either chain-solves
   `contained` at a reduced, recorded speed ≥ the validity floor, or returns
   `NO_SOLUTION`/`link_flip_infeasible` naming the first infeasible link;
@@ -1221,7 +1387,11 @@ The tests `08-cli-and-agent-interface.md` §2 and §6 delegate to this document.
 - **Trigger:** at release, and whenever the hash of the full `schema` output
   changes. Never per-commit. Deterministic CI leg: `T-COLDSTART-RECORD` asserts
   a committed record exists whose `schema_output_hash` matches the current
-  binary's output (the same committed-record pattern as `T-JUDGE-RECORD`, §7.4).
+  binary's output **and whose recorded per-task pass rate is `3/3` on every
+  battery task** — the hash alone is invariant under the cold-start pass rate the
+  gate exists to guard, so a `3/3 → 0/3` regression with unchanged `schema` text
+  would otherwise pass silently. (Same committed-record pattern as
+  `T-JUDGE-RECORD`, §7.4.)
 
 **Per-recipe acceptance tests (`A-RECIPE-*`).** Deterministic, agent-free. The
 harness **extracts the command blocks from 08 §6 verbatim and executes them** —
@@ -1466,8 +1636,19 @@ out in the migration notes and the affected doctrine checks re-verified.
   `outcome = contained`, the chain checks pass, per-corner checks pass under
   chain-mode applicability (open-exit checks `na` on interior corners),
   `quality = good`, colour green, `solve` exit 0.
-- `A-RUBRIC-STAMP` — every verdict carries `rubric`; recompute under the same
-  pack reproduces `result_hash`.
+- `A-RUBRIC-STAMP` — every verdict carries `rubric`; recompute under the **same**
+  pack reproduces `result_hash`; **and recompute under a pack whose perturbed
+  grading threshold is decisive on the fixture produces *different graded values*
+  (`doctrine` and/or `quality`) — not merely a different `result_hash`.** The third
+  arm must bite on the *grade*, not the hash: the `rubric` pack-id stamp is itself
+  **inside** `result_hash` (it is not on the `05 §8.3` exclusion list), so two
+  distinct packs already differ in `result_hash` from the stamp change alone — an
+  engine that stamps the pack but ignores it in grading would still pass a
+  "`result_hash` differs" arm, exactly the vacuity the arm exists to close.
+  Asserting that the graded `doctrine`/`quality` values move is what shows the
+  rubric *feeds* the grade (the mechanical mirror of `P-OUTCOME-RUBRIC-FREE`, which
+  pins that a rubric change moves exactly `doctrine`/`quality`/`result_hash`), which
+  field-presence and same-pack determinism both leave open.
 - `A-DANGER-DWELL` — the `lean_ceiling`-fail fixture required by
   `A-CATALOGUE-EXERCISED` pins `corners[].danger_dwell_s` to the
   bracketed-interpolated reserve-exceedance time (arithmetic owned by 01
@@ -1570,7 +1751,12 @@ images:
   later station, tighter/wider lane fraction) are preserved.
 - `P-PROJ-CROSS` — two lines cross in projection exactly as often, and in the same
   station order, as in true geometry.
-- `P-PROJ-IDENTITY` — `mode=true` is the identity projection, byte-exactly.
+- `P-PROJ-IDENTITY` — `mode=true` with **no window** is the identity projection on
+  `(s, d)`, byte-exactly; `mode=true` **with an explicit window** is the identity
+  composed with a pure **crop** — the window bounds the drawn extent but never
+  rescales `(s, d)`. This pins the precedence 06's `mode:"true"` definition ("the
+  identity transform plus optional crop") otherwise leaves open: an explicit window
+  crops, it does **not** make the mode yield to a stretching transform.
 - `P-PROJ-MARKER` — every marker and callout anchor (corner-relative, per the
   scheme in `03-roads-scenarios-and-visibility.md`) lands on its line's projected
   image, never in empty space.
@@ -1579,6 +1765,27 @@ images:
 
 These run on fuzzed roads and line sets, not only fixtures — the projection must
 hold its invariants for anything the road DSL can express.
+
+**Five of these eight are algebraic identities of the projection, not independent
+tests, and are labelled as such.** `06 §2.2` defines the transform as
+`s'(s) = ∫ 1/c(seg) du` with `c > 0` everywhere (so `s'` is strictly monotone) and
+`d' = d · width_exag` with `width_exag > 0` (clamped `≤ WIDTH_EXAG_MAX`, `06 §2.2`)
+— from which
+`P-PROJ-ORDER` (`s'` monotone ⇒ station order preserved), `P-PROJ-SIDE`
+(`sign(d') = sign(d)` because `width_exag > 0`), `P-PROJ-APEX-REL`, `P-PROJ-CROSS`
+and `P-PROJ-IDENTITY` follow from the definition before the engine runs. They are
+kept as **XY-space regression guards** — they catch a transform that stops being
+positively-scaled and monotone-in-station — but they do **not** test the one thing
+the projection actually *decides*: which `width_exag` / orientation / window it
+picks. That is covered by a property over parameter *selection*, not just the
+transform's algebra:
+
+- `P-PROJ-PARAM-SELECTION` — over fuzzed roads and line sets, the `width_exag`,
+  orientation and window the projection **selects** for a `diagram`-mode figure are
+  the ones that put the sidecar metrics inside `§5.2`'s bands; where no legal
+  parameter does, the figure is **refused** (out-of-band failure per `§5.2`), never
+  drawn stretched. This is the decision the five identities cannot fail on, and
+  where a real projection bug would live.
 
 ### 5.2 The proportion gate (mechanical)
 
@@ -1628,8 +1835,14 @@ against pixels:
   carries a dash pattern; every dashed stroke is a sight ray or dotted
   reference; every trajectory has an arrowhead and no annotation stroke does; no
   trajectory shares a stroke pattern with any annotation stroke.
-- `A-FIG82-SINGLEMARK` — the fig 8.2 scene renders exactly one hourglass, red,
-  at the shared station (coincident-marker collapse).
+- `A-FIG82-SINGLEMARK` — the fig 8.2 scene renders exactly one hourglass,
+  **green**, at the shared station (coincident-marker collapse). The collapse
+  takes the colour of the owning line **drawn last in role order — `ideal` wins
+  ties** (06's coincident-collapse rule), and the ideal line is green; a `red`
+  assertion here **contradicts the colour law** and is unsatisfiable (the
+  marker-collapse golden below agrees: "topmost-draw-order colour"). *(The fig-8.2
+  scene roster itself is still undefined in `design/` — see the book-figure-scene
+  gap, §10 / §4-of-the-sweep.)*
 - `A-FIG83-MARKS` — the fig 8.3 scene with `marks: turn_point`: the green line
   carries exactly 1 hourglass, the fifty_pence line exactly `facets`
   hourglasses, zero rings/dots.
@@ -1734,18 +1947,27 @@ error on a fixture scenario. Everything of substance is a contract test.
 - `C-POV-OCCLUDE` — static config test: `min(occluder-kind heights) ≥
   eye_height_m + POV_OCCLUDE_CLEAR_M`; plus one POV render golden with a `wall`
   fully breaking the road at the limit point.
-- `C-ONE-CORE` — a scenario loaded in the viewer recomputes a trajectory
-  tolerance-equal to the CLI's for the same scenario and version. Under D1 this is
-  the same ESM module imported twice, so the test is cheap — but it stays, because
-  it is the guarantee that makes viewer-side recomputation of shared scenarios
-  (D6) honest.
+- `C-ONE-CORE` — **a bundle-graph lint**: the viewer's recompute path and the
+  CLI's solve path resolve to **one** `engine/` module — a single entry imported by
+  both `viewer/` and `cli/`, with no second copy of the engine in either bundle.
+  This is what has teeth. Recomputing a trajectory and comparing it to the CLI's is
+  a **tautology** when (D1) the two are literally the same ESM module imported twice
+  (`09 L1739`), so that recompute-equality is kept only as a cheap sentinel; the
+  lint is the guarantee that makes viewer-side recomputation of shared scenarios
+  (D6) honest — it goes red the moment a build duplicates the core.
 
 *Share-URL skew (05 §8.4):*
 
-- `C-SKEW-DETECT` — a committed FigureSpec fixture with deliberately stale stamps
-  (an old outcome and hash) recomputes to `skew.tier: "story"` with the correct
-  per-line tiers (`match | unstamped | detail | story`), and the placard string
-  renders in both the viewer view-model and the SVG export.
+- `C-SKEW-DETECT` — a committed FigureSpec fixture with **four lines, one per
+  tier**, so every `skew` tier carries a witness rather than the `detail` tier
+  being masked: `match` (stamp reproduces exactly), `unstamped` (no stamp), `detail`
+  (stamp's `outcome` reproduces but `result_hash` differs — numbers moved, story
+  held), and `story` (stamp's `outcome` no longer reproduces). Recompute yields the
+  figure-level `skew.tier: "story"` (the max over lines) with the correct per-line
+  tiers (`match | unstamped | detail | story`), and the placard string renders in
+  both the viewer view-model and the SVG export. On the prior one-stamp fixture the
+  `detail` tier — `NOT story ∧ result_hash differs` (05 §8.4) — is unreachable, so
+  the gate never exercised it.
 - `C-SKEW-CLEAN` — `export --as share-url` → decode → recompute on the same
   engine/runtime → every line `tier: "match"`, `skew.tier: "match"`, no placard
   (one fixture with §4's round-trip, one more assertion).
@@ -1952,8 +2174,13 @@ it gets rejected at validation instead. The table is the standing proof.
 
 **`effect_class` gains one value with a detector, not a carve-out:** `analysis` —
 *"the recomputable analysis document returned by the named pure API function
-changes."* `effectAt("analysis", before, after)` = deep-inequality of that
-document. It is the effect class for all three out-of-hash analysis products —
+changes."* `effectAt("analysis", before, after)` = deep-inequality of that document
+**minus its declared echo fields** (`reserve_checks`, `rubric`, `checks_version` —
+the fields `P-STANDING-STAMPED` pins as *echoed from the loaded pack, never
+re-derived*). Without that subtraction the detector fires on the pack echo passing
+through — any recompute under a changed pack trips it regardless of whether the
+*re-derived* content moved, masking whether the analysis itself is effectual — so
+it is diffed over the re-derived body only. It is the effect class for all three out-of-hash analysis products —
 `StandingReport`, `SaveWindow` and `CommitmentReport` — because all three are
 recomputable documents outside the hashed record, and classifying them as
 `envelope` would assert a movement in an object they are deliberately not part

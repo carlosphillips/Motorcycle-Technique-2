@@ -1306,11 +1306,18 @@ Against the shipped presets, at the speeds those presets actually ride:
 | `bookBlind` | 12 | 34 | 9.444 | 10.70 | 0.89 |
 | `bookEsses` | 12 | 32 | 8.889 | 9.48 | 0.79 |
 | `bookHairpin` | 10 | 28 | 7.778 | **7.25** | **0.73** |
+| `bookDoubleApex`, c1/c3 (R12 apex corners) | 12 | 30 | 8.333 | 8.33 | 0.69 |
+| `bookDoubleApex`, c2 (R24 opening middle) | 24 | 30 | 8.333 | **8.33** | **0.35** |
 | `bookDecreasing`, tightened exit (r2) | 9 | 34 | 9.444 | 10.70 | 1.19 |
 
-On every preset except `bookDecreasing`'s tightened exit the reserve-lean circle
-is **20–35 % tighter than the road**. The break-even entry speed on a 12 m arc is
-`sqrt(8.3385 · 12) = 10.00 m/s = 36.0 km/h`, above every book figure's entry. So
+On the governing corners of every preset except `bookDecreasing`'s tightened exit
+the reserve-lean circle is **11–35 % tighter than the road** (ratios `0.65–0.89`;
+`bookDoubleApex`'s opening middle corner is tighter still — `0.35`, an even safer
+margin, in the same direction). The safety-relevant fact is the one-sided bound `R_res / R_road < 1`:
+only `bookDecreasing`'s `1.19` exit is *above* it (reserve circle wider than the
+road), and it is the single flagged exception. The break-even entry speed on a
+12 m arc is `sqrt(8.3385 · 12) = 10.00 m/s = 36.0 km/h`, above every book figure's
+entry. So
 from *inside* the corridor this rider does not return the line — it drives the
 line across the **inside** edge, and the inside departure is one the design
 explicitly refuses to call a save (§4a.2). §4a is safe today only because §4a.2

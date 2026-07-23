@@ -535,9 +535,14 @@ edge by design, `03-…md` §4), whether the sight chord reaches past the corner
 rises steeply with the corner's **swept angle**. Radius moves it far less:
 shrinking the corner shrinks the sight geometry with it. `depth` is inert — only
 the band's inner face matters — while `margin` is not negligible, since bringing
-the face closer does block more. **On the hold-wide line no 90° corner in the
-proportion band is blind at any legal margin**; on a cut-in line at
-`margin ≤ 0.5` a 90° corner can be blind, by a few tens of centimetres.
+the face closer does block more. **On the hold-wide line, at the doctrinal turn-in
+(`rider.start.f = 1.0`, turning in at `s0`), no 90° corner in the proportion band
+is blind at any legal margin** — the operational claim the reshape rests on.
+(`blind(c)` is single-turn-in: swept down to `entry−7` at a small margin the
+hold-wide line *can* go blind at the wide band edge, by up to ≈ 1.2 m — a
+knife-edge small-margin effect the `^140` reshape escapes, being blind at every
+turn-in ≤ 20.5 m.) On a cut-in line at `margin ≤ 0.5` a 90° corner can be blind by
+a few tens of centimetres even at the doctrinal turn-in.
 (`03-…md` §3.1 tabulates the curve and the margin sweep.)
 
 Corners near that boundary must be avoided rather than tuned to, because

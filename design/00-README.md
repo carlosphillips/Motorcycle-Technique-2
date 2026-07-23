@@ -457,10 +457,13 @@ Sibling documents must conform to all of them.
   strings rather than reading them, and found the load-bearing ones false. **(1) `bookBlind` was
   not blind.** It was `book90` geometry, and `blind(c)` (`01 §A.2`) is `s_limit < s_end(c)`; the
   minimum achievable `s_limit` was 32.50 m against `s_end = 30.85 m` (swept over turn-in `entry−4 … s_end` × the corridor). Widening the turn-in sweep further *does* reach
-  blind on a cut-in line — 30.00 m from `entry−8`, 28.75 m from station 0 — which is the same
-  cut-in-only effect described below, never a hold-wide one. Blindness under a roadside
+  blind on a cut-in line — 30.00 m from `entry−8`, 28.75 m from station 0 — and, **at a small
+  margin (`≤ ~0.2`), on the hold-wide line too** (blind by up to ≈ 1.2 m at the wide band edge
+  from `entry−7`, since `blind(c)` is single-turn-in). Blindness under a roadside
   band occluder rises steeply with **swept angle** (half-crossing ≈ 115° at book proportions), so
-  **no 90° corner in the band is blind on the hold-wide line at any legal hedge margin** — and at
+  **no 90° corner in the band is blind on the hold-wide line at the doctrinal turn-in
+  (`rider.start.f = 1.0`, turning in at `s0`)** — an earlier draft's "at any legal hedge margin"
+  overstated it — and at
   `margin ≤ 0.5` a 90° corner *is* blind on a **cut-in** line — marginally at 0.5 (0.10 m), by
   1.35 m at `margin = 0` — which would make
   `blind(c)` true for the bad line and false for the good one and invert
