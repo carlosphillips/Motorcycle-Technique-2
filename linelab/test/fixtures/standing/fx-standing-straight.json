@@ -1,0 +1,6 @@
+{
+  "spec": "linelab/1",
+  "id": "fx-standing-straight",
+  "road": { "dsl": "lane 3.5 | S 120" },
+  "rider": { "profile": "street", "start": { "speed_kmh": 40, "f": 0.5 }, "plan": [] }
+}

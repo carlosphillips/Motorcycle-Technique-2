@@ -1,0 +1,182 @@
+{
+  "figure_id": "fig-08-06",
+  "spec_hash": "40ae19",
+  "svg_fnv1a": "2fff4c",
+  "judge_identity": {
+    "judge_model": "claude",
+    "judge_model_version": "claude-sonnet-5",
+    "rubric_version": "1"
+  },
+  "verdicts": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "fail"
+          },
+          {
+            "id": "J3",
+            "verdict": "na"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "fail"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Raster is 2000x2714. mode=\"true\" in manifest.json (confirmed) → J6 na per policy. No occluders declared in manifest/scene, and SVG has empty <g data-stage=\"5-occluders\"> and <g data-stage=\"7-sight-rays\"> → J4 na. No fan elements in SVG, none drawn → J9 na. No `labels:` block in the .scene → J3 na.\n\nJ1 pass: pixel-sampled colours match D9 exactly — bad/mistake line = (179,46,46) = #b32e2e (failing), good/ideal line = (176,125,30) = #b07d1e (caution); confirmed again in SVG stroke/marker-fill attributes.\n\nJ7 pass: nothing rendered beyond the 2 declared lines + road + legend; no invented occluders/rays/fan.\n\nJ8 pass: legend text (\"premature@all — mistake · failing (runoff)\" / \"chained 32 km/h — ideal · caution (contained)\") crisp black-on-cream at top-left (0–600,0–80); road grey, cream background, white dashed centreline, gold and red lines all clearly separable at native res.\n\nJ2 FAIL: the mistake (\"bad\") line carries zero marker glyphs. SVG's <g data-stage=\"9-markers\"> contains 4 turn_point hourglasses + 5 apex rings + 4 exit dots + 4 release chevrons, ALL with data-line-id=\"good\" — none with data-line-id=\"bad\", despite \"premature\" being defined by an early turn_in event on that very line (the marker-from-event law requires an hourglass wherever a turn_in event exists). Visually corroborated: near original-px (1783,175) the only bowtie/hourglass shape present is gold; the red polyline merely passes close by with no glyph of its own anywhere along its length (checked full extent y=222–1106, x=890–1788 via colour-mask scan).\n\nJ5 FAIL: the note claims \"Each corner wider than the last — an early turn-in compounds through the sequence\" and the scene comment claims per-corner peak lean \"strictly increases across the chain,\" but the rendered mistake line diverges through only the FIRST corner and then terminates. Colour-mask over the full raster shows every red pixel confined to y∈[222,1106] of 2714 (top 41% of the frame) — nothing below y=1106 even though the good line's markers continue on to y≈2650 across 3 more corners. SVG confirms: the \"bad\" polyline's last vertex is (33.72,15.82) with its off_road arrowhead+tick immediately after (a correctly-placed edge-crossing terminal, visible as a small red arrow at original-px ≈(900,1085), on-pavement at the verge — the standing_sentence's termination requirement IS satisfied structurally), but that station sits before the good line's own second turn-in (cy≈22.6) — i.e. the mistake runs off within/just after corner 1, never reaching corners 2–4. A reader sees one small excursion, not compounding \"each corner wider than the last,\" and does not see runoff at the final corner as the design's F-ORACLE-CHAIN pin and the figure's own caption both promise.\n\nNote: manifest's own gate_verdict for fig-08-06 is \"fail,\" consistent with (though not the primary basis for) the above."
+      },
+      {
+        "attempt": 2,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "na"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest confirms mode=\"true\" (J6 na, no fan → J9 na) and declares no occluders anywhere in the schema (J4 na). Scene/manifest declare no callout \"labels\" set (only a legend) → J3 na, nothing to check.\n\nJ1 pass: pixel-sampled line colours exactly match the D9 mapping — red line = RGB(179,46,46) = #b32e2e (failing, \"bad\") at (907,1082); gold line = RGB(176,125,30) = #b07d1e (caution, \"good\") at (130,2593). Legend swatches (top-left, ~x=20,y=14/46) match the same two colours and text (\"premature@all — mistake · failing (runoff)\", \"chained 32 km/h — ideal · caution (contained)\"), matching manifest legend rows verbatim.\n\nJ2 pass: tiled the full 2000x2714 raster and located every glyph on-line, none floating: hourglass (turn_point) at (1793,232) — a coincident-collapse of good's and bad's turn-in (rendered gold, \"ideal wins ties\" per spec, correct since bad's line is still overlapping gold above this point); ring (apex) + adjacent hourglass near (467,1815) and (680,1757); chevron (release) near (1720,880) beside the runoff point; further rings/hourglasses/chevrons down the chain (~x870-1000,y1400-2100); at the very bottom terminus, ring (apex) immediately followed by a small filled dot (exit) at ~(131,2470-2490), then plain arrowhead at (131,2596) — exit dot present since the good line completes to exit heading. All glyphs sit centered on the gold/red stroke.\n\nJ5 pass: the mistake (red) line cuts a visibly straighter, more direct diagonal into the first corner versus gold's wider road-hugging arc, diverging exactly at the shared turn-in hourglass (1793,232); the divergence widens through the bend and the red line runs off the pavement, terminating in an off-road glyph at (907,1082) sitting right on the outer road-edge boundary (grey→green transition). This reads immediately as \"turned in too early → ran out of road.\"\n\nJ7 pass, standing sentence holds: the failing line's endpoint (907,1082) sits exactly at the road-edge crossing — arrowhead pointing off-pavement plus a short tick along the edge, matching the design's off_road terminal-glyph spec for outcome=runoff — not wandering into the grass, not exiting the frame uncropped. Good line's endpoint is a plain arrowhead at (131,2596), matching outcome=contained (no off-road tick). No sight rays, no occlusion shading, no extra glyphs beyond the four declared marker classes and the two declared lines were found anywhere in the tiled review. Both lines are flush-cut at the top frame edge coincident with view.window.from_s=0 (clamped to road start per the window formula), so this is the road's actual origin, not a silently-clipped mid-trajectory approach — no missing entry-annotation violation.\n\nJ8 pass: at native 2x raster the ~5-7px strokes are cleanly separated and hue-distinguishable everywhere the two lines diverge (red/gold never ambiguous); where the two paths are literally coincident (the top straight, by design ideal-line z-order) only gold shows, which is the documented z-order, not a legibility defect. Legend text zoomed 2x is crisp, no artifacting, fully readable (\"premature@all — mistake · failing (runoff)\" / \"chained 32 km/h — ideal · caution (contained)\")."
+      },
+      {
+        "attempt": 3,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest mode='true' -> J6 na per policy. No 'occluders' key anywhere in the fig-08-06 manifest entry or .scene -> J4 na. No continuation fan drawn -> J9 na.\n\nJ1: pixel-sampled exact hex matches to QUALITY_COLOUR (src/render/constants.ts): good line (role=ideal, quality=caution) samples (176,125,30)=#b07d1e exactly; bad line (role=mistake, quality=failing) samples (179,46,46)=#b32e2e exactly. Both match the D9 quality->colour law exactly, no deviation.\n\nJ2: default marks spec (scene has no `marks:` field) = 'auto' = all 4 classes (turn_point/apex/exit/release) drawn on the ideal-role line only, per src/render/markers.ts enabledClasses(). Confirmed visually: the gold (ideal) line carries repeated open-ring (apex), small filled-dot (exit), solid pinched-hexagon 'hourglass' (turn_point), and double-chevron (release) glyphs at multiple corners along its length (e.g. ring+dot at ~(135,2265)/(135,2300) native px, ring+hourglass cluster at ~(462,462), ring+dot+chevron cluster ~(905-1090,1085-1300), hourglass at top ~(1790,230)) — every glyph centred exactly on the line stroke, none floating off it. The red (mistake) line correctly carries zero turn/apex/exit/release glyphs anywhere (consistent with 'auto' being role-scoped, not a bug).\n\nJ3: legend box top-left ('premature@all — mistake · failing (runoff)' / 'chained 32 km/h — ideal · caution (contained)') crisply rendered, fully inside frame, not clipped, text matches manifest.legend verbatim (role/quality/outcome per line). No other callouts are declared in scene/manifest for this figure (scene's prose 'note' is book-caption text, not an in-image callout — confirmed it is not baked into the SVG/PNG by src/render/topdown.ts, which only ever writes scene.footnote, null in true mode).\n\nJ5: red line stays glued to the gold line near the top (their shared turn-in region, ~y=150-300 native), then visibly cuts a straighter chord across the esses — ignoring the road's curvature — diverging further from gold through the middle corner, and terminates with an arrowhead sitting just outside the paved edge in the grass at ~(905,1085) native px (a clean, in-frame 'runoff', satisfying the standing sentence). This is a legible, honest picture of 'one early turn-in cuts across the corner, drifts wide, and eventually runs off' — exactly what premature@all teaches. The chain not reaching corners 3-4 is expected (outcome=runoff; an honest empty render for corners never reached is not fabrication).\n\nJ7: nothing extraneous drawn — road, the two declared lines in their declared colours, the standard turn/apex/exit/release glyph set on the ideal line only, one runoff terminal glyph on the mistake line, and the declared legend text. No occluders, no sight rays, no fan, no undeclared elements.\n\nJ8: at native 2000x2714 raster, gold (#b07d1e) vs red (#b32e2e) are easily distinguished by hue even at a glance; legend text renders crisp/anti-aliased with no clipping (verified via 600x80 crop at (0,0)); marker glyphs (ring/dot/hourglass/chevron) are clearly shaped and distinguishable from each other under zoom, not degenerating into indistinct blobs."
+      }
+    ],
+    "items": [
+      {
+        "id": "J1",
+        "verdict": "pass"
+      },
+      {
+        "id": "J2",
+        "verdict": "pass",
+        "flaky": true
+      },
+      {
+        "id": "J3",
+        "verdict": "na",
+        "flaky": true
+      },
+      {
+        "id": "J4",
+        "verdict": "na"
+      },
+      {
+        "id": "J5",
+        "verdict": "pass",
+        "flaky": true
+      },
+      {
+        "id": "J6",
+        "verdict": "na"
+      },
+      {
+        "id": "J7",
+        "verdict": "pass"
+      },
+      {
+        "id": "J8",
+        "verdict": "pass"
+      },
+      {
+        "id": "J9",
+        "verdict": "na"
+      }
+    ],
+    "verdict": "pass"
+  }
+}

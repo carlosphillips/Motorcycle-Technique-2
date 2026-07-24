@@ -1,0 +1,182 @@
+{
+  "figure_id": "fig-08-03",
+  "spec_hash": "09875f",
+  "svg_fnv1a": "c8435a",
+  "judge_identity": {
+    "judge_model": "claude",
+    "judge_model_version": "claude-sonnet-5",
+    "rubric_version": "1"
+  },
+  "verdicts": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "fail"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "fail"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest mode=\"true\" (true-mode v0.1 bake) → J6 na per policy. No occluders declared/drawn (SVG stage-5/7 groups empty) → J4 na. No continuation fan drawn → J9 na.\n\nJ1 pass: bad(mistake/failing)=red #b32e2e, good(ideal/good)=#1f6f43 green, matching legend swatches exactly at top-left (px 0-500,0-80).\n\nJ2 pass: located all 11 turn_point hourglass marks by SVG coords→pixel and visually confirmed each in a contact sheet (crops at 140px boxes): good has 1 mark (px ~545,2182), bad has 10 marks (px ~108,276,444,747,920,1096,1225,1374,1516,1654 along y 2182→1617). Every mark sits centered on its own line's stroke, none floating off-path.\n\nJ3 fail: label \"one smooth input\" (declared anchor apex@good) has its leader-line anchor point at px ~(1646,1612), which lands inside/immediately adjacent to the RED bad-line's 10th turn_point marker glyph centered at px ~(1654,1617) — see crop of region (1500-1800,1500-1750). The anchor is visually swallowed by a different line's marker at the red/green crossing, so a reader cannot tell the callout is pointing at the green line rather than the red mistake marker. (First label \"first of six inputs\"@turn_point#1/bad is anchored cleanly, no issue there.)\n\nJ5 fail: the scene's own on-figure claim (label anchored at bad's first mark) reads \"first of six inputs,\" but the bad/mistake line visibly carries 10 discrete turn_point hourglass marks, not 6 (enumerated and visually verified above at px x=108…1654). The mistake line therefore does not read as the specific error it is captioned to teach (six partial steering corrections) — a reader counting the marks finds ten.\n\nJ7 pass: every drawn element (road, both lines, 11 turn_point marks, 2 labels, legend, direction arrowheads, one off-road termination tick on bad) is declared by the scene/manifest; no undeclared sight-rays, occluders, or fan.\n\nJ8 pass: legend and both callout texts are crisp with white halo stroke at native res (checked crops at (60,2080,700,2180) and (1560,1520,2000,1660)); red vs dark-green strokes are clearly distinguishable in hue and width; dashed white centerline is visually distinct from solid road edges.\n\nStanding sentence check: bad(failing) line's endpoint arrow terminates right at the road edge (px region 1780-2000,1180-1420), consistent with declared outcome \"runoff\" — not wandering into the grass uncropped, not exiting the frame."
+      },
+      {
+        "attempt": 2,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "fail"
+          },
+          {
+            "id": "J3",
+            "verdict": "fail"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest mode=\"true\" (not diagram) → J6 na per policy. Manifest declares no occluders and no sight-rays/eye icons appear in the raster → J4 na. No continuation fan drawn → J9 na.\n\nJ1 pass: red line = legend \"fifty_pence — mistake·failing(runoff)\", green = \"solved 34km/h — ideal·good\"; swatch colors match line colors throughout, no discoloration found.\n\nJ2 FAIL: scene explicitly requires (A-FIG83-MARKS) green=1 turn-point hourglass, red=6. Green line: exactly 1 correctly-colored hourglass found on-line at px(545,2181) — correct. Red line: I count TEN hourglass markers, not six, at approx px x = 106, 275, 444, 747, 919, 1095, 1223, 1373, 1515, 1653 (y descending along the curve from ~2189 to ~1616), confirmed both by direct visual count (crop spanning px(50,1550)-(1750,2250)) and by automated blob-erosion analysis on the red mask (10 distinct blob-pairs excluding the legend swatch and the line's arrowhead). This is a clear, countable overshoot of the declared multiplicity (10 vs 6).\n\nJ3 FAIL: label \"first of six inputs\" (turn_point#1@bad) correctly anchors to the first/leftmost red marker at px(106,2181) — confirmed, leader line terminates cleanly on it. But label \"one smooth input\" (declared apex@good) has its leader line terminate at px≈(1653,1616) on a marker that is filled RED (sampled RGB≈179,46,46, matching the mistake-line color), not green — verified in a 5x crop of that region (the leader's arrow tip lands squarely on the red hourglass sitting where red and green cross). Good's own correctly-colored green turn-point marker is elsewhere, at px(545,2181), and carries no label. So the \"apex@good\" callout visually reads as pointing at bad's line/marker, not good's — a swallowed/misattributed anchor.\n\nJ5 pass: zoomed crop px(850-1300, 1950-2200) shows the red line is built from visible straight facets meeting at sharp angle-kinks exactly at each turn marker, contrasted against green's single smooth unbroken arc — this legibly sells \"many partial steering corrections vs one smooth input,\" the exact lesson of fifty-pencing.\n\nJ7 pass: no undeclared graphic categories (no stray occluders/lines/labels); the road's dashed white centerline is standard preset furniture, not a fabricated element. (The J2 marker-count excess is scored there, not double-counted here.)\n\nJ8 pass: legend text and both callout labels are crisp with white halo against the grey/cream background at native res (checked via 3x crops); red vs green lines remain clearly distinguishable throughout, including at the crossing point.\n\nBad line's arrow endpoint pokes just past the road edge near px(1900,1290) — consistent with declared outcome=runoff, not \"wandering in the grass,\" and fully inside the frame (no uncropped exit). Good line's endpoint arrow is fully inside the frame near px(1875,45), also fine."
+      },
+      {
+        "attempt": 3,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "fail"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest confirms mode=\"true\" (no occluders field) → J6=na per policy note, J4=na (no occluders declared), J9=na (v0.1, no fan drawn).\n\nJ1 pass: legend swatches match verdict classes — red for bad (mistake·failing·runoff) at top-left legend row, dark green for good (ideal·good) — consistent with the lines drawn (red faceted line, green smooth line).\n\nJ2 FAIL (located, pixel-verified): I isolated marker blobs by color-mask + erosion and visually confirmed each with 90px zoom crops. The GOOD/green line carries exactly 1 hourglass, at (x≈550,y≈2182) — matches spec. The BAD/red line carries 10 distinct hourglass turn-point markers, at approx (x,y) = (107,2180),(276,2181),(445,2170),(748,2121),(920,2072),(1096,2002),(1225,1939),(1374,1846),(1516,1741),(1655,1617) — each individually confirmed as a real bowtie hourglass sitting on a genuine kink in the red polyline (verified straight facet segments between adjacent markers at crops around x=870-1150 and x=1180-1420). The scene file's own annotation (line 3-4, tagged A-FIG83-MARKS) declares \"the red line 6\" hourglasses. Rendered count is 10, not 6 — a clear marks-setting mismatch. (The arrowhead at (1909,1316) is the line-end arrow, not counted as a turn-point marker; likewise green's end-arrow at (1872,103) is not a marker.)\n\nJ3 pass: \"first of six inputs\" leader terminates exactly at the first/leftmost red hourglass (x≈107,y≈2180), which is turn_point#1@bad. \"one smooth input\" leader terminates on the green curve at its crossing with red (x≈1655,y≈1617) — confirmed via 300px zoom crop that the green line's path passes through that exact point (crossover_zoom.png); a red marker also happens to sit there since the lines cross at that x, but the green curve genuinely passes through the anchor, so it is not floating/clipped/swallowed. Both labels have white halo, fully legible, un-clipped by frame.\n\nJ5 pass: zoomed segments (e.g. x=870-1150, x=1180-1420) show the red line is built from straight facet segments meeting at kinks — a visibly polygonal/kinked path — contrasted with the green line's continuous smooth arc. This reads as \"many partial corrections vs one smooth input\" per the book's teaching point, independent of the J2 count defect.\n\nJ7 pass: no undeclared lines, occluders, or elements found; road preset book90, both lines (good/bad), turn_point marks, and both labels correspond to scene declarations. Red line's runoff endpoint terminates exactly at the road/grass boundary (arrowhead tip at road edge, x≈1855,y≈1245 region) — satisfies the standing sentence (not wandering in the grass, not exiting frame uncropped); green line's arrow ends cleanly within the road well short of the frame edge.\n\nJ8 pass: legend text (\"fifty_pence — mistake · failing (runoff)\", \"solved 34 km/h — ideal · good\") and both callout labels are crisp with white halo at native raster (2000×2294); red (179,46,46) vs dark green (31,111,67) vs road grey (201,201,201) vs grass (231,236,216) are all clearly distinguishable by hue/luminance, no aliasing garble."
+      }
+    ],
+    "items": [
+      {
+        "id": "J1",
+        "verdict": "pass"
+      },
+      {
+        "id": "J2",
+        "verdict": "fail",
+        "flaky": true
+      },
+      {
+        "id": "J3",
+        "verdict": "fail",
+        "flaky": true
+      },
+      {
+        "id": "J4",
+        "verdict": "na"
+      },
+      {
+        "id": "J5",
+        "verdict": "pass",
+        "flaky": true
+      },
+      {
+        "id": "J6",
+        "verdict": "na"
+      },
+      {
+        "id": "J7",
+        "verdict": "pass"
+      },
+      {
+        "id": "J8",
+        "verdict": "pass"
+      },
+      {
+        "id": "J9",
+        "verdict": "na"
+      }
+    ],
+    "verdict": "fail"
+  }
+}

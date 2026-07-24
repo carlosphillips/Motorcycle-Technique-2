@@ -1,0 +1,180 @@
+{
+  "figure_id": "fig-08-04",
+  "spec_hash": "1a9dd5",
+  "svg_fnv1a": "8b0e1e",
+  "judge_identity": {
+    "judge_model": "claude",
+    "judge_model_version": "claude-sonnet-5",
+    "rubric_version": "1"
+  },
+  "verdicts": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest mode=\"true\" (no occluders field) → J6 na (diagram-only item), J4 na (no occluders declared/drawn).\n\nJ1: pixel-sampled both strokes. Legend + body match D9 exactly: good line/swatch = rgb(31,111,67)≈#1f6f43; bad line/swatch = rgb(179,46,46)=#b32e2e. No mismatch anywhere sampled.\n\nJ2: four marker glyphs found on the good line, each dead-center on the stroke (verified at 4x crop, no gap/float): hourglass ~(640,2490) turn-in near entry; ring ~(1730,1277) apex, leader from \"wait for the radius to open\" lands exactly on its rim; double-chevron ~(1430,563) release; dot ~(1308,405) exit. Order along the path (descending y = earlier in path) is turn-in→apex→release→exit→plain arrowhead at road_end (~830,105) — physically coherent sequence for a late-apex line on a decreasing-radius bend. Bad line carries no markers, consistent with the marker-from-event law (no events ⇒ honest empty render); not treated as a failure absent trace evidence.\n\nJ3: both callouts anchored correctly, no clipping. apex@good leader tip touches the ring (checked at 3x zoom). run_wide_detect@bad leader tip lands exactly at the point the red line splits from the green line (~823,2465), i.e. right on the mistake event station. Label boxes are fully inside the frame with white halo, no overlap with other ink.\n\nJ5: bad (overspeed) line departs the good line right as the road starts tightening and beelines to the outer edge, terminating there — a short but legible \"couldn't hold the tightening line, pushed wide\" read, directly under its own label. Matches legend outcome=runoff.\n\nJ7: nothing extra drawn — road matches preset shape, only the two declared lines, two declared labels, and event-sourced markers appear. Runoff arrowhead placement (below) matches the documented off_road terminal-glyph law, not fabrication.\n\nStanding sentence / off_road terminus: zoomed crop at native res (900-1150,2400-2540) shows the red arrowhead landing exactly at the road/grass edge crossing, tip pointing off-pavement into the grass — on-pavement placement per the off_road spec, not wandering loose in the grass, not exiting the frame.\n\nJ8: at 3-4x native crops, both strokes stay crisply distinguishable (color + width), and all callout/legend text is sharp with a white halo against both the gray road and green grass backgrounds — no legibility floor issues found.\n\nJ9: no continuation fan drawn anywhere in the figure; two solved trajectories only."
+      },
+      {
+        "attempt": 2,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "fail"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "J1 pass: legend swatches (179,46,46) red / (31,111,67) green match line pixel colors exactly; red=bad/mistake/failing, green=good/ideal per D9. J2 pass: hourglass bowtie marker on the shared turn-in point (~px 644,2474), ring apex marker on the good line (~px 1735,1283, matches 'apex@good' anchor), filled-dot exit marker further up the good line (~px 1313,407) — all sit on-line, none floating. J3 pass: 'wait for the radius to open' leader touches the ring apex marker exactly (crop confirmed); 'too fast — pushed wide as it tightens' leader touches the fork point where red separates from green (~px 785,2450); neither label is clipped or overlapping other ink. J4 na: manifest declares no occluders for fig-08-04, scene has none either. J5 FAIL: measured the red (mistake) line's pixel extent directly — it runs only from the fork at ~px(785,2450) to its runoff arrowhead tip at ~px(1039,2457), i.e. it diverges and terminates within ~260px of the shared turn-in marker at ~px(644,2474), essentially immediately after turn-in while the road is still only gently curving (still near the straight-to-curve transition visible in that crop). The apex ring — where the road is actually tight/late-apexing per the good line's own marker — sits far deeper into the corner at ~px(1735,1283), over 1200px later along the path. So the picture shows the mistake line quitting almost instantly at corner entry, not drifting progressively wide 'as it tightens' toward the exit as both the scene note ('the tightening exit forces the line wide... cannot hold it') and the label itself ('pushed wide as it tightens') claim. A reader sees an abrupt near-turn-in runoff, not a tightening-induced wide exit — the picture doesn't teach the stated lesson. J6 na: manifest mode='true' (bake law overrides the scene's mode=diagram), so projection disclosure is not applicable per judge.json's own na rule. J7 pass: only the declared road, two lines, and two labels are drawn; one unlabeled tick/chevron mark on the good line (~px 1440,568) is present beyond the hourglass/ring/dot trio, but it reads as a line-style rendering convention (sits cleanly on the line, not an added line/label/road element) rather than a fabricated element — noted but not treated as fabrication. J8 pass: at native raster, legend text, 'wait for the radius to open', and 'too fast — pushed wide as it tightens' are all crisp with white halo against the grey road; red vs green lines are clearly distinguishable by hue and both render at a consistent visible stroke width. J9 na: no continuation fan drawn; not applicable outside D45 render promotion. Standing sentence check: the red line's endpoint (runoff arrow lower barb) sits right at the road/grass boundary (~px 1004,2474-2477, grass begins at 2477) — it terminates at the edge, doesn't wander into the grass or exit the frame uncropped."
+      },
+      {
+        "attempt": 3,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "fail"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest confirms mode=\"true\" (v0.1 true-projection bake) → J6=na per policy note; no occluders field in manifest/scene → J4=na; no continuation fan drawn (v0.1, D45-only) → J9=na.\n\nJ1 pass: sampled line RGB exactly matches D9 colour-law-v2 hex (06-rendering-and-projection.md §5.1): good line = (31,111,67) = #1f6f43 (good→green), bad line = (179,46,46) = #b32e2e (failing→red). Matches manifest legend (good: role=ideal/quality=good; bad: role=mistake/quality=failing/outcome=runoff).\n\nJ2 pass: good line carries all four event-sourced marker classes, none floating — hourglass turn_point at ~(700,2440px, rotated to local heading), ring apex at ~(1730,1280px) with label leader terminating exactly on it, release double-chevron at ~(1435,580px, rotated to diagonal heading), dot exit at ~(1335,390px) near the arrowhead. Bad line shows no separate markers of its own, which is correct per the coincident-collapse rule (06 §3.1 item 9) since its turn-in event sits at the same station as good's (collapses to the single green hourglass, ideal wins ties) and it never reaches an apex/exit (honest empty set).\n\nJ3 pass: both callouts anchored on-line, not floating/clipped — \"wait for the radius to open\" leader terminates precisely on the ring-apex glyph; \"too fast — pushed wide as it tightens\" leader terminates precisely at the red/green divergence point (the run_wide_detect station). Both boxes fully inside frame with white-halo text.\n\nJ5 FAIL: the bad (mistake) line does not visually read as \"pushed wide as it tightens.\" Measured in original-res pixels: divergence from the green line occurs at ~(783,2451), only ~150px of corner-arc travel past the turn-in hourglass at ~(641,2402) — i.e. within roughly the first ~10% of the corner, still near its widest/loosest radius (r=16 end of the bookDecreasing R16>9 taper). The red segment is short and essentially straight (not a curved-but-insufficient arc), terminating in an off-road arrowhead at ~(1040,2464) — total red length ≈258px vs. the corner's full arc reaching the apex ring at ~(1730,1280), which is far deeper into the curve and never approached by the red line. A reader sees the mistake line depart almost tangentially right at turn-in, before any visible tightening has occurred, which reads as \"went straight off immediately\" rather than \"carried too much speed through a decreasing-radius corner and was progressively pushed wide as it tightened\" — the specific decreasing-radius lesson the label and scene note assert. (Physically plausible given the scene's own +26 km/h margin exceeds even the loosest-radius limit, but that just underscores the mismatch: the drawn failure is generic overspeed-at-entry, not radius-tightening-specific.)\n\nJ7 pass: nothing rendered beyond what the manifest/scene declare — road, two lines, four event markers on the good line, two anchored labels, legend. No sight rays, occluders, speed chips, or fan hatching appear, consistent with none being declared. Standing-sentence check: the failing line's arrowhead sits right at the road-edge crossing (pixel scan shows red terminates within ~1-5px of the gray/off-road boundary at x≈1020-1040), not wandering into the grass and not exiting the frame uncropped.\n\nJ8 pass: at native 2000×2590 raster, legend text, both callout boxes, and both line colours are crisp and unambiguous; red vs. green are clearly distinguishable at both full view and native-pixel zoom."
+      }
+    ],
+    "items": [
+      {
+        "id": "J1",
+        "verdict": "pass"
+      },
+      {
+        "id": "J2",
+        "verdict": "pass"
+      },
+      {
+        "id": "J3",
+        "verdict": "pass"
+      },
+      {
+        "id": "J4",
+        "verdict": "na"
+      },
+      {
+        "id": "J5",
+        "verdict": "fail",
+        "flaky": true
+      },
+      {
+        "id": "J6",
+        "verdict": "na"
+      },
+      {
+        "id": "J7",
+        "verdict": "pass"
+      },
+      {
+        "id": "J8",
+        "verdict": "pass"
+      },
+      {
+        "id": "J9",
+        "verdict": "na"
+      }
+    ],
+    "verdict": "fail"
+  }
+}

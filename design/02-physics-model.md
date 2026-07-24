@@ -853,12 +853,69 @@ forbidden; `T-BLESSED-DOC-SYNC` regenerates the block from the committed
 fixtures and asserts byte equality, so this document can never claim numbers
 the fixtures don't hold.
 
-<!-- BLESSED:BEGIN engine=<semver> date=<YYYY-MM-DD> -->
+<!-- BLESSED:BEGIN engine=0.1.0 date=2026-07-23 -->
 | fixture | quantity | value | unit | tol |
 |---|---|---|---|---|
-| C30 | turn_in_s | … | m | ±0.01 |
-| C30 | apex_pct | … | % | ±0.1 |
-| … | *(exactly the quantities §8 enumerates, for every fixture in §8.2)* | | | |
+| C30 | turn_in_s | 26.21782053655581 | m | ±0.01 |
+| C30 | lean_commit_deg | 31.372848313777666 | deg | ±0.01 |
+| C30 | apex_s | 66 | m | ±0.01 |
+| C30 | apex_pct | 65.78404314465008 | % | ±0.1 |
+| C30 | apex_f | 0.03400197259168147 | - | ±0.001 |
+| C30 | apex_clearance_m | 0.09180532599753999 | m | ±0.01 |
+| C30 | v_apex_ms | 14.53278143623492 | m/s | ±0.01 |
+| C30 | phi_max_deg | 31.372848313777666 | deg | ±0.01 |
+| C30 | grip_min | 0.3503147709285165 | - | ±0.001 |
+| C30 | release_s | 85.60701520889671 | m | ±0.01 |
+| C30 | exit_heading_err_deg | -1 | deg | ±0.01 |
+| C30 | road_end_phi_deg | -0.11893501352011661 | deg | ±0.01 |
+| C30 | road_end_f | 0.7811758502112548 | - | ±0.001 |
+| C30 | outcome | contained | - | exact |
+| C30 | quality | good | - | exact |
+| C30-chop | turn_in_s | 26.21782053655581 | m | ±0.01 |
+| C30-chop | lean_commit_deg | 31.372848313777666 | deg | ±0.01 |
+| C30-chop | apex_s | 64.5 | m | ±0.01 |
+| C30-chop | apex_pct | 62.60094428281217 | % | ±0.1 |
+| C30-chop | apex_f | 0.03933497673340397 | - | ±0.001 |
+| C30-chop | apex_clearance_m | 0.10620443718019068 | m | ±0.01 |
+| C30-chop | v_apex_ms | 14.140500000000065 | m/s | ±0.01 |
+| C30-chop | phi_max_deg | 31.372848313777666 | deg | ±0.01 |
+| C30-chop | grip_min | 0.36201515454929445 | - | ±0.001 |
+| C30-chop | release_s | 86.40459927816184 | m | ±0.01 |
+| C30-chop | exit_heading_err_deg | -1 | deg | ±0.01 |
+| C30-chop | road_end_phi_deg | -0.004270317139838747 | deg | ±0.01 |
+| C30-chop | road_end_f | 1.3751534418535318 | - | ±0.001 |
+| C30-chop | outcome | wide | - | exact |
+| C30-chop | quality | failing | - | exact |
+| C30-trailbrake | turn_in_s | 29.5 | m | ±0.01 |
+| C30-trailbrake | lean_commit_deg | 19.5 | deg | ±0.01 |
+| C30-trailbrake | apex_s | 76 | m | ±0.01 |
+| C30-trailbrake | apex_pct | 87.00470222356945 | % | ±0.1 |
+| C30-trailbrake | apex_f | -0.09330622600272365 | - | ±0.001 |
+| C30-trailbrake | apex_clearance_m | 0.25192681020735375 | m | ±0.01 |
+| C30-trailbrake | v_apex_ms | 10.903052224879318 | m/s | ±0.01 |
+| C30-trailbrake | phi_max_deg | 19.5 | deg | ±0.01 |
+| C30-trailbrake | grip_min | 0.5913872156636455 | - | ±0.001 |
+| C30-trailbrake | release_s | 81.90000313307213 | m | ±0.01 |
+| C30-trailbrake | exit_heading_err_deg | -1 | deg | ±0.01 |
+| C30-trailbrake | road_end_phi_deg | 0.008684415604949087 | deg | ±0.01 |
+| C30-trailbrake | road_end_f | -0.01894723230658024 | - | ±0.001 |
+| C30-trailbrake | outcome | contained | - | exact |
+| C30-trailbrake | quality | caution | - | exact |
+| C30-DR | turn_in_s | 8.297381841698263 | m | ±0.01 |
+| C30-DR | lean_commit_deg | 32.27201713970964 | deg | ±0.01 |
+| C30-DR | apex_s | 33 | m | ±0.01 |
+| C30-DR | apex_pct | 75.98638268784303 | % | ±0.1 |
+| C30-DR | apex_f | 0.22596122325811285 | - | ±0.001 |
+| C30-DR | apex_clearance_m | 0.6100953027969047 | m | ±0.01 |
+| C30-DR | v_apex_ms | 9.977296083176311 | m/s | ±0.01 |
+| C30-DR | phi_max_deg | 32.27201713970964 | deg | ±0.01 |
+| C30-DR | grip_min | 0.32987083846805987 | - | ±0.001 |
+| C30-DR | release_s | 41.4432587121141 | m | ±0.01 |
+| C30-DR | exit_heading_err_deg | -1 | deg | ±0.01 |
+| C30-DR | road_end_phi_deg | -0.8487759120454561 | deg | ±0.01 |
+| C30-DR | road_end_f | 0.8455986608147426 | - | ±0.001 |
+| C30-DR | outcome | contained | - | exact |
+| C30-DR | quality | good | - | exact |
 <!-- BLESSED:END -->
 
 ### 8.2 Companion goldens

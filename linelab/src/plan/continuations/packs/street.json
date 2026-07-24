@@ -1,0 +1,22 @@
+{
+  "pack": "linelab-continuations/1",
+  "name": "street",
+  "version": 1,
+  "requires_continuations_version": 1,
+  "doctrine_source": "Parks, Total Control, ch. 8 (blind corners)",
+  "escape_rider": "brake_reserve_escape",
+  "envelope": {
+    "kappa_max_1pm": { "value": 0.14285714285714285, "units": "1/m", "source": "TUNING" },
+    "dkappa_ds_max_1pm2": { "value": 0.005, "units": "1/m^2", "source": "TUNING" },
+    "kappa_step_max_1pm": { "value": 0.14285714285714285, "units": "1/m", "source": "TUNING" },
+    "member_sweep_max_deg": { "value": 150.0, "units": "deg", "source": "TUNING" },
+    "member_curve_max_m": { "value": 120.0, "units": "m", "source": "TUNING" },
+    "member_runout_m": { "value": 60.0, "units": "m", "source": "TUNING" },
+    "ladder_reach": { "value": 1.0, "units": "-", "source": "TUNING" }
+  },
+  "ladder": [-1, -0.6667, -0.3333, 0, 0.3333, 0.6667, 1],
+  "escape": {
+    "escape_decel_mss": { "value": 3.0, "units": "m/s^2", "source": "TUNING" },
+    "escape_ellipse_max": { "value": 0.95, "units": "-", "source": "TUNING" }
+  }
+}

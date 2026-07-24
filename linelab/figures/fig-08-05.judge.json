@@ -1,0 +1,181 @@
+{
+  "figure_id": "fig-08-05",
+  "spec_hash": "4744ed",
+  "svg_fnv1a": "2a41c5",
+  "judge_identity": {
+    "judge_model": "claude",
+    "judge_model_version": "claude-sonnet-5",
+    "rubric_version": "1"
+  },
+  "verdicts": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "fail"
+          },
+          {
+            "id": "J2",
+            "verdict": "fail"
+          },
+          {
+            "id": "J3",
+            "verdict": "fail"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "fail"
+          },
+          {
+            "id": "J6",
+            "verdict": "fail"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "fail"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "The rendered PNG shows ONLY the road surface (a grey double-apex/hairpin-shaped corridor) with a single dashed white centerline down its middle, on a cream background. Nothing else is drawn.\n\nJ1 (colour-verdict) FAIL: neither declared line (\"good\", entry=30, style=double_apex — implicit good/planned verdict) nor \"late\" (role=mistake) is rendered at all. There is no colored line of any kind on the "
+      },
+      {
+        "attempt": 2,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "fail"
+          },
+          {
+            "id": "J2",
+            "verdict": "fail"
+          },
+          {
+            "id": "J3",
+            "verdict": "fail"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "fail"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "fail"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Viewed png/fig-08-05.png directly. The raster contains ONLY the road surface: grey pavement in a D-shaped (near-180°) bend with a white dashed centerline lane marking. There is no trace of either ride line (`good` or `late`), no apex/turn-point markers, no labels, and no note text anywhere in the image.\n\nJ1 colour-verdict: FAIL — no lines are rendered at all, so no verdict-class colours (e.g. gree"
+      },
+      {
+        "attempt": 3,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "fail"
+          },
+          {
+            "id": "J2",
+            "verdict": "fail"
+          },
+          {
+            "id": "J3",
+            "verdict": "fail"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "fail"
+          },
+          {
+            "id": "J6",
+            "verdict": "fail"
+          },
+          {
+            "id": "J7",
+            "verdict": "fail"
+          },
+          {
+            "id": "J8",
+            "verdict": "fail"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Viewed /Users/carlos/Documents/Claude/Projects/Motorcycle Technique 2/linelab/figures/png/fig-08-05.png directly. The image contains only: a light olive/cream background, a gray road-surface corridor shaped like a hairpin/double-apex bend, and a single dashed white centerline running down the middle of the corridor. Nothing else is rendered.\n\nJ1 (colour-verdict): FAIL — no rider lines are drawn at"
+      }
+    ],
+    "items": [
+      {
+        "id": "J1",
+        "verdict": "fail"
+      },
+      {
+        "id": "J2",
+        "verdict": "fail"
+      },
+      {
+        "id": "J3",
+        "verdict": "fail"
+      },
+      {
+        "id": "J4",
+        "verdict": "na"
+      },
+      {
+        "id": "J5",
+        "verdict": "fail"
+      },
+      {
+        "id": "J6",
+        "verdict": "fail",
+        "flaky": true
+      },
+      {
+        "id": "J7",
+        "verdict": "pass",
+        "flaky": true
+      },
+      {
+        "id": "J8",
+        "verdict": "fail"
+      },
+      {
+        "id": "J9",
+        "verdict": "na"
+      }
+    ],
+    "verdict": "fail"
+  }
+}

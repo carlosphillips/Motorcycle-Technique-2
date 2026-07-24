@@ -1,0 +1,197 @@
+{
+  "fixture": "C30-heldbrake",
+  "engine_semver": "0.1.0",
+  "input": {
+    "kind": "run",
+    "input": {
+      "spec": "linelab/1",
+      "id": "C30-heldbrake",
+      "road": {
+        "dsl": "lane 3.5 | S 35 | R 30 ^90 | S 25"
+      },
+      "rider": {
+        "profile": "street",
+        "start": {
+          "speed_kmh": 56.5,
+          "f": 0
+        },
+        "plan": [
+          {
+            "do": "turn_in",
+            "id": "t1",
+            "at_s": 35,
+            "target": {
+              "lean_deg": 40
+            }
+          },
+          {
+            "do": "brake",
+            "id": "b1",
+            "at_s": 52,
+            "decel": 8
+          }
+        ]
+      }
+    }
+  },
+  "lines": [
+    {
+      "line_id": "C30-heldbrake",
+      "role": "ideal",
+      "outcome": "runoff",
+      "quality": "failing",
+      "result_hash": "1bf746",
+      "terminated": {
+        "reason": "off_road",
+        "s": 67.93405928791192,
+        "t": 4.4819961517146565
+      },
+      "events": [
+        {
+          "kind": "turn_in",
+          "s": 35,
+          "t": 2.2300794983290384,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "apex",
+          "s": 35,
+          "t": 2.2300794983290384,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "steering_complete",
+          "s": 47.284937153584536,
+          "t": 2.96,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "run_wide_detect",
+          "s": 50.87791313236182,
+          "t": 3.1901585628499833,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "brake_start",
+          "s": 52,
+          "t": 3.263499890625575,
+          "action_id": "b1"
+        },
+        {
+          "kind": "sight_min",
+          "s": 62,
+          "t": 3.9682660186340395
+        },
+        {
+          "kind": "correction",
+          "s": 64.73175006744393,
+          "t": 4.190158562849984,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "off_road",
+          "s": 67.93405928791192,
+          "t": 4.4819961517146565
+        }
+      ],
+      "corners": [
+        {
+          "id": "c1",
+          "hand": "R",
+          "corner_type": "constant",
+          "apexes": [
+            {
+              "s": 35,
+              "pct": 0,
+              "f": 6.503723031792141e-7,
+              "clearance_m": 0.0000017560052185672248,
+              "v_kmh": 56.5,
+              "lean_deg": 0
+            }
+          ],
+          "lean_max_deg": 40,
+          "grip_min": 1.1102230246251565e-16,
+          "danger_dwell_s": 0,
+          "exit": {
+            "s": 67.93405928791192,
+            "d": 3.4999885781120095,
+            "f": 2.4444402141155592,
+            "heading_err_deg": -32.3195662817571
+          }
+        }
+      ],
+      "phi_max_deg": 40,
+      "grip_min": 1.1102230246251565e-16,
+      "v_min_ms": 11.347642558576853,
+      "checks": [
+        {
+          "id": "late_apex",
+          "verdict": "fail"
+        },
+        {
+          "id": "out_in_out",
+          "verdict": "fail"
+        },
+        {
+          "id": "single_input",
+          "verdict": "pass"
+        },
+        {
+          "id": "quick_steer",
+          "verdict": "pass"
+        },
+        {
+          "id": "throttle_rule",
+          "verdict": "fail"
+        },
+        {
+          "id": "trail_brake_taper",
+          "verdict": "warn"
+        },
+        {
+          "id": "traction_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "lean_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "exit_containment",
+          "verdict": "fail"
+        },
+        {
+          "id": "stop_within_sight",
+          "verdict": "fail"
+        },
+        {
+          "id": "hold_wide_for_sight",
+          "verdict": "na"
+        },
+        {
+          "id": "rideability",
+          "verdict": "fail"
+        },
+        {
+          "id": "link_continuity",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_flow",
+          "verdict": "na"
+        },
+        {
+          "id": "wrong_strategy_for_corner",
+          "verdict": "na"
+        }
+      ]
+    }
+  ],
+  "blessed": []
+}

@@ -1,0 +1,14 @@
+{
+  "spec": "linelab/1",
+  "id": "fx-chain-flow-broken",
+  "road": { "dsl": "lane 3.5 | S 8 | R 12 ^75 | S 6 | L 12 ^75 | S 10" },
+  "rider": {
+    "profile": "street",
+    "start": { "speed_kmh": 30, "f": 0.7 },
+    "plan": [
+      { "do": "turn_in", "id": "t1", "at_s": 4, "target": { "lean_deg": 33 } },
+      { "do": "turn_in", "id": "t2", "at_s": 25, "target": { "lean_deg": 38 } },
+      { "do": "brake", "id": "b1", "at_s": 35, "decel": 1.5 }
+    ]
+  }
+}

@@ -1,0 +1,94 @@
+// cli/verbs/figure.ts — the `figure` verb (design/08 §3, D30): bake a figure
+// from either spelling (scene text or FigureSpec JSON, sniffed by content —
+// leading `{` → JSON, never by extension). Bakes are declaration-gated by
+// DEFAULT (§3.1/§3.4 — no `--gate` flag needed). `--check` lints either
+// spelling without solving (the same code path as the `check` verb).
+import { lowerScene } from "../../plan/scene.js";
+import { validateFigureSpec, specHash } from "../../plan/figure.js";
+import { run, expectDeclarationsOf } from "../../solve/run.js";
+import { gateFigure } from "../../solve/gate.js";
+import { isLineRefusal } from "../../solve/envelope.js";
+import { renderViews, computeProportionMetrics, gateProportions, buildManifestRecord } from "../../render/index.js";
+import { EXIT } from "../exit.js";
+import { parseZeroFileFlags } from "../args.js";
+import { errOutcome, okOutcome, looksLikeJson, parseJson } from "./shared.js";
+function straightLenM(road) {
+    return road.segments.filter((s) => s.type === "straight").reduce((sum, s) => sum + s.len_m, 0);
+}
+function lowerInput(text) {
+    if (looksLikeJson(text)) {
+        const j = parseJson(text, "input");
+        if (!j.ok)
+            return j;
+        const spec = validateFigureSpec(j.value);
+        if (!spec.ok)
+            return spec;
+        return { ok: true, value: { spec: spec.value, rawJson: j.value } };
+    }
+    const spec = lowerScene(text);
+    if (!spec.ok)
+        return spec;
+    return { ok: true, value: { spec: spec.value } };
+}
+export function figureVerb(input) {
+    const parsed = parseZeroFileFlags(input.argv);
+    if (!parsed.ok)
+        return errOutcome(parsed.error);
+    const lowered = lowerInput(input.loadedText);
+    if (!lowered.ok)
+        return errOutcome(lowered.error);
+    const spec = lowered.value.spec;
+    if (parsed.value.check) {
+        return okOutcome({ valid: true, spec_hash: specHash(spec) }, undefined, EXIT.OK);
+    }
+    const figureId = parsed.value.out !== undefined ? parsed.value.out.split("/").filter((s) => s.length > 0).pop() ?? "figure" : "figure";
+    const result = run(spec, { engine_semver: input.engineSemver, figure_id: figureId });
+    if (!result.ok)
+        return errOutcome(result.error);
+    const envelope = result.value;
+    // declaration-gated by default (§3.1/§3.4): a FigureSpec line's `expect` block
+    // rides the RAW json only when the input was JSON-spelled; scene text carries
+    // no `expect` (D30 — JSON-only, deliberately).
+    const declaredR = lowered.value.rawJson !== undefined ? expectDeclarationsOf(lowered.value.rawJson) : undefined;
+    const declared = declaredR?.ok ? declaredR.value : {};
+    const report = gateFigure(envelope, { expect: declared });
+    let exit = report.pass ? EXIT.OK : EXIT.DEVIATION;
+    const writes = [];
+    if (parsed.value.out !== undefined) {
+        const outDir = parsed.value.out;
+        const lines = envelope.lines.filter((l) => !isLineRefusal(l));
+        // flag-over-file merge law (08 §4.2), applied to the view surface: `--mode`
+        // overrides the spec's own `view.mode` — this is how CI bakes mode=diagram
+        // scenes with `--mode true` (ARCHITECTURE §6.5).
+        const fileView = typeof spec.view === "object" && spec.view !== null ? spec.view : {};
+        const viewSpec = parsed.value.mode !== undefined ? { ...fileView, mode: parsed.value.mode } : spec.view;
+        // "the bake stays total ... Refused lines draw nothing" (design/05 §7):
+        // a label anchored on a REFUSED line draws nothing with its line — dropped
+        // here rather than aborting the whole bake (WP-17 fix). Labels naming a
+        // line absent from the figure altogether still reach resolveLabels and
+        // fail typed (A-ANCHOR-ERRORS unaffected).
+        const refusedIds = new Set(envelope.lines.filter((l) => isLineRefusal(l)).map((l) => l.line_id));
+        const drawableLabels = spec.labels?.filter((lb) => !refusedIds.has(lb.line));
+        const rendered = renderViews({
+            road: envelope.road,
+            lines,
+            viewSpec,
+            ...(drawableLabels !== undefined ? { labels: drawableLabels } : {}),
+            marks: spec.marks ?? "auto"
+        });
+        if (!rendered.ok)
+            return errOutcome(rendered.error);
+        writes.push({ path: `${outDir}/${envelope.figure_id}.svg`, content: rendered.value.svg });
+        writes.push({ path: `${outDir}/${envelope.figure_id}.json`, content: JSON.stringify(envelope, null, 2) });
+        const metrics = computeProportionMetrics(rendered.value.scene, envelope.road.corners, straightLenM(envelope.road));
+        const gate = gateProportions(metrics);
+        const manifest = buildManifestRecord(envelope.figure_id, specHash(spec), rendered.value.scene, metrics, gate.verdict);
+        writes.push({ path: `${outDir}/manifest.json`, content: JSON.stringify(manifest, null, 2) });
+        // NOTE: the render PROPORTION gate (design/06) is a book-figure QA check
+        // owned by WP-17's `test/render/gate.test.ts`, not a CLI exit-tier trigger
+        // (08 §3.1's table names only declaration-gated/version-skew/NO_SOLUTION
+        // triggers) — it rides in the written manifest only, never the exit code.
+    }
+    return okOutcome(envelope, writes, exit);
+}
+//# sourceMappingURL=figure.js.map

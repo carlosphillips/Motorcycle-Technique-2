@@ -1,0 +1,258 @@
+{
+  "pack": "linelab-rubric/1",
+  "name": "parks-street",
+  "version": 2,
+  "requires_checks_version": 2,
+  "doctrine_source": "Parks, Total Control, ch. 8–9",
+  "checks": [
+    {
+      "id": "late_apex",
+      "metric": "apex_pct",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": { "corner_trend": ["decreasing", "constant"] },
+      "thresholds": {
+        "APEX_PCT_BAR_DECREASING": {
+          "value": 60,
+          "units": "%",
+          "source": "book:With a delayed entry, it can be safely completed with only one turning point"
+        },
+        "APEX_PCT_BAR_CONSTANT": {
+          "value": 50,
+          "units": "%",
+          "source": "book:So an early turn point creates an early apex, which forces the line wide or requires a mid-corner steering correction"
+        }
+      },
+      "bands": { "past_bar": "pass", "before_bar": "fail" },
+      "teaches": "apex past the corner-type late bar",
+      "book_ref": "Total Control ch. 8, Delayed Apex"
+    },
+    {
+      "id": "out_in_out",
+      "metric": "oio_fractions",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "OIO_OUTSIDE_MIN": { "value": 0.55, "units": "f", "source": "TUNING" },
+        "OIO_INSIDE_MAX": { "value": 0.45, "units": "f", "source": "TUNING" },
+        "OIO_SWING_MIN": { "value": 0.4, "units": "f", "source": "TUNING" }
+      },
+      "bands": { "shape_met": "pass", "shape_broken": "fail" },
+      "teaches": "enter wide, touch inside, exit wide (chain-modified)",
+      "book_ref": "Total Control ch. 8"
+    },
+    {
+      "id": "single_input",
+      "metric": "input_count",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {},
+      "bands": {
+        "within_allowance": "pass",
+        "extra_input": "fail",
+        "fifty_pence": "fail",
+        "no_input": "fail"
+      },
+      "teaches": "one steering input per corner (commanded channel)",
+      "book_ref": "Total Control ch. 8, Fifty-Pencing"
+    },
+    {
+      "id": "quick_steer",
+      "metric": "steer_share",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "QS_SHARE_FAIL": { "value": 0.45, "units": "frac_of_L_c", "source": "TUNING" },
+        "QS_SHARE_WARN": { "value": 0.3, "units": "frac_of_L_c", "source": "TUNING" },
+        "QS_TIME_WARN": { "value": 1.0, "units": "s", "source": "TUNING" },
+        "SMALL_LEAN_DEG": { "value": 3.0, "units": "deg", "source": "TUNING" }
+      },
+      "bands": { "quick": "pass", "slow_leg": "warn", "eats_corner": "fail" },
+      "teaches": "roll-in must not eat the corner (two-sided ladder)",
+      "book_ref": "Total Control ch. 8, Turning Points"
+    },
+    {
+      "id": "throttle_rule",
+      "metric": "throttle_legs",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "THR_EPS": { "value": 0.05, "units": "m/s^2", "source": "TUNING" },
+        "CRACK_EARLY_FRAC": { "value": 0.6, "units": "frac_of_L_c", "source": "TUNING" },
+        "ROLLON_LATE_FRAC": { "value": 0.6, "units": "frac_of_L_c", "source": "TUNING" },
+        "RATE_THRESHOLD": { "value": 8.0, "units": "m/s^3", "source": "TUNING" },
+        "CHOP_TOL": { "value": 0.5, "units": "m/s^2", "source": "TUNING" },
+        "SMALL_LEAN_DEG": { "value": 3.0, "units": "deg", "source": "TUNING" }
+      },
+      "bands": { "disciplined": "pass", "warn_leg": "warn", "fail_leg": "fail" },
+      "teaches": "crack → v_min ≤ apex → roll-on, no chop",
+      "book_ref": "Total Control ch. 9, Throttle Control"
+    },
+    {
+      "id": "trail_brake_taper",
+      "metric": "taper_profile",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "TB_PHI_MIN": { "value": 15, "units": "deg", "source": "TUNING" },
+        "REDEEPEN_TOL": { "value": 0.3, "units": "m/s^2", "source": "TUNING" },
+        "RESID_FRAC": { "value": 0.35, "units": "-", "source": "TUNING" },
+        "A_SU_ONSET": { "value": 2.5, "units": "m/s^2", "source": "TUNING" }
+      },
+      "bands": { "tapered": "pass", "ate_reserve": "warn", "forced_standup": "fail" },
+      "teaches": "brake past turn-in must taper below stand-up authority",
+      "book_ref": "Total Control ch. 11, Trail Braking"
+    },
+    {
+      "id": "traction_ceiling",
+      "metric": "ellipse_max",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "eps_mag": { "value": 0.001, "units": "-", "source": "TUNING" }
+      },
+      "bands": { "within_ellipse": "pass", "exceeded": "fail" },
+      "teaches": "never beyond the friction ellipse",
+      "book_ref": "Total Control ch. 1, Traction"
+    },
+    {
+      "id": "lean_ceiling",
+      "metric": "lean_max",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "BLIND_RESERVE_DEG": { "value": 35, "units": "deg", "source": "TUNING" }
+      },
+      "bands": { "within_reserve": "pass", "ate_reserve": "warn", "beyond_ceiling": "fail" },
+      "teaches": "reserve / ceiling three-band ladder",
+      "book_ref": "Total Control ch. 8, Lean Angle Reserve"
+    },
+    {
+      "id": "exit_containment",
+      "metric": "oio_fractions",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {},
+      "bands": { "contained": "pass", "escaped": "fail" },
+      "teaches": "exit lane fraction < 1",
+      "book_ref": "Total Control ch. 8"
+    },
+    {
+      "id": "stop_within_sight",
+      "metric": "sight_deficit",
+      "scope": "line",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "SIGHT_WARN_M": { "value": 5, "units": "m", "source": "TUNING" }
+      },
+      "bands": { "margin_ok": "pass", "thin_margin": "warn", "deficit": "fail" },
+      "teaches": "ssd(v, phi, …).ssd_m ≤ sight_ride_m at every station",
+      "book_ref": "Total Control ch. 8, Blind Corners"
+    },
+    {
+      "id": "hold_wide_for_sight",
+      "metric": "hold_wide_legs",
+      "scope": "corner",
+      "severity": "standard",
+      "applicability": { "requires_blind": true },
+      "thresholds": {
+        "HOLD_WINDOW_FRAC": { "value": 0.75, "units": "frac_of_L_c", "source": "TUNING" },
+        "RELEASE_TOL_M": { "value": 2.0, "units": "m", "source": "TUNING" },
+        "HOLD_F_MIN": { "value": 0.7, "units": "f", "source": "TUNING" }
+      },
+      "bands": {
+        "held_wide": "pass",
+        "drifted_early": "warn",
+        "committed_closing": "fail",
+        "cut_in_early": "fail"
+      },
+      "teaches": "on a blind corner, stay wide until release",
+      "book_ref": "Total Control ch. 8, Blind Corners"
+    },
+    {
+      "id": "rideability",
+      "metric": "tracker_overdrive",
+      "scope": "line",
+      "severity": "standard",
+      "applicability": {},
+      "thresholds": {
+        "RATE_TOL_DPS": { "value": 2.0, "units": "deg/s", "source": "TUNING" },
+        "KAPPA_STEP": { "value": 0.01, "units": "1/m", "source": "TUNING" },
+        "PHI_JUMP": { "value": 3.0, "units": "deg", "source": "TUNING" }
+      },
+      "bands": { "rideable": "pass", "overdriven": "fail" },
+      "teaches": "no tracker overdrive / kinematic teleport",
+      "book_ref": "Total Control ch. 2, Steering"
+    },
+    {
+      "id": "link_continuity",
+      "metric": "link_legs",
+      "scope": "pair",
+      "severity": "standard",
+      "applicability": { "chain_mode": "geometric" },
+      "thresholds": {
+        "LINK_ENTRY_OUTER_MIN": { "value": 0.5, "units": "f", "source": "TUNING" },
+        "LINK_BRAKE_RESET": { "value": 1.0, "units": "m/s^2", "source": "TUNING" },
+        "LINK_GAP_FRAC": { "value": 1.0, "units": "-", "source": "TUNING" }
+      },
+      "bands": { "linked": "pass", "broken": "fail" },
+      "teaches": "each exit sets up the next entry",
+      "book_ref": "Total Control ch. 8, Linked Turns"
+    },
+    {
+      "id": "chain_containment",
+      "metric": "chain_extent",
+      "scope": "chain",
+      "severity": "standard",
+      "applicability": { "chain_mode": "ridden" },
+      "thresholds": {
+        "EPS_F": { "value": 0.02, "units": "f", "source": "TUNING" }
+      },
+      "bands": { "contained": "pass", "escaped": "fail" },
+      "teaches": "the whole chain stays in the corridor",
+      "book_ref": "Total Control ch. 8, Linked Turns"
+    },
+    {
+      "id": "chain_flow",
+      "metric": "flow_legs",
+      "scope": "chain",
+      "severity": "standard",
+      "applicability": { "chain_mode": "ridden" },
+      "thresholds": {
+        "SMALL_LEAN_DEG": { "value": 3.0, "units": "deg", "source": "TUNING" }
+      },
+      "bands": { "flowing": "pass", "broken": "fail" },
+      "teaches": "one rhythm through the sequence",
+      "book_ref": "Total Control ch. 8, Linked Turns"
+    },
+    {
+      "id": "wrong_strategy_for_corner",
+      "metric": "apex_pct",
+      "scope": "corner",
+      "severity": "critical",
+      "applicability": { "corner_trend": ["decreasing"] },
+      "thresholds": {
+        "DR_RATIO_MIN": { "value": 1.25, "units": "-", "source": "TUNING" },
+        "DR_ALT_SPEED_MARGIN": { "value": 1.0, "units": "-", "source": "TUNING" }
+      },
+      "bands": {
+        "single_late_apex": "pass",
+        "double_blind_slow": "warn",
+        "double_on_dr": "fail"
+      },
+      "teaches": "a double-apex strategy ridden on a decreasing-radius corner (≥ 2 measured apexes); warns under the fig 8.4 caption's sanction",
+      "book_ref": "Total Control ch. 8, fig 8.4, Decreasing Radius Turn"
+    }
+  ],
+  "renames": { "sight_vs_stopping": "stop_within_sight" },
+  "annex": { "reserve_checks": ["lean_ceiling", "stop_within_sight"] }
+}

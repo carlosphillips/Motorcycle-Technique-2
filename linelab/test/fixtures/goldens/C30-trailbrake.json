@@ -1,0 +1,334 @@
+{
+  "fixture": "C30-trailbrake",
+  "engine_semver": "0.1.0",
+  "input": {
+    "kind": "run",
+    "input": {
+      "spec": "linelab/1",
+      "id": "C30-trailbrake",
+      "road": {
+        "dsl": "lane 3.5 | S 35 | R 30 ^90 | S 25"
+      },
+      "rider": {
+        "profile": "street",
+        "start": {
+          "speed_kmh": 55,
+          "f": 0.9
+        },
+        "plan": [
+          {
+            "do": "brake",
+            "id": "b1",
+            "at_s": 2,
+            "decel": 2
+          },
+          {
+            "do": "turn_in",
+            "id": "t1",
+            "at_s": 29.5,
+            "target": {
+              "lean_deg": 19.5
+            }
+          },
+          {
+            "do": "throttle",
+            "id": "r0",
+            "at_s": 36,
+            "accel": 0
+          },
+          {
+            "do": "throttle",
+            "id": "r1",
+            "at_s": 65,
+            "accel": 1
+          }
+        ]
+      }
+    }
+  },
+  "lines": [
+    {
+      "line_id": "C30-trailbrake",
+      "role": "ideal",
+      "outcome": "contained",
+      "quality": "caution",
+      "result_hash": "1459e2",
+      "terminated": {
+        "reason": "road_end",
+        "s": 107.12388980384009,
+        "t": 8.885000000000002
+      },
+      "events": [
+        {
+          "kind": "brake_start",
+          "s": 2,
+          "t": 0.13090909125316383,
+          "action_id": "b1"
+        },
+        {
+          "kind": "turn_in",
+          "s": 29.5,
+          "t": 2.1567693456163193,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "steering_complete",
+          "s": 33.514611060350134,
+          "t": 2.515,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "crack",
+          "s": 36,
+          "t": 2.747034123120805,
+          "action_id": "r0"
+        },
+        {
+          "kind": "brake_end",
+          "s": 39.546380890997035,
+          "t": 3.085,
+          "action_id": "b1"
+        },
+        {
+          "kind": "roll_on",
+          "s": 65,
+          "t": 5.43791168232782,
+          "action_id": "r1"
+        },
+        {
+          "kind": "apex",
+          "s": 76,
+          "t": 6.37862444710132,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "release",
+          "s": 81.90000313307213,
+          "t": 6.8500000000000005,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "exit",
+          "s": 83.83649541982444,
+          "t": 7.016999330713321,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "sight_min",
+          "s": 107.12388980384009,
+          "t": 8.885000000000002
+        },
+        {
+          "kind": "road_end",
+          "s": 107.12388980384009,
+          "t": 8.885000000000002
+        }
+      ],
+      "corners": [
+        {
+          "id": "c1",
+          "hand": "R",
+          "corner_type": "constant",
+          "apexes": [
+            {
+              "s": 76,
+              "pct": 87.00470222356945,
+              "f": -0.09330622600272365,
+              "clearance_m": 0.25192681020735375,
+              "v_kmh": 39.250988009565546,
+              "lean_deg": 19.5
+            }
+          ],
+          "lean_max_deg": 19.5,
+          "grip_min": 0.5913872156636455,
+          "danger_dwell_s": 0,
+          "exit": {
+            "s": 83.83649541982444,
+            "d": -3.163619462036533,
+            "f": -0.023562763717234567,
+            "heading_err_deg": -1
+          }
+        }
+      ],
+      "phi_max_deg": 19.5,
+      "grip_min": 0.5913872156636455,
+      "v_min_ms": 10.047777777777874,
+      "checks": [
+        {
+          "id": "late_apex",
+          "verdict": "pass"
+        },
+        {
+          "id": "out_in_out",
+          "verdict": "fail"
+        },
+        {
+          "id": "single_input",
+          "verdict": "pass"
+        },
+        {
+          "id": "quick_steer",
+          "verdict": "pass"
+        },
+        {
+          "id": "throttle_rule",
+          "verdict": "fail"
+        },
+        {
+          "id": "trail_brake_taper",
+          "verdict": "pass"
+        },
+        {
+          "id": "traction_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "lean_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "exit_containment",
+          "verdict": "pass"
+        },
+        {
+          "id": "stop_within_sight",
+          "verdict": "pass"
+        },
+        {
+          "id": "hold_wide_for_sight",
+          "verdict": "na"
+        },
+        {
+          "id": "rideability",
+          "verdict": "pass"
+        },
+        {
+          "id": "link_continuity",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_flow",
+          "verdict": "na"
+        },
+        {
+          "id": "wrong_strategy_for_corner",
+          "verdict": "na"
+        }
+      ]
+    }
+  ],
+  "blessed": [
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "turn_in_s",
+      "value": 29.5,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "lean_commit_deg",
+      "value": 19.5,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "apex_s",
+      "value": 76,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "apex_pct",
+      "value": 87.00470222356945,
+      "unit": "%",
+      "tol": "±0.1"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "apex_f",
+      "value": -0.09330622600272365,
+      "unit": "-",
+      "tol": "±0.001"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "apex_clearance_m",
+      "value": 0.25192681020735375,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "v_apex_ms",
+      "value": 10.903052224879318,
+      "unit": "m/s",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "phi_max_deg",
+      "value": 19.5,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "grip_min",
+      "value": 0.5913872156636455,
+      "unit": "-",
+      "tol": "±0.001"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "release_s",
+      "value": 81.90000313307213,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "exit_heading_err_deg",
+      "value": -1,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "road_end_phi_deg",
+      "value": 0.008684415604949087,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "road_end_f",
+      "value": -0.01894723230658024,
+      "unit": "-",
+      "tol": "±0.001"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "outcome",
+      "value": "contained",
+      "unit": "-",
+      "tol": "exact"
+    },
+    {
+      "fixture": "C30-trailbrake",
+      "quantity": "quality",
+      "value": "caution",
+      "unit": "-",
+      "tol": "exact"
+    }
+  ]
+}

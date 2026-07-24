@@ -1,0 +1,22 @@
+{
+  "name": "linelab",
+  "version": "0.1.0",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "bin": { "linelab": "./dist/cli/main.js", "linelab-bless": "./dist/cli/bless.js" },
+  "exports": { ".": "./dist/index.js" },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cli": "node --enable-source-maps dist/cli/main.js",
+    "bless": "node --enable-source-maps dist/cli/bless.js"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.0",
+    "vitest": "^3.0.0",
+    "@types/node": "^20.17.0"
+  }
+}

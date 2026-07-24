@@ -1,0 +1,297 @@
+{
+  "fixture": "C30-DR",
+  "engine_semver": "0.1.0",
+  "input": {
+    "kind": "run",
+    "input": {
+      "road": "lane 3.5 | S 10 | R 16>9 ^130 | S 14",
+      "entry_kmh": 34,
+      "accept": "best_failing"
+    }
+  },
+  "lines": [
+    {
+      "line_id": "solved",
+      "role": "ideal",
+      "outcome": "contained",
+      "quality": "good",
+      "result_hash": "fd349a",
+      "terminated": {
+        "reason": "road_end",
+        "s": 52.361600344901056,
+        "t": 5.215
+      },
+      "events": [
+        {
+          "kind": "brake_start",
+          "s": 0,
+          "t": 0,
+          "action_id": "b_c1"
+        },
+        {
+          "kind": "crack",
+          "s": 3.188635435781117,
+          "t": 0.3464191432592978,
+          "action_id": "k_c1"
+        },
+        {
+          "kind": "brake_end",
+          "s": 5.880022940722765,
+          "t": 0.67,
+          "action_id": "b_c1"
+        },
+        {
+          "kind": "turn_in",
+          "s": 8.297381841698263,
+          "t": 0.967908141979907,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "steering_complete",
+          "s": 13.142966837128444,
+          "t": 1.555,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "roll_on",
+          "s": 22.132092001487603,
+          "t": 2.61863694184082,
+          "action_id": "ro_c1"
+        },
+        {
+          "kind": "apex",
+          "s": 33,
+          "t": 3.6500916539690755,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "release",
+          "s": 41.4432587121141,
+          "t": 4.335,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "exit",
+          "s": 46.059167153845664,
+          "t": 4.72381376937315,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "sight_min",
+          "s": 52.361600344901056,
+          "t": 5.215
+        },
+        {
+          "kind": "road_end",
+          "s": 52.361600344901056,
+          "t": 5.215
+        }
+      ],
+      "corners": [
+        {
+          "id": "c1",
+          "hand": "R",
+          "corner_type": "decreasing",
+          "apexes": [
+            {
+              "s": 33,
+              "pct": 75.98638268784303,
+              "f": 0.22596122325811285,
+              "clearance_m": 0.6100953027969047,
+              "v_kmh": 35.91826589943472,
+              "lean_deg": 32.27201713970964
+            }
+          ],
+          "lean_max_deg": 32.27201713970964,
+          "grip_min": 0.32987083846805987,
+          "danger_dwell_s": 0,
+          "exit": {
+            "s": 46.059167153845664,
+            "d": -0.8130330846522321,
+            "f": 0.8470247834621363,
+            "heading_err_deg": -1
+          }
+        }
+      ],
+      "phi_max_deg": 32.27201713970964,
+      "grip_min": 0.32987083846805987,
+      "v_min_ms": 8.114444444444445,
+      "checks": [
+        {
+          "id": "late_apex",
+          "verdict": "pass"
+        },
+        {
+          "id": "out_in_out",
+          "verdict": "pass"
+        },
+        {
+          "id": "single_input",
+          "verdict": "pass"
+        },
+        {
+          "id": "quick_steer",
+          "verdict": "pass"
+        },
+        {
+          "id": "throttle_rule",
+          "verdict": "pass"
+        },
+        {
+          "id": "trail_brake_taper",
+          "verdict": "na"
+        },
+        {
+          "id": "traction_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "lean_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "exit_containment",
+          "verdict": "pass"
+        },
+        {
+          "id": "stop_within_sight",
+          "verdict": "pass"
+        },
+        {
+          "id": "hold_wide_for_sight",
+          "verdict": "na"
+        },
+        {
+          "id": "rideability",
+          "verdict": "pass"
+        },
+        {
+          "id": "link_continuity",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_flow",
+          "verdict": "na"
+        },
+        {
+          "id": "wrong_strategy_for_corner",
+          "verdict": "pass"
+        }
+      ]
+    }
+  ],
+  "blessed": [
+    {
+      "fixture": "C30-DR",
+      "quantity": "turn_in_s",
+      "value": 8.297381841698263,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "lean_commit_deg",
+      "value": 32.27201713970964,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "apex_s",
+      "value": 33,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "apex_pct",
+      "value": 75.98638268784303,
+      "unit": "%",
+      "tol": "±0.1"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "apex_f",
+      "value": 0.22596122325811285,
+      "unit": "-",
+      "tol": "±0.001"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "apex_clearance_m",
+      "value": 0.6100953027969047,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "v_apex_ms",
+      "value": 9.977296083176311,
+      "unit": "m/s",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "phi_max_deg",
+      "value": 32.27201713970964,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "grip_min",
+      "value": 0.32987083846805987,
+      "unit": "-",
+      "tol": "±0.001"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "release_s",
+      "value": 41.4432587121141,
+      "unit": "m",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "exit_heading_err_deg",
+      "value": -1,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "road_end_phi_deg",
+      "value": -0.8487759120454561,
+      "unit": "deg",
+      "tol": "±0.01"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "road_end_f",
+      "value": 0.8455986608147426,
+      "unit": "-",
+      "tol": "±0.001"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "outcome",
+      "value": "contained",
+      "unit": "-",
+      "tol": "exact"
+    },
+    {
+      "fixture": "C30-DR",
+      "quantity": "quality",
+      "value": "good",
+      "unit": "-",
+      "tol": "exact"
+    }
+  ]
+}

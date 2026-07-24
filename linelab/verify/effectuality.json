@@ -1,0 +1,1267 @@
+{
+  "note": "design/09 §8.1 (D8) — the committed effectuality witness table: one row per field path the `schema` verb prints on the v0.1 INPUT surfaces (the row schema's closed 10-surface set; the schema's `envelope` and `rubric` sections describe outputs and pack data, not accepted input). test/effectuality/d8.test.ts implements effectAt() beside this table, re-derives the enumeration from buildSchemaDoc() (T-D8-EXHAUSTIVE), and OBSERVES every row: `effect` rows run the named witness fixture with and without the perturbation and assert the per-class difference; `reject:<CODE>/<reason>` rows assert the typed code + detail.reason (deferred-token rows: the `deferred` member). The schema's `figure` section rides surface `scene` (D30 — scene text and FigureSpec JSON are one identity).",
+  "rows": [
+    {
+      "id": "scenario:spec",
+      "surface": "scenario",
+      "field": "spec",
+      "fixture": "FX-WIRE-BAD",
+      "perturbation": {
+        "from": "linelab/1",
+        "to": "linelab/9"
+      },
+      "effect_class": "verdict",
+      "expect": "reject:SCHEMA/spec_mismatch"
+    },
+    {
+      "id": "scenario:id",
+      "surface": "scenario",
+      "field": "id",
+      "fixture": "FX-STRAIGHT-RIDE",
+      "perturbation": {
+        "from": "fx-ride",
+        "to": "fx-ride-2"
+      },
+      "effect_class": "envelope",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:road",
+      "surface": "scenario",
+      "field": "road",
+      "fixture": "FX-STRAIGHT-RIDE",
+      "perturbation": {
+        "from": "lane 3.5 | S 120",
+        "to": "lane 3.5 | S 80"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:rider.start.speed_kmh",
+      "surface": "scenario",
+      "field": "rider.start.speed_kmh",
+      "fixture": "FX-STRAIGHT-RIDE",
+      "perturbation": {
+        "from": 34,
+        "to": 50
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:rider.start.f",
+      "surface": "scenario",
+      "field": "rider.start.f",
+      "fixture": "FX-STRAIGHT-RIDE",
+      "perturbation": {
+        "from": 0.2,
+        "to": 0.7
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:rider.profile",
+      "surface": "scenario",
+      "field": "rider.profile",
+      "fixture": "FX-C30-PLAN",
+      "perturbation": {
+        "from": "street",
+        "to": "casual"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:rider.roll_rate_cap_dps",
+      "surface": "scenario",
+      "field": "rider.roll_rate_cap_dps",
+      "fixture": "FX-C30-PLAN",
+      "perturbation": "presence",
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:rider.plan",
+      "surface": "scenario",
+      "field": "rider.plan",
+      "fixture": "FX-POS-STRAIGHT",
+      "perturbation": "presence",
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:config.mu",
+      "surface": "scenario",
+      "field": "config.mu",
+      "fixture": "FX-STRAIGHT-BRAKE",
+      "perturbation": {
+        "from": 1,
+        "to": 0.5
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "scenario:config.rubric",
+      "surface": "scenario",
+      "field": "config.rubric",
+      "fixture": "FX-WIRE-BAD",
+      "perturbation": {
+        "from": "parks-street",
+        "to": "parks-track"
+      },
+      "effect_class": "verdict",
+      "expect": "reject:UNKNOWN_ID/unknown_rubric"
+    },
+    {
+      "id": "scenario:config.checks_version",
+      "surface": "scenario",
+      "field": "config.checks_version",
+      "fixture": "FX-WIRE-BAD",
+      "perturbation": {
+        "from": 2,
+        "to": 1
+      },
+      "effect_class": "verdict",
+      "expect": "reject:SCHEMA/checks_version_unsupported"
+    },
+    {
+      "id": "scenario:expect_fail",
+      "surface": "scenario",
+      "field": "expect_fail",
+      "fixture": "FX-WIRE-BAD",
+      "perturbation": {
+        "from": [],
+        "to": [
+          "sight_vs_stopping"
+        ]
+      },
+      "effect_class": "verdict",
+      "expect": "reject:UNKNOWN_ID/renamed_check"
+    },
+    {
+      "id": "plan:do",
+      "surface": "plan",
+      "field": "do",
+      "fixture": "FX-WIRE-BAD",
+      "perturbation": {
+        "from": "brake",
+        "to": "steer"
+      },
+      "effect_class": "trajectory",
+      "expect": "reject:SCHEMA/action_kind_unknown"
+    },
+    {
+      "id": "plan:id",
+      "surface": "plan",
+      "field": "id",
+      "fixture": "FX-STRAIGHT-BRAKE",
+      "perturbation": {
+        "from": "b1",
+        "to": "bz"
+      },
+      "effect_class": "envelope",
+      "expect": "effect"
+    },
+    {
+      "id": "plan:brake.decel",
+      "surface": "plan",
+      "field": "brake.decel",
+      "fixture": "FX-STRAIGHT-BRAKE",
+      "perturbation": {
+        "from": 6,
+        "to": 3
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "plan:turn_in.target",
+      "surface": "plan",
+      "field": "turn_in.target",
+      "fixture": "FX-C30-PLAN",
+      "perturbation": {
+        "from": 36.5,
+        "to": 33
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "plan:throttle.accel",
+      "surface": "plan",
+      "field": "throttle.accel",
+      "fixture": "FX-STRAIGHT-THROTTLE",
+      "perturbation": {
+        "from": 1,
+        "to": 2
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "plan:throttle.freeze_steer_s",
+      "surface": "plan",
+      "field": "throttle.freeze_steer_s",
+      "fixture": "FX-C30-FREEZE",
+      "perturbation": "presence",
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "plan:position.over_m",
+      "surface": "plan",
+      "field": "position.over_m",
+      "fixture": "FX-POS-SHORTWIN",
+      "perturbation": {
+        "from": "auto",
+        "to": 6
+      },
+      "effect_class": "trajectory",
+      "expect": "reject:INEFFECTUAL/position_target_unreachable"
+    },
+    {
+      "id": "road-dsl:book90",
+      "surface": "road-dsl",
+      "field": "book90",
+      "fixture": "FX-PRESET-RIDE",
+      "perturbation": {
+        "from": "lane 3.5 | S 35 | R 30 ^90 | S 25",
+        "to": "preset book90"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "road-dsl:bookDecreasing",
+      "surface": "road-dsl",
+      "field": "bookDecreasing",
+      "fixture": "FX-PRESET-RIDE",
+      "perturbation": {
+        "from": "lane 3.5 | S 35 | R 30 ^90 | S 25",
+        "to": "preset bookDecreasing"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "road-dsl:bookEsses",
+      "surface": "road-dsl",
+      "field": "bookEsses",
+      "fixture": "FX-PRESET-RIDE",
+      "perturbation": {
+        "from": "lane 3.5 | S 35 | R 30 ^90 | S 25",
+        "to": "preset bookEsses"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "road-dsl:bookHairpin",
+      "surface": "road-dsl",
+      "field": "bookHairpin",
+      "fixture": "FX-PRESET-RIDE",
+      "perturbation": {
+        "from": "lane 3.5 | S 35 | R 30 ^90 | S 25",
+        "to": "preset bookHairpin"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "road-dsl:bookBlind",
+      "surface": "road-dsl",
+      "field": "bookBlind",
+      "fixture": "FX-PRESET-RIDE",
+      "perturbation": {
+        "from": "lane 3.5 | S 35 | R 30 ^90 | S 25",
+        "to": "preset bookBlind"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "road-dsl:bookDoubleApex",
+      "surface": "road-dsl",
+      "field": "bookDoubleApex",
+      "fixture": "FX-PRESET-RIDE",
+      "perturbation": {
+        "from": "lane 3.5 | S 35 | R 30 ^90 | S 25",
+        "to": "preset bookDoubleApex"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "occluders:kind",
+      "surface": "occluders",
+      "field": "kind",
+      "fixture": "FX-OCC-HEDGE",
+      "perturbation": {
+        "from": "hedge",
+        "to": "wall"
+      },
+      "effect_class": "sight",
+      "expect": "effect"
+    },
+    {
+      "id": "occluders:side",
+      "surface": "occluders",
+      "field": "side",
+      "fixture": "FX-OCC-HEDGE",
+      "perturbation": {
+        "from": "inside",
+        "to": "outside"
+      },
+      "effect_class": "sight",
+      "expect": "effect"
+    },
+    {
+      "id": "occluders:at",
+      "surface": "occluders",
+      "field": "at",
+      "fixture": "FX-OCC-HEDGE",
+      "perturbation": {
+        "from": "entry:c1-8",
+        "to": "entry:c1+2"
+      },
+      "effect_class": "sight",
+      "expect": "effect"
+    },
+    {
+      "id": "occluders:span_m",
+      "surface": "occluders",
+      "field": "span_m",
+      "fixture": "FX-OCC-HEDGE",
+      "perturbation": {
+        "from": 20,
+        "to": 4
+      },
+      "effect_class": "sight",
+      "expect": "effect"
+    },
+    {
+      "id": "occluders:margin_m",
+      "surface": "occluders",
+      "field": "margin_m",
+      "fixture": "FX-OCC-HEDGE",
+      "perturbation": {
+        "from": 1,
+        "to": 6
+      },
+      "effect_class": "sight",
+      "expect": "effect"
+    },
+    {
+      "id": "occluders:lane",
+      "surface": "occluders",
+      "field": "lane",
+      "fixture": "FX-OCC-VEHICLE",
+      "perturbation": {
+        "from": "own",
+        "to": "oncoming"
+      },
+      "effect_class": "sight",
+      "expect": "effect"
+    },
+    {
+      "id": "hazards:kind",
+      "surface": "hazards",
+      "field": "kind",
+      "fixture": "FX-HAZ-PATCH",
+      "perturbation": "presence",
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "hazards:side",
+      "surface": "hazards",
+      "field": "side",
+      "fixture": "FX-HAZ-NARROW",
+      "perturbation": {
+        "from": "center",
+        "to": "left"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "hazards:at",
+      "surface": "hazards",
+      "field": "at",
+      "fixture": "FX-HAZ-PATCH",
+      "perturbation": {
+        "from": "s:15",
+        "to": "s:60"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "hazards:span_m",
+      "surface": "hazards",
+      "field": "span_m",
+      "fixture": "FX-HAZ-PATCH",
+      "perturbation": {
+        "from": 10,
+        "to": 2
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "hazards:width_m",
+      "surface": "hazards",
+      "field": "width_m",
+      "fixture": "FX-HAZ-LEFT",
+      "perturbation": {
+        "from": 1,
+        "to": 2
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "hazards:mu",
+      "surface": "hazards",
+      "field": "mu",
+      "fixture": "FX-HAZ-PATCH",
+      "perturbation": {
+        "from": 0.3,
+        "to": 0.8
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:entry_kmh",
+      "surface": "solve",
+      "field": "entry_kmh",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": {
+        "from": 48,
+        "to": 44
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:turn_in",
+      "surface": "solve",
+      "field": "turn_in",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": {
+        "from": 12,
+        "to": 8
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:style",
+      "surface": "solve",
+      "field": "style",
+      "fixture": "FX-SOLVE-DA",
+      "perturbation": {
+        "from": "single",
+        "to": "double_apex"
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:vis",
+      "surface": "solve",
+      "field": "vis",
+      "fixture": "FX-SOLVE-BLIND",
+      "perturbation": {
+        "from": "none",
+        "to": "cautious"
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:vis_hold_f",
+      "surface": "solve",
+      "field": "vis_hold_f",
+      "fixture": "FX-SOLVE-BLIND",
+      "perturbation": {
+        "from": "default",
+        "to": 0.5
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:vis_margin",
+      "surface": "solve",
+      "field": "vis_margin",
+      "fixture": "FX-SOLVE-BLIND",
+      "perturbation": {
+        "from": 1,
+        "to": 1.4
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:believed_road",
+      "surface": "solve",
+      "field": "believed_road",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:accept",
+      "surface": "solve",
+      "field": "accept",
+      "fixture": "FX-SOLVE-DA",
+      "perturbation": {
+        "from": "clean",
+        "to": "best_failing"
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "solve:constraints",
+      "surface": "solve",
+      "field": "constraints",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "view:mode",
+      "surface": "view",
+      "field": "mode",
+      "fixture": "FX-VIEW-C30",
+      "perturbation": {
+        "from": "true",
+        "to": "diagram"
+      },
+      "effect_class": "render",
+      "expect": "reject:SCHEMA/deferred"
+    },
+    {
+      "id": "view:window",
+      "surface": "view",
+      "field": "window",
+      "fixture": "FX-VIEW-C30",
+      "perturbation": {
+        "from": "all",
+        "to": "{at_s 10 .. at_s 60}"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "view:orient",
+      "surface": "view",
+      "field": "orient",
+      "fixture": "FX-VIEW-C30",
+      "perturbation": {
+        "from": 0,
+        "to": 90
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "view:rays",
+      "surface": "view",
+      "field": "rays",
+      "fixture": "FX-VIEW-OCC",
+      "perturbation": {
+        "from": "all_turn_ins",
+        "to": "off"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "view:legend",
+      "surface": "view",
+      "field": "legend",
+      "fixture": "FX-VIEW-C30",
+      "perturbation": {
+        "from": "on",
+        "to": "off"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:premature",
+      "surface": "mistakes",
+      "field": "premature",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:premature.early_by_m",
+      "surface": "mistakes",
+      "field": "premature.early_by_m",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 10,
+        "to": 4
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:premature.lean_deg",
+      "surface": "mistakes",
+      "field": "premature.lean_deg",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:premature_contained",
+      "surface": "mistakes",
+      "field": "premature_contained",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:premature_contained.early_by_m",
+      "surface": "mistakes",
+      "field": "premature_contained.early_by_m",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 10,
+        "to": 4
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:slow_steer",
+      "surface": "mistakes",
+      "field": "slow_steer",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:slow_steer.roll_rate_factor",
+      "surface": "mistakes",
+      "field": "slow_steer.roll_rate_factor",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 0.3,
+        "to": 0.6
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:fifty_pence",
+      "surface": "mistakes",
+      "field": "fifty_pence",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:fifty_pence.early_by_m",
+      "surface": "mistakes",
+      "field": "fifty_pence.early_by_m",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 10,
+        "to": 6
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:fifty_pence.facets",
+      "surface": "mistakes",
+      "field": "fifty_pence.facets",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 6,
+        "to": 3
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:chop",
+      "surface": "mistakes",
+      "field": "chop",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:chop.offset_m",
+      "surface": "mistakes",
+      "field": "chop.offset_m",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 5,
+        "to": 10
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:chop.slew_mss",
+      "surface": "mistakes",
+      "field": "chop.slew_mss",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 40,
+        "to": 10
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:chop.freeze_s",
+      "surface": "mistakes",
+      "field": "chop.freeze_s",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 1,
+        "to": 0.3
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:overspeed",
+      "surface": "mistakes",
+      "field": "overspeed",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:overspeed.by_kmh",
+      "surface": "mistakes",
+      "field": "overspeed.by_kmh",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 26,
+        "to": 10
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:underread",
+      "surface": "mistakes",
+      "field": "underread",
+      "fixture": "F-ORACLE-DR",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:underread.r_believed",
+      "surface": "mistakes",
+      "field": "underread.r_believed",
+      "fixture": "F-ORACLE-DR",
+      "perturbation": {
+        "from": 16,
+        "to": 13
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:underread.sweep_believed_deg",
+      "surface": "mistakes",
+      "field": "underread.sweep_believed_deg",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 70,
+        "to": 75
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:underread.of",
+      "surface": "mistakes",
+      "field": "underread.of",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": "c1",
+        "to": "c9"
+      },
+      "effect_class": "verdict",
+      "expect": "reject:UNKNOWN_ID/unknown_corner_id"
+    },
+    {
+      "id": "mistakes:overread",
+      "surface": "mistakes",
+      "field": "overread",
+      "fixture": "F-ORACLE-90",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:overread.r_believed",
+      "surface": "mistakes",
+      "field": "overread.r_believed",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": "sweep_believed_deg=105",
+        "to": "+r_believed=9"
+      },
+      "effect_class": "verdict",
+      "expect": "reject:SCHEMA/misjudge_param_required"
+    },
+    {
+      "id": "mistakes:overread.sweep_believed_deg",
+      "surface": "mistakes",
+      "field": "overread.sweep_believed_deg",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": 105,
+        "to": 100
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "mistakes:overread.of",
+      "surface": "mistakes",
+      "field": "overread.of",
+      "fixture": "F-ORACLE-90",
+      "perturbation": {
+        "from": "c1",
+        "to": "c9"
+      },
+      "effect_class": "verdict",
+      "expect": "reject:UNKNOWN_ID/unknown_corner_id"
+    },
+    {
+      "id": "scene:lines[].name",
+      "surface": "scene",
+      "field": "lines[].name",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": {
+        "from": "a",
+        "to": "b"
+      },
+      "effect_class": "envelope",
+      "expect": "effect"
+    },
+    {
+      "id": "scene:lines[].role",
+      "surface": "scene",
+      "field": "lines[].role",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": {
+        "from": "ideal",
+        "to": "reference"
+      },
+      "effect_class": "envelope",
+      "expect": "effect"
+    },
+    {
+      "id": "scene:lines[].spec",
+      "surface": "scene",
+      "field": "lines[].spec",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": {
+        "from": "entry 70",
+        "to": "entry 60"
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "scene:marks",
+      "surface": "scene",
+      "field": "marks",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": {
+        "from": "auto",
+        "to": "none"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "scene:note",
+      "surface": "scene",
+      "field": "note",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": "presence",
+      "effect_class": "envelope",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--road",
+      "surface": "cli",
+      "field": "--road",
+      "fixture": "FX-CLI-RIDE",
+      "perturbation": {
+        "from": "(file) lane 3.5 | S 120",
+        "to": "--road lane 3.5 | S 80"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--use-full-width",
+      "surface": "cli",
+      "field": "--use-full-width",
+      "fixture": "FX-CLI-C30",
+      "perturbation": "presence",
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--bike-margin",
+      "surface": "cli",
+      "field": "--bike-margin",
+      "fixture": "FX-CLI-C30",
+      "perturbation": {
+        "from": 0.4,
+        "to": 1.2
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--mu",
+      "surface": "cli",
+      "field": "--mu",
+      "fixture": "FX-CLI-BRAKE",
+      "perturbation": {
+        "from": 1,
+        "to": 0.5
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--occluder",
+      "surface": "cli",
+      "field": "--occluder",
+      "fixture": "FX-CLI-OCC",
+      "perturbation": "presence",
+      "effect_class": "sight",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--hazard",
+      "surface": "cli",
+      "field": "--hazard",
+      "fixture": "FX-CLI-BRAKE",
+      "perturbation": "presence",
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--entry",
+      "surface": "cli",
+      "field": "--entry",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": {
+        "from": 48,
+        "to": 44
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--start-f",
+      "surface": "cli",
+      "field": "--start-f",
+      "fixture": "FX-CLI-RIDE",
+      "perturbation": {
+        "from": 0.2,
+        "to": 0.7
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--profile",
+      "surface": "cli",
+      "field": "--profile",
+      "fixture": "FX-CLI-C30",
+      "perturbation": {
+        "from": "street",
+        "to": "casual"
+      },
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--roll-rate-cap",
+      "surface": "cli",
+      "field": "--roll-rate-cap",
+      "fixture": "FX-CLI-C30",
+      "perturbation": "presence",
+      "effect_class": "trajectory",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--turn-in",
+      "surface": "cli",
+      "field": "--turn-in",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": {
+        "from": 12,
+        "to": 8
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--brake",
+      "surface": "cli",
+      "field": "--brake",
+      "fixture": "FX-CLI-MERGE",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--brake-slew",
+      "surface": "cli",
+      "field": "--brake-slew",
+      "fixture": "FX-CLI-MERGE",
+      "perturbation": {
+        "from": "default",
+        "to": 1.5
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--throttle",
+      "surface": "cli",
+      "field": "--throttle",
+      "fixture": "FX-CLI-MERGE",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--throttle-slew",
+      "surface": "cli",
+      "field": "--throttle-slew",
+      "fixture": "FX-CLI-MERGE",
+      "perturbation": {
+        "from": "default",
+        "to": 1
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--throttle-freeze",
+      "surface": "cli",
+      "field": "--throttle-freeze",
+      "fixture": "FX-CLI-EARLY",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--position",
+      "surface": "cli",
+      "field": "--position",
+      "fixture": "FX-CLI-MERGE",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--style",
+      "surface": "cli",
+      "field": "--style",
+      "fixture": "FX-SOLVE-DA",
+      "perturbation": {
+        "from": "single",
+        "to": "double_apex"
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--vis",
+      "surface": "cli",
+      "field": "--vis",
+      "fixture": "FX-SOLVE-BLIND",
+      "perturbation": {
+        "from": "none",
+        "to": "cautious"
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--vis-hold",
+      "surface": "cli",
+      "field": "--vis-hold",
+      "fixture": "FX-SOLVE-BLIND",
+      "perturbation": {
+        "from": "default",
+        "to": 0.5
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--vis-margin",
+      "surface": "cli",
+      "field": "--vis-margin",
+      "fixture": "FX-SOLVE-BLIND",
+      "perturbation": {
+        "from": 1,
+        "to": 1.4
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--constraint",
+      "surface": "cli",
+      "field": "--constraint",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--believe-road",
+      "surface": "cli",
+      "field": "--believe-road",
+      "fixture": "FX-SOLVE-R25",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--accept",
+      "surface": "cli",
+      "field": "--accept",
+      "fixture": "FX-SOLVE-DA",
+      "perturbation": {
+        "from": "clean",
+        "to": "best_failing"
+      },
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--mistake",
+      "surface": "cli",
+      "field": "--mistake",
+      "fixture": "FX-CLI-COMPOSED",
+      "perturbation": "presence",
+      "effect_class": "verdict",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--line-id",
+      "surface": "cli",
+      "field": "--line-id",
+      "fixture": "FX-CLI-COMPOSED",
+      "perturbation": "presence",
+      "effect_class": "envelope",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--marks",
+      "surface": "cli",
+      "field": "--marks",
+      "fixture": "FX-VIEW-C30",
+      "perturbation": {
+        "from": "auto",
+        "to": "none"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--rays",
+      "surface": "cli",
+      "field": "--rays",
+      "fixture": "FX-VIEW-OCC",
+      "perturbation": {
+        "from": "auto",
+        "to": "off"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--legend",
+      "surface": "cli",
+      "field": "--legend",
+      "fixture": "FX-VIEW-C30",
+      "perturbation": {
+        "from": "on",
+        "to": "off"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--orient",
+      "surface": "cli",
+      "field": "--orient",
+      "fixture": "FX-VIEW-C30",
+      "perturbation": {
+        "from": 0,
+        "to": 90
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--rubric",
+      "surface": "cli",
+      "field": "--rubric",
+      "fixture": "FX-CLI-FLAGS",
+      "perturbation": {
+        "from": "parks-street",
+        "to": "parks-track"
+      },
+      "effect_class": "verdict",
+      "expect": "reject:SCHEMA/rubric_unknown_value"
+    },
+    {
+      "id": "cli:--checks-version",
+      "surface": "cli",
+      "field": "--checks-version",
+      "fixture": "FX-CLI-FLAGS",
+      "perturbation": {
+        "from": 2,
+        "to": 1
+      },
+      "effect_class": "verdict",
+      "expect": "reject:SCHEMA/checks_version_unknown_value"
+    }
+  ]
+}

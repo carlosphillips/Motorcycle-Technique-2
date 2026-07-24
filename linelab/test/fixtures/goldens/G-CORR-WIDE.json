@@ -1,0 +1,365 @@
+{
+  "fixture": "G-CORR-WIDE",
+  "engine_semver": "0.1.0",
+  "input": {
+    "kind": "run",
+    "input": {
+      "road": {
+        "preset": "book90",
+        "hand": "R"
+      },
+      "entry_kmh": 32,
+      "mistake": {
+        "kind": "premature"
+      }
+    }
+  },
+  "lines": [
+    {
+      "line_id": "solved",
+      "role": "ideal",
+      "outcome": "contained",
+      "quality": "good",
+      "result_hash": "92e0c5",
+      "terminated": {
+        "reason": "road_end",
+        "s": 46.84955592153196,
+        "t": 4.17
+      },
+      "events": [
+        {
+          "kind": "brake_start",
+          "s": 0,
+          "t": 0,
+          "action_id": "b_c1"
+        },
+        {
+          "kind": "crack",
+          "s": 0.5,
+          "t": 0.056290316230181034,
+          "action_id": "k_c1"
+        },
+        {
+          "kind": "brake_end",
+          "s": 1.0640751629519618,
+          "t": 0.12000000000000001,
+          "action_id": "b_c1"
+        },
+        {
+          "kind": "turn_in",
+          "s": 6,
+          "t": 0.6780034974158938,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "steering_complete",
+          "s": 11.481609752922118,
+          "t": 1.3,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "roll_on",
+          "s": 12.66509906984384,
+          "t": 1.4313250023570345,
+          "action_id": "ro_c1"
+        },
+        {
+          "kind": "apex",
+          "s": 24,
+          "t": 2.434005651717121,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "release",
+          "s": 33.09156743189742,
+          "t": 3.13,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "exit",
+          "s": 38.35749073154539,
+          "t": 3.5484725134475674,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "sight_min",
+          "s": 46.84955592153196,
+          "t": 4.17
+        },
+        {
+          "kind": "road_end",
+          "s": 46.84955592153196,
+          "t": 4.17
+        }
+      ],
+      "corners": [
+        {
+          "id": "c1",
+          "hand": "R",
+          "corner_type": "constant",
+          "apexes": [
+            {
+              "s": 24,
+              "pct": 63.66197723675814,
+              "f": 0.22392796498030149,
+              "clearance_m": 0.604605505446814,
+              "v_kmh": 38.30454476159925,
+              "lean_deg": 34.3700777335509
+            }
+          ],
+          "lean_max_deg": 34.3700777335509,
+          "grip_min": 0.2802242504167197,
+          "danger_dwell_s": 0,
+          "exit": {
+            "s": 38.35749073154539,
+            "d": -0.8180154258506859,
+            "f": 0.8451794719071534,
+            "heading_err_deg": -1
+          }
+        }
+      ],
+      "phi_max_deg": 34.3700777335509,
+      "grip_min": 0.2802242504167197,
+      "v_min_ms": 8.845688888888887,
+      "checks": [
+        {
+          "id": "late_apex",
+          "verdict": "pass"
+        },
+        {
+          "id": "out_in_out",
+          "verdict": "pass"
+        },
+        {
+          "id": "single_input",
+          "verdict": "pass"
+        },
+        {
+          "id": "quick_steer",
+          "verdict": "pass"
+        },
+        {
+          "id": "throttle_rule",
+          "verdict": "pass"
+        },
+        {
+          "id": "trail_brake_taper",
+          "verdict": "na"
+        },
+        {
+          "id": "traction_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "lean_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "exit_containment",
+          "verdict": "pass"
+        },
+        {
+          "id": "stop_within_sight",
+          "verdict": "pass"
+        },
+        {
+          "id": "hold_wide_for_sight",
+          "verdict": "na"
+        },
+        {
+          "id": "rideability",
+          "verdict": "pass"
+        },
+        {
+          "id": "link_continuity",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_flow",
+          "verdict": "na"
+        },
+        {
+          "id": "wrong_strategy_for_corner",
+          "verdict": "na"
+        }
+      ]
+    },
+    {
+      "line_id": "premature",
+      "role": "mistake",
+      "outcome": "runoff",
+      "quality": "failing",
+      "result_hash": "c40b51",
+      "terminated": {
+        "reason": "off_road",
+        "s": 32.089375401744974,
+        "t": 3.230978557415028
+      },
+      "events": [
+        {
+          "kind": "brake_start",
+          "s": 0,
+          "t": 0,
+          "action_id": "b_c1"
+        },
+        {
+          "kind": "turn_in",
+          "s": 0.5,
+          "t": 0.056290316230181034,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "crack",
+          "s": 0.5,
+          "t": 0.056290316230181034,
+          "action_id": "k_c1"
+        },
+        {
+          "kind": "brake_end",
+          "s": 1.0640750587695946,
+          "t": 0.12000000000000001,
+          "action_id": "b_c1"
+        },
+        {
+          "kind": "steering_complete",
+          "s": 2.9655675126546424,
+          "t": 0.335,
+          "corner_id": "c1",
+          "action_id": "ti_c1"
+        },
+        {
+          "kind": "roll_on",
+          "s": 12.66509906984384,
+          "t": 1.4443331086745348,
+          "action_id": "ro_c1"
+        },
+        {
+          "kind": "apex",
+          "s": 18,
+          "t": 1.9023882252246749,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "run_wide_detect",
+          "s": 27.810633630124926,
+          "t": 2.7283746885193314,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "sight_min",
+          "s": 32.089375401744974,
+          "t": 3.230978557415028
+        },
+        {
+          "kind": "off_road",
+          "s": 32.089375401744974,
+          "t": 3.230978557415028
+        }
+      ],
+      "corners": [
+        {
+          "id": "c1",
+          "hand": "R",
+          "corner_type": "constant",
+          "apexes": [
+            {
+              "s": 18,
+              "pct": 31.83098861837907,
+              "f": 0.014082313068314256,
+              "clearance_m": 0.03802224528444853,
+              "v_kmh": 34.01493474377938,
+              "lean_deg": 15.136701214911511
+            }
+          ],
+          "lean_max_deg": 15.136701214911511,
+          "grip_min": 0.6486204824272497,
+          "danger_dwell_s": 0,
+          "exit": {
+            "s": 30.5,
+            "d": 1.9349481167529043,
+            "f": 1.864795598797372,
+            "heading_err_deg": -44.85186980252608
+          }
+        }
+      ],
+      "phi_max_deg": 15.136701214911511,
+      "grip_min": 0.6486204824272497,
+      "v_min_ms": 8.845688888888887,
+      "checks": [
+        {
+          "id": "late_apex",
+          "verdict": "fail"
+        },
+        {
+          "id": "out_in_out",
+          "verdict": "pass"
+        },
+        {
+          "id": "single_input",
+          "verdict": "pass"
+        },
+        {
+          "id": "quick_steer",
+          "verdict": "pass"
+        },
+        {
+          "id": "throttle_rule",
+          "verdict": "pass"
+        },
+        {
+          "id": "trail_brake_taper",
+          "verdict": "pass"
+        },
+        {
+          "id": "traction_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "lean_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "exit_containment",
+          "verdict": "fail"
+        },
+        {
+          "id": "stop_within_sight",
+          "verdict": "fail"
+        },
+        {
+          "id": "hold_wide_for_sight",
+          "verdict": "na"
+        },
+        {
+          "id": "rideability",
+          "verdict": "pass"
+        },
+        {
+          "id": "link_continuity",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_flow",
+          "verdict": "na"
+        },
+        {
+          "id": "wrong_strategy_for_corner",
+          "verdict": "na"
+        }
+      ]
+    }
+  ],
+  "blessed": []
+}

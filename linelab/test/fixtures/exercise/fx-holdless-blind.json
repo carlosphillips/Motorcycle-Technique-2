@@ -1,0 +1,10 @@
+{
+  "spec": "linelab/1",
+  "id": "fx-holdless-blind",
+  "road": { "preset": "bookBlind" },
+  "rider": {
+    "profile": "street",
+    "start": { "speed_kmh": 30, "f": 0.25 },
+    "plan": [{ "do": "turn_in", "id": "t1", "at_s": 17, "target": { "lean_deg": 30 } }]
+  }
+}

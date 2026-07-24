@@ -1,0 +1,237 @@
+[
+  {
+    "figure_id": "fig-08-01",
+    "spec_hash": "35a71f",
+    "mode": "true",
+    "view": {
+      "window": {
+        "from_s": 0,
+        "to_s": 46.84955592153876
+      },
+      "orient": 0
+    },
+    "legend": [
+      {
+        "line_id": "bad",
+        "role": "mistake",
+        "quality": "failing",
+        "outcome": "runoff"
+      },
+      {
+        "line_id": "good",
+        "role": "ideal",
+        "quality": "good",
+        "outcome": "contained"
+      }
+    ],
+    "proportion_metrics": {
+      "width_ratio": [
+        {
+          "corner_id": "c1",
+          "value": 0.5833333333333334
+        }
+      ],
+      "straight_share": 0.5979297158942166,
+      "road_ink": 0.3772782921616817,
+      "frame_aspect": 0.871597084975644
+    },
+    "gate_verdict": "fail"
+  },
+  {
+    "figure_id": "fig-08-02",
+    "spec_hash": "1bc028",
+    "mode": "true",
+    "view": {
+      "window": {
+        "from_s": 0,
+        "to_s": 46.84955592153876
+      },
+      "orient": 0
+    },
+    "legend": [
+      {
+        "line_id": "bad",
+        "role": "mistake",
+        "quality": "failing",
+        "outcome": "runoff"
+      },
+      {
+        "line_id": "good",
+        "role": "ideal",
+        "quality": "good",
+        "outcome": "contained"
+      }
+    ],
+    "proportion_metrics": {
+      "width_ratio": [
+        {
+          "corner_id": "c1",
+          "value": 0.5833333333333334
+        }
+      ],
+      "straight_share": 0.5979297158942166,
+      "road_ink": 0.3772782921616817,
+      "frame_aspect": 0.871597084975644
+    },
+    "gate_verdict": "fail"
+  },
+  {
+    "figure_id": "fig-08-03",
+    "spec_hash": "09875f",
+    "mode": "true",
+    "view": {
+      "window": {
+        "from_s": 0,
+        "to_s": 46.84955592153876
+      },
+      "orient": 0
+    },
+    "legend": [
+      {
+        "line_id": "bad",
+        "role": "mistake",
+        "quality": "failing",
+        "outcome": "runoff"
+      },
+      {
+        "line_id": "good",
+        "role": "ideal",
+        "quality": "good",
+        "outcome": "contained"
+      }
+    ],
+    "proportion_metrics": {
+      "width_ratio": [
+        {
+          "corner_id": "c1",
+          "value": 0.5833333333333334
+        }
+      ],
+      "straight_share": 0.5979297158942166,
+      "road_ink": 0.3772782921616817,
+      "frame_aspect": 0.871597084975644
+    },
+    "gate_verdict": "fail"
+  },
+  {
+    "figure_id": "fig-08-04",
+    "spec_hash": "1a9dd5",
+    "mode": "true",
+    "view": {
+      "window": {
+        "from_s": 0,
+        "to_s": 52.361600344907856
+      },
+      "orient": 0
+    },
+    "legend": [
+      {
+        "line_id": "bad",
+        "role": "mistake",
+        "quality": "failing",
+        "outcome": "runoff"
+      },
+      {
+        "line_id": "good",
+        "role": "ideal",
+        "quality": "good",
+        "outcome": "contained"
+      }
+    ],
+    "proportion_metrics": {
+      "width_ratio": [
+        {
+          "corner_id": "c1",
+          "value": 0.56
+        }
+      ],
+      "straight_share": 0.4586175030409133,
+      "road_ink": 0.36760545995931015,
+      "frame_aspect": 0.7720081163008198
+    },
+    "gate_verdict": "warn"
+  },
+  {
+    "figure_id": "fig-08-05",
+    "spec_hash": "4744ed",
+    "mode": "true",
+    "view": {
+      "window": {
+        "from_s": 0,
+        "to_s": 68.07669225265029
+      },
+      "orient": 0
+    },
+    "legend": [],
+    "proportion_metrics": {
+      "width_ratio": [
+        {
+          "corner_id": "c1",
+          "value": 0.5833333333333334
+        },
+        {
+          "corner_id": "c2",
+          "value": 0.2916666666666667
+        },
+        {
+          "corner_id": "c3",
+          "value": 0.5833333333333334
+        }
+      ],
+      "straight_share": 0.32334659695015994,
+      "road_ink": 0.42999311610292806,
+      "frame_aspect": 0.7192733092944085
+    },
+    "gate_verdict": "fail"
+  },
+  {
+    "figure_id": "fig-08-06",
+    "spec_hash": "40ae19",
+    "mode": "true",
+    "view": {
+      "window": {
+        "from_s": 0,
+        "to_s": 98.83185307179586
+      },
+      "orient": 90
+    },
+    "legend": [
+      {
+        "line_id": "bad",
+        "role": "mistake",
+        "quality": "failing",
+        "outcome": "runoff"
+      },
+      {
+        "line_id": "good",
+        "role": "ideal",
+        "quality": "caution",
+        "outcome": "contained"
+      }
+    ],
+    "proportion_metrics": {
+      "width_ratio": [
+        {
+          "corner_id": "c1",
+          "value": 0.5833333333333334
+        },
+        {
+          "corner_id": "c2",
+          "value": 0.5833333333333334
+        },
+        {
+          "corner_id": "c3",
+          "value": 0.5833333333333334
+        },
+        {
+          "corner_id": "c4",
+          "value": 0.5833333333333334
+        }
+      ],
+      "straight_share": 0.36451521194629827,
+      "road_ink": 0.17321047818267746,
+      "frame_aspect": 0.7367103480591171
+    },
+    "gate_verdict": "fail"
+  }
+]

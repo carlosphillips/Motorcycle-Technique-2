@@ -1,0 +1,247 @@
+{
+  "fixture": "C30-squeeze",
+  "engine_semver": "0.1.0",
+  "input": {
+    "kind": "run",
+    "input": {
+      "spec": "linelab/1",
+      "id": "C30-squeeze",
+      "road": {
+        "dsl": "lane 3.5 | S 35 | R 30 ^90 | S 25"
+      },
+      "rider": {
+        "profile": "street",
+        "start": {
+          "speed_kmh": 70,
+          "f": 0.9
+        },
+        "plan": [
+          {
+            "do": "brake",
+            "id": "b1",
+            "at_s": 2,
+            "decel": 4.6
+          },
+          {
+            "do": "throttle",
+            "id": "c1",
+            "at_s": 22,
+            "accel": 0
+          },
+          {
+            "do": "turn_in",
+            "id": "t1",
+            "at_s": 29.5,
+            "target": {
+              "lean_deg": 36.5
+            }
+          },
+          {
+            "do": "brake",
+            "id": "b2",
+            "at_s": 50,
+            "decel": 2,
+            "slew_mss": 4
+          },
+          {
+            "do": "throttle",
+            "id": "c2",
+            "at_s": 70,
+            "accel": 0
+          }
+        ]
+      }
+    }
+  },
+  "lines": [
+    {
+      "line_id": "C30-squeeze",
+      "role": "ideal",
+      "outcome": "contained",
+      "quality": "caution",
+      "result_hash": "e9cca1",
+      "terminated": {
+        "reason": "road_end",
+        "s": 107.12388980384009,
+        "t": 7.625
+      },
+      "events": [
+        {
+          "kind": "brake_start",
+          "s": 2,
+          "t": 0.1028571431279944,
+          "action_id": "b1"
+        },
+        {
+          "kind": "crack",
+          "s": 22,
+          "t": 1.1965516842128303,
+          "action_id": "c1"
+        },
+        {
+          "kind": "turn_in",
+          "s": 29.5,
+          "t": 1.6869326471754693,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "brake_end",
+          "s": 33.5999750224409,
+          "t": 1.97,
+          "action_id": "b1"
+        },
+        {
+          "kind": "steering_complete",
+          "s": 39.18393290781124,
+          "t": 2.35,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "brake_start",
+          "s": 50,
+          "t": 3.0806847934212516,
+          "action_id": "b2"
+        },
+        {
+          "kind": "crack",
+          "s": 70,
+          "t": 4.524446408541238,
+          "action_id": "c2"
+        },
+        {
+          "kind": "release",
+          "s": 71.44387497971444,
+          "t": 4.64,
+          "corner_id": "c1",
+          "action_id": "t1"
+        },
+        {
+          "kind": "brake_end",
+          "s": 74.16466355414961,
+          "t": 4.86,
+          "action_id": "b2"
+        },
+        {
+          "kind": "apex",
+          "s": 82,
+          "t": 5.476081757482562,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "exit",
+          "s": 82,
+          "t": 5.476081757482562,
+          "corner_id": "c1"
+        },
+        {
+          "kind": "sight_min",
+          "s": 107.12388980384009,
+          "t": 7.625
+        },
+        {
+          "kind": "road_end",
+          "s": 107.12388980384009,
+          "t": 7.625
+        }
+      ],
+      "corners": [
+        {
+          "id": "c1",
+          "hand": "R",
+          "corner_type": "constant",
+          "apexes": [
+            {
+              "s": 82,
+              "pct": 99.73709767092107,
+              "f": 0.08779577326535015,
+              "clearance_m": 0.23704858781644544,
+              "v_kmh": 42.09874000000026,
+              "lean_deg": 5
+            }
+          ],
+          "lean_max_deg": 36.5,
+          "grip_min": 0.2324670452226535,
+          "danger_dwell_s": 0,
+          "exit": {
+            "s": 82,
+            "d": -2.8629514121835546,
+            "f": 0.08779577326535015,
+            "heading_err_deg": 0.004002352496051107
+          }
+        }
+      ],
+      "phi_max_deg": 36.5,
+      "grip_min": 0.2324670452226535,
+      "v_min_ms": 11.694094444444517,
+      "checks": [
+        {
+          "id": "late_apex",
+          "verdict": "pass"
+        },
+        {
+          "id": "out_in_out",
+          "verdict": "fail"
+        },
+        {
+          "id": "single_input",
+          "verdict": "fail"
+        },
+        {
+          "id": "quick_steer",
+          "verdict": "pass"
+        },
+        {
+          "id": "throttle_rule",
+          "verdict": "fail"
+        },
+        {
+          "id": "trail_brake_taper",
+          "verdict": "fail"
+        },
+        {
+          "id": "traction_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "lean_ceiling",
+          "verdict": "pass"
+        },
+        {
+          "id": "exit_containment",
+          "verdict": "pass"
+        },
+        {
+          "id": "stop_within_sight",
+          "verdict": "pass"
+        },
+        {
+          "id": "hold_wide_for_sight",
+          "verdict": "na"
+        },
+        {
+          "id": "rideability",
+          "verdict": "pass"
+        },
+        {
+          "id": "link_continuity",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_flow",
+          "verdict": "na"
+        },
+        {
+          "id": "wrong_strategy_for_corner",
+          "verdict": "na"
+        }
+      ]
+    }
+  ],
+  "blessed": []
+}

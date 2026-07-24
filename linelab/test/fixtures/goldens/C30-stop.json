@@ -1,0 +1,132 @@
+{
+  "fixture": "C30-stop",
+  "engine_semver": "0.1.0",
+  "input": {
+    "kind": "run",
+    "input": {
+      "spec": "linelab/1",
+      "id": "C30-stop",
+      "road": {
+        "dsl": "lane 3.5 | S 35 | R 30 ^90 | S 25"
+      },
+      "rider": {
+        "profile": "street",
+        "start": {
+          "speed_kmh": 60,
+          "f": 0.9
+        },
+        "plan": [
+          {
+            "do": "brake",
+            "id": "b1",
+            "at_s": 0,
+            "decel": 7
+          }
+        ]
+      }
+    }
+  },
+  "lines": [
+    {
+      "line_id": "C30-stop",
+      "role": "ideal",
+      "outcome": "stopped",
+      "quality": "caution",
+      "result_hash": "e9fe90",
+      "terminated": {
+        "reason": "stopped",
+        "s": 28.880799143590416,
+        "t": 2.6785738095238054
+      },
+      "events": [
+        {
+          "kind": "brake_start",
+          "s": 0,
+          "t": 0,
+          "action_id": "b1"
+        },
+        {
+          "kind": "sight_min",
+          "s": 12.5,
+          "t": 0.7782866927878996
+        },
+        {
+          "kind": "stop",
+          "s": 28.880799143590416,
+          "t": 2.6785738095238054
+        }
+      ],
+      "corners": [],
+      "phi_max_deg": 0,
+      "grip_min": 0.2864424057084608,
+      "v_min_ms": 2,
+      "checks": [
+        {
+          "id": "late_apex",
+          "verdict": "na"
+        },
+        {
+          "id": "out_in_out",
+          "verdict": "na"
+        },
+        {
+          "id": "single_input",
+          "verdict": "na"
+        },
+        {
+          "id": "quick_steer",
+          "verdict": "na"
+        },
+        {
+          "id": "throttle_rule",
+          "verdict": "na"
+        },
+        {
+          "id": "trail_brake_taper",
+          "verdict": "na"
+        },
+        {
+          "id": "traction_ceiling",
+          "verdict": "na"
+        },
+        {
+          "id": "lean_ceiling",
+          "verdict": "na"
+        },
+        {
+          "id": "exit_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "stop_within_sight",
+          "verdict": "fail"
+        },
+        {
+          "id": "hold_wide_for_sight",
+          "verdict": "na"
+        },
+        {
+          "id": "rideability",
+          "verdict": "pass"
+        },
+        {
+          "id": "link_continuity",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_containment",
+          "verdict": "na"
+        },
+        {
+          "id": "chain_flow",
+          "verdict": "na"
+        },
+        {
+          "id": "wrong_strategy_for_corner",
+          "verdict": "na"
+        }
+      ]
+    }
+  ],
+  "blessed": []
+}

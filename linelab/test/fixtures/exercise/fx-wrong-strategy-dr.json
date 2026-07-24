@@ -1,0 +1,14 @@
+{
+  "spec": "linelab/1",
+  "id": "fx-wrong-strategy-dr",
+  "road": { "preset": "bookDecreasing" },
+  "rider": {
+    "profile": "street",
+    "start": { "speed_kmh": 27, "f": 0.9 },
+    "plan": [
+      { "do": "turn_in", "id": "t1", "at_s": 8, "target": { "lean_deg": 32 } },
+      { "do": "turn_in", "id": "t2", "at_s": 15, "target": { "lean_deg": 6 } },
+      { "do": "turn_in", "id": "t3", "at_s": 25, "target": { "lean_deg": 38 } }
+    ]
+  }
+}

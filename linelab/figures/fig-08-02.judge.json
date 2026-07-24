@@ -1,0 +1,180 @@
+{
+  "figure_id": "fig-08-02",
+  "spec_hash": "1bc028",
+  "svg_fnv1a": "e251fc",
+  "judge_identity": {
+    "judge_model": "claude",
+    "judge_model_version": "claude-sonnet-5",
+    "rubric_version": "1"
+  },
+  "verdicts": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "na"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest confirms mode=\"true\" (not diagram) → J6 na, full stop; legend lists no occluders → J4 na; no drawn continuation fan (v0.1) → J9 na. Scene declares no `labels:` block (unlike fig-08-01/03/04/05) and the rendered SVG's data-stage=\"10-labels\" group is empty → nothing to check, J3 na.\n\nJ1: SVG strokes confirm bad=#b32e2e (failing/mistake) and good=#1f6f43 (ideal/good); visually the red and dark-green lines match these hex values exactly in the raster — correct D9 mapping.\n\nJ2: Cropped/zoomed the turn-point (~native 500,2150): a single dark-green hourglass/bowtie glyph sits centered on the green line, not floating off it. Matches the scene's explicit note that good/bad turn-in stations coincide and collapse to one green glyph (A-FIG82-SINGLEMARK) — correct, not a missing red marker.\n\nJ5: Zoomed on the corner (crop 900-1400,1900-2200 native): the red \"bad\" (slow_steer) line tracks close to the green line at first then fails to lean over, staying low/outside while green climbs toward the apex; the red line terminates in an arrowhead exactly at the road's outer boundary, tip crossing into the grass — a legible \"runs deep and wide, runs off the outside\" read for a slow-roll mistake, and matches the SVG's explicit data-terminal-reason=\"off_road\" tick mark.\n\nJ7: Nothing drawn beyond declared elements — road (book90 preset), two lines, one collapsed turn_point marker, legend. Sight-rays and occluder SVG groups are present but empty (none declared, none drawn). No fabricated labels/marks.\n\nJ8: Zoomed legend at 3x (native 0-500,0-80): \"slow_steer — mistake · failing (runoff)\" and \"solved 34 km/h — ideal · good\" render crisp and fully legible; red vs. dark-green strokes are easily distinguishable throughout at native resolution; good line's exit arrowhead at top of frame is clean, fully inside the road, not clipped by the image border.\n\nStanding sentence check: the failing (red) line's endpoint sits precisely at its off-road termination (arrowhead exiting the road edge into the grass margin) — it neither wanders further into the grass nor is cut off uncropped by the frame."
+      },
+      {
+        "attempt": 2,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest confirms mode=\"true\" (SVG root also has data-mode=\"true\") -> J6 na. No occluders declared (empty <g data-stage=\"5-occluders\"> and empty sight-rays group) -> J4 na. No fan drawn -> J9 na.\n\nJ1: legend swatches and line strokes match exactly — bad/mistake/failing = #b32e2e (red, sampled (179,46,46)), good/ideal = #1f6f43 (green, sampled (31,111,67)), consistent between legend chips and the two polylines' data-role/data-quality attrs.\n\nJ2: single hourglass turn_point glyph (green, ~40x40px at 2x, cropped at x~500-620,y~2140-2220) sits exactly on the shared start of both lines, per the scene's declared A-FIG82-SINGLEMARK collapse (good+bad share turn-in station). Not floating — centered on the line stroke.\n\nJ3: no labels: section declared in the .scene (unlike fig-08-01); only the two legend rows exist as text, both crisp and fully inside the frame at top-left (crop 0,0-500,80), non-clipped, non-overlapping.\n\nJ5: red \"bad\" line tracks green closely near turn-in, then takes a visibly wider/flatter arc through the corner (crop 600,1850-1750,2294) vs. green's tighter inside line, and terminates via a <line data-terminal-reason=\"off_road\"> exactly at the road's outer edge (crop 1150,2000-1500,2200 shows the arrowhead tip crossing the gray/pale-green boundary). This reads clearly as \"long slow roll -> runs deep and wide -> exits the corner,\" matching the note text and outcome=runoff.\n\nJ7: SVG stage groups contain only road/lane-markings/lines/one marker/legend — no occluder or sight-ray elements were rendered (both groups present but empty), no extra marks beyond turn_point, nothing undeclared.\n\nJ8: PNG is 2000x2294 vs SVG viewBox-derived 1000x1147 (exact 2x). Legend text renders sharp and legible at that raster (crop 0,0-500,80); red/green strokes are both chromatically and stroke-width distinct (0.065 vs 0.089 local units) so lines stay distinguishable even where they run close together near turn-in.\n\nGood line's arrow crosses the top frame boundary (crop 1400,0-2000,250) but stays laterally centered within the road width the whole way — that's the view-window truncation (view: window=auto cutting the road render at to_s), not a runoff; consistent with its declared outcome=\"contained\" and not covered by the standing sentence (which is scoped to failing lines)."
+      },
+      {
+        "attempt": 3,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest: mode=\"true\" (J6=na per policy), legend has no occluders field (J4=na), no fan drawn (J9=na).\n\nJ1 pass: pixel-sampled exact hex on the raster — good line = #1f6f43 (17645px), mistake line = #b32e2e (2193px) — matching constants.ts good/failing and manifest quality \"good\"/\"failing\" for outcome contained/runoff.\n\nJ2 pass: single dark-green hourglass/bowtie glyph sits centered on the green line at ~(541,2255) orig px, exactly where the scene comment says the two turn-in stations coincide and collapse to one glyph (A-FIG82-SINGLEMARK) — on-line, not floating, matches declared merge behavior.\n\nJ3 pass: legend block top-left (\"slow_steer — mistake · failing (runoff)\" / \"solved 34 km/h — ideal · good\"), fully inside frame, crisp, not clipped or swallowed. No other labels declared in the .scene.\n\nJ5 pass: green line hugs the inside/apex through the full corner and exits top-of-frame with a plain arrowhead (road_end, natural exit). Red line tracks the green line from the shared turn-in point, then arcs wide/shallow and departs the road's outer edge partway through the corner, well short of the apex the green line reaches — a direct visual read of \"the slow roll to full lean eats corner angle, the line runs deep/wide.\"\n\nJ7 pass: only road + dashed centerline + two verdict-coloured trajectories + one turn-point marker + legend are drawn — matches the .scene's road/lines/marks declarations, nothing extra (no sight rays/occlusion wash, consistent with no occluders declared). The red line's terminal glyph is asymmetric (tip on the pavement edge + an elongated barb running along the road-edge line) vs. the green line's plain symmetric arrowhead — this matches design/06 §…8's documented off_road terminal treatment (\"arrowhead on the edge crossing + a short tick along the road edge\") keyed off outcome=runoff, corroborated by reading design/06-rendering-and-projection.md; not fabrication.\n\nJ8 pass: at native 2000x2294 raster, legend text is sharp and legible, green/red/grey-dashed/black ink are all clearly distinguishable at both full-frame and zoomed-crop resolution (verified via crops of legend, marker, and both arrowheads).\n\nStanding sentence check: red line's terminus sits right at the pavement/grass boundary (arrow tip on-edge, aimed off it) — not wandering into the grass, not exiting the frame; frame crop confirms tip stays inside canvas bounds."
+      }
+    ],
+    "items": [
+      {
+        "id": "J1",
+        "verdict": "pass"
+      },
+      {
+        "id": "J2",
+        "verdict": "pass"
+      },
+      {
+        "id": "J3",
+        "verdict": "pass",
+        "flaky": true
+      },
+      {
+        "id": "J4",
+        "verdict": "na"
+      },
+      {
+        "id": "J5",
+        "verdict": "pass"
+      },
+      {
+        "id": "J6",
+        "verdict": "na"
+      },
+      {
+        "id": "J7",
+        "verdict": "pass"
+      },
+      {
+        "id": "J8",
+        "verdict": "pass"
+      },
+      {
+        "id": "J9",
+        "verdict": "na"
+      }
+    ],
+    "verdict": "pass"
+  }
+}

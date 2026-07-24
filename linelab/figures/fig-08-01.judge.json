@@ -1,0 +1,180 @@
+{
+  "figure_id": "fig-08-01",
+  "spec_hash": "35a71f",
+  "svg_fnv1a": "6e95db",
+  "judge_identity": {
+    "judge_model": "claude",
+    "judge_model_version": "claude-sonnet-5",
+    "rubric_version": "1"
+  },
+  "verdicts": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest: mode=\"true\" (so J6=na per policy), legend bad=mistake/failing/runoff (red), good=ideal/good/contained (green), no \"occluders\" key present anywhere in the fig-08-01 entry (so J4=na per policy despite the scene declaring one and a vehicle being rendered). No fan structure in v0.1 (J9=na).\n\nJ1 pass: pixel-sampled colours are exact hex matches to design/06 D9 mapping — bad line px(963,2050)=(179,46,46)=#b32e2e (failing/red); good line px(1870,700)=(31,111,67)=#1f6f43 (good/green). Matches manifest legend roles exactly.\n\nJ2 pass: hourglass (bowtie) markers present on each line at its own turn-in point, centered on the stroke, not floating — red hourglass ~(95,2211), green hourglass ~(480,2211) (native px, crop_hourglass_*.png). Only turn_point marks appear, consistent with `marks: turn_point` (no stray ring/dot marks).\n\nJ3 pass: both declared labels present and correctly anchored. \"premature turn point\" leader runs from the text box down to the red hourglass at turn_point@bad (~x95,y2211); \"late apex — sight and exit\" leader terminates exactly on the green stroke at its apex bend (~x1615,y1590 native, confirmed by zoomed crop touching the line, not floating in the gray). Neither label is clipped by the frame.\n\nJ4 na: manifest declares no occluders field for this entry (only figure_id/spec_hash/mode/view/legend/proportion_metrics/gate_verdict), so per policy this item does not apply, notwithstanding that a vehicle rectangle and red/green dashed rays are visibly rendered near (1510-1650, 700-900).\n\nJ5 pass: the mistake line legibly reads as \"turn in too soon → early apex → wide/runoff exit.\" Its hourglass sits earlier on the straight than the good line's (x≈95 vs x≈480). Through the bend it hugs measurably closer to the inside than good (e.g. at y=2100: red_x=806 vs green_x=1115, Δ≈309px more toward the apex side). Near the exit it crosses outside the good line and terminates exactly at the road's outer edge (tip ≈1887,1440; edge sampled at x≈1888-1890 same row) — a clean \"runoff\" endpoint sitting at its termination in-frame, not wandering into the grass or cut by the frame border, satisfying the standing sentence.\n\nJ6 na: manifest mode=\"true\" (not diagram), per rubric this item is na on every v0.1 true-mode figure.\n\nJ7 pass: nothing rendered beyond what's declared — road (book90), 2 lines in their verdict colours, 1 vehicle occluder with its paired sight-rays, 2 turn_point hourglasses, 2 anchored labels, and the standard line-legend swatch top-left. No extraneous marks/labels/shapes found.\n\nJ8 pass: at native raster, red vs green strokes are highly saturated and easily distinguished against the gray road/pale-green background; all text (legend, both callouts) renders with a white halo/outline and is crisp and fully legible at 1:1, e.g. crop_legend.png and crop_apex_anchor.png show clean glyph edges with no aliasing artifacts.\n\nJ9 na: no continuation fan is drawn anywhere in the figure (v0.1 has no fan disclosure requirement)."
+      },
+      {
+        "attempt": 2,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "na"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest mode=\"true\" (not diagram) → J6 na. No manifest entry (this figure or any of the 6) carries an occluders field → J4 na per pinned instruction, despite the .scene declaring one and the raster showing a vehicle + dashed sight rays (those are legitimate declared content per the .scene, just not graded under J4 this round). No continuation fan drawn → J9 na.\n\nJ1: legend/manifest — bad=mistake/failing→rendered red; good=ideal/good→rendered dark green. Matches D9 (green=good, red=failing). Legend swatches at top-left (crop ~0,0-700,120) confirm same hues as the plotted lines.\n\nJ2: hourglass (bowtie) markers present on both lines exactly at their turn-in points, colour-matched to their line (red hourglass ~px(95,2140) on the red line; green hourglass ~px(545,2140) on the green line, zoomed crop /tmp/crop_markers_zoom.png). Only turn_point requested in scene (no apex/exit marks), so no ring/dot required — none fabricated either.\n\nJ3: \"premature turn point\" leader line touches dead-center of the red hourglass marker (crop /tmp/crop_leader_zoom.png). \"late apex — sight and exit\" leader touches the green line precisely at the apex bend (crop /tmp/crop_apexleader_zoom.png). Neither label clipped or floating.\n\nJ5: red (mistake) line's hourglass sits far earlier on the straight than green's, so red visibly turns in prematurely; through the corner red runs a near-straight chord while green curves in and tracks the lane, and red's arrowhead terminates exactly on the outer road-edge line (crop /tmp/crop_redarrow_zoom2.png, tip crossing the white edge line into the verge right in front of the oncoming vehicle) — a clear, legible \"turned in too soon → ran wide toward the oncoming vehicle\" story matching the mistake=premature/outcome=runoff legend.\n\nJ7: every drawn element traces to fig-08-01.scene: road (book90), 2 lines (good/bad), turn_point marks, 2 labels, 1 oncoming vehicle occluder + its sight rays. Nothing extraneous found.\n\nJ8: solid red vs solid dark green are easily distinguished by hue even where the lines run close together near the start (crop /tmp/crop_markers_zoom.png); legend and callout text carry a white halo and are crisp/readable at native res (crop /tmp/crop_legend.png). Good line's exit arrow (crop /tmp/crop_topcorner.png) sits fully inside the frame with ~75px margin to the canvas top — not clipped, satisfying the standing sentence for uncropped endpoints."
+      },
+      {
+        "attempt": 3,
+        "items": [
+          {
+            "id": "J1",
+            "verdict": "pass"
+          },
+          {
+            "id": "J2",
+            "verdict": "pass"
+          },
+          {
+            "id": "J3",
+            "verdict": "pass"
+          },
+          {
+            "id": "J4",
+            "verdict": "pass"
+          },
+          {
+            "id": "J5",
+            "verdict": "pass"
+          },
+          {
+            "id": "J6",
+            "verdict": "na"
+          },
+          {
+            "id": "J7",
+            "verdict": "pass"
+          },
+          {
+            "id": "J8",
+            "verdict": "pass"
+          },
+          {
+            "id": "J9",
+            "verdict": "na"
+          }
+        ],
+        "evidence": "Manifest confirms mode:\"true\" → J6 na (no diagram-mode disclosure note expected/seen); no continuation fan drawn → J9 na.\n\nJ1: legend swatches (top-left, ~13,12–~500,50) read \"premature — mistake · failing (runoff)\" in red and \"solved 34 km/h — ideal · good\" in green; measured line colours red≈[178,34,34], green≈[31,111,67] match D9 (green=good, red=failing) and manifest legend roles/qualities exactly.\n\nJ2: hourglass/bowtie markers present at ~(115,2178) on the red line and ~(560,2178) on the green line (cropped c7/c8), both centered exactly on their respective lines, none floating. No ring/dot marks drawn anywhere, correctly matching scene's `marks: turn_point` (only) declaration.\n\nJ3: \"premature turn point\" label (~x100–400,y2140) has a thin leader touching the red marker precisely (crop c7). \"late apex — sight and exit\" label (~x1090–1390,y1560) has a leader whose tip sits exactly on the green curve at ~(1685,1618) (crop c10, zoomed). Neither label touches a frame edge or overlaps other ink illegibly.\n\nJ4: occluder (vehicle) bbox measured at x[1502,1641] y[668,989]. Two dashed sight rays (pale red, pale green) originate exactly at each line's turn-point marker and run straight to the vehicle, terminating near its near corner (red terminates ~1801,856; green ~1775,852) — confirmed continuous and grazing the vehicle in crops c1/c2/c3. Beyond that same y (≈852, measured via a horizontal colour-boundary scan across the exit lane at multiple x, boundary flat at y=851–853 for all x outside the vehicle's own column) the road shifts to a darker grey shade representing the occluded/blocked-from-view region — this boundary height matches the rays' termination height almost exactly, confirming genuine occlusion shading rather than decorative texture.\n\nJ5: crossover of the two solid curves is clearly legible — sampled x per y shows red left of green for y=1800–2100 (e.g. y=2100: red_x=806 < green_x=1115, red cutting the corner earlier/tighter) and red right of green for y=900–1600 (e.g. y=1500: red_x=1836 > green_x=1704), i.e. red apexes early then swings wide. Red's line terminates (arrowhead) at (1888,1441), sitting exactly on the road's outer edge/verge boundary (crop c6) — reads as \"ran out of road,\" matching the standing sentence (endpoint at its termination, not into the grass, not exiting frame uncropped). Green completes the exit cleanly to the top of frame (arrow tip ~1860,101), also within the road. Core lesson (turn in early → early apex → wide/off-track exit) reads clearly from the image; the note field's \"toward the oncoming vehicle\" phrasing is not itself rendered as on-figure text, so there is nothing in the raster contradicting it.\n\nJ7: enumerated visible elements — 1 road (book90 L-curve), 2 verdict-coloured lines, 2 turn-point markers, 2 labels+leaders, 1 legend, 1 vehicle occluder with window glazing, 2 sight rays + occlusion shading (consequence of the declared occluder), 1 dashed centerline — all match the .scene/manifest declarations; nothing extraneous found.\n\nJ8: legend and both callout labels render in solid black text with a white halo against grey/green fill, fully crisp at native 2000×2294 raster (checked via 300–600% crops); red solid vs pale-red-dashed vs green solid vs pale-green-dashed vs white-dashed centerline are all easily distinguishable by hue and stroke style even before zooming."
+      }
+    ],
+    "items": [
+      {
+        "id": "J1",
+        "verdict": "pass"
+      },
+      {
+        "id": "J2",
+        "verdict": "pass"
+      },
+      {
+        "id": "J3",
+        "verdict": "pass"
+      },
+      {
+        "id": "J4",
+        "verdict": "na",
+        "flaky": true
+      },
+      {
+        "id": "J5",
+        "verdict": "pass"
+      },
+      {
+        "id": "J6",
+        "verdict": "na"
+      },
+      {
+        "id": "J7",
+        "verdict": "pass"
+      },
+      {
+        "id": "J8",
+        "verdict": "pass"
+      },
+      {
+        "id": "J9",
+        "verdict": "na"
+      }
+    ],
+    "verdict": "pass"
+  }
+}

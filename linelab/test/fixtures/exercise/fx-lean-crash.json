@@ -1,0 +1,11 @@
+{
+  "spec": "linelab/1",
+  "id": "fx-lean-crash",
+  "road": { "preset": "book90" },
+  "rider": {
+    "profile": "street",
+    "start": { "speed_kmh": 34, "f": 0.9 },
+    "plan": [{ "do": "turn_in", "id": "t1", "at_s": 10, "target": { "lean_deg": 35 } }]
+  },
+  "config": { "mu": 0.4 }
+}

@@ -1,0 +1,27 @@
+{
+  "note": "THE one golden tolerance table (design/09 §3.2 — 'the tolerance table lives beside the fixtures, in one place'; ARCHITECTURE §10.25 pins this path). Golden comparisons run RAW f64 fixture values against these categories; the emission-rounding policy (design/05 §8.3) is a separate contract test and is never entangled with goldens. Tolerance category must match quantity category (continuous vs discrete grid-derived).",
+  "categories": [
+    { "category": "positions", "unit": "m", "tol": 0.01, "mark": "TUNING" },
+    { "category": "angles", "unit": "deg", "tol": 0.01, "mark": "TUNING" },
+    { "category": "speeds", "unit": "m/s", "tol": 0.01, "mark": "TUNING" },
+    { "category": "apex_pct", "unit": "%", "tol": 0.1, "mark": "TUNING", "note": "the blessed-block sketch's own ±0.1 row (design/09 §3.2a write-back format)" },
+    {
+      "category": "fractions",
+      "unit": "",
+      "tol": 0.001,
+      "mark": "TUNING",
+      "note": "PENDING RATIFICATION: design/09 §3.2 names no fraction category, but 02 §8 pins fraction-valued golden quantities (apex lane fraction, minimum grip margin). Pinned here so the ONE table owns every ± the goldens use."
+    },
+    {
+      "category": "discrete_grid_derived",
+      "pinned_runtime": "exact",
+      "cross_runtime": "± one grid quantum (2 m coarse step / ds_m)",
+      "note": "coarse-sweep turn-in station, resample-grid apex argmin (design/09 §3.2)"
+    },
+    { "category": "tau_close_s", "unit": "s", "tol": 0.05, "note": "bisection endpoint at a feasibility discontinuity — out-of-hash but golden-pinned (design/09 §3.2); consumed by the D44 save-window goldens at v0.2" },
+    { "category": "s_close_m", "unit": "m", "tol": 0.5 },
+    { "category": "s_star_m", "unit": "m", "tol": 0.5 },
+    { "category": "status", "equality": "exact" },
+    { "category": "transition_count", "equality": "exact" }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "agent_model": "claude",
+  "agent_model_version": "claude-fable-5",
+  "attempts": 3,
+  "policy": {
+    "note": "design/09 §3.6 (D36, G4): the pinned cold-start identity — same committed-record pattern as the vision judge (verify/judge.json). Context: a fresh agent given the complete `linelab schema` output plus the `explain` outputs for the closed vocabularies; it may freely invoke schema/explain/check; it may NOT read design docs, examples, source, or the book. First-try = the first non-lint invocation (run/solve/figure) satisfies the task's mechanical acceptance predicate. Pass bar: 3 attempts per task, release bar 3/3; a 2/3 is recorded flaky and is a SCHEMA-TEXT defect, fixed there, never by loosening the bar. Trigger: at release, and whenever the hash of the full `schema` output changes — never per-commit. Deterministic CI leg T-COLDSTART-RECORD asserts a committed record whose schema_output_hash matches the current binary AND whose recorded per-task pass rate is 3/3 on every battery task.",
+    "pass_bar": "3/3 per task",
+    "flaky_meaning": "schema-text defect"
+  },
+  "battery_scope": "v0.1 verb subset (ARCHITECTURE §1: verbs run solve mistake figure render check schema explain export). Recipes (a)/(b)/(e)/(f) are the v0.1 gates (design/09 §10 v0.1 row); recipes (c)/(d)/(g)/(h)/(i)/(j) and the sweep/compare-bearing tasks join the battery when their verbs/fixtures promote (full battery at v0.2).",
+  "battery": [
+    {
+      "id": "recipe-a",
+      "goal": "Produce the ideal line for a single 25 m-radius 90-degree right-hander on a 3.5 m lane with short approach and exit straights, at a feasible entry speed, and report its verdict.",
+      "accepts": "exit 0; one ideal line; outcome contained, quality good; apex_pct in (50, 90); events include brake, turn_in, apex"
+    },
+    {
+      "id": "recipe-b",
+      "goal": "Show the same corner ridden well and ridden with a premature turn-in, as one two-line figure, and export the top-down drawing.",
+      "accepts": "exit 0; two lines; mistake-line outcome = the premature fixture pin (runoff); render exit 0; proportion gate passes"
+    },
+    {
+      "id": "recipe-e",
+      "goal": "Bake the named book figure fig-08-01 from its committed scene and export it.",
+      "accepts": "figure bake exit 0; two lines; SVG written; proportion gate passes; manifest shows hourglass/ring/dot markers"
+    },
+    {
+      "id": "recipe-f",
+      "goal": "Solve a line on the hard 25 m/90-degree corner at 55 km/h that keeps the bike outside lane-fraction 0.6 through the corner entry, or find out typed-why that cannot be done.",
+      "accepts": "satisfiable arm: verdict constraints block records satisfied true, non-negative margin, tightest station; refusal arm: exit 3, NO_SOLUTION/constraint_unmet naming the constraint id and worst station (empty_band admissible on the geometry-infeasible arm per the recipe's dual-outcome wording)"
+    },
+    {
+      "id": "surface-road-dsl",
+      "goal": "Author a two-corner road of your own in the road DSL (an S-bend with different radii) and ride it at a feasible speed.",
+      "accepts": "run/solve exit 0 on a novel |-separated DSL with lane first and two curved segments"
+    },
+    {
+      "id": "surface-plan",
+      "goal": "Author an explicit rider plan (brake, then turn in, then roll on) on a simple corner without letting the solver choose anything.",
+      "accepts": "run exit 0 on a wire scenario whose rider.plan carries brake + turn_in + throttle actions; events show all three"
+    },
+    {
+      "id": "surface-occluder",
+      "goal": "Place a hedge on the inside of a corner so the rider's sight line is limited, and show the effect in the result.",
+      "accepts": "run exit 0; verdict sight block present; recorded sight channel changes vs the occluder-free run"
+    },
+    {
+      "id": "surface-hazard",
+      "goal": "Put a patch of gravel in the braking zone of a straight and show that braking over it matters.",
+      "accepts": "run exit 0; per-sample mu changes over the patch; trajectory differs from the patch-free run"
+    },
+    {
+      "id": "surface-mistake",
+      "goal": "Compile the fifty-pence-piece mistake on a solved corner line with a smaller-than-default number of facets.",
+      "accepts": "exit 0; two lines; mistake line carries kind fifty_pence with params.facets set; outcome in the pin row's admissible set"
+    },
+    {
+      "id": "surface-constraint",
+      "goal": "Add a speed ceiling through a corner's entry span to a solve and show the bound was honoured.",
+      "accepts": "exit 0; verdict constraints rows all satisfied: true; or the typed NO_SOLUTION/constraint_unmet refusal"
+    },
+    {
+      "id": "surface-figure",
+      "goal": "Author a two-line figure as scene text (a good line and one mistake overlay) and bake it.",
+      "accepts": "figure exit 0 on novel scene text; two lines; SVG + manifest written"
+    }
+  ]
+}
