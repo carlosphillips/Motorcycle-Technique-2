@@ -108,29 +108,27 @@ describe("lowerScene — the six committed book-figure scenes lower cleanly", ()
     });
   });
 
-  it("fig-08-05 (double apex): believeRoad= lowers to a DslRoadSpec, role= overrides the default", () => {
+  it("fig-08-05 (double apex): a `mistake` line takes role=mistake with no override, and marks: names two classes", () => {
     const spec = mustLower(readScene("fig-08-05.scene"));
     expect(spec).toEqual({
       road: { preset: "bookDoubleApex" },
       lines: [
-        { name: "good", role: "ideal", spec: { road: { preset: "bookDoubleApex" }, entry_kmh: 30, style: "double_apex" } },
-        {
-          name: "late",
-          role: "mistake", // explicit role=mistake override — NOT the "alternative" a 2nd ride line defaults to
-          spec: {
-            road: { preset: "bookDoubleApex" },
-            entry_kmh: 30,
-            believed_road: { dsl: "lane 3.5 | S 10 | L 24 ^130 | S 12" }
-          }
-        }
+        { name: "good", role: "ideal", spec: { road: { preset: "bookDoubleApex" }, entry_kmh: 30, turn_in: "auto" } },
+        // a `mistake` KIND line is role=mistake by construction — no `role=`
+        // token needed, unlike a 2nd `ride` line, which defaults to "alternative"
+        { name: "early", role: "mistake", spec: { kind: "premature" } }
       ],
       labels: [
         { feature: "apex", n: 1, line: "good", text: "first touch" },
-        { feature: "apex", n: 2, line: "good", text: "second touch" },
-        { feature: "run_wide_detect", line: "late", offset_m: 8, text: "believed one steady corner — ran off before reacting" }
+        { feature: "apex", n: 1, line: "early", text: "early apex - hard on the inside of c1" },
+        { feature: "run_wide_detect", line: "early", text: "no geometry left for c2 - off the outside edge" }
       ],
+      // `marks: turn_point,apex` — a class LIST, so both classes are drawn on
+      // EVERY line's events, not just the ideal's (the `auto` default is
+      // ideal-only; render/markers.ts `enabledClasses`)
+      marks: ["turn_point", "apex"],
       view: { mode: "diagram", window: "auto" },
-      note: "Two apexes bridged by an opening; the believed-single-corner line runs off before a reaction is possible."
+      note: "Touch the inside of the first corner too soon and the compound corner takes the exit away."
     });
   });
 

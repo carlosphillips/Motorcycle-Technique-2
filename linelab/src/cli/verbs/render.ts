@@ -1,7 +1,8 @@
 // cli/verbs/render.ts — the `render` verb (design/08 §3): write SVG(s) + a
 // manifest from an already-computed envelope. `topdown` (default) writes the
 // figure SVG + proportion manifest; `pov` (v0.3 immersion, design/07 §5) writes
-// the first-person `<figure_id>.pov.svg`. args.ts parses `pov` as a legal
+// the first-person `<figure_id>.pov.svg`, or `<figure_id>.<line_id>.pov.svg`
+// when `--line` focuses one line. args.ts parses `pov` as a legal
 // `--views` NAME and leaves the phase gate "in exactly one place, the render
 // layer" — that gate is now the shipped render. View flags (`--marks`/`--rays`/
 // `--legend`/`--orient`/`--look`, the pov camera toggle) override the
@@ -107,9 +108,38 @@ export function renderVerb(input: RenderVerbInput): VerbOutcome {
     // the POV target: true-geometry first-person SVG (render/pov.ts). No
     // proportion gate/manifest — POV is not a DrawnScene and 06 §6.2's gate is
     // topdown-only ("mode: true renders are exempt"); the pov svg stands alone.
-    const rendered = renderViews({ road: envelope.road, lines, viewSpec, marks, target: "pov" });
+    //
+    // `--line <id>` focuses ONE line, exactly as it does on the `controls` view,
+    // and names the output `<figure_id>.<line_id>.pov.svg` to match that view's
+    // per-line spelling. Without it the focus rule is unchanged
+    // (`povFocusLine`: ideal wins) and so is the filename — a bare
+    // `render --views pov` still writes `<figure_id>.pov.svg`.
+    //
+    // Why the flag exists: one POV frame is a picture, not evidence. The
+    // camera pose is the LINE's own recorded Sample, so the ideal line's frame
+    // and the mistake line's frame at the same corner are the comparison that
+    // carries the lesson — what each rider can actually see from where their
+    // own line put them. Rendering only the ideal line's frame shows the half
+    // that never had the problem.
+    const requestedLine = parsed.value.line;
+    let focus: readonly LineResult[] = lines;
+    let suffix = "";
+    if (requestedLine !== undefined) {
+      const found = lines.find((l) => l.line_id === requestedLine);
+      if (found === undefined) {
+        return errOutcome({
+          code: "UNKNOWN_ID",
+          at: "--line",
+          message: `unknown line "${requestedLine}" (available: ${lines.map((l) => l.line_id).join(", ")})`,
+          detail: { reason: "unknown_line_id", available: lines.map((l) => l.line_id) }
+        });
+      }
+      focus = [found];
+      suffix = `.${found.line_id}`;
+    }
+    const rendered = renderViews({ road: envelope.road, lines: focus, viewSpec, marks, target: "pov" });
     if (!rendered.ok) return errOutcome(rendered.error);
-    const povPath = `${outDir}/${envelope.figure_id}.pov.svg`;
+    const povPath = `${outDir}/${envelope.figure_id}${suffix}.pov.svg`;
     writes.push({ path: povPath, content: rendered.value.svg });
     report["pov"] = povPath;
   }

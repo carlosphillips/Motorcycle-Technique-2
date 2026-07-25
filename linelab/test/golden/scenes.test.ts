@@ -3,24 +3,26 @@
 // (figures/fig-08-04.scene), design/09 §3.2.
 //
 // ENGINE-TRUTH STATE (post fix/adjudication phases — the bookDecreasing
-// empty-clean-band seam is RESOLVED; the A-DOUBLEAPEX and believed-band seams
-// still stand):
+// empty-clean-band seam is RESOLVED; the A-DOUBLEAPEX seam still stands):
 //   fig-08-04 `good`  → SOLVES: contained/good, ONE late apex (the clean band
 //                       at 34 km/h is non-empty on this engine now),
 //   fig-08-04 `bad`   → overspeed:by_kmh=2.5 (fig84 amendment): wide/failing —
 //                       a marginal overspeed pushed wide off the tightening exit,
-//   fig-08-05 `good`  → NO_SOLUTION/no_two_touch_line (the pinned
-//                       A-DOUBLEAPEX SEAM),
-//   fig-08-05 `late`  → SOLVES runoff/failing (adj-fig-08-05): the believed
-//                       single-R24 world under-reads the tightening R12 touches,
-//                       so the line runs off before it can react —
-//                       run_wide_detect at s≈15.81, then off_road; corrective
-//                       infeasible (departed_before_reaction), no correction.
+//   fig-08-05 `good`  → SOLVES: contained/caution via the CHAINED solver. The
+//                       scene no longer asks for `style=double_apex`, which
+//                       refuses no_two_touch_line on bookDoubleApex at every
+//                       entry probed 18–36 km/h (the A-DOUBLEAPEX SEAM — a
+//                       solver capability gap, not an at-this-speed fact). The
+//                       `caution` grade is corner-scoped doctrine reading the
+//                       linking c2 as its own corner: a late_apex fail at 5% of
+//                       c2's sweep. That IS the compound-corner lesson.
+//   fig-08-05 `early` → SOLVES runoff/failing: `mistake premature` turns in
+//                       10 m early, apexes c1 at 51% of sweep hard on the
+//                       inside, then runs wide in c2 and off the outside edge;
+//                       corrective infeasible (departed_before_reaction).
 // Under design/05 §7 the bake stays TOTAL either way: refusals are first-class
 // typed entries, refused lines draw nothing, and the envelope still bakes.
-// G-8.4-COMPANION and G-8.5-RED both pin the SOLVED engine truth now:
-// fig-08-05 `good` still refuses no_two_touch_line (the A-DOUBLEAPEX seam; its
-// per-line double-apex pins remain it.todo), `late` solves the runoff above.
+// G-8.4-COMPANION and G-8.5-RED both pin the SOLVED engine truth now.
 
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
@@ -99,33 +101,57 @@ describe("G-8.4-COMPANION (fig-08-04.scene bake — solved engine truth, design/
   });
 });
 
-describe("G-8.5-RED (fig-08-05.scene bake — good refuses; late solves the runoff, engine truth)", () => {
-  it("the bake is total: good refuses (no_two_touch_line); late solves runoff — run_wide_detect then off_road, corrective infeasible (departed_before_reaction)", { timeout: 600_000 }, () => {
+describe("G-8.5-RED (fig-08-05.scene bake — chained good contains; the early apex runs off in c2)", () => {
+  it("the bake is total: good rides all three corners contained-but-caution; early apexes c1 at 51% of sweep then departs the outside edge in c2, corrective infeasible (departed_before_reaction)", { timeout: 600_000 }, () => {
     const env = bake("fig-08-05.scene");
     expect(env.lines).toHaveLength(2);
 
-    // good still refuses under adj-doubleapex (the per-line good pins are it.todo)
-    const good = refusalOf(env, "good");
-    expect(good.error.code).toBe("NO_SOLUTION");
-    expect(good.error.detail?.["sub_reason"]).toBe("no_two_touch_line");
-    const window = good.error.detail?.["window"] as { corner_ids: string[] };
-    expect(window.corner_ids).toEqual(["c1", "c2", "c3"]);
+    // `good` is the CHAINED line, not the two-touch one: `style=double_apex`
+    // refuses on bookDoubleApex at every entry speed probed 18–36 km/h (the
+    // A-DOUBLEAPEX SEAM, solve/doubleApex.ts header — the compound-window
+    // drift arithmetic cannot widen back out to c2's inside edge), so the
+    // scene asks for the line the engine can actually stand behind.
+    const good = lineOf(env, "good");
+    expect(good.verdict.outcome).toBe("contained");
+    expect(good.trajectory.terminated.reason).toBe("road_end");
+    // …and it is graded `caution`, not `good`: the corner-scoped doctrine reads
+    // the linking c2 as a corner of its own, so c2's apex at 5% of ITS sweep is
+    // a late_apex fail. That grade is the figure's lesson, not a defect —
+    // apexing each corner in turn is already compromised on a compound corner.
+    expect(good.verdict.quality).toBe("caution");
+    const c2 = good.verdict.corners.find((c) => c.id === "c2")!;
+    expect(c2.apexes).toHaveLength(1);
+    expect(c2.apexes[0]!.pct).toBeCloseTo(5.0, 1);
+    expect(good.verdict.corners.every((c) => c.ran_wide === false)).toBe(true);
 
-    // late now SOLVES the runoff (adj-fig-08-05): the under-read believed world
-    // leaves no reaction time, so the line departs the outer edge before a
-    // corrective shot can launch — its run-wide bookmark carries the mistake.
-    const late = lineOf(env, "late");
-    expect(late.verdict.outcome).toBe("runoff");
-    expect(late.verdict.quality).toBe("failing");
-    expect(late.trajectory.terminated.reason).toBe("off_road");
-    expect(late.verdict.misjudgment?.s_divergence_m).toBe(10);
-    const lc = late.verdict.corners.find((c) => c.corrective != null)!.corrective!;
-    expect(lc.feasible).toBe(false);
-    expect(lc.fail_reason).toBe("departed_before_reaction");
-    expect(lc.detect.s).toBeCloseTo(15.81, 1);
-    expect(late.trajectory.events.some((e) => e.kind === "run_wide_detect")).toBe(true);
-    expect(late.trajectory.events.some((e) => e.kind === "correction")).toBe(false);
+    // `early` is `mistake premature` — the kind D25 renamed from `early_apex`.
+    // It turns in 10 m sooner, touches the inside of c1 at 51% of sweep (an
+    // apex barely off the kerb, f ≈ 0.02), and the geometry that hands it into
+    // c2 is unrideable: run_wide_detect, then off the outside edge before c3.
+    const early = lineOf(env, "early");
+    expect(early.verdict.outcome).toBe("runoff");
+    expect(early.verdict.quality).toBe("failing");
+    expect(early.trajectory.terminated.reason).toBe("off_road");
+    expect(early.verdict.diagnosis?.cause).toBe("plan_gap");
+    expect(early.verdict.diagnosis?.detail?.["mistake_kind"]).toBe("premature");
+    expect(early.verdict.diagnosis?.detail?.["early_by_m"]).toBe(10);
+
+    const ec1 = early.verdict.corners.find((c) => c.id === "c1")!;
+    expect(ec1.apexes).toHaveLength(1);
+    expect(ec1.apexes[0]!.pct).toBeCloseTo(51.2, 1); // early — the 50% bar is the late_apex boundary
+    expect(ec1.apexes[0]!.f).toBeLessThan(0.05); // hard on the inside edge
+    // c1 itself still contains; the cost lands one corner later
+    expect(ec1.ran_wide).toBe(false);
+    const ec2 = early.verdict.corners.find((c) => c.id === "c2")!;
+    expect(ec2.ran_wide).toBe(true);
+
+    const corrective = ec2.corrective!;
+    expect(corrective.feasible).toBe(false);
+    expect(corrective.fail_reason).toBe("departed_before_reaction");
+    expect(corrective.detect.s).toBeCloseTo(29.59, 1);
+    expect(early.trajectory.events.some((e) => e.kind === "run_wide_detect")).toBe(true);
+    expect(early.trajectory.events.some((e) => e.kind === "correction")).toBe(false);
   });
 
-  it.todo("G-8.5-RED as designed — double: 2 apexes in the taper corner; good: 1 in c1 + 1 in c3; wrong_strategy_for_corner fail on double; colours per 06 §5.1 — lands when the A-DOUBLEAPEX and believed-band seams are ratified/resolved");
+  it.todo("G-8.5-RED with a TWO-TOUCH ideal — 2 apexes across the c1..c3 window, wrong_strategy_for_corner fail on a single-apex alternative — lands if/when the A-DOUBLEAPEX compound-window drift arithmetic is resolved");
 });

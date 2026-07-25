@@ -1,16 +1,27 @@
-# Fig 8.5 — the double apex: a compound corner that rewards two touches.
-# `good` plans the compound with two apexes; `late` believes a single steady R24
-# corner (an under-read of the tightening R12 touches), so it runs off before it
-# can react when the actual road turns out tighter than believed — the under-read
-# leaves no reaction time (corrective infeasible, departed_before_reaction).
-# believeRoad is TUNING.
+# Fig 8.5 — the double apex: where you first touch decides whether you make the second.
+# bookDoubleApex is one linked run (c1 R12 ^70 | c2 R24 ^40 | c3 R12 ^70): two
+# tight touches bridged by an opening. `good` is the chained line the engine can
+# actually find — contained through all three, but graded `caution`, because the
+# corner-scoped doctrine reads the linking c2 as a corner of its own and marks its
+# 5%-of-sweep apex early. That grade IS the lesson: a line that apexes each corner
+# in turn is already compromised on a compound corner.
+# `early` turns in ten metres sooner (`premature`, the kind D25 renamed from
+# `early_apex`). It touches the inside of c1 at 51% of sweep — a textbook early
+# apex, hard on the kerb — and the geometry it hands itself for c2 is unrideable:
+# it runs wide and off the outside edge before c3 exists.
+# The two-touch solver (`style=double_apex`) refuses on this road at EVERY entry
+# speed tried, 18-36 km/h — the compound-window drift arithmetic in
+# solve/doubleApex.ts cannot widen back out to c2's inside edge. That refusal is a
+# recorded, tripwire-tested design decision, so this figure draws the chained line
+# the engine stands behind rather than a two-touch line it cannot justify.
 road:      preset bookDoubleApex
 lines:
-  good:    ride entry=30 style=double_apex
-  late:    ride entry=30 believeRoad="lane 3.5 | S 10 | L 24 ^130 | S 12" role=mistake
+  good:    ride entry=30 turnIn=auto
+  early:   mistake premature
+marks:     turn_point,apex
 labels:
-  apex#1@good         "first touch"
-  apex#2@good         "second touch"
-  run_wide_detect@late +8  "believed one steady corner — ran off before reacting"
+  apex#1@good           "first touch"
+  apex#1@early          "early apex - hard on the inside of c1"
+  run_wide_detect@early "no geometry left for c2 - off the outside edge"
 view:      mode=diagram window=auto
-note:      "Two apexes bridged by an opening; the believed-single-corner line runs off before a reaction is possible."
+note:      "Touch the inside of the first corner too soon and the compound corner takes the exit away."

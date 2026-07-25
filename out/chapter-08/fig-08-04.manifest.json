@@ -1,0 +1,38 @@
+{
+  "figure_id": "fig-08-04",
+  "spec_hash": "30fcb5",
+  "mode": "true",
+  "view": {
+    "window": {
+      "from_s": 0,
+      "to_s": 52.361600344907856
+    },
+    "orient": 0
+  },
+  "legend": [
+    {
+      "line_id": "bad",
+      "role": "mistake",
+      "quality": "failing",
+      "outcome": "wide"
+    },
+    {
+      "line_id": "good",
+      "role": "ideal",
+      "quality": "good",
+      "outcome": "contained"
+    }
+  ],
+  "proportion_metrics": {
+    "width_ratio": [
+      {
+        "corner_id": "c1",
+        "value": 0.56
+      }
+    ],
+    "straight_share": 0.4586175030409133,
+    "road_ink": 0.36760545995931015,
+    "frame_aspect": 0.7720081163008198
+  },
+  "gate_verdict": "warn"
+}

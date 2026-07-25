@@ -1,0 +1,760 @@
+[
+ {
+  "figure": "fig-08-01",
+  "lines": [
+   {
+    "id": "good",
+    "ok": true,
+    "outcome": "contained",
+    "quality": "good",
+    "headline": "contained — clean",
+    "diagnosis": null,
+    "tally": {
+     "pass": 10,
+     "fail": 0,
+     "warn": 0,
+     "na": 6
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 30.47,
+      "grip_min": 0.37,
+      "apex_pct": 66.3,
+      "ran_wide": false
+     }
+    ],
+    "sight_margin_min_m": -30.95,
+    "flags": []
+   },
+   {
+    "id": "bad",
+    "ok": false,
+    "outcome": "runoff",
+    "quality": "failing",
+    "headline": "ran off in c1",
+    "diagnosis": {
+     "cause": "plan_gap",
+     "at_s": 0.5,
+     "corner_id": "c1",
+     "detail": {
+      "mistake_kind": "premature",
+      "early_by_m": 10,
+      "clamped_to_road_start": true
+     }
+    },
+    "tally": {
+     "pass": 7,
+     "fail": 4,
+     "warn": 0,
+     "na": 5
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 14.51,
+      "grip_min": 0.658,
+      "apex_pct": 31.8,
+      "ran_wide": true
+     }
+    ],
+    "sight_margin_min_m": -22.22,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "late_apex",
+      "corner": "c1",
+      "msg": "apex at 31.8% of sweep, before the 50% bar"
+     },
+     {
+      "v": "fail",
+      "id": "exit_containment",
+      "corner": "c1",
+      "msg": "terminated off-road before the exit sample"
+     },
+     {
+      "v": "fail",
+      "id": "stop_within_sight",
+      "corner": null,
+      "msg": "stopping distance exceeds sight by 22.2 m"
+     },
+     {
+      "v": "fail",
+      "id": "rideability",
+      "corner": null,
+      "msg": "tracker overdrive"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "figure": "fig-08-02",
+  "lines": [
+   {
+    "id": "good",
+    "ok": true,
+    "outcome": "contained",
+    "quality": "good",
+    "headline": "contained — clean",
+    "diagnosis": null,
+    "tally": {
+     "pass": 10,
+     "fail": 0,
+     "warn": 0,
+     "na": 6
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 30.47,
+      "grip_min": 0.37,
+      "apex_pct": 66.3,
+      "ran_wide": false
+     }
+    ],
+    "sight_margin_min_m": -30.95,
+    "flags": []
+   },
+   {
+    "id": "bad",
+    "ok": false,
+    "outcome": "runoff",
+    "quality": "failing",
+    "headline": "ran off in c1",
+    "diagnosis": {
+     "cause": "roll_rate_limited",
+     "at_s": 6.97,
+     "corner_id": "c1",
+     "detail": {
+      "roll_rate_cap_dps": 15,
+      "roll_rate_factor": 0.3
+     }
+    },
+    "tally": {
+     "pass": 5,
+     "fail": 5,
+     "warn": 0,
+     "na": 6
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 17.88,
+      "grip_min": 0.659,
+      "apex_pct": 2.7,
+      "ran_wide": true
+     }
+    ],
+    "sight_margin_min_m": -19.73,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "late_apex",
+      "corner": "c1",
+      "msg": "apex at 2.7% of sweep, before the 50% bar"
+     },
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c1",
+      "msg": "out-in-out shape broken"
+     },
+     {
+      "v": "fail",
+      "id": "quick_steer",
+      "corner": "c1",
+      "msg": "roll-in never completed inside the record — it ate every ridden metre of the corner"
+     },
+     {
+      "v": "fail",
+      "id": "exit_containment",
+      "corner": "c1",
+      "msg": "terminated off-road before the exit sample"
+     },
+     {
+      "v": "fail",
+      "id": "stop_within_sight",
+      "corner": null,
+      "msg": "stopping distance exceeds sight by 19.7 m"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "figure": "fig-08-03",
+  "lines": [
+   {
+    "id": "good",
+    "ok": true,
+    "outcome": "contained",
+    "quality": "good",
+    "headline": "contained — clean",
+    "diagnosis": null,
+    "tally": {
+     "pass": 10,
+     "fail": 0,
+     "warn": 0,
+     "na": 6
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 30.47,
+      "grip_min": 0.37,
+      "apex_pct": 66.3,
+      "ran_wide": false
+     }
+    ],
+    "sight_margin_min_m": -30.95,
+    "flags": []
+   },
+   {
+    "id": "bad",
+    "ok": false,
+    "outcome": "runoff",
+    "quality": "failing",
+    "headline": "ran off in c1",
+    "diagnosis": {
+     "cause": "plan_gap",
+     "at_s": 0.5,
+     "corner_id": "c1",
+     "detail": {
+      "mistake_kind": "fifty_pence",
+      "early_by_m": 10,
+      "clamped_to_road_start": true,
+      "facets": 6
+     }
+    },
+    "tally": {
+     "pass": 6,
+     "fail": 5,
+     "warn": 0,
+     "na": 5
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 23.31,
+      "grip_min": 0.514,
+      "apex_pct": 21.2,
+      "ran_wide": true
+     }
+    ],
+    "sight_margin_min_m": -19.79,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "late_apex",
+      "corner": "c1",
+      "msg": "apex at 21.2% of sweep, before the 50% bar"
+     },
+     {
+      "v": "fail",
+      "id": "single_input",
+      "corner": "c1",
+      "msg": "3 steering input(s), 1 allowed"
+     },
+     {
+      "v": "fail",
+      "id": "exit_containment",
+      "corner": "c1",
+      "msg": "terminated off-road before the exit sample"
+     },
+     {
+      "v": "fail",
+      "id": "stop_within_sight",
+      "corner": null,
+      "msg": "stopping distance exceeds sight by 19.8 m"
+     },
+     {
+      "v": "fail",
+      "id": "rideability",
+      "corner": null,
+      "msg": "tracker overdrive"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "figure": "fig-08-04",
+  "lines": [
+   {
+    "id": "good",
+    "ok": true,
+    "outcome": "contained",
+    "quality": "good",
+    "headline": "contained — clean",
+    "diagnosis": null,
+    "tally": {
+     "pass": 11,
+     "fail": 0,
+     "warn": 0,
+     "na": 5
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 24.78,
+      "grip_min": 0.487,
+      "apex_pct": 76,
+      "ran_wide": false
+     }
+    ],
+    "sight_margin_min_m": -26.3,
+    "flags": []
+   },
+   {
+    "id": "bad",
+    "ok": false,
+    "outcome": "wide",
+    "quality": "failing",
+    "headline": "ran wide in c1 — recoverable within reserve",
+    "diagnosis": {
+     "cause": "overspeed_entry",
+     "at_s": 0,
+     "corner_id": "c1",
+     "detail": {
+      "by_kmh": 2.5,
+      "entry_kmh": 36.5
+     }
+    },
+    "tally": {
+     "pass": 8,
+     "fail": 4,
+     "warn": 0,
+     "na": 4
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 24.78,
+      "grip_min": 0.526,
+      "apex_pct": 1.4,
+      "ran_wide": true
+     }
+    ],
+    "sight_margin_min_m": -15.67,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "late_apex",
+      "corner": "c1",
+      "msg": "apex at 1.4% of sweep, before the 60% bar"
+     },
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c1",
+      "msg": "out-in-out shape broken"
+     },
+     {
+      "v": "fail",
+      "id": "exit_containment",
+      "corner": "c1",
+      "msg": "terminated off-road before the exit sample"
+     },
+     {
+      "v": "fail",
+      "id": "stop_within_sight",
+      "corner": null,
+      "msg": "stopping distance exceeds sight by 15.7 m"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "figure": "fig-08-05",
+  "lines": [
+   {
+    "id": "good",
+    "ok": false,
+    "outcome": "contained",
+    "quality": "caution",
+    "headline": "contained — 6 check fails",
+    "diagnosis": null,
+    "tally": {
+     "pass": 23,
+     "fail": 6,
+     "warn": 2,
+     "na": 8
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 25.16,
+      "grip_min": 0.53,
+      "apex_pct": 98.9,
+      "ran_wide": false
+     },
+     {
+      "id": "c2",
+      "lean_max_deg": 11.92,
+      "grip_min": 0.789,
+      "apex_pct": 5,
+      "ran_wide": false
+     },
+     {
+      "id": "c3",
+      "lean_max_deg": 34.16,
+      "grip_min": 0.285,
+      "apex_pct": 0.6,
+      "ran_wide": false
+     }
+    ],
+    "sight_margin_min_m": -22.93,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "late_apex",
+      "corner": "c2",
+      "msg": "apex at 5.0% of sweep, before the 50% bar"
+     },
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c2",
+      "msg": "out-in-out shape broken — exit leg waived (chained)"
+     },
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c3",
+      "msg": "out-in-out shape broken"
+     },
+     {
+      "v": "fail",
+      "id": "single_input",
+      "corner": "c1",
+      "msg": "2 steering input(s), 1 allowed"
+     },
+     {
+      "v": "fail",
+      "id": "single_input",
+      "corner": "c3",
+      "msg": "2 steering input(s), 1 allowed"
+     },
+     {
+      "v": "warn",
+      "id": "throttle_rule",
+      "corner": "c1",
+      "msg": "missed legs: roll_on"
+     },
+     {
+      "v": "warn",
+      "id": "throttle_rule",
+      "corner": "c2",
+      "msg": "missed legs: roll_on"
+     },
+     {
+      "v": "fail",
+      "id": "link_continuity",
+      "corner": null,
+      "msg": "link broken: entry_side"
+     }
+    ]
+   },
+   {
+    "id": "early",
+    "ok": false,
+    "outcome": "runoff",
+    "quality": "failing",
+    "headline": "ran off in c2",
+    "diagnosis": {
+     "cause": "plan_gap",
+     "at_s": 0.5,
+     "corner_id": "c1",
+     "detail": {
+      "mistake_kind": "premature",
+      "early_by_m": 10,
+      "clamped_to_road_start": true
+     }
+    },
+    "tally": {
+     "pass": 12,
+     "fail": 9,
+     "warn": 1,
+     "na": 17
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 11.98,
+      "grip_min": 0.755,
+      "apex_pct": 51.2,
+      "ran_wide": false
+     },
+     {
+      "id": "c2",
+      "lean_max_deg": 11.92,
+      "grip_min": 0.789,
+      "apex_pct": 2,
+      "ran_wide": true
+     }
+    ],
+    "sight_margin_min_m": -11.45,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "late_apex",
+      "corner": "c2",
+      "msg": "apex at 2.0% of sweep, before the 50% bar"
+     },
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c2",
+      "msg": "out-in-out shape broken — exit leg waived (chained)"
+     },
+     {
+      "v": "fail",
+      "id": "single_input",
+      "corner": "c2",
+      "msg": "0 steering input(s), 1 allowed"
+     },
+     {
+      "v": "fail",
+      "id": "throttle_rule",
+      "corner": "c1",
+      "msg": "missed legs: roll_on, discipline"
+     },
+     {
+      "v": "warn",
+      "id": "throttle_rule",
+      "corner": "c2",
+      "msg": "missed legs: roll_on"
+     },
+     {
+      "v": "fail",
+      "id": "exit_containment",
+      "corner": "c2",
+      "msg": "terminated off-road before the exit sample"
+     },
+     {
+      "v": "fail",
+      "id": "stop_within_sight",
+      "corner": null,
+      "msg": "stopping distance exceeds sight by 11.4 m"
+     },
+     {
+      "v": "fail",
+      "id": "link_continuity",
+      "corner": null,
+      "msg": "link broken: entry_side"
+     },
+     {
+      "v": "fail",
+      "id": "link_continuity",
+      "corner": null,
+      "msg": "link broken: entry_side"
+     },
+     {
+      "v": "fail",
+      "id": "chain_containment",
+      "corner": null,
+      "msg": "chain leaves the corridor on the outside side"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "figure": "fig-08-06",
+  "lines": [
+   {
+    "id": "good",
+    "ok": false,
+    "outcome": "contained",
+    "quality": "caution",
+    "headline": "contained — 2 check fails",
+    "diagnosis": null,
+    "tally": {
+     "pass": 35,
+     "fail": 2,
+     "warn": 3,
+     "na": 11
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 35.03,
+      "grip_min": 0.299,
+      "apex_pct": 98.7,
+      "ran_wide": false
+     },
+     {
+      "id": "c2",
+      "lean_max_deg": 28.09,
+      "grip_min": 0.466,
+      "apex_pct": 97.4,
+      "ran_wide": false
+     },
+     {
+      "id": "c3",
+      "lean_max_deg": 37,
+      "grip_min": 0.246,
+      "apex_pct": 99.2,
+      "ran_wide": false
+     },
+     {
+      "id": "c4",
+      "lean_max_deg": 37,
+      "grip_min": 0.214,
+      "apex_pct": 2.4,
+      "ran_wide": false
+     }
+    ],
+    "sight_margin_min_m": -24.66,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c3",
+      "msg": "out-in-out shape broken — exit leg waived (chained)"
+     },
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c4",
+      "msg": "out-in-out shape broken"
+     },
+     {
+      "v": "warn",
+      "id": "throttle_rule",
+      "corner": "c1",
+      "msg": "missed legs: roll_on"
+     },
+     {
+      "v": "warn",
+      "id": "throttle_rule",
+      "corner": "c2",
+      "msg": "missed legs: roll_on"
+     },
+     {
+      "v": "warn",
+      "id": "throttle_rule",
+      "corner": "c3",
+      "msg": "missed legs: roll_on"
+     }
+    ]
+   },
+   {
+    "id": "bad",
+    "ok": false,
+    "outcome": "runoff",
+    "quality": "failing",
+    "headline": "ran off in c2",
+    "diagnosis": {
+     "cause": "plan_gap",
+     "at_s": 0.5,
+     "corner_id": "c1",
+     "detail": {
+      "mistake_kind": "premature",
+      "early_by_m": 10,
+      "clamped_to_road_start": true
+     }
+    },
+    "tally": {
+     "pass": 12,
+     "fail": 11,
+     "warn": 1,
+     "na": 27
+    },
+    "corners": [
+     {
+      "id": "c1",
+      "lean_max_deg": 23.97,
+      "grip_min": 0.539,
+      "apex_pct": 70,
+      "ran_wide": false
+     },
+     {
+      "id": "c2",
+      "lean_max_deg": 26.39,
+      "grip_min": 0.504,
+      "apex_pct": 27.3,
+      "ran_wide": true
+     }
+    ],
+    "sight_margin_min_m": -13.7,
+    "flags": [
+     {
+      "v": "fail",
+      "id": "late_apex",
+      "corner": "c2",
+      "msg": "apex at 27.3% of sweep, before the 50% bar"
+     },
+     {
+      "v": "fail",
+      "id": "out_in_out",
+      "corner": "c2",
+      "msg": "out-in-out shape broken — exit leg waived (chained)"
+     },
+     {
+      "v": "fail",
+      "id": "single_input",
+      "corner": "c2",
+      "msg": "2 steering input(s), 1 allowed"
+     },
+     {
+      "v": "fail",
+      "id": "throttle_rule",
+      "corner": "c1",
+      "msg": "missed legs: roll_on, discipline"
+     },
+     {
+      "v": "warn",
+      "id": "throttle_rule",
+      "corner": "c2",
+      "msg": "missed legs: roll_on"
+     },
+     {
+      "v": "fail",
+      "id": "exit_containment",
+      "corner": "c2",
+      "msg": "terminated off-road before the exit sample"
+     },
+     {
+      "v": "fail",
+      "id": "stop_within_sight",
+      "corner": null,
+      "msg": "stopping distance exceeds sight by 13.7 m"
+     },
+     {
+      "v": "fail",
+      "id": "link_continuity",
+      "corner": null,
+      "msg": "link broken: entry_side"
+     },
+     {
+      "v": "fail",
+      "id": "link_continuity",
+      "corner": null,
+      "msg": "link broken: entry_side"
+     },
+     {
+      "v": "fail",
+      "id": "link_continuity",
+      "corner": null,
+      "msg": "link broken: entry_side"
+     },
+     {
+      "v": "fail",
+      "id": "chain_containment",
+      "corner": null,
+      "msg": "chain leaves the corridor on the inside side"
+     },
+     {
+      "v": "fail",
+      "id": "chain_flow",
+      "corner": null,
+      "msg": "flow broken: rhythm"
+     }
+    ]
+   }
+  ]
+ }
+]
