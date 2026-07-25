@@ -1,7 +1,14 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const BAKE = '/tmp/ch8bake';
-const SCENES = '/Users/carlos/Documents/Claude/Projects/Motorcycle Technique 2/figures';
+// Paths derive from this file's location: the gallery has to rebuild on any
+// clone, not only on the machine that first baked it.
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(HERE, '../..');
+const BAKE = resolve(process.env['CH8_BAKE_DIR'] ?? join(HERE, '.bake'));
+const SCENES = join(ROOT, 'figures');
+const GALLERY_OUT = join(HERE, 'gallery.html');
 const summary = JSON.parse(readFileSync(`${BAKE}/summary.json`, 'utf8'));
 
 const esc = (s) =>
@@ -1161,6 +1168,6 @@ const asciiSafe = [...html]
   .map((ch) => (ch.codePointAt(0) > 127 ? `&#${ch.codePointAt(0)};` : ch))
   .join('');
 
-writeFileSync('/tmp/ch8bake/gallery.html', asciiSafe);
+writeFileSync(GALLERY_OUT, asciiSafe);
 const nonAscii = [...html].filter((c) => c.codePointAt(0) > 127).length;
 console.log(`wrote gallery.html ${asciiSafe.length} bytes (escaped ${nonAscii} non-ASCII chars)`);

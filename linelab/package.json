@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "cli": "node --enable-source-maps dist/cli/main.js",
-    "bless": "node --enable-source-maps dist/cli/bless.js"
+    "bless": "node --enable-source-maps dist/cli/bless.js",
+    "bake:ch8": "bash ../out/chapter-08/bake.sh"
   },
   "devDependencies": {
     "typescript": "~5.7.0",

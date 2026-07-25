@@ -1,15 +1,49 @@
 #!/bin/bash
-# Re-bake all six Chapter 8 figures from the scene sources, then render every
-# view. The POV pass now runs once PER LINE (`render --views pov --line <id>`),
-# so a plate can put the ideal rider's frame beside the mistake rider's frame at
-# the same corner instead of showing one frame with nothing to compare it to.
+# Re-bake all six Chapter 8 figures from the scene sources, render every view,
+# copy the committed artefacts into this directory, and rebuild the gallery.
+#
+#   bash out/chapter-08/bake.sh          (or: cd linelab && npm run bake:ch8)
+#
+# Everything is derived from this script's own location — no absolute paths, no
+# state in /tmp. The scratch bake lands in ./.bake (git-ignored); only the SVGs,
+# manifests, envelopes, verdicts.json and gallery.html are committed.
+#
+# The POV pass runs once PER LINE (`render --views pov --line <id>`), so a plate
+# can put the ideal rider's frame beside the mistake rider's frame at the same
+# corner instead of showing one frame with nothing to compare it to.
 set -u
-LAB="/Users/carlos/Documents/Claude/Projects/Motorcycle Technique 2/linelab"
-SCENES="/Users/carlos/Documents/Claude/Projects/Motorcycle Technique 2/figures"
-BAKE=/tmp/ch8bake
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$HERE/../.." && pwd)"
+LAB="$ROOT/linelab"
+SCENES="$ROOT/figures"
+BAKE="${CH8_BAKE_DIR:-$HERE/.bake}"
 CLI="$LAB/dist/cli/main.js"
 
-cd "$LAB" || exit 1
+failures=0
+deviations=0
+note_exit() { # <label> <status>
+  echo "$1 exit=$2"
+  [ "$2" -eq 0 ] || failures=$((failures + 1))
+}
+# `figure` returns tier 3 (DEVIATION) when a line's emergent verdict differs
+# from the gate's derived expectation — fig 8.5 and 8.6's ideal lines grade
+# `caution` on the linking corner, a known engine seam (test/golden/scenes.ts).
+# That is a finding to surface, not a broken bake: the envelope still wrote.
+note_figure_exit() { # <label> <status>
+  if [ "$2" -eq 3 ]; then
+    echo "$1 exit=3  DEVIATION (gate expectation unmet — envelope still written)"
+    deviations=$((deviations + 1))
+  else
+    note_exit "$1" "$2"
+  fi
+}
+
+# dist/ is what the CLI runs from; a stale build silently bakes the old renderer.
+if [ "${CH8_SKIP_BUILD:-0}" != "1" ]; then
+  (cd "$LAB" && npm run --silent build)
+  note_exit "build" $?
+fi
 
 for n in 01 02 03 04 05 06; do
   id="fig-08-$n"
@@ -18,12 +52,12 @@ for n in 01 02 03 04 05 06; do
 
   node "$CLI" figure "$SCENES/$id.scene" --mode true --out "$BAKE/$id" \
     > "$BAKE/$id.stdout.json" 2> "$BAKE/$id.stderr"
-  echo "$id figure exit=$?"
+  note_figure_exit "$id figure" $?
 
   env="$BAKE/$id/$id.json"
   node "$CLI" render "$env" --views topdown,controls --mode true --out "$BAKE/views-$n" \
     > "$BAKE/render-$n.json" 2>&1
-  echo "$id topdown+controls exit=$?"
+  note_exit "$id topdown+controls" $?
 
   # one POV per drawn line — the comparison IS the view
   for line in $(node -e "
@@ -31,11 +65,32 @@ for n in 01 02 03 04 05 06; do
     const v = e.value ?? e;
     console.log((v.lines ?? []).filter(l => l.ok !== false || !l.error).map(l => l.line_id).join(' '));
   "); do
-    node "$CLI" render "$env" --views pov --line "$line" --mode true --out "$BAKE/views-$n" \
-      > "$BAKE/pov-$n-$line.json" 2>&1
-    echo "  $id pov --line $line exit=$?"
+    node "$CLI" render "$env" --views pov --line "$line" --mode true --look limit_point \
+      --out "$BAKE/views-$n" > "$BAKE/pov-$n-$line.json" 2>&1
+    note_exit "  $id pov --line $line" $?
   done
+
+  # The committed artefacts. The top-down and its manifest come from the FIGURE
+  # verb, not from `render`: only the figure verb sees the scene, so only its
+  # render carries the scene's `marks:` selection and `labels:` callouts, and
+  # only its manifest carries the real spec_hash. `render` re-renders from the
+  # envelope, which has neither — it exists here for the per-line controls and
+  # POV strips. Copying the wrong one silently drops every callout.
+  cp "$BAKE/$id/$id.svg" "$HERE/$id.svg"
+  cp "$BAKE/$id/manifest.json" "$HERE/$id.manifest.json"
+  cp "$BAKE/views-$n"/*.controls.svg "$BAKE/views-$n"/*.pov.svg "$HERE/"
+  cp "$env" "$HERE/$id.envelope.json"
 done
 
-node "$BAKE/summarize.mjs" > "$BAKE/summary.json"
-echo "summary rewritten"
+node "$HERE/summarize.mjs" "$BAKE" > "$BAKE/summary.json"
+note_exit "summarize" $?
+cp "$BAKE/summary.json" "$HERE/verdicts.json"
+
+CH8_BAKE_DIR="$BAKE" node "$HERE/build-gallery.mjs"
+note_exit "gallery" $?
+
+if [ "$failures" -ne 0 ]; then
+  echo "bake FAILED: $failures step(s) non-zero"
+  exit 1
+fi
+echo "bake ok ($deviations figure deviation(s))"
