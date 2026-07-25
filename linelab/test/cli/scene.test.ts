@@ -50,7 +50,11 @@ describe("lowerScene — the six committed book-figure scenes lower cleanly", ()
         { feature: "apex", line: "good", text: "late apex — sight and exit" }
       ],
       marks: ["turn_point"],
-      view: { mode: "diagram", window: "auto" },
+      // `consequence=on` is the stage-8b gate (design/06 §3.1): fig 8.1 is the
+      // figure whose whole lesson is what the runoff was pointing AT, so it is
+      // the one scene that asks for the ray. plan/ passes view keys through
+      // opaquely — the string spelling is what render/project.ts validates.
+      view: { mode: "diagram", window: "auto", consequence: "on" },
       note: "Turn in too soon and the geometry points the exit wide — toward the oncoming vehicle."
     });
   });

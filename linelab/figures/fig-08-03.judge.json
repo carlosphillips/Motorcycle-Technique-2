@@ -1,7 +1,7 @@
 {
   "figure_id": "fig-08-03",
   "spec_hash": "09875f",
-  "svg_fnv1a": "e9dcd6",
+  "svg_fnv1a": "615819",
   "judge_identity": {
     "judge_model": "claude",
     "judge_model_version": "claude-opus-5",
@@ -49,7 +49,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 1 \u2014 full 2000x2294 raster. Legend: red \"fifty_pence \u2014 mistake \u00b7 failing (runoff)\", green \"solved 34 km/h \u2014 ideal \u00b7 good\", matching the manifest (J1 pass). SIX red hourglasses are strung along the red line and exactly ONE green hourglass sits on the green \u2014 the count is the lesson, and each glyph is planted on its own line with none floating in open road (J2 pass). The first red hourglass is at the very start of the straight, LEFT of the green one, so the mistake's first input also precedes the ideal's (J5 corroborated). \"first of six inputs\" leads to that first red hourglass and \"one smooth input\" leads to the green line in the corner; both are inside the frame and unobstructed (J3 pass). No occluders declared or drawn (J4 na). J5: six turn-point glyphs against one is unmistakable at a glance, and the red line's cumulative cost is drawn \u2014 it ends on the outer edge with an arrowhead rather than completing the corner (J5 pass). Nothing undeclared (J7 pass); text and both line colours are crisp at 2x (J8 pass). J6 na, J9 na."
+        "evidence": "Pass 1 — full 2000x2294 raster. Legend: red \"fifty_pence — mistake · failing (runoff)\", green \"solved 34 km/h — ideal · good\", matching the manifest (J1 pass). SIX red hourglasses are strung along the red line and exactly ONE green hourglass sits on the green — the count is the lesson, and each glyph is planted on its own line with none floating in open road (J2 pass). The first red hourglass is at the very start of the straight, LEFT of the green one, so the mistake's first input also precedes the ideal's (J5 corroborated). \"first of six inputs\" leads to that first red hourglass and \"one smooth input\" leads to the green line in the corner; both are inside the frame and unobstructed (J3 pass). No occluders declared or drawn (J4 na). J5: six turn-point glyphs against one is unmistakable at a glance, and the red line's cumulative cost is drawn — it ends on the outer edge with an arrowhead rather than completing the corner (J5 pass). Nothing undeclared (J7 pass); text and both line colours are crisp at 2x (J8 pass). J6 na, J9 na."
       },
       {
         "attempt": 2,
@@ -91,7 +91,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 2 \u2014 SVG draw list against the manifest. Two polylines, bad #b32e2e / arrow-failing and good #1f6f43 / arrow-good, matching the declared failing/good classes (J1 pass). data-marker-class inventory: {good, turn_point} x1 and {bad, turn_point} x6 \u2014 six is the `fifty_pence` facet count, and no apex/exit/release glyph appears, which is what the scene's `marks: turn_point` licenses and nothing more (J2 pass, J7 pass). Two <text> callouts beyond the legend, matching the two declared labels (J3 pass). Zero rays and zero occluders (J4 na). One data-terminal-reason=\"off_road\" on bad."
+        "evidence": "Pass 2 — SVG draw list against the manifest. Two polylines, bad #b32e2e / arrow-failing and good #1f6f43 / arrow-good, matching the declared failing/good classes (J1 pass). data-marker-class inventory: {good, turn_point} x1 and {bad, turn_point} x6 — six is the `fifty_pence` facet count, and no apex/exit/release glyph appears, which is what the scene's `marks: turn_point` licenses and nothing more (J2 pass, J7 pass). Two <text> callouts beyond the legend, matching the two declared labels (J3 pass). Zero rays and zero occluders (J4 na). One data-terminal-reason=\"off_road\" on bad."
       },
       {
         "attempt": 3,
@@ -133,7 +133,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 3 \u2014 re-examination of the marker chain at full 2x resolution. Walking the red line from its start, the six hourglasses are at visibly increasing spacing as speed builds, each one sitting centred on the red stroke with the pinched waist resolvable at this scale (so they read as hourglasses, not as filled diamonds \u2014 the defect the hourglassPoints regression gate exists to catch). The red polyline itself renders smoother than the word \"fifty-pencing\" suggests, so J5 rests on the glyph count and the label rather than on visible faceting of the stroke; that is still a legible, honest reading of the taught error, and the six-versus-one contrast carries it (J5 pass, recorded as the weakest of this figure's passes)."
+        "evidence": "Pass 3 — re-examination of the marker chain at full 2x resolution. Walking the red line from its start, the six hourglasses are at visibly increasing spacing as speed builds, each one sitting centred on the red stroke with the pinched waist resolvable at this scale (so they read as hourglasses, not as filled diamonds — the defect the hourglassPoints regression gate exists to catch). The red polyline itself renders smoother than the word \"fifty-pencing\" suggests, so J5 rests on the glyph count and the label rather than on visible faceting of the stroke; that is still a legible, honest reading of the taught error, and the six-versus-one contrast carries it (J5 pass, recorded as the weakest of this figure's passes)."
       }
     ],
     "items": [

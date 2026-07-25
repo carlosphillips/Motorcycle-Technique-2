@@ -1,7 +1,7 @@
 {
   "figure_id": "fig-08-06",
   "spec_hash": "40ae19",
-  "svg_fnv1a": "2fff4c",
+  "svg_fnv1a": "9fc9f6",
   "judge_identity": {
     "judge_model": "claude",
     "judge_model_version": "claude-opus-5",
@@ -49,7 +49,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 1 \u2014 full 2000x2714 raster. Legend: red \"premature@all \u2014 mistake \u00b7 failing (runoff)\", amber \"chained 32 km/h \u2014 ideal \u00b7 caution (contained)\"; the ideal is drawn #b07d1e for caution, matching its declared class (J1 pass). The amber line carries the full auto marker set through all four corners \u2014 hourglasses, rings, filled exit dots and release chevrons \u2014 and the red mistake carries none, which is what `auto` licenses when a scene declares no marks: (J2 pass). This scene declares no labels: and no occluders:, so J3 and J4 do not apply (na). J5: the red line turns in early at the first corner and never recovers the road's shape \u2014 it holds an almost straight chord diagonally across the esses while the amber line follows each corner in turn, and it leaves the corridor on the outer edge partway through. An early turn-in that stops tracking the road and runs out of corridor is the error `premature@all` names, and it is legible from the drawing alone; the scene note's further claim of strictly increasing per-corner lean is a data fact, not something the top-down carries (J5 pass, on the drawn error rather than on the amplification claim). Nothing undeclared (J7 pass); at 2x both colours and all glyphs resolve (J8 pass). J6 na, J9 na."
+        "evidence": "Pass 1 — full 2000x2714 raster. Legend: red \"premature@all — mistake · failing (runoff)\", amber \"chained 32 km/h — ideal · caution (contained)\"; the ideal is drawn #b07d1e for caution, matching its declared class (J1 pass). The amber line carries the full auto marker set through all four corners — hourglasses, rings, filled exit dots and release chevrons — and the red mistake carries none, which is what `auto` licenses when a scene declares no marks: (J2 pass). This scene declares no labels: and no occluders:, so J3 and J4 do not apply (na). J5: the red line turns in early at the first corner and never recovers the road's shape — it holds an almost straight chord diagonally across the esses while the amber line follows each corner in turn, and it leaves the corridor on the outer edge partway through. An early turn-in that stops tracking the road and runs out of corridor is the error `premature@all` names, and it is legible from the drawing alone; the scene note's further claim of strictly increasing per-corner lean is a data fact, not something the top-down carries (J5 pass, on the drawn error rather than on the amplification claim). Nothing undeclared (J7 pass); at 2x both colours and all glyphs resolve (J8 pass). J6 na, J9 na."
       },
       {
         "attempt": 2,
@@ -91,7 +91,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 2 \u2014 SVG draw list against the manifest. Two polylines: bad #b32e2e / arrow-failing, good #b07d1e / arrow-caution, matching the manifest's failing and caution declarations (J1 pass). data-marker-class inventory: good turn_point x4, apex x5, exit x4, release x16, and no {bad, ...} entry at all \u2014 four corners' worth of ideal-line markers, no fabricated glyph on the mistake (J2 pass, J7 pass). Zero <text> nodes beyond the two legend rows and zero data-ray-line / data-occluder-kind attributes (J3 na, J4 na). One data-terminal-reason=\"off_road\" on bad. The manifest records view.orient 90 while mode is \"true\"; the identity transform does not apply the rotation, which is the recorded v0.1 deviation and not a drawing defect \u2014 J6 remains na because the figure is a true-mode render."
+        "evidence": "Pass 2 — SVG draw list against the manifest. Two polylines: bad #b32e2e / arrow-failing, good #b07d1e / arrow-caution, matching the manifest's failing and caution declarations (J1 pass). data-marker-class inventory: good turn_point x4, apex x5, exit x4, release x16, and no {bad, ...} entry at all — four corners' worth of ideal-line markers, no fabricated glyph on the mistake (J2 pass, J7 pass). Zero <text> nodes beyond the two legend rows and zero data-ray-line / data-occluder-kind attributes (J3 na, J4 na). One data-terminal-reason=\"off_road\" on bad. The manifest records view.orient 90 while mode is \"true\"; the identity transform does not apply the rotation, which is the recorded v0.1 deviation and not a drawing defect — J6 remains na because the figure is a true-mode render."
       },
       {
         "attempt": 3,
@@ -133,7 +133,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 3 \u2014 high-zoom crop of the terminal at (810,990)+300x240 in the 2x frame. The red arrowhead tip is planted on the road/grass boundary at the outside of the corner with its edge tick along the edge, not drifting into the ground fill and not leaving the frame. In the same crop the amber line is still centred in the corridor with an hourglass and a ring resolvable a short distance below \u2014 so at the station where the mistake leaves the road, the ideal is demonstrably still tracking it, which is the contrast the figure needs (J5 pass, J8 pass)."
+        "evidence": "Pass 3 — high-zoom crop of the terminal at (810,990)+300x240 in the 2x frame. The red arrowhead tip is planted on the road/grass boundary at the outside of the corner with its edge tick along the edge, not drifting into the ground fill and not leaving the frame. In the same crop the amber line is still centred in the corridor with an hourglass and a ring resolvable a short distance below — so at the station where the mistake leaves the road, the ideal is demonstrably still tracking it, which is the contrast the figure needs (J5 pass, J8 pass)."
       }
     ],
     "items": [

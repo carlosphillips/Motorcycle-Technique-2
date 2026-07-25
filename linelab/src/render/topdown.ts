@@ -107,6 +107,41 @@ function stageLaneMarkings(scene: DrawnScene, pxScale: number): string {
   return s;
 }
 
+/**
+ * Stage 3b (design/06 §3.1) — the usable corridor's two edges: the band `f`
+ * runs on, `bike_margin_m` inside the carriageway stage 3 strokes.
+ *
+ * `off_road` fires at the carriageway edge, and stage 8's terminal glyph does
+ * land there. But every check that grades a line as running WIDE —
+ * `exit_containment`, `chain_containment`, and the apex percentages, all of
+ * them measured in `f` — is graded against this inner band, which carried no
+ * ink: the verdict card said "ran wide" and the figure showed nothing to have
+ * run wide of.
+ *
+ * Neutral ink, finely dotted, never a verdict colour and never arrowheaded: it
+ * is road furniture, so it cannot be confused with a trajectory (§5.2).
+ */
+const USABLE_EDGE_INK = "#5f6552";
+const USABLE_EDGE_WIDTH_PX = 1.1;
+
+function stageUsableCorridor(scene: DrawnScene, pxScale: number): string {
+  const u = scene.road.usable;
+  if (u === null) return "";
+  const common = {
+    fill: "none",
+    stroke: USABLE_EDGE_INK,
+    "stroke-width": pxScale * USABLE_EDGE_WIDTH_PX,
+    "stroke-dasharray": `${pxScale * 1.5} ${pxScale * 3}`,
+    "stroke-opacity": 0.75
+  };
+  return (
+    open("g", { "data-stage": "3b-usable-corridor" }) +
+    leaf("polyline", { points: points(u.lo), ...common, "data-corridor-edge": "lo" }) +
+    leaf("polyline", { points: points(u.hi), ...common, "data-corridor-edge": "hi" }) +
+    close("g")
+  );
+}
+
 const OCCLUDER_FILL: Record<string, string> = { hedge: "#4c7a4c", wall: "#8a8a8a", bank: "#a8875a", vehicle: "#6b6b8a" };
 
 /**
@@ -270,8 +305,8 @@ function stageSightRays(scene: DrawnScene, pxScale: number): string {
 // marks the sizes TUNING/presentation-only): px at the nominal 1000 px frame.
 const TERMINAL_R_PX = 4;
 /** `off_road` edge tick: half-length along the road edge. Sized to read beside the arrowhead at raster scale — the 4 px half-length it replaces did not. */
-const EDGE_TICK_HALF_LEN_PX = 8;
-const EDGE_TICK_WIDTH_PX = 2.6;
+const EDGE_TICK_HALF_LEN_PX = 12;
+const EDGE_TICK_WIDTH_PX = 3.2;
 
 function terminalGlyphSvg(line: DrawnLine, pxScale: number): string {
   const t = line.terminal;
@@ -354,20 +389,173 @@ function stageLines(scene: DrawnScene, pxScale: number): string {
   return s;
 }
 
+// ---------------------------------------------------------------------------
+// Stage 8b — line chrome (design/06 §3.1). Presentation ink derived from the
+// DRAWN POLYLINE and its true stations: which way the line runs, how far along
+// it you are, what it entered at, and how it ended in a word. Deliberately NOT
+// stage 9: stage 9 is the marker-from-event law, and none of this comes from an
+// event. Nothing here invents geometry — every glyph sits on a drawn sample.
+
+/** m — spacing of the direction/distance ladder along each line. */
+const LADDER_EVERY_M = 10;
+const CHEVRON_LEN_PX = 7;
+const CHEVRON_WIDTH_PX = 1.6;
+const CHROME_FONT_PX = 12;
+
+/** How a line ended, in a rider's word — the redundant channel that survives a greyscale print or a red-green reader (§5.2). */
+function outcomeWord(line: DrawnLine): string {
+  if (line.terminal.reason === "off_road") return line.outcome === "wide" ? "ran wide" : "ran off";
+  if (line.terminal.reason === "crash") return "crashed";
+  if (line.terminal.reason === "stopped") return "stopped";
+  return line.quality === "good" ? "clean" : line.quality;
+}
+
+/** Halo'd text at a drawn point — the same paint-order treatment stage 10 gives callouts, so small type survives over tarmac. */
+function chromeText(x: number, y: number, pxScale: number, size: number, colour: string, anchor: string, content: string, extra: Readonly<Record<string, string | number>> = {}): string {
+  return textEl(
+    {
+      x,
+      y,
+      "font-size": pxScale * size,
+      "font-family": "sans-serif",
+      fill: colour,
+      "text-anchor": anchor,
+      "paint-order": "stroke",
+      stroke: "#ffffff",
+      "stroke-width": pxScale * 2.6,
+      "stroke-opacity": 0.85,
+      "stroke-linejoin": "round",
+      ...extra
+    },
+    content
+  );
+}
+
+/** Index of the drawn point at or just past true station `s`, or null when the line never reaches it. */
+function indexAtStation(line: DrawnLine, s: number): number | null {
+  for (let i = 0; i < line.stations.length; i++) if (line.stations[i]! >= s) return i;
+  return null;
+}
+
+function headingAt(line: DrawnLine, i: number): { ux: number; uy: number } {
+  const a = line.polyline[Math.max(0, i - 1)]!;
+  const b = line.polyline[Math.min(line.polyline.length - 1, i + 1)]!;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const m = Math.hypot(dx, dy);
+  return m < 1e-9 ? { ux: 1, uy: 0 } : { ux: dx / m, uy: dy / m };
+}
+
+function stageLineChrome(scene: DrawnScene, pxScale: number): string {
+  let s = open("g", { "data-stage": "8b-line-chrome" });
+  for (const line of scene.lines) {
+    if (line.polyline.length < 2) continue;
+
+    // (1) the consequence ray, when asked for: neutral, hatched, arrowhead-free
+    // — it is not a trajectory and must never read as one (§3.2).
+    if (line.consequence !== null && line.consequence.length >= 2) {
+      s += leaf("polyline", {
+        points: points(line.consequence),
+        fill: "none",
+        stroke: "#4a4a4a",
+        "stroke-width": pxScale * 1.4,
+        "stroke-dasharray": `${pxScale * 2} ${pxScale * 4}`,
+        "stroke-opacity": 0.6,
+        "data-consequence": line.line_id
+      });
+    }
+
+    // (2) the distance ladder: a chevron pointing the way the rider is going,
+    // every 10 true metres, numbered on the ideal line so one figure carries
+    // one scale of distance and the other lines stay quiet.
+    const first = line.stations[0] ?? 0;
+    const last = line.stations[line.stations.length - 1] ?? 0;
+    const numbered = line.role === "ideal";
+    for (let station = Math.ceil(first / LADDER_EVERY_M) * LADDER_EVERY_M; station <= last; station += LADDER_EVERY_M) {
+      const i = indexAtStation(line, station);
+      if (i === null || i === 0) continue;
+      const p = line.polyline[i]!;
+      const { ux, uy } = headingAt(line, i);
+      const len = pxScale * CHEVRON_LEN_PX;
+      // a "›" — two strokes meeting at the point, opening backwards
+      const tipX = p.x + ux * len * 0.5;
+      const tipY = p.y + uy * len * 0.5;
+      const backX = p.x - ux * len * 0.5;
+      const backY = p.y - uy * len * 0.5;
+      const nx = -uy * len * 0.5;
+      const ny = ux * len * 0.5;
+      s += leaf("polyline", {
+        points: points([
+          { x: backX + nx, y: backY + ny },
+          { x: tipX, y: tipY },
+          { x: backX - nx, y: backY - ny }
+        ]),
+        fill: "none",
+        stroke: line.colour,
+        "stroke-width": pxScale * CHEVRON_WIDTH_PX,
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "data-ladder-station": station,
+        "data-line-id": line.line_id
+      });
+      if (numbered) {
+        s += chromeText(p.x + nx * 2.2, p.y + ny * 2.2, pxScale, CHROME_FONT_PX, "#3a3f34", "middle", `${station} m`, {
+          "data-ladder-label": station
+        });
+      }
+    }
+
+    // (3) entry: where this line starts and how fast it was going there.
+    const p0 = line.polyline[0]!;
+    const h0 = headingAt(line, 0);
+    s += leaf("circle", {
+      cx: p0.x,
+      cy: p0.y,
+      r: pxScale * 3,
+      fill: line.colour,
+      "data-entry": line.line_id
+    });
+    // lines that share an entry point share a label position — split them
+    // across the line so two "34 km/h" stamps never land on top of each other.
+    const side = line.role === "ideal" ? 1 : -1;
+    s += chromeText(
+      p0.x - h0.ux * pxScale * 10 - h0.uy * pxScale * 26 * side,
+      p0.y - h0.uy * pxScale * 10 + h0.ux * pxScale * 26 * side,
+      pxScale,
+      CHROME_FONT_PX,
+      line.colour,
+      "middle",
+      `${Math.round(line.entry_kmh)} km/h`,
+      { "data-entry-label": line.line_id }
+    );
+
+    // (4) how it ended, in a word, beside the terminal glyph.
+    const t = line.terminal;
+    const trad = (t.heading_deg * Math.PI) / 180;
+    const tux = Math.cos(trad);
+    const tuy = Math.sin(trad);
+    s += chromeText(t.at.x + tux * pxScale * 4 - tuy * pxScale * 13, t.at.y + tuy * pxScale * 4 + tux * pxScale * 13, pxScale, CHROME_FONT_PX + 1, line.colour, "middle", outcomeWord(line), {
+      "data-outcome-word": line.line_id
+    });
+  }
+  s += close("g");
+  return s;
+}
+
 // Marker-glyph proportions. design/06 §3.1 stage 9 fixes the marker
 // VOCABULARY (hourglass / ring / dot / double-chevron) but no sizes — these
 // are presentation-only locals at the nominal 1000 px frame, not design
 // TUNING constants, so they live here rather than in render/constants.ts
 // (ARCHITECTURE §6.6: "unnamed design literals get local names").
-const MARKER_R_PX = 6;
+const MARKER_R_PX = 7.5;
 /** hourglass end-bar half-width, as a fraction of `MARKER_R_PX` */
 const HOURGLASS_END_HALF_W = 0.85;
 /** hourglass waist half-width — strictly smaller than the end bars: THIS is the pinch that makes it an hourglass and not a rhombus. */
 const HOURGLASS_WAIST_HALF_W = 0.18;
 /** `exit` dot radius as a fraction of `MARKER_R_PX` — a filled disc strictly inside the `apex` ring's diameter, so the two never read alike. */
-const EXIT_DOT_R = 0.6;
+const EXIT_DOT_R = 0.5;
 /** `apex` ring stroke width in px at the nominal frame — leaves a visible hole, which is what separates a ring from the `exit` dot. */
-const APEX_RING_STROKE_PX = 1.8;
+const APEX_RING_STROKE_PX = 2.2;
 
 /**
  * The `turn_point` HOURGLASS outline (design/06 §3.1 stage 9), in drawn units:
@@ -483,7 +671,7 @@ function stageLabels(scene: DrawnScene, pxScale: number, vbX: number, vbY: numbe
   return s;
 }
 
-function stageChrome(scene: DrawnScene, pxScale: number, vbX: number, vbY: number): string {
+function stageChrome(scene: DrawnScene, pxScale: number, vbX: number, vbY: number, vbW: number, vbH: number): string {
   let s = open("g", { "data-stage": "11-chrome" });
   if (scene.legend.visible) {
     const lineH = pxScale * 16;
@@ -514,8 +702,39 @@ function stageChrome(scene: DrawnScene, pxScale: number, vbX: number, vbY: numbe
       scene.footnote
     );
   }
+  s += scaleBarSvg(scene, pxScale, vbX, vbY, vbW, vbH);
   s += close("g");
   return s;
+}
+
+/**
+ * The scale bar (§3.1 stage 11). Drawn space is true metres in v0.1, so the bar
+ * is literal: a `nice` round distance that reads about a fifth of the frame,
+ * captioned in metres and feet. Without it every distance in the figure — how
+ * early the turn-in was, how much road the mistake ate — is unitless.
+ */
+const SCALE_NICE_M: readonly number[] = [5, 10, 20, 25, 50, 100];
+const M_PER_FT = 0.3048;
+
+function scaleBarSvg(scene: DrawnScene, pxScale: number, vbX: number, vbY: number, vbW: number, vbH: number): string {
+  const target = vbW * 0.2;
+  const metres = SCALE_NICE_M.reduce((a, b) => (Math.abs(b - target) < Math.abs(a - target) ? b : a));
+  // bottom-RIGHT: every book road runs bottom-left to top, so the left gutter is
+  // where the entry annotation lives and the right one is empty ground.
+  const x0 = vbX + vbW - pxScale * 26 - metres;
+  const y = vbY + vbH - pxScale * 40;
+  const tick = pxScale * 5;
+  const ink = "#3a3f34";
+  const stroke = { stroke: ink, "stroke-width": pxScale * 1.6 };
+  return (
+    open("g", { "data-scale-bar": metres, "data-lane-width-m": scene.road.lane_width_m }) +
+    leaf("line", { x1: x0, y1: y, x2: x0 + metres, y2: y, ...stroke }) +
+    leaf("line", { x1: x0, y1: y - tick, x2: x0, y2: y + tick, ...stroke }) +
+    leaf("line", { x1: x0 + metres, y1: y - tick, x2: x0 + metres, y2: y + tick, ...stroke }) +
+    chromeText(x0 + metres / 2, y - pxScale * 8, pxScale, CHROME_FONT_PX, ink, "middle", `${metres} m · ${Math.round(metres / M_PER_FT)} ft`) +
+    chromeText(x0 + metres / 2, y + pxScale * 17, pxScale, CHROME_FONT_PX - 1, ink, "middle", `lane ${scene.road.lane_width_m.toFixed(1)} m wide`) +
+    close("g")
+  );
 }
 
 function defsArrowMarkers(): string {
@@ -565,15 +784,17 @@ function renderInner(scene: DrawnScene, style: RenderStyle | undefined): string 
   svg += stageBackground(vbX, vbY, vbW, vbH, style?.backgroundColour ?? "#e7ecd8");
   svg += stageRoadSurface(scene);
   svg += stageLaneMarkings(scene, pxScale);
+  svg += stageUsableCorridor(scene, pxScale);
   svg += stageGravel(scene, pxScale);
   svg += stageOccluders(scene, pxScale);
   // stage 5b (D45 continuation fan) — ABSENT per phase law (00 §3).
   svg += stageOcclusion(scene);
   svg += stageSightRays(scene, pxScale);
   svg += stageLines(scene, pxScale);
+  svg += stageLineChrome(scene, pxScale);
   svg += stageMarkers(scene, pxScale);
   svg += stageLabels(scene, pxScale, vbX, vbY, vbW, vbH);
-  svg += stageChrome(scene, pxScale, vbX, vbY);
+  svg += stageChrome(scene, pxScale, vbX, vbY, vbW, vbH);
   svg += close("svg");
   return svg;
 }

@@ -1,7 +1,7 @@
 {
   "figure_id": "fig-08-02",
   "spec_hash": "1bc028",
-  "svg_fnv1a": "e251fc",
+  "svg_fnv1a": "41a7ca",
   "judge_identity": {
     "judge_model": "claude",
     "judge_model_version": "claude-opus-5",
@@ -49,7 +49,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 1 \u2014 full 2000x2294 raster. Legend reads \"slow_steer \u2014 mistake \u00b7 failing (runoff)\" in red and \"solved 34 km/h \u2014 ideal \u00b7 good\" in green, matching the manifest's two entries (J1 pass). Exactly ONE hourglass is drawn, in green, on the bottom straight. That is correct rather than missing: `slow_steer` is a roll-RATE cap, so the mistake keeps the ideal's turn-in station, the two turn-point glyphs coincide inside MARK_COINCIDE_EPS_M, and design/06 \u00a73.1 stage 9 collapses them to one glyph coloured by the higher-ranked role, which is the ideal's green (J2 pass). This scene declares no labels: and no occluders:, so J3 and J4 do not apply (na). J5: the red line separates from the green just after the shared turn-in, stays OUTSIDE it \u2014 below and to the right, on the outside of this left-hander \u2014 and never gets the lean it needs, so it runs out of road at the outer edge before the corner has developed. A lazy roll to full lean that eats the corner and puts the line off the outside is the error the figure teaches, and that is what is drawn (J5 pass). Nothing undeclared appears (J7 pass); at 2x the two colours and the legend text are clean (J8 pass). J6 na (mode true), J9 na (v0.1)."
+        "evidence": "Pass 1 — full 2000x2294 raster. Legend reads \"slow_steer — mistake · failing (runoff)\" in red and \"solved 34 km/h — ideal · good\" in green, matching the manifest's two entries (J1 pass). Exactly ONE hourglass is drawn, in green, on the bottom straight. That is correct rather than missing: `slow_steer` is a roll-RATE cap, so the mistake keeps the ideal's turn-in station, the two turn-point glyphs coincide inside MARK_COINCIDE_EPS_M, and design/06 §3.1 stage 9 collapses them to one glyph coloured by the higher-ranked role, which is the ideal's green (J2 pass). This scene declares no labels: and no occluders:, so J3 and J4 do not apply (na). J5: the red line separates from the green just after the shared turn-in, stays OUTSIDE it — below and to the right, on the outside of this left-hander — and never gets the lean it needs, so it runs out of road at the outer edge before the corner has developed. A lazy roll to full lean that eats the corner and puts the line off the outside is the error the figure teaches, and that is what is drawn (J5 pass). Nothing undeclared appears (J7 pass); at 2x the two colours and the legend text are clean (J8 pass). J6 na (mode true), J9 na (v0.1)."
       },
       {
         "attempt": 2,
@@ -91,7 +91,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 2 \u2014 SVG draw list against the manifest. Two trajectory polylines: bad #b32e2e / arrow-failing and good #1f6f43 / arrow-good, matching the manifest's failing and good declarations under the D9 colour law (J1 pass). data-marker-class inventory is a single {good, turn_point} \u2014 no second hourglass exists in the file at all, confirming the collapse happened in deriveMarkers rather than one glyph being painted over another (J2 pass). Zero <text> nodes outside the two legend rows and zero data-ray-line / data-occluder-kind attributes, consistent with a scene that declares neither labels nor occluders (J3 na, J4 na, J7 pass). One data-terminal-reason=\"off_road\" on bad. Stage list has no 6-occlusion group, the correct difference from fig-08-01."
+        "evidence": "Pass 2 — SVG draw list against the manifest. Two trajectory polylines: bad #b32e2e / arrow-failing and good #1f6f43 / arrow-good, matching the manifest's failing and good declarations under the D9 colour law (J1 pass). data-marker-class inventory is a single {good, turn_point} — no second hourglass exists in the file at all, confirming the collapse happened in deriveMarkers rather than one glyph being painted over another (J2 pass). Zero <text> nodes outside the two legend rows and zero data-ray-line / data-occluder-kind attributes, consistent with a scene that declares neither labels nor occluders (J3 na, J4 na, J7 pass). One data-terminal-reason=\"off_road\" on bad. Stage list has no 6-occlusion group, the correct difference from fig-08-01."
       },
       {
         "attempt": 3,
@@ -133,7 +133,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 3 \u2014 high-zoom crop of the terminal at (950,2050)+700x244 in the 2x frame. The red line runs BELOW the green through the whole crop \u2014 the outside of the left-hander \u2014 and its arrowhead tip sits exactly where the grey surface gives way to the pale-green ground, with the edge tick visible at the crossing. Standing sentence holds: the endpoint is at its termination, not in the grass and not off-frame. This crop also settles the read direction that the whole-frame view left ambiguous: green is inboard of red at every station in the crop, so the mistake is running WIDE, not cutting in (J5 pass)."
+        "evidence": "Pass 3 — high-zoom crop of the terminal at (950,2050)+700x244 in the 2x frame. The red line runs BELOW the green through the whole crop — the outside of the left-hander — and its arrowhead tip sits exactly where the grey surface gives way to the pale-green ground, with the edge tick visible at the crossing. Standing sentence holds: the endpoint is at its termination, not in the grass and not off-frame. This crop also settles the read direction that the whole-frame view left ambiguous: green is inboard of red at every station in the crop, so the mistake is running WIDE, not cutting in (J5 pass)."
       }
     ],
     "items": [

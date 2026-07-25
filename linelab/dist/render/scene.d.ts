@@ -14,6 +14,18 @@ export interface DrawnRoad {
     readonly left: readonly DrawnPoint[];
     readonly right: readonly DrawnPoint[];
     readonly centre: readonly DrawnPoint[];
+    /**
+     * design/06 §3.1 stage 3b: the USABLE corridor's two edges — the band `f`
+     * runs on and the doctrine grades "wide" against (the rider's lane inset by
+     * `bike_margin_m`, road/corridor.ts's `corridorEdgeOffsets`). Distinct from
+     * `left`/`right`, which are the carriageway where `off_road` fires. `null`
+     * only when the two coincide (`use_full_width` with a zero margin), where
+     * drawing them twice would be noise.
+     */
+    readonly usable: {
+        readonly lo: readonly DrawnPoint[];
+        readonly hi: readonly DrawnPoint[];
+    } | null;
 }
 /** design/06 §3.1 stage 5: one schematic glyph per occluder (hedge/wall/bank/vehicle, design/03 §4 vocabulary). */
 export interface DrawnOccluder {
@@ -87,7 +99,25 @@ export interface DrawnLine {
     readonly colour: string;
     /** station-ordered, clipped to the window; identity on `(x, y)` in v0.1 true mode (ARCHITECTURE §6.5, P6). */
     readonly polyline: readonly DrawnPoint[];
+    /**
+     * True station of each `polyline` point, same length and order. Stage 8b's
+     * distance ink (direction chevrons, the 10 m ladder) is spaced in HONEST
+     * metres, never in drawn ones — and a consumer that wants "where is s = 24 m
+     * on this line" (the gallery's station toggle) reads it here instead of
+     * re-deriving geometry the projection already resolved.
+     */
+    readonly stations: readonly number[];
+    /** the line's entry speed in km/h — stage 8b's entry annotation ("34 km/h" at the first drawn sample). */
+    readonly entry_kmh: number;
     readonly terminal: DrawnTerminal;
+    /**
+     * design/06 §3.1 stage 8b, gated by `view.consequence`: where an `off_road`
+     * line was heading when it left the corridor, extrapolated at constant
+     * heading. NOT a trajectory — the engine did not integrate it (§3.2), so it
+     * is drawn in neutral hatched ink with no arrowhead and is `null` unless the
+     * ViewSpec asked for it.
+     */
+    readonly consequence: readonly DrawnPoint[] | null;
     /** null iff no occluder in the figure, or the line has no `turn_in` event to anchor the default ray (§3.1 stage 7). */
     readonly sightRay: DrawnSightRay | null;
 }

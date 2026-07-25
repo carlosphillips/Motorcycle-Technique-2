@@ -57,6 +57,25 @@ function corridorCentreHalf(p: CorridorParams): { c: number; a: number } {
   return p.use_full_width ? { c: 0, a: W - bm } : { c: -W / 2, a: W / 2 - bm };
 }
 
+/**
+ * The two corridor edges as signed offsets, hand-free and station-free:
+ * `d_lo < d_hi`, the band every containment law reads (`f ∈ [0, 1]` maps onto
+ * exactly this interval — which of the two is `f = 0` flips with corner hand,
+ * which is why this pair is ordered by `d` and not by `f`).
+ *
+ * Exported because the renderer has to DRAW this band (design/06 §3.1 stage
+ * 3b). `off_road` fires at the CARRIAGEWAY edge (`|d| > lane_width_m`, already
+ * stroked at stage 3) — but every doctrine check that speaks of running wide
+ * (`exit_containment`, `chain_containment`, and the apex percentages, which are
+ * measured in `f`) is graded against THIS band, and until stage 3b it had no
+ * ink at all: the reader was told a line ran wide with nothing on the page to
+ * run wide OF.
+ */
+export function corridorEdgeOffsets(p: CorridorParams): { readonly d_lo: number; readonly d_hi: number } {
+  const { c, a } = corridorCentreHalf(p);
+  return { d_lo: c - a, d_hi: c + a };
+}
+
 function frameHand(p: CorridorParams, s: number): Hand {
   return governingCorner(p.corners, s)?.hand ?? NO_CORNER_FRAME_HAND;
 }

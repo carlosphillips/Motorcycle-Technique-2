@@ -6889,7 +6889,8 @@
     "caption": "Turn in too soon and the geometry points the exit wide — toward the oncoming vehicle.",
     "view": {
       "mode": "diagram",
-      "window": "auto"
+      "window": "auto",
+      "consequence": "on"
     }
   }
 }

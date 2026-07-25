@@ -21,6 +21,24 @@ export interface CorridorParams {
     readonly corners: readonly Corner[];
 }
 /**
+ * The two corridor edges as signed offsets, hand-free and station-free:
+ * `d_lo < d_hi`, the band every containment law reads (`f ∈ [0, 1]` maps onto
+ * exactly this interval — which of the two is `f = 0` flips with corner hand,
+ * which is why this pair is ordered by `d` and not by `f`).
+ *
+ * Exported because the renderer has to DRAW this band (design/06 §3.1 stage
+ * 3b). `off_road` fires at the CARRIAGEWAY edge (`|d| > lane_width_m`, already
+ * stroked at stage 3) — but every doctrine check that speaks of running wide
+ * (`exit_containment`, `chain_containment`, and the apex percentages, which are
+ * measured in `f`) is graded against THIS band, and until stage 3b it had no
+ * ink at all: the reader was told a line ran wide with nothing on the page to
+ * run wide OF.
+ */
+export declare function corridorEdgeOffsets(p: CorridorParams): {
+    readonly d_lo: number;
+    readonly d_hi: number;
+};
+/**
  * dOf: signed offset d for lane fraction f at station s, in the governing
  * corner's frame. f = 0 is the INNER usable edge, f = 1 the OUTER. The inside
  * of the corner lies toward −handSign(hand) in d-space (a right-hander's inside

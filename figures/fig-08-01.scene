@@ -8,5 +8,5 @@ marks:     turn_point
 labels:
   turn_point@bad  "premature turn point"
   apex@good       "late apex — sight and exit"
-view:      mode=diagram window=auto
+view:      mode=diagram window=auto consequence=on
 note:      "Turn in too soon and the geometry points the exit wide — toward the oncoming vehicle."

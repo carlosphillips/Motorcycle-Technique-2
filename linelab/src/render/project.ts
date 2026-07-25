@@ -23,7 +23,8 @@ import type { WireAnchor } from "../plan/types.js";
 import type { LineResult } from "../solve/types.js";
 import type { Sample, ResolvedHazard } from "../core/types.js";
 import { footprintsOf } from "../sight/footprints.js";
-import { governingCorner, sideSign, NO_CORNER_FRAME_HAND } from "../road/corridor.js";
+import { governingCorner, sideSign, corridorEdgeOffsets, NO_CORNER_FRAME_HAND } from "../road/corridor.js";
+import { msToKmh } from "../core/units.js";
 import { terminalGlyphFor, roleRank } from "./ink.js";
 import { buildLegend } from "./legend.js";
 import {
@@ -97,6 +98,8 @@ interface ResolvedViewRequest {
   readonly orient: ViewOrient;
   readonly rays: ViewRays;
   readonly legend: ViewLegendMode;
+  /** design/06 §3.1 stage 8b — draw where a runoff was pointing when it left. Off unless asked. */
+  readonly consequence: boolean;
 }
 
 const ORIENT_NUMERIC = new Set([0, 90, 180, 270]);
@@ -104,7 +107,7 @@ const ORIENT_NUMERIC = new Set([0, 90, 180, 270]);
 /** Validates the opaque `view:` value (design/06 §2.1) into the v0.1-legal request, typed-`SCHEMA`/`deferred` per §6.4's table. */
 function parseViewSpec(raw: unknown): Result<ResolvedViewRequest> {
   if (raw === undefined || raw === null) {
-    return ok({ window: "auto", orient: "auto", rays: "auto", legend: "auto" });
+    return ok({ window: "auto", orient: "auto", rays: "auto", legend: "auto", consequence: false });
   }
   if (!isObject(raw)) return err(schemaErr("view", "view must be a JSON object", "type_mismatch"));
 
@@ -181,7 +184,17 @@ function parseViewSpec(raw: unknown): Result<ResolvedViewRequest> {
     return err(schemaErr("view.look", 'view.look must be "heading" or "limit_point"', "type_mismatch"));
   }
 
-  return ok({ window: windowReq, orient, rays, legend });
+  // scene-lowered values arrive as opaque strings, so `on`/`off` are the
+  // spelling; booleans are accepted for JSON-spelled FigureSpecs.
+  let consequence = false;
+  if (raw["consequence"] !== undefined) {
+    const c = raw["consequence"];
+    if (c === "on" || c === true) consequence = true;
+    else if (c === "off" || c === false) consequence = false;
+    else return err(schemaErr("view.consequence", 'view.consequence must be "on" or "off"', "type_mismatch"));
+  }
+
+  return ok({ window: windowReq, orient, rays, legend, consequence });
 }
 
 // ---------------------------------------------------------------------------
@@ -406,6 +419,37 @@ function nearestSample(samples: readonly Sample[], s: number): Sample | undefine
 /** Probe half-span for the road-edge tangent at an `off_road` crossing — a local numeric-differentiation step, not a design literal. */
 const EDGE_TANGENT_PROBE_M = 0.5;
 
+/** m — how far stage 8b's consequence ray reaches past a runoff before it is simply cut. Presentation-only. */
+const CONSEQUENCE_LEN_M = 8;
+
+/**
+ * Stage 8b: where the line was pointing when it left the corridor, cut at the
+ * first occluder it runs into (fig 8.1's oncoming vehicle) or at
+ * `CONSEQUENCE_LEN_M`. A straight constant-heading ray, never an integration —
+ * the whole point is that the engine stopped simulating here.
+ */
+function consequenceRay(from: DrawnPoint, heading_deg: number, occluders: readonly DrawnOccluder[]): readonly DrawnPoint[] {
+  const rad = (heading_deg * Math.PI) / 180;
+  const ux = Math.cos(rad);
+  const uy = Math.sin(rad);
+  let best = CONSEQUENCE_LEN_M;
+  for (const o of occluders) {
+    const poly = o.footprint;
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[i]!;
+      const b = poly[(i + 1) % poly.length]!;
+      const ex = b.x - a.x;
+      const ey = b.y - a.y;
+      const den = ux * ey - uy * ex;
+      if (Math.abs(den) < 1e-9) continue;
+      const t = ((a.x - from.x) * ey - (a.y - from.y) * ex) / den;
+      const u = ((a.x - from.x) * uy - (a.y - from.y) * ux) / den;
+      if (t > 0.05 && t < best && u >= 0 && u <= 1) best = t;
+    }
+  }
+  return [from, { x: from.x + ux * best, y: from.y + uy * best }];
+}
+
 /**
  * The road edge's tangent heading (degrees) at station `s`, on the side the
  * line left by (`dSign`) — design/06 §3.1 stage 8's "a short tick along the
@@ -428,11 +472,14 @@ function buildDrawnLine(
   hasOccluders: boolean,
   rays: ViewRays,
   from_s: number,
-  to_s: number
+  to_s: number,
+  occluders: readonly DrawnOccluder[],
+  consequence: boolean
 ): DrawnLine {
   const colour = QUALITY_COLOUR[line.verdict.quality];
   const kept = clippedSamples(line.trajectory.samples, from_s, to_s);
   const polyline = kept.map((s) => ({ x: s.x, y: s.y }));
+  const stations = kept.map((s) => s.s);
   const last = line.trajectory.samples[line.trajectory.samples.length - 1];
   const t = line.trajectory.terminated;
   const glyph = terminalGlyphFor(t.reason);
@@ -458,7 +505,10 @@ function buildDrawnLine(
     outcome: line.verdict.outcome,
     colour,
     polyline,
+    stations,
+    entry_kmh: msToKmh(line.trajectory.samples[0]?.v ?? 0),
     terminal,
+    consequence: consequence && t.reason === "off_road" ? consequenceRay(terminal.at, terminal.heading_deg, occluders) : null,
     sightRay
   };
 }
@@ -468,12 +518,27 @@ function buildDrawnRoad(road: ComposedRoad, from_s: number, to_s: number): Drawn
   for (let s = from_s; s < to_s; s += EDGE_STEP_M) stations.push(s);
   stations.push(to_s);
   const w = road.lane_width_m;
+  // stage 3b: the graded band. `corridorEdgeOffsets` is the SAME arithmetic the
+  // f↔d map runs on (road/corridor.ts) — the renderer re-derives nothing.
+  const edges = corridorEdgeOffsets({
+    lane_width_m: w,
+    bike_margin_m: road.bike_margin_m,
+    use_full_width: road.use_full_width,
+    corners: road.corners
+  });
+  const coincident = edges.d_lo <= -w && edges.d_hi >= w;
   return {
     lane_width_m: w,
     use_full_width: road.use_full_width,
     left: stations.map((s) => road.worldAt(s, -w)),
     right: stations.map((s) => road.worldAt(s, w)),
-    centre: stations.map((s) => road.worldAt(s, 0))
+    centre: stations.map((s) => road.worldAt(s, 0)),
+    usable: coincident
+      ? null
+      : {
+          lo: stations.map((s) => road.worldAt(s, edges.d_lo)),
+          hi: stations.map((s) => road.worldAt(s, edges.d_hi))
+        }
   };
 }
 
@@ -511,7 +576,7 @@ export function project(road: ComposedRoad, lines: readonly LineResult[], viewSp
   // caller's array order. Sorted HERE, once, so every downstream consumer of
   // `scene.lines` (stage 7 rays, stage 8 lines, legend) reads it pre-ordered.
   const drawnLines = lines
-    .map((l) => buildDrawnLine(road, l, occluders.length > 0, view.value.rays, from_s, to_s))
+    .map((l) => buildDrawnLine(road, l, occluders.length > 0, view.value.rays, from_s, to_s, occluders, view.value.consequence))
     .sort((a, b) => roleRank(a.role) - roleRank(b.role));
   const drawnRoad = buildDrawnRoad(road, from_s, to_s);
   const orient = resolveOrient(view.value.orient);
@@ -540,7 +605,11 @@ export function project(road: ComposedRoad, lines: readonly LineResult[], viewSp
     ...drawnRoad,
     left: drawnRoad.left.map(rotate),
     right: drawnRoad.right.map(rotate),
-    centre: drawnRoad.centre.map(rotate)
+    centre: drawnRoad.centre.map(rotate),
+    usable:
+      drawnRoad.usable === null
+        ? null
+        : { lo: drawnRoad.usable.lo.map(rotate), hi: drawnRoad.usable.hi.map(rotate) }
   };
   // `rotatePoint` is a rotation by +orient about the pivot, so every HEADING
   // it carries rotates by +orient too — the terminal glyphs (`bar` transverse
@@ -549,6 +618,7 @@ export function project(road: ComposedRoad, lines: readonly LineResult[], viewSp
   const rotatedLines: DrawnLine[] = drawnLines.map((l) => ({
     ...l,
     polyline: l.polyline.map(rotate),
+    consequence: l.consequence === null ? null : l.consequence.map(rotate),
     terminal: {
       ...l.terminal,
       at: rotate(l.terminal.at),
