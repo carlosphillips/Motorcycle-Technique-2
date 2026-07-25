@@ -7,15 +7,20 @@
 // still stand):
 //   fig-08-04 `good`  → SOLVES: contained/good, ONE late apex (the clean band
 //                       at 34 km/h is non-empty on this engine now),
-//   fig-08-04 `bad`   → overspeed compiles on the solved base: runoff/failing,
+//   fig-08-04 `bad`   → overspeed:by_kmh=2.5 (fig84 amendment): wide/failing —
+//                       a marginal overspeed pushed wide off the tightening exit,
 //   fig-08-05 `good`  → NO_SOLUTION/no_two_touch_line (the pinned
 //                       A-DOUBLEAPEX SEAM),
-//   fig-08-05 `late`  → NO_SOLUTION/believed_world_not_clean (the believed
-//                       single-R24 world has an empty band at 30 km/h).
+//   fig-08-05 `late`  → SOLVES runoff/failing (adj-fig-08-05): the believed
+//                       single-R24 world under-reads the tightening R12 touches,
+//                       so the line runs off before it can react —
+//                       run_wide_detect at s≈15.81, then off_road; corrective
+//                       infeasible (departed_before_reaction), no correction.
 // Under design/05 §7 the bake stays TOTAL either way: refusals are first-class
 // typed entries, refused lines draw nothing, and the envelope still bakes.
-// G-8.4-COMPANION now pins the SOLVED engine truth; G-8.5-RED still pins the
-// refusal skeleton, its designed per-line pins landing when its seams resolve.
+// G-8.4-COMPANION and G-8.5-RED both pin the SOLVED engine truth now:
+// fig-08-05 `good` still refuses no_two_touch_line (the A-DOUBLEAPEX seam; its
+// per-line double-apex pins remain it.todo), `late` solves the runoff above.
 
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
@@ -70,17 +75,23 @@ describe("G-8.4-COMPANION (fig-08-04.scene bake — solved engine truth, design/
     expect(good.verdict.doctrine.checks.filter((c) => c.verdict === "fail")).toEqual([]);
 
     const bad = lineOf(env, "bad");
-    expect(bad.verdict.outcome).toBe("runoff");
+    // AMENDED (fig84 adjudication): the scene now authors `overspeed:by_kmh=2.5`
+    // — a marginal overspeed. bookDecreasing's good line rides at f≈0.999 entering
+    // 0.4 m from the outer edge, so the +26 default departed at 12% of the corner
+    // (a 475 px stub); +2.5 marches monotonically wide off the outer edge as the
+    // radius tightens and grades `wide` (admissible for overspeed, 03 §7.1;
+    // quality failing/red, 05 §6.1). off_road terminal unchanged.
+    expect(bad.verdict.outcome).toBe("wide");
     expect(bad.verdict.quality).toBe("failing");
     expect(bad.trajectory.terminated.reason).toBe("off_road");
-    // closed engine-truth fail set (wrong_strategy_for_corner PASSES on this
-    // engine — the WP-17 gloss expected na carve-outs; recorded ratification)
+    // closed engine-truth fail set — at +2.5 the marginal overspeed drops
+    // `quick_steer` from the +26 set (the line is not a hard early stab)
     expect(
       bad.verdict.doctrine.checks
         .filter((c) => c.verdict === "fail")
         .map((c) => c.id)
         .sort()
-    ).toEqual(["exit_containment", "late_apex", "out_in_out", "quick_steer", "stop_within_sight"]);
+    ).toEqual(["exit_containment", "late_apex", "out_in_out", "stop_within_sight"]);
 
     // the figure's road is the bookDecreasing expansion (one taper corner)
     expect(env.road.corners).toHaveLength(1);
@@ -88,21 +99,32 @@ describe("G-8.4-COMPANION (fig-08-04.scene bake — solved engine truth, design/
   });
 });
 
-describe("G-8.5-RED (fig-08-05.scene bake — refusal skeleton, engine truth)", () => {
-  it("the bake is total: both lines ride the envelope as typed refusals (good: no_two_touch_line; late: believed_world_not_clean with the inner empty_band)", { timeout: 600_000 }, () => {
+describe("G-8.5-RED (fig-08-05.scene bake — good refuses; late solves the runoff, engine truth)", () => {
+  it("the bake is total: good refuses (no_two_touch_line); late solves runoff — run_wide_detect then off_road, corrective infeasible (departed_before_reaction)", { timeout: 600_000 }, () => {
     const env = bake("fig-08-05.scene");
     expect(env.lines).toHaveLength(2);
 
+    // good still refuses under adj-doubleapex (the per-line good pins are it.todo)
     const good = refusalOf(env, "good");
     expect(good.error.code).toBe("NO_SOLUTION");
     expect(good.error.detail?.["sub_reason"]).toBe("no_two_touch_line");
     const window = good.error.detail?.["window"] as { corner_ids: string[] };
     expect(window.corner_ids).toEqual(["c1", "c2", "c3"]);
 
-    const late = refusalOf(env, "late");
-    expect(late.error.code).toBe("NO_SOLUTION");
-    expect(late.error.detail?.["sub_reason"]).toBe("believed_world_not_clean");
-    expect((late.error.detail?.["inner"] as { sub_reason: string }).sub_reason).toBe("empty_band");
+    // late now SOLVES the runoff (adj-fig-08-05): the under-read believed world
+    // leaves no reaction time, so the line departs the outer edge before a
+    // corrective shot can launch — its run-wide bookmark carries the mistake.
+    const late = lineOf(env, "late");
+    expect(late.verdict.outcome).toBe("runoff");
+    expect(late.verdict.quality).toBe("failing");
+    expect(late.trajectory.terminated.reason).toBe("off_road");
+    expect(late.verdict.misjudgment?.s_divergence_m).toBe(10);
+    const lc = late.verdict.corners.find((c) => c.corrective != null)!.corrective!;
+    expect(lc.feasible).toBe(false);
+    expect(lc.fail_reason).toBe("departed_before_reaction");
+    expect(lc.detect.s).toBeCloseTo(15.81, 1);
+    expect(late.trajectory.events.some((e) => e.kind === "run_wide_detect")).toBe(true);
+    expect(late.trajectory.events.some((e) => e.kind === "correction")).toBe(false);
   });
 
   it.todo("G-8.5-RED as designed — double: 2 apexes in the taper corner; good: 1 in c1 + 1 in c3; wrong_strategy_for_corner fail on double; colours per 06 §5.1 — lands when the A-DOUBLEAPEX and believed-band seams are ratified/resolved");

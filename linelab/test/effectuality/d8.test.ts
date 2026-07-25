@@ -320,6 +320,20 @@ function viewSvg(key: string, viewSpec: Wire, envKey: "c30" | "occ" = "c30"): st
     return r.value.svg;
   });
 }
+/**
+ * The `pov` render target under a given `look` (design/07 §5.2), on the
+ * occluder-bearing turn fixture where the limit point is clamped — so the two
+ * camera aims yield distinct frames. Feeds the `view:look` effect witness.
+ */
+function povLookSvg(look: "heading" | "limit_point"): string {
+  return memo(`povlook:${look}`, () => {
+    const env = occTurnEnv();
+    const lines = env.lines.filter((l): l is LineResult => !isLineRefusal(l));
+    const r = renderViews({ road: env.road as unknown as ComposedRoad, lines, target: "pov", viewSpec: { look } as never });
+    if (!r.ok) throw new Error(`pov renderViews refused: ${JSON.stringify(r.error)}`);
+    return r.value.svg;
+  });
+}
 function occTurnEnv(): FigureResult {
   return runOk(
     "occ-turn",
@@ -364,6 +378,10 @@ function occEnvText(): string {
 }
 function rdr(argv: readonly string[], text: string): VerbOutcome {
   return memo(`rdr:${text.length}:${argv.join(" ")}`, () => renderVerb({ loadedText: text, argv: ["--views", "topdown", ...argv] }));
+}
+// the `render` verb on the pov target — the `.pov.svg` is what `svgOf` picks up
+function rdrPov(argv: readonly string[], text: string): VerbOutcome {
+  return memo(`rdrpov:${text.length}:${argv.join(" ")}`, () => renderVerb({ loadedText: text, argv: ["--views", "pov", ...argv] }));
 }
 
 // ---------------------------------------------------------------------------
@@ -493,6 +511,7 @@ const BUILDERS: Readonly<Record<string, () => Obs>> = {
   "view:orient": () => pair(viewSvg("o-0", { mode: "true", orient: 0 }), viewSvg("o-90", { mode: "true", orient: 90 })),
   "view:rays": () => pair(viewSvg("r-all", { mode: "true", rays: "all_turn_ins" }, "occ"), viewSvg("r-off", { mode: "true", rays: "off" }, "occ")),
   "view:legend": () => pair(viewSvg("l-on", { mode: "true", legend: "on" }), viewSvg("l-off", { mode: "true", legend: "off" })),
+  "view:look": () => pair(povLookSvg("heading"), povLookSvg("limit_point")),
 
   // -- cli (flag-over-file merge law, in-process verbs) ----------------------
   "cli:--road": () => pair(trajDoc((rv([], rideText).stdout as { value: FigureResult }).value), trajDoc((rv(["--road", "lane 3.5 | S 80"], rideText).stdout as { value: FigureResult }).value)),
@@ -525,6 +544,7 @@ const BUILDERS: Readonly<Record<string, () => Obs>> = {
   "cli:--rays": () => pair(svgOf(rdr(["--mode", "true", "--rays", "auto"], occEnvText())), svgOf(rdr(["--mode", "true", "--rays", "off"], occEnvText()))),
   "cli:--legend": () => pair(svgOf(rdr(["--mode", "true", "--legend", "on"], envText())), svgOf(rdr(["--mode", "true", "--legend", "off"], envText()))),
   "cli:--orient": () => pair(svgOf(rdr(["--mode", "true", "--orient", "0"], envText())), svgOf(rdr(["--mode", "true", "--orient", "90"], envText()))),
+  "cli:--look": () => pair(svgOf(rdrPov(["--look", "heading"], occEnvText())), svgOf(rdrPov(["--look", "limit_point"], occEnvText()))),
   "cli:--rubric": () => rejectOf((rv(["--rubric", "parks-track"], rideText).stdout as { ok: boolean; error?: LinelabError }) as never),
   "cli:--checks-version": () => rejectOf((rv(["--checks-version", "1"], rideText).stdout as { ok: boolean; error?: LinelabError }) as never)
 };
@@ -809,7 +829,8 @@ describe("T-D8-VERB-SCOPED — design/08 §3's verb-scoped flags are effectual w
       "--range": { range: "30:40:5" },
       "--range2": { range2: "1:2:1" },
       "--metric": { metric: "outcome" },
-      "--format": { format: "json" }
+      "--format": { format: "json" },
+      "--lock": { lock: "station" }
     };
     // the parse of a flagless invocation, used as the base every sample layers on
     const bare = parseZeroFileFlags([]);
@@ -835,7 +856,8 @@ describe("T-D8-VERB-SCOPED — design/08 §3's verb-scoped flags are effectual w
         checked++;
       }
     }
-    // 13 flags × 13 shipped verbs, minus the 14 (flag, verb) pairs that bite
+    // |VERB_SCOPED_FLAGS| × |SHIPPED_VERBS|, minus the (flag, verb) pairs that
+    // bite — computed dynamically so the roster/flag additions self-adjust.
     expect(checked).toBe(VERB_SCOPED_FLAGS.length * SHIPPED_VERBS.length -
       VERB_SCOPED_FLAGS.reduce((n, r) => n + r.verbs.length, 0));
   });

@@ -18,3 +18,9 @@ export declare const SAVE_WINDOW_INK = "#3d3d3d";
 export declare const SAVE_WINDOW_RING_R_M = 0.55;
 /** m — the ring's tick, drawn outward so the glyph cannot read as a closed apex ring */
 export declare const SAVE_WINDOW_TICK_M = 0.45;
+/** the corrective ghost's one neutral ink — not a verdict colour, not the save ink */
+export declare const CORRECTIVE_GHOST_INK = "#4a5a6a";
+/** ghost opacity (07 §3.5) — a counterfactual overlay reads under the figure */
+export declare const CORRECTIVE_GHOST_OPACITY = 0.5;
+/** the opacity a non-focused line's ghost glyph draws at (07 §4.2 "reduced opacity") */
+export declare const COMPARE_GHOST_OPACITY = 0.4;

@@ -677,9 +677,15 @@ the shot is not integrable: `feasible = false`, `fail_reason =
 mechanism by which a short corner with a hard outside edge pins `runoff`.
 
 The `correction` event is **the shot-start bookmark**: kind `correction` at
-`(s_shot, t_shot)` on the main line, emitted iff the corrective was attempted,
-`detail: {feasible}` — "the last moment a save had to begin", a stepper jump
-target. It never implies the main line bends back.
+`(s_shot, t_shot)` on the main line, emitted iff the corrective was attempted
+**and its shot start lies on the recorded line** — i.e. not the
+`departed_before_reaction` arm, where `t_shot > t_terminated` and no on-line
+shot instant exists — `detail: {feasible}` — "the last moment a save had to
+begin", a stepper jump target. It never implies the main line bends back. **On
+`departed_before_reaction` no `correction` event is emitted; the `corrective`
+block still publishes `{feasible: false, fail_reason: departed_before_reaction}`
+(§4a.6), and the `run_wide_detect` bookmark (§4a.2) is the on-line anchor a label
+may address at the departure — no separate departed-bookmark event is minted.**
 
 ### 4a.4 Control policy (the shadow run)
 
@@ -925,6 +931,20 @@ demotes from load-bearing assumption to regression test. The earlier form
 asserted the identity while the two predicates differed in quantifier — prefix
 versus terminal — and was false.
 
+**The construction above assumes the main line reached `t_shot`.** When it did
+not — `t_shot > t_terminated`, the `departed_before_reaction` case §4a.3 owns —
+`stateAt(line, {t: t_shot})` is undefined, `corrective.feasible = false` by §4a.3
+with no shadow run, and `saved(t_shot)` takes its **extended value `false`**: a
+save cannot be launched from an instant the line never reached, so the identity
+still holds (both sides `false`) by that same short-circuit. This is the one case
+in which `t_shot` is *not* a grid point (§4b.5 admits it only when in domain), and
+it is why §4b.6's consistency argument runs over two cases. `saveAt(t_shot)` there
+returns `INTERNAL/save_launch_unresolvable` by design — the launch instant is off
+the recorded line — so `P-SAVEWIN-ANCHOR` discharges this case by asserting
+`corrective.feasible = false ∧ fail_reason = departed_before_reaction`, never a
+live `saveAt` probe. Witnessed on `slow_steer` @34 (`t_shot_s = 2.66 s` on a line
+gone `off_road` at `1.95 s`) and `underread`.
+
 **Why the peak-guard repair is rejected.** The alternative repair on the table
 was to delete only the terminal-reason clause and keep a peak guard,
 `f_peak ≤ F_SAVE + eps_f_save` over the whole shadow. That is worse than the
@@ -1010,23 +1030,34 @@ This is a property of any finite scan; bisection does not close it, because
 bisection refines a bracket the scan already found.
 
 Evaluate `saved` at every grid point in ascending `τ`. Let `transition_count` =
-the number of adjacent grid pairs whose verdicts differ.
+the number of adjacent grid pairs whose verdicts differ, and let `open_count` =
+the number of maximal contiguous runs of `saved = true` (the save *bands*). A
+leading `false` run is **not** a closed window but the §4b.3 inside-curl: at `τ`
+early enough that the reserve-lean circle overshoots the inside edge and departs
+before `s_detect`, `saved = false` by the predicate itself. That prefix precedes
+the window; it does not deny that the window opens. The classification therefore
+keys on `open_count` — how many times the window opened — not on `saved(τ₀)`.
 
 | condition | `status` | scalars emitted |
 |---|---|---|
 | `corrective == null` for that corner | `not_applicable` | none |
-| `saved(τ₀) = false` | `never_open` | none (+ `transition_count`) |
+| `open_count == 0` (no grid point `saved`) | `never_open` | none (+ `transition_count`) |
 | every grid point `saved = true` | `open_at_end` | `tau_close_s = τ_last`, `open_at_end: true` |
-| `transition_count == 1` | `resolved` | the full set |
-| `transition_count > 1` | `intermittent` | **only** `transition_count` |
+| `open_count == 1` | `resolved` | the full set |
+| `open_count ≥ 2` | `intermittent` | **only** `transition_count` |
 
 **The table is first-match-wins in table order.** The rows are not pairwise
-disjoint — a scan that begins `false` and ends `true` matches both `never_open`
-and `transition_count == 1` — so precedence, not disjointness, is what makes
-`saveWindow` a total function. `never_open` is tested before the transition
-rows, which is why the `resolved` branch below can assume the scan opens: a
-window that was never open has already been classified. `status` is a **closed
-five-value set**. **`intermittent` is a refusal, not a
+disjoint — a scan whose single save band reaches the horizon matches both
+`open_at_end` and `open_count == 1` — so precedence, not disjointness, is what
+makes `saveWindow` a total function. `never_open` (zero bands) is tested before
+the band rows, which is why the `resolved` branch below can assume the scan
+opens: a window that never opened has already been classified. `resolved` is
+**exactly one** save band, whose trailing edge is the single closing instant
+`tau_close_s`; the band may carry a §4b.3 inside-curl `false` prefix and a
+`false` tail of too-late launches, and neither denies that single instant.
+`intermittent` is **two or more** disjoint bands — the window genuinely opened
+and closed more than once — the one shape with no single closing instant.
+`status` is a **closed five-value set**. **`intermittent` is a refusal, not a
 caveat**: no `tau_close_s`, no `s_close_m`, no `reaction_budget_s`, no glyph, no
 HUD row — the stepper shows *"the reserve-lean save window opened and closed N
 times over this corner; linelab will not report a single closing instant."* That
@@ -1038,10 +1069,13 @@ refusal is what keeps D11 closed (§4b.6).
 suppressed. A refusal that concealed which controller had refused would be a
 worse object than the one it replaced.
 
-Under `resolved`, bisect inside the single (true, false) adjacent pair to
+Under `resolved`, bisect the (true, false) adjacent pair at the **closing edge
+of the single band** — the band's last `true` → first `false` grid pair — to
 `HORIZON_EPS_S`, at most `HORIZON_BISECT_MAX` halvings, reporting **the last `τ`
 that evaluated `true`** — the reported window is never longer than the measured
-one. `s_close_m = s(tau_close_s)` via `stateAt`.
+one. For a scan that opens at `τ₀` the closing edge is the sole transition; for
+one carrying the §4b.3 inside-curl prefix it is the band's trailing edge, never
+the leading `false → true`. `s_close_m = s(tau_close_s)` via `stateAt`.
 
 ### 4b.6 The reaction budget, and the freeze-aware D11 argument
 
@@ -1058,8 +1092,21 @@ have".
 
 **The consistency argument, restated freeze-aware.** By §4a.3,
 `t_shot = t_earliest + t_react_s`. Under `status: "resolved"`, `saved` is true on
-a prefix and false after; `t_shot` is a mandatory grid point; and
-`saved(t_shot) ≡ corrective.feasible` by §4b.3's construction. Hence
+a single contiguous band and false outside it (the band may carry a §4b.3
+inside-curl `false` prefix); `t_shot` lies at or past that band's trailing edge,
+being `≥ t_detect` and hence beyond the inside-curl prefix. The bound
+`tau_close < t_shot` then holds in the two disjoint ways `corrective.feasible =
+false` can arise (§4a.5). **(i) `departed_before_reaction`** (`t_shot >
+t_terminated`, §4a.3): the τ-domain caps at `t_terminated` (§4b.5), so
+`tau_close ≤ t_terminated < t_shot` outright — `t_shot` is *past* the grid, not
+on it (§4b.5 admits it only when in domain), and `saveAt(t_shot)` is not
+integrable, exactly as §4a.3 declares the corrective there. **(ii)
+integrable-but-no-return** (`shadow_off_road | shadow_crash |
+no_return_before_road_end`, `t_shot ≤ t_terminated`): if `t_shot` lies in domain
+it is a grid point where `saved(t_shot) ≡ corrective.feasible = false` by §4b.3's
+construction and the band shape forces `tau_close < t_shot`; if §4b.5's exit-tail
+cap places `t_shot` above the domain top `hi` then `tau_close ≤ hi < t_shot`
+directly. Hence
 
 ```
 corrective.feasible = false  ⇒  tau_close < t_shot

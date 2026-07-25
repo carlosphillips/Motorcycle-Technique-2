@@ -7,14 +7,19 @@ export interface DeferredRow {
 export declare const DEFERRED_TABLE: readonly DeferredRow[];
 /**
  * The closed set of shipped verbs: the 9 v0.1 verbs (ARCHITECTURE scope line,
- * §8 WP-15 row) plus the four v0.2 inspection verbs — `state`, `save-window`,
+ * §8 WP-15 row), the four v0.2 inspection verbs — `state`, `save-window`,
  * `serve`, `sweep` (design/08 §3 verb table; the inspection verbs exit 0/2/4
- * only — no exit-3 tier, "inspection is not a gate").
+ * only — no exit-3 tier, "inspection is not a gate") — and the v0.3 immersion
+ * verb `compare` (design/08 §3.5, §6(c); design/07 §4). `compare` is a pure
+ * consumer of the one engine: it recomputes its inputs through `run()` and
+ * reads each line's own `stateAt` (never a second engine — C-ONE-CORE), so it
+ * carries no exit-3 gate tier of its own (it produces a diff, it does not gate).
  */
-export declare const SHIPPED_VERBS: readonly ["run", "solve", "mistake", "figure", "render", "check", "state", "save-window", "serve", "sweep", "schema", "explain", "export"];
+export declare const SHIPPED_VERBS: readonly ["run", "solve", "mistake", "figure", "render", "check", "state", "save-window", "serve", "sweep", "compare", "schema", "explain", "export"];
 export type ShippedVerb = (typeof SHIPPED_VERBS)[number];
 export declare function isShippedVerb(v: string): v is ShippedVerb;
-/** Deferred verbs named in the design of record but not shipped yet. */
+/** Deferred verbs named in the design of record but not shipped yet.
+ *  (`compare` shipped with v0.3 immersion — it is now in SHIPPED_VERBS.) */
 export declare const DEFERRED_VERBS: Readonly<Record<string, DeferredPhase>>;
 export declare function deferredFor(token: string): DeferredPhase | undefined;
 export declare function deferredError(at: string, token: string, deferred: DeferredPhase, schema_ref?: string): LinelabError;

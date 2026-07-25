@@ -36,7 +36,8 @@ export function looksLikeJson(text) {
 export function schemaErr(at, message, reason, detail) {
     return { code: "SCHEMA", at, message, detail: { reason, ...detail } };
 }
-export function recomposeEnvelopeRoad(road, at = "input.road") {
+/** THE projection: disclosed road → the wire spec that rebuilds its corridor. */
+export function roadWireSpec(road, at = "input.road") {
     const dsl = road?.dsl;
     if (typeof dsl !== "string" || dsl.length === 0) {
         return {
@@ -44,10 +45,20 @@ export function recomposeEnvelopeRoad(road, at = "input.road") {
             error: schemaErr(at, "envelope carries no road.dsl to recompose", "envelope_road_undisclosed")
         };
     }
-    return compose({
-        dsl,
-        ...(typeof road?.bike_margin_m === "number" ? { bike_margin_m: road.bike_margin_m } : {}),
-        ...(typeof road?.use_full_width === "boolean" ? { use_full_width: road.use_full_width } : {})
-    });
+    return {
+        ok: true,
+        value: {
+            dsl,
+            ...(typeof road?.use_full_width === "boolean" ? { use_full_width: road.use_full_width } : {}),
+            ...(typeof road?.bike_margin_m === "number" ? { bike_margin_m: road.bike_margin_m } : {})
+        }
+    };
+}
+/** THE recompose: the same projection, handed straight to `compose()`. */
+export function recomposeEnvelopeRoad(road, at = "input.road") {
+    const spec = roadWireSpec(road, at);
+    if (!spec.ok)
+        return spec;
+    return compose(spec.value);
 }
 //# sourceMappingURL=shared.js.map

@@ -52,8 +52,9 @@ const blessJs = join(repoRoot, "dist/cli/bless.js");
 const design02 = resolve(repoRoot, "../design/02-physics-model.md");
 
 beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
-  if (!existsSync(blessJs)) throw new Error(`build did not produce ${blessJs}`);
+  // dist/ is built once by test/globalSetup.ts before the worker pool starts;
+  // this only asserts that build produced the bless binary this file spawns.
+  if (!existsSync(blessJs)) throw new Error(`test/globalSetup.ts did not produce ${blessJs}`);
 }, 180_000);
 
 // ---------------------------------------------------------------------------
@@ -72,9 +73,23 @@ function makeSandbox(): Sandbox {
   const design = join(dir, "design");
   mkdirSync(join(root, "test", "analytic"), { recursive: true });
   mkdirSync(design, { recursive: true });
-  for (const f of ["package.json", "tsconfig.json", "vitest.config.ts"]) {
+  for (const f of ["package.json", "tsconfig.json"]) {
     cpSync(join(repoRoot, f), join(root, f));
   }
+  // The project vitest.config.ts now wires a globalSetup (test/globalSetup.ts →
+  // test/helpers/build.ts) that builds dist/ once for the CLI-spawning suites.
+  // The bless analytic gate (runAnalyticGate → `vitest run test/analytic/*`) runs
+  // pure in-process an/bounds fixtures and NEVER spawns dist/, so the sandbox uses
+  // the original globalSetup-free config — the exact config it ran under before —
+  // rather than dragging a pointless tree compile (and the globalSetup file, which
+  // the sandbox does not copy) into the hermetic gate.
+  writeFileSync(
+    join(root, "vitest.config.ts"),
+    'import { defineConfig } from "vitest/config";\n' +
+      "export default defineConfig({\n" +
+      '  test: { include: ["test/**/*.test.ts"], pool: "threads", isolate: true }\n' +
+      "});\n"
+  );
   cpSync(join(repoRoot, "src"), join(root, "src"), { recursive: true });
   mkdirSync(join(root, "test", "fixtures"), { recursive: true });
   cpSync(join(repoRoot, "test", "fixtures", "tolerances.json"), join(root, "test", "fixtures", "tolerances.json"));

@@ -18,7 +18,14 @@ export type {
 } from "./types.js";
 export { CURSOR_AXES, HUD_GROUPS, HUD_ORIGINS, LOCK_MODES, VIEWER_VIEWS } from "./types.js";
 
-export { FRAME_STEP_S, PLAYBACK_SPEEDS, SAVE_WINDOW_INK } from "./constants.js";
+export {
+  FRAME_STEP_S,
+  PLAYBACK_SPEEDS,
+  SAVE_WINDOW_INK,
+  CORRECTIVE_GHOST_INK,
+  CORRECTIVE_GHOST_OPACITY,
+  COMPARE_GHOST_OPACITY
+} from "./constants.js";
 
 export { loadSession, sessionOf, withFocus, lineOf, focusedLine, stateInputFor } from "./session.js";
 export type { ViewerSession, LoadOptions } from "./session.js";
@@ -60,6 +67,15 @@ export {
 } from "./saveWindow.js";
 export type { SaveWindowOverlay, SaveWindowProbe, OverlayPoint } from "./saveWindow.js";
 
+export { correctiveGhostOverlay, correctiveGhostSvg } from "./correctiveGhost.js";
+export type { CorrectiveGhostOverlay } from "./correctiveGhost.js";
+
+// v0.3 (00 §3's immersion row): the pov view + compare mode.
+export { renderPovView, parsePovLook, POV_LOOK_MODES } from "./pov.js";
+export type { PovLook } from "./pov.js";
+export { compareModel, compareGhostsSvg, lockAxisOf } from "./compare.js";
+export type { CompareModel, GhostState } from "./compare.js";
+
 export {
   createApp,
   frameOf,
@@ -72,9 +88,11 @@ export {
   nudgeSample,
   flipAxis,
   setLock,
+  setLook,
   focusLine,
   jumpToBookmark,
   toggleSaveWindow,
+  toggleCorrectiveGhost,
   hudHtml,
   bookmarkOptionsHtml,
   legendHtml,

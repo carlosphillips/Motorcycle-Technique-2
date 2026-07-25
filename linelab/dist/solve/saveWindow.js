@@ -390,9 +390,17 @@ function computeWindow(line, cornerId, scan_ds_m) {
         t_earliest_s: t_earliest,
         react_profile_s
     };
-    // --- §4b.5 status rows 2–5 (never_open before the transition rows is what
-    // lets the resolved branch assume the scan opens)
-    if (verdicts[0] === false) {
+    // --- §4b.5 status rows, keyed on open_count = the number of maximal
+    // contiguous runs of `saved = true` (the save *bands*). A leading `false` run
+    // is the §4b.3 inside-curl, not a closed window, so it no longer masks a real
+    // window: never_open ⟺ zero bands. never_open is tested before the band rows
+    // so the resolved branch can assume the scan opens.
+    let open_count = 0;
+    for (let i = 0; i < verdicts.length; i++) {
+        if (verdicts[i] && (i === 0 || !verdicts[i - 1]))
+            open_count++;
+    }
+    if (open_count === 0) {
         return ok(seal({ ...base, status: "never_open", transition_count, runs }));
     }
     if (verdicts.every((v) => v)) {
@@ -405,18 +413,31 @@ function computeWindow(line, cornerId, scan_ds_m) {
             runs
         }));
     }
-    if (transition_count > 1) {
+    if (open_count >= 2) {
         // a refusal, not a caveat: no tau_close_s, no s_close_m, no
         // reaction_budget_s — the disclosure block still rides (§4b.5, D11)
         return ok(seal({ ...base, status: "intermittent", transition_count, runs }));
     }
-    // --- resolved: bisect inside the single (true, false) adjacent pair to
-    // HORIZON_EPS_S, at most HORIZON_BISECT_MAX halvings, reporting the LAST τ
-    // that evaluated true — the reported window is never longer than the
-    // measured one.
-    let k = 0;
-    while (k + 1 < verdicts.length && verdicts[k + 1] === true)
-        k++;
+    // --- resolved: exactly one save band. Bisect its CLOSING edge — the band's
+    // last `true` → first `false` grid pair (never the leading `false → true` of a
+    // §4b.3 inside-curl prefix). For a scan that opens at τ₀ the closing edge is
+    // the sole transition; the reported window is never longer than the measured
+    // one (04 §4b.5).
+    let k = verdicts.length - 1;
+    while (k >= 0 && verdicts[k] !== true)
+        k--; // band's trailing (last-true) index
+    if (k + 1 >= verdicts.length) {
+        // single band that reaches the horizon with no trailing `false` (an
+        // inside-curl prefix followed by open-to-horizon): open_at_end in substance.
+        return ok(seal({
+            ...base,
+            status: "open_at_end",
+            tau_close_s: grid[grid.length - 1],
+            open_at_end: true,
+            transition_count,
+            runs
+        }));
+    }
     let tLo = grid[k];
     let tHi = grid[k + 1];
     let s_star = stars[k] ?? null;

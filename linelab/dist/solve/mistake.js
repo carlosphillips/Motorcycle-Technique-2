@@ -197,6 +197,97 @@ function probeEasedLean(ctx, plan, tiIndex, s_ti, kissLean) {
     return kissLean;
 }
 // ---------------------------------------------------------------------------
+// The fifty_pence facet ladder (design/03 §7.1).
+//
+// The pin is a COUNT: "an early first facet (`early_by_m = 10`) + `facets − 1`
+// corrections (`facets = 6` — six steering *inputs*)". A facet IS a `turn_in`
+// event — design/06 §3.1 stage 9 ("a line with six `turn_in` events draws six
+// hourglasses"; "there is deliberately no `facet` class") — so the compiled
+// plan carries EXACTLY `facets` turn_in actions, no more. design/09 §5's
+// A-FIG83-MARKS ("the fifty_pence line exactly `facets` hourglasses") and
+// A-ANCHOR-ERRORS (`turn_point#7@bad` must miss, "listing six candidates")
+// both read that count off this ladder.
+//
+// The back-off therefore rides INSIDE the ladder, never as an extra action.
+// It cannot be dropped either: `cmd_lean` is a ZOH setpoint that steps only at
+// a turn_in activation (core/record.ts), and design/01 §A.2 counts a steering
+// input as a maximal RISING run of |cmd_lean| — a monotone ladder is ONE
+// rising run, which would PASS `single_input` and contradict the §7.1 pin
+// (`single_input` is fifty_pence's mandatory failure). Alternating
+// bite / give-back over six facets yields three maximal rising runs, which is
+// design/01 §4.3's own arithmetic for this row: "6 facets → ≥ 3 commanded
+// inputs, the always-fail rule".
+//
+// Magnitudes stay engine-probed consequences of the delta (design/03 §7's
+// "facet magnitudes are engine-probed consequences … never independent author
+// inputs"): the ladder's two anchors are the probed kiss lean and the probed
+// eased lean, and the give-back is expressed as a fraction of the bite the
+// rider has just made — the rider un-does most of the input, the bike stops
+// turning enough to hold the corner, and the line drifts back out. That
+// out-in-out-in wobble is what makes the drawn line read as facets rather than
+// as a smooth arc.
+/** the give-back keeps this fraction of the bite it un-does (local, ARCHITECTURE §6.6). */
+const FACET_GIVEBACK_F = 0.25;
+/** wire floor: `turn_in.target.lean_deg ∈ (0, 90)` (design/03 §6.1). */
+const FACET_LEAN_MIN_DEG = 1.0;
+/** the facet sequence spans this fraction of the arc from the early first facet (local). */
+const FACET_SPAN_ARC_F = 0.65;
+/** two facets never sit closer than this (local). */
+const FACET_GAP_MIN_M = 0.5;
+/** each reach probe pulls the sequence in by this factor (local). */
+const FACET_COMPRESS_F = 0.7;
+/**
+ * `facets` commanded leans, alternating bite / give-back, walking the probed
+ * [kiss, eased] band upward. Deterministic and total for any `facets ≥ 2`.
+ */
+export function facetLadder(kiss, eased, facets) {
+    const nBites = Math.ceil(facets / 2);
+    const rung = (k) => nBites === 1 ? eased : kiss + ((eased - kiss) * k) / (nBites - 1);
+    const out = [];
+    for (let i = 0; i < facets; i++) {
+        const bite = rung(Math.floor(i / 2));
+        out.push(i % 2 === 0 ? bite : Math.max(FACET_LEAN_MIN_DEG, FACET_GIVEBACK_F * bite));
+    }
+    return out;
+}
+/** the facet actions for one span fraction (stations only; leans come from the ladder). */
+function facetActionsFor(ladder, baseId, corner, s_ti, spanArcF) {
+    const sEnd = Math.min(corner.s0 + spanArcF * (corner.s1 - corner.s0), corner.s1 - 1);
+    const gap = Math.max(FACET_GAP_MIN_M, (sEnd - s_ti) / (ladder.length - 1));
+    return ladder.map((lean_deg, i) => ({
+        do: "turn_in",
+        id: `${baseId}_f${i + 1}`,
+        at_s: s_ti + i * gap,
+        target: { lean_deg },
+        hand: corner.hand
+    }));
+}
+/**
+ * The facet count is the pin, so every facet must actually reach the
+ * controller: a sequence spread so wide that the line departs the road before
+ * the last input fires would draw fewer than `facets` hourglasses and break
+ * design/09's A-FIG83-MARKS. Bounded reach probe (≤ N_PROBE engine shots at
+ * the shipped resolution, deterministic): pull the sequence in by
+ * FACET_COMPRESS_F until the run emits one `turn_in` event per facet. The
+ * spacing is therefore an engine-probed consequence of the delta, exactly like
+ * the facet magnitudes (design/03 §7).
+ */
+function reachableFacetActions(ctx, plan, tiIndex, ladder, baseId, corner, s_ti) {
+    const rest = plan.filter((_, i) => i !== tiIndex);
+    let actions = facetActionsFor(ladder, baseId, corner, s_ti, FACET_SPAN_ARC_F);
+    for (let k = 0; k < N_PROBE; k++) {
+        const candidate = [...rest, ...actions].sort((a, b) => a.at_s - b.at_s);
+        const m = measureRun(ctx, candidate, false);
+        const fired = m.traj.events.filter((e) => e.kind === "turn_in" && e.s >= s_ti - 1e-9).length;
+        if (fired >= ladder.length)
+            return actions;
+        actions = facetActionsFor(ladder, baseId, corner, s_ti, FACET_SPAN_ARC_F * Math.pow(FACET_COMPRESS_F, k + 1));
+    }
+    // budget exhausted: the tightest sequence probed — the emergent line then
+    // tells the truth (the oracle pin catches tune drift)
+    return actions;
+}
+// ---------------------------------------------------------------------------
 // turn_in attribution: the base line's turn_in EVENTS carry corner_id +
 // action_id (05 §5) — the robust join between corners and plan actions.
 function turnInActionIdFor(events, cornerId) {
@@ -648,48 +739,18 @@ function perturbTurnIn(kind, params, ctx, corners, basePlan, events) {
                 : a);
         }
         else {
-            // fifty_pence: an early shallow first facet + (facets − 1) corrections
-            // walking up to the probed EASED lean — the rider under-turns, drifts
-            // wide, and catches it in steps; still ONE steering-channel replacement;
-            // facet magnitudes are engine-probed consequences of the delta, never
-            // author inputs
+            // fifty_pence: an early first facet + (facets − 1) corrections — EXACTLY
+            // `facets` turn_in actions, alternating bite / give-back over the probed
+            // kiss→eased band (see the facetLadder banner). Still ONE
+            // steering-channel replacement; every magnitude is engine-probed.
             const facets = Math.round(params.nums["facets"] ?? defaultOf("fifty_pence", "facets"));
             if (facets < 2) {
                 return err(badRange("mistake.params.facets", "facets must be ≥ 2", "mistake_param_nonpositive", { facets }));
             }
             const kiss = probeKissLean(cctx, plan, tiIndex, s_ti);
             const eased = probeEasedLean(cctx, plan, tiIndex, s_ti, kiss);
-            // saw-tooth facet ladder kiss → eased: each correction RELAXES a touch
-            // before the next add (fifty-pencing's bar-pressure wobble) — the dips
-            // are what make each facet a distinct steering input in the commanded
-            // channel (metric §A.2: a rising run ends only when cmd_lean falls)
-            // saw-tooth facet ladder kiss → eased: each correction RELAXES a touch
-            // before the next add (fifty-pencing's bar-pressure wobble) — the dips
-            // are what make each facet a distinct steering input in the commanded
-            // channel (metric §A.2: a rising run ends only when cmd_lean falls)
-            const FACET_DIP_DEG = 3.0;
-            const sEnd = Math.min(corner.s0 + 0.65 * (corner.s1 - corner.s0), corner.s1 - 1);
-            const gap = Math.max(0.5, (sEnd - s_ti) / (facets - 1));
-            const facetActions = [];
-            for (let i = 0; i < facets; i++) {
-                const lean = kiss + ((eased - kiss) * i) / (facets - 1);
-                facetActions.push({
-                    do: "turn_in",
-                    id: `${tiGood.id}_f${i + 1}`,
-                    at_s: s_ti + i * gap,
-                    target: { lean_deg: lean },
-                    hand: corner.hand
-                });
-                if (i < facets - 1) {
-                    facetActions.push({
-                        do: "turn_in",
-                        id: `${tiGood.id}_f${i + 1}r`,
-                        at_s: s_ti + (i + 0.5) * gap,
-                        target: { lean_deg: Math.max(1, lean - FACET_DIP_DEG) },
-                        hand: corner.hand
-                    });
-                }
-            }
+            const ladder = facetLadder(kiss, eased, facets);
+            const facetActions = reachableFacetActions(cctx, plan, tiIndex, ladder, tiGood.id, corner, s_ti);
             plan = [...plan.filter((_, i) => i !== tiIndex), ...facetActions];
         }
         plan.sort((a, b) => a.at_s - b.at_s);

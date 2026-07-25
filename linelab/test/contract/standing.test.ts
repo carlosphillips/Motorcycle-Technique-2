@@ -19,42 +19,36 @@
 //   A-LADDER-PROSE              every shipped printing surface carries pack
 //                               id, checks_version, the rung-token gloss, and
 //                               the 05 §6.4 placard verbatim
-//   A-STANDING-WARN-BAND        typed it.todo — see SEAM-STANDING-WARN
+//   A-STANDING-WARN-BAND        the three reachable arms of the RESOLVED gate
+//                               (design/09 §4, amended) — na-cap rung-3 witness,
+//                               blind-corner warn band (¬clean, rung 2), and the
+//                               book90@38 empty_band emergent-refusal pin
 //
 // ═══════════════════════════════════════════════════════════════════════════
-// SEAM-STANDING-WARN (OPEN — engine-truth finding, reported under the oracle's
-// iron rule, design/09 §4: never an edited expectation).
-// The design pin (09 §4 "F-STANDING-WARN"): preset book90, street, mu 1.0,
-// DEFAULT solve, entry ∈ [36, 44] km/h grades contained ∧ clean(line) ∧
-// lean_ceiling "warn" → standing "clean" (rung 3), blocked_by
-// [{lean_ceiling, warn}]. On THIS engine that intersection is EMPTY over the
-// whole calibration band, probed at 35, 35.5, 36, 36.5, 37, 38, 40, 42, 44:
-//   · accept=clean refuses NO_SOLUTION across the band (36: non_clean_band —
-//     the lone contained candidate carries 1 fail; 37–44: empty_band).
-//   · accept=best_failing shows why: the best candidates grade contained with
-//     an out_in_out FAIL from 35 km/h up (35: phi_max 33.17°, 36: 36.47°,
-//     37: 36.77°), then containment itself breaks (38: wide at phi_max
-//     39.17°; 40+: runoff) — all with lean_ceiling still PASS, i.e. below
-//     the 40.36° reserve (phiReserve(0.85·1.0) = atan(0.85)).
-//   · The clean band on book90's default solve therefore tops out below
-//     35 km/h at phi_max ≈ 33°, ~7° under the warn floor: the design's
-//     36.01 km/h floor arithmetic is sound, but clean(line) dies (out_in_out,
-//     then containment) before the reserve is ever eaten.
-// The design prices exactly this outcome: "If no entry in the band yields
-// contained ∧ warn, that is an engine or doctrine finding reported under the
-// oracle's iron rule — never an edited expectation" (09 §4). So:
-//   · A-STANDING-WARN-BAND as designed is a typed it.todo below;
-//   · the committed fixture test/fixtures/standing/fx-standing-warn.json
-//     (road book90, entry 38 = F_STANDING_WARN_ENTRY_KMH) is pinned to its
-//     EMERGENT truth — NO_SOLUTION/empty_band — so any engine drift re-opens
-//     this seam mechanically;
-//   · G-STANDING-BITES' rung-3 witness is discharged by the na-cap arm
-//     instead (committed fixture fx-standing-straight.json: a clean
-//     straight-road line whose zero-corner record gives lean_ceiling ZERO
-//     instances → verdict "na" → reserved unattainable → rung 3 exactly as
-//     05 §6.4's cap law demands). DEVIATION from the 09 §10 witness map,
-//     recorded here and in this package's return; the designed witness lands
-//     when the seam is ratified/resolved.
+// SEAM-STANDING-WARN — RESOLVED by the adjudicated design amendment (design/09
+// §4 A-STANDING-WARN-BAND + §10 witness map + design/01 §A.6.1). The seam was:
+// the design's original F-STANDING-WARN pin (book90, street, mu 1.0, DEFAULT
+// solve, entry ∈ [36, 44]) required contained ∧ clean(line) ∧ lean_ceiling
+// "warn" → standing "clean" (rung 3). On THIS engine that intersection is EMPTY
+// over the whole band, and the emptiness is STRUCTURAL, not a calibration miss:
+//   · the §4.1 clean door caps a solved accept=clean line's peak lean at
+//     phiReserve(mu_use) — the SAME quantity as check 8's non-blind reserve
+//     (atan(0.85) = 40.36°) — so a clean line's peak sits AT the reserve and
+//     never eats it. lean_ceiling is PASS for every clean line.
+//   · the BLIND_RESERVE_DEG = 35° cap that opens a warn window is gated by
+//     blind(c), false for every hold-wide (clean) line; a line that cuts in far
+//     enough to keep blind(c) true and reach phi_max > 35° fails
+//     hold_wide_for_sight AND out_in_out, so it is never clean (rung 2).
+//   · probed accept=clean across 35..44 km/h: refuses NO_SOLUTION (36:
+//     non_clean_band; 37–44: empty_band); accept=best_failing tops out at
+//     phi_max ≈ 33° at 35 km/h, ~7° under the warn floor, all lean_ceiling PASS.
+// The amendment redirects the gate to the reachable engine truth (three arms,
+// asserted above) and the §10 witness map now NAMES the na-cap fixture
+// fx-standing-straight.json as the rung-3 witness — so G-STANDING-BITES is a
+// genuine set-equality with NO documented deviation (AMBER → GREEN). The
+// committed fx-standing-warn.json (book90, entry 38 = F_STANDING_WARN_ENTRY_KMH)
+// is retained only as the emergent-refusal pin — NO_SOLUTION/empty_band — so any
+// engine drift that opens the clean∧warn band re-opens this gate mechanically.
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { describe, expect, it, vi } from "vitest";
@@ -223,14 +217,15 @@ describe("A-STANDING-RESERVED (design/09 §4)", () => {
 
 // ---------------------------------------------------------------------------
 // G-STANDING-BITES — every rung witnessed by a committed fixture, as a
-// set-equality over the declared witness corpus (see SEAM-STANDING-WARN for
-// the rung-3 deviation).
+// set-equality over the declared witness corpus. The rung-3 witness
+// (fx-standing-straight, the na cap) is now the one the amended design/09 §10
+// witness map NAMES, so this is a genuine set-equality with no deviation.
 
 describe("G-STANDING-BITES (design/09 §10)", () => {
   it("the witness corpus attains exactly the rung set {0,1,2,3,4}", { timeout: 600_000 }, () => {
     const witnesses: readonly { rung: number; token: string; line: LineResult }[] = [
       { rung: 4, token: "reserved", line: base90() }, // F-ORACLE-90 good line
-      { rung: 3, token: "clean", line: straightLine() }, // na-cap witness (SEAM-STANDING-WARN)
+      { rung: 3, token: "clean", line: straightLine() }, // na-cap witness — the amended §10 rung-3 witness
       { rung: 2, token: "caution", line: mistakeLine("premature_contained") },
       { rung: 1, token: "failing", line: mistakeLine("premature") },
       { rung: 0, token: "crash", line: crashLine() }
@@ -610,15 +605,58 @@ describe("A-LADDER-PROSE (design/09 §4)", () => {
 // ---------------------------------------------------------------------------
 // A-STANDING-WARN-BAND — SEAM-STANDING-WARN (see the file banner)
 
-describe("A-STANDING-WARN-BAND / SEAM-STANDING-WARN", () => {
-  it.todo(
-    "A-STANDING-WARN-BAND as designed — F-STANDING-WARN (preset book90, street, mu 1.0, default solve, entry 38 ∈ [36,44]) grades contained ∧ clean ∧ lean_ceiling warn → standing clean (rung 3), reserved_blocked_by [{lean_ceiling, warn}] — lands when SEAM-STANDING-WARN is ratified/resolved (on this engine no entry in the calibration band yields contained ∧ clean ∧ warn; arithmetic in the file banner and in the three ENFORCED cases below)"
-  );
+describe("A-STANDING-WARN-BAND (design/09 §4, amended)", () => {
+  it("A-STANDING-WARN-BAND — the three reachable arms of the resolved gate (design/09 §4)", { timeout: 600_000 }, () => {
+    // The amended gate: the `contained ∧ clean(line) ∧ lean_ceiling="warn"`
+    // intersection is EMPTY on this engine, and the emptiness is STRUCTURAL — the
+    // §4.1 clean door caps a clean line's peak lean at phiReserve(mu_use), the
+    // same quantity as check 8's non-blind reserve, so no clean line eats the
+    // reserve (the "SEAM pin, quantified" case below carries the arithmetic). The
+    // gate therefore asserts the reachable truth in three arms.
 
-  // The three cases below are the parts of A-STANDING-WARN-BAND this engine CAN
-  // decide. Before them the gate was a bare `it.todo` and nothing about the warn
-  // band was asserted at all; now the reachable half bites, and the unreachable
-  // half is pinned with numbers so a drift that opens it re-opens the seam.
+    // (a) the rung-3 `clean` witness is the corner-less na-cap fixture the amended
+    //     §10 witness map now NAMES: lean_ceiling has zero instances → verdict
+    //     `na` → reserved unattainable → standing caps at 3.
+    const naReport = gradeOf(straightLine());
+    expect(naReport.standing).toBe("clean");
+    expect(naReport.rung).toBe(3);
+    expect(naReport.reserved_blocked_by).toEqual([{ id: "lean_ceiling", reason: "na" }]);
+
+    // (b) the lean_ceiling WARN band is non-empty — reachable on a BLIND corner
+    //     (reserve capped at BLIND_RESERVE_DEG = 35°), where it grades
+    //     contained ∧ warn ∧ ¬clean → rung 2, never the designed rung 3.
+    const blind = run(
+      {
+        spec: "linelab/1",
+        id: "fx-standing-warn-blind",
+        road: { preset: "bookBlind" },
+        rider: { profile: "street", start: { speed_kmh: 34, f: 1.0 }, plan: [{ do: "turn_in", id: "t1", at_s: 12, target: { lean_deg: 37 } }] }
+      },
+      { engine_semver: "0.1.0" }
+    );
+    expect(blind.ok).toBe(true);
+    if (!blind.ok) return;
+    const blindLine = blind.value.lines[0] as LineResult;
+    expect(blindLine.verdict.outcome).toBe("contained");
+    expect(blindLine.verdict.doctrine.checks.filter((c) => c.id === "lean_ceiling").map((c) => c.verdict)).toContain("warn");
+    expect(clean(blindLine.verdict.outcome, blindLine.verdict.doctrine)).toBe(false);
+    expect(gradeOf(blindLine).standing).toBe("caution"); // rung 2, not 3 — ¬clean
+
+    // (c) the committed F-STANDING-WARN input (book90 @38) refuses
+    //     NO_SOLUTION/empty_band — retained only as the emergent-refusal pin so
+    //     any engine drift that opens the clean∧warn band re-opens this gate.
+    const input = loadJson(join(standingFixturesDir, "fx-standing-warn.json")) as { road: string; entry_kmh: number };
+    expect(input).toEqual({ road: "book90", entry_kmh: 38 });
+    const seam = chainedSolve(input as never);
+    const e = errOf(seam);
+    expect(e.code).toBe("NO_SOLUTION");
+    expect(e.detail?.["sub_reason"]).toBe("empty_band");
+  });
+
+  // The cases below carry the quantified detail behind the three arms above: the
+  // warn band's blind-corner reachability with metrics, the ladder-half block,
+  // and the numbers proving the clean∧warn emptiness is structural (a drift that
+  // opened it would fail the "SEAM pin, quantified" case and re-open the gate).
 
   it("the warn BAND itself is reachable — on a BLIND corner, where the reserve is min(phi_reserve, BLIND_RESERVE_DEG = 35°)", { timeout: 300_000 }, () => {
     // `lean_ceiling`'s reserve is capped at the pack's BLIND_RESERVE_DEG when

@@ -8,15 +8,20 @@
 // `with*` composition (render/scene.ts) — before handing the finished scene to
 // `renderTopdown`.
 //
-// `target: "pov"` rejects typed `SCHEMA`/`deferred: "immersion (v0.3)"`
-// (00 §3/ARCHITECTURE §6.4's table) — the POV render target doesn't exist
-// until v0.3; only `topdown` ships in v0.1.
-import { ok, err } from "../core/result.js";
+// `target: "pov"` is the IMMERSION view (v0.3): a first-person pinhole
+// projection of TRUE geometry (render/pov.ts, design/07 §5). It is UN-DEFERRED
+// here — the phase-gate that once rejected it (`SCHEMA`/`deferred: "immersion
+// (v0.3)"`) is retired now that the target ships. The pov SVG is built by
+// render/pov.ts, which NEVER imports render/project.ts (C-POV-TRUE-GEOMETRY's
+// structural lint); `project()` runs on the pov path only to validate the
+// ViewSpec once and to fill the shared `RenderViewsResult.scene`.
+import { ok } from "../core/result.js";
 import { project, rotatePoint } from "./project.js";
 import { deriveMarkers } from "./markers.js";
 import { resolveLabels } from "./labels.js";
 import { withMarkers, withLabels } from "./scene.js";
 import { renderTopdown } from "./topdown.js";
+import { renderPovForFigure } from "./pov.js";
 export { project } from "./project.js";
 export { renderTopdown } from "./topdown.js";
 // v0.2 (00 §3's inspection row): the controls strip with its linked cursor.
@@ -27,24 +32,36 @@ export { renderControls, phaseBandsOf, lastCornerIdOf, CONTROLS_NEUTRAL_INKS } f
 export { fallbackSvg } from "./fallback.js";
 export { gateProportions, computeProportionMetrics } from "./gateProportions.js";
 export { buildManifestRecord } from "./manifest.js";
+// v0.3 (00 §3's immersion row): the POV render target. `render/pov.ts` owns the
+// camera/projection/draw-list; these are its public surface (the viewer consumes
+// `povFrame`/`renderPov` for the canvas view; 09 asserts the draw list).
+export { renderPov, povFrame, renderPovForFigure, povFocusLine, povDefaultSample, povYawDeg, POV_LOOK_MODES, POV_MARKER_STATES } from "./pov.js";
+function isRecord(v) {
+    return typeof v === "object" && v !== null && !Array.isArray(v);
+}
 /**
- * `renderViews(input) → Result<{scene, svg}>` — v0.1: `target: "topdown"`
- * (the default) only. `target: "pov"` is a phase-gated `SCHEMA` rejection
- * (ARCHITECTURE §6.4's table), not a `renderTopdown` failure — `renderTopdown`
- * itself never throws/errors (§3 intro), so only composition-time failures
- * (`project()`'s typed errors, `resolveLabels`'s typed anchor failures)
- * surface through this `Result`.
+ * `renderViews(input) → Result<{scene, svg}>` — dispatches the render target.
+ * `target: "topdown"` (the default) composes a projected `DrawnScene` and draws
+ * it; `target: "pov"` (v0.3 immersion) builds the first-person SVG from TRUE
+ * geometry (render/pov.ts) and carries the topdown scene alongside for the
+ * shared return contract. Neither renderer throws — only composition-time
+ * failures (`project()`'s typed errors, `resolveLabels`'s typed anchor
+ * failures) surface through this `Result`.
  */
 export function renderViews(input) {
     if (input.target === "pov") {
-        return err({
-            code: "SCHEMA",
-            at: "render.target",
-            message: 'render target "pov" is not shipped yet',
-            schema_ref: "render.target",
-            deferred: "immersion (v0.3)",
-            detail: { reason: "deferred" }
-        });
+        // C-POV-TRUE-GEOMETRY: the pov SVG is built by renderPovForFigure from TRUE
+        // geometry only (render/pov.ts never imports project.ts). project() runs
+        // here solely to (a) validate the ViewSpec once — including the `look`
+        // closed set — and (b) fill the shared RenderViewsResult.scene contract.
+        // The pov svg is INVARIANT to every projection setting project() resolves
+        // (orient/window/…), which is the behavioural half of the gate.
+        const base = project(input.road, input.lines, input.viewSpec);
+        if (!base.ok)
+            return base;
+        const look = isRecord(input.viewSpec) && input.viewSpec["look"] === "limit_point" ? "limit_point" : "heading";
+        const svg = renderPovForFigure(input.road, input.lines, look);
+        return ok({ scene: base.value, svg });
     }
     const base = project(input.road, input.lines, input.viewSpec);
     if (!base.ok)

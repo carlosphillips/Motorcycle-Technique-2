@@ -1,8 +1,14 @@
-# DEVIATIONS.md — v0.1 ratification queue
+# DEVIATIONS.md — v0.1 → v1.0 ratification queue
 
-This is the design owner's decision queue for linelab v0.1. It compiles every
-place the shipped engine (`src/`) reads differently than the design-of-record
-letter (`design/00`–`09`), sourced from: the two build-task transcripts
+**Project status: v1.0 CLOSED (2026-07-24).** All three phases shipped (v0.1 figure
+spine, v0.2 inspection, v0.3 immersion); every gate green in two consecutive full runs
+(50 files / 1357 pass / 0 fail / 4 documented `it.todo`); G1–G9 all hold. The v0.3
+immersion-completion ratification is the **"v1.0 CLOSE" section immediately below** (read
+it first — it supersedes any earlier "still deferred" note about `pov`/`--look`/`compare`).
+
+This is the design owner's decision queue. It compiles every place the shipped engine
+(`src/`) reads differently than the design-of-record letter (`design/00`–`09`), sourced
+from: the two build-task transcripts
 (package `ratification[]` blocks + adversarial `reviews[]`), five later
 design-owner adjudications, `PENDING RATIFICATION` code comments still in
 `src/`, and the six baked figures' visual-judge records
@@ -29,7 +35,505 @@ this entry is stale.
 
 ---
 
-## Adjudicated this cycle (read first)
+## v1.0 CLOSE — immersion completion + ratification merge (2026-07-24, READ FIRST)
+
+This pass completed v0.3 immersion and closed v1.0. The gate auditor + adversarial review
+found the immersion code coherent on the merits but **incomplete at the CLI seam**
+(`pov`/`--look` half-shipped). This pass finished the un-deferral, re-pinned four stale
+phase tests, strengthened two weak gate clauses, and merged every ratification item below.
+**No `src/` engine changed; no golden, `result_hash`, or baked figure moved** (verified:
+`test/golden/**`, `test/hash/**`, `test/render/gate.test.ts` all green — v0.3 is a pure
+consumer of the v0.1 engine). Full suite: **50 files / 1357 pass / 0 fail / 4 `it.todo`**,
+run twice, deterministic; typecheck exit 0.
+
+### Landed this pass (code — all `adjudicated-fixed`, no design conflict)
+
+- **`pov`/`--look` un-deferral COMPLETED (the split-brain fix).** design/08 §3 line 83
+  (`render … --views topdown,controls,pov`) and §4.1's View flag group (`--look
+  <heading|limit_point>`, "all ViewSpec fields, 06 §2.1") already ship both in v0.3, so
+  this is a pure implementation gap, not a design conflict. The whole `immersion (v0.3)`
+  deferred row is **retired** (`compare`+`pov`+`--look` all shipped; the same phase-gating
+  law that retired the empty `inspection (v0.2)` row: a phase with nothing left to defer
+  prints nothing). `cli/verbs/controls.ts`'s pov guard is deleted — `controls` now composes
+  `topdown`/`pov` through the one `render` verb, so the phase decision for `pov` lives in
+  exactly one place (C-ONE-CORE-style single seam). Files: `cli/deferred.ts`,
+  `cli/verbs/controls.ts`, `cli/verbs/render.ts`. Tripwires: `test/cli/compare.test.ts`
+  (immersion row absent; `deferredFor("pov"|"--look")` undefined), `test/cli/schema.test.ts`
+  (`DEFERRED_TABLE` length 4; roster includes `compare`).
+- **`--look` shipped as the `view.look` ViewSpec field.** Un-deferred in `cli/args.ts`
+  (dropped from `DEFERRED_FLAG_NAMES`) and added as a `FLAG_TABLE` row mirroring
+  `--orient` (`field:"view.look"`, closed set `heading|limit_point`, group View); the
+  `schema view` section grows a `look` field; two D8 effectuality witnesses added
+  (`view:look`, `cli:--look`) in `verify/effectuality.json` + `test/effectuality/d8.test.ts`.
+  `render/index.ts` already read `viewSpec.look`; `project.ts` already validated it. An
+  unknown `--look` is a plain closed-set `SCHEMA`/`look_unknown` (never `deferred` — the
+  token left the table when pov shipped). Tripwire: `test/cli/schema.test.ts` (`--look`
+  renders pov; `chase` → SCHEMA, not deferred).
+- **Four stale phase-pins re-pinned** to the shipped v0.3 phase: `test/cli/schema.test.ts`
+  (roster+`compare`, table length 4), `test/cli/serve.test.ts` (recipe-c leg 3 → shipped
+  `compare`: exit 0, one pair, two verdicts, `world_delta.differs:false`),
+  `test/effectuality/d8.test.ts` (`--lock` sample-map entry), `test/render/ink.test.ts`
+  (pov render target renders, not deferred).
+- **Two weak gate clauses strengthened.** C-POV-LIMIT-CONSISTENT's render-layer "two views"
+  clause now runs on the occluder-bearing `wallBlind` fixture so `project()` actually draws
+  the topdown sight ray (it is `null` on an unoccluded road) — the `ray != null` +
+  `ray.to == POV limit world == recorded (limit_x, limit_y)` equality now FIRES.
+  C-POV-OCCLUDE's wall golden now asserts `f.limit.markerState === "clamped"` (verified at
+  `s0+2`). Both in `test/render/pov.test.ts`.
+- **`serve` now advertises the views it actually offers.** `cli/verbs/serve.ts`'s serve-plan
+  metadata was a hand-kept `["topdown", "controls"]` while the viewer's `VIEWER_VIEWS` grew
+  `pov` with immersion — a client reading the plan would miss `pov`. Fixed to source the ONE
+  set (`views: [...VIEWER_VIEWS]`; `cli`→`viewer/types` is a same-rank import the DAG already
+  permits, and `serve.ts` already imports `viewer/page.js`). Tripwire re-pinned:
+  `test/cli/serve.test.ts` (serve offers `["topdown", "controls", "pov"]`).
+
+### design/07 — Viewer & POV (immersion deviations recorded)
+
+- **[07 §5.3 item 5 — red DEFICIT band]** *declared deviation, faithful subset.* The POV
+  draws the white "what-you-can-see" sight tint from the recorded `Sample.sight_m`, but
+  OMITS the red deficit band (`s + sight_m → derived.ssd_station_m`) the letter specifies
+  when `ssd_m > sight_ride_m`. The Sample-only `renderPov` builder carries no
+  `derived.ssd_station_m`; drawing the band needs `core/stateAt.derived` threaded into the
+  pure builder — a future stateAt-wiring pass. No C-POV gate requires it; the HUD "▶
+  deficit" text is present. **needs-decision** (wire `stateAt.derived.ssd_station_m` into
+  the POV frame, or amend 07 §5.3 to the tint-only subset). `src/render/pov.ts`.
+- **[07 §5.3 draw order — sight tint vs occluders]** *implemented-invariant-first.* The
+  letter pins 4 occluders → 5 sight band. The code paints the 12%-opacity sight tint BEFORE
+  the opaque occluder quads on purpose: a translucent tint painted OVER an opaque occluder
+  would wash the occluder that must read as solid, contradicting the occlusion invariant
+  the stage exists to show (occluders still paint over the road surface — C-POV-OCCLUDE's
+  paint-order golden asserts stage 4 after stage 2). Amend 07 §5.3's order or ratify the
+  tint-first realization. `src/render/pov.ts` `serialize()`.
+- **[07 §5.5 static CLI POV frame selection — `--at`/`--every`]** *declared deviation
+  (design-letter tension), needs-decision.* design/08 §3 line 83 lists `[--at <s> | --every
+  <m>]` on the render verb ("pov renders frames at `--at`/`--every` stations"), but design/07
+  §5.5 scopes the STATIC CLI POV as `frame(result, lineId, cursor, look)` and calls CLI
+  frame-SEQUENCE export "a future rasterizer seam" (it pins no default cursor for the static
+  target). The shipped `render --views pov` emits ONE default frame (focused line = highest
+  role rank; cursor = nearest the first corner's `s_mid`, else mid sample — a recorded
+  judgment call). Per-station POV is fully delivered TODAY in the interactive viewer
+  (`serve` → step to any station → `pov` view). Not implemented as CLI flags this pass to
+  respect 07 §5.5's future-seam scoping (avoid gold-plating a future rasterizer); recorded
+  under design/08 too. **needs-decision**: implement `--at`/`--every` as render frame
+  selectors, or amend 08 §3 to defer them to the rasterizer per 07 §5.5. (Also filed under
+  design/08 below.)
+- **[07 §5.2/§5.3 — POV presentation constants]** *implemented (ratified, ARCHITECTURE
+  §6.6).* 07 §5.2/§5.3 fix the camera NUMBERS (fov 60, near 0.5, eye 1.4, look-max 70,
+  inset frac 0.05) and occluder heights but not the canvas dimensions, glyph pixel sizes,
+  lookahead, or neutral palette tones. Those are declared as LOCAL presentation constants
+  in `render/constants.ts` (1000×600 canvas, 14 px chevron, 140 m lookahead, neutral
+  sky/ground/road/occluder tones) without TUNING status, per ARCHITECTURE §6.6 (unnamed
+  design literals get local names). Every design-owned number is imported verbatim; the
+  path overlay's verdict colour is D9's `QUALITY_COLOUR`.
+- **[07 §5.5 — static render target's `scene` fill]** *implemented (ratified).*
+  `renderViews`'s shared return type is `{scene: DrawnScene; svg}`. For `target:"pov"` the
+  `scene` is filled with the `project()` topdown scene purely to hold that contract without
+  cascading an optional-scene type change into non-owned files; the pov SVG itself is
+  project-free (`render/pov.ts` never imports `project.ts` — C-POV-TRUE-GEOMETRY's
+  structural lint), and byte-identity is asserted on `.svg` (invariant to the `project()`
+  scene). 07 §5.5 says "there is no DrawnScene in the POV pipeline" — true of the SVG; the
+  `scene` is a contract placeholder, not consumed by the pov drawing.
+- **[07 §4.2/§5.6 — POV ghost overlays]** *declared deviation (presentation gap).*
+  Compare-mode ghosts are drawn on the TOP-DOWN (glyphs, reduced opacity, verdict colour
+  retained — 07 §4.2, delivered via `viewer/compare.ts`). The POV view renders only the
+  FOCUSED line's path: `render/pov.ts`'s `PovFrame` exposes a single path + one camera with
+  no multi-line/ghost-path API, so POV ghost PATHS and time-lock ghost bike markers are not
+  yet drawn. Needs a `render/pov.ts` ghost-lines extension. C-COMPARE state correctness is
+  fully green (`test/viewer/compare.test.ts`); the gap is presentation-only.
+- **[07 §5.2 — `look` closed set vs the viewer UI toggle]** *implemented (ratified).* The
+  closed 2-value set `{heading, limit_point}` is enforced at every input boundary crossing
+  into the POV: `parsePovLook` returns `SCHEMA`/`unknown_look` (NOT `deferred` — look ships
+  in v0.3), and the CLI `--look` flag validates `heading|limit_point` (SCHEMA/`look_unknown`).
+  The viewer's `setLook` transition soft-coerces an out-of-set value to a no-op (the toggle
+  structurally cannot emit an invalid value), mirroring the v0.2 `setLock` pattern; the
+  SCHEMA refusal still fires wherever an arbitrary string enters (CLI/scene/ViewSpec door,
+  `renderView`).
+
+### design/08 — CLI & Agent Interface (immersion)
+
+- **[08 §3 line 83 — `--at`/`--every` static POV frames]** *needs-decision* — see the
+  design/07 §5.5 entry above (design-letter tension 08 §3 ↔ 07 §5.5; the interactive viewer
+  is the shipped per-station POV surface).
+- **[08 §3.5 — `compare` recompute path]** *implemented (ratified, D6).* For envelope
+  inputs, `compare.ts` recomputes each line by re-running its `resolved_scenario` through
+  `run()` (A-RESOLVED-RERUN), NOT via the literal `export --as figure-spec` projection —
+  that projection spells a figure road as `{dsl}` while a preset line spec spells `{preset}`
+  (→ `run()` refuses `line_road_differs`) and drops non-DSL-expressible
+  `bike_margin_m`/`use_full_width`. Re-running `resolved_scenario` is the SAME one engine,
+  recomputes trajectory+verdict from the spec (never trusts shipped samples — D6's
+  substance), and is robust to presets/non-default corridors. Verified end-to-end;
+  C-COMPARE reproduces the same re-run byte-for-byte. Scene/scenario/FigureSpec/composed
+  inputs `run()` directly.
+- **[08 §3.5 — N>2 unpaired shape]** *implemented (ratified, extension flagged).* §3.5
+  defines `unpaired` two-sided as `{a, b}` (the canonical two-input case). The impl supports
+  N≥2 (road/world/pairing generalize; each pair discloses its full member set via
+  `inputs:[…]`) but folds `unpaired` as a = line_ids only in input 0, b = line_ids unique to
+  any later input. **needs-decision** if the design owner wants a fully N-way unpaired shape
+  (a small extension; the letter only specifies the two-sided form).
+- **[08 §5.2/§5.9 — `explain compare`]** *no change (correct as-is).* `explain compare` →
+  `SCHEMA`/`explain_target_unknown` is CORRECT and UNCHANGED by shipping `compare`: `compare`
+  is a VERB, and explain's disambiguation covers check ids / error codes / mistake kinds
+  (§5.2) plus analysis tokens (§5.9) — a verb is not an explain vocabulary token, and §5.9
+  mandates no `explain <verb>` placard. Not a deviation; flagged only because the review
+  phrasing ("`explain compare` returns its real placard") is not achievable within the
+  design contract.
+
+### ARCHITECTURE / design/09 — infra
+
+- **[ARCHITECTURE §1 — `vitest.config.ts` pinned shape]** *implemented-invariant-first,
+  needs-decision.* §1 pins the config verbatim without a `globalSetup` key. The shipped
+  config adds `globalSetup: ["./test/globalSetup.ts"]` (→ `ensureBuilt`) so `dist/` builds
+  exactly once, single-threaded, before the worker pool — the structural cure for the
+  in-`beforeAll` build race. The pinned `include`/`pool`/`isolate` keys are unchanged;
+  `globalSetup` is purely additive. Verified: two consecutive full runs byte-identical
+  green, zero empty-stdout reds. Recommend ARCHITECTURE §1's snippet grow the `globalSetup`
+  key so the pin matches the shipped config.
+- **[09 §8.1 — `view.look` / D8 exhaustiveness]** *implemented (ratified).* Shipping
+  `--look` adds `view.look` to the printed schema and `cli:--look` to `FLAG_MAPPINGS`;
+  `T-D8-EXHAUSTIVE`'s set-equality is kept by adding matching witness rows
+  (`view:look`, `cli:--look`, both `effect_class:"render"`, `expect:"effect"`) to
+  `verify/effectuality.json` with observation builders in `test/effectuality/d8.test.ts`
+  (pov render under `look:heading` vs `limit_point` on the occluder fixture → distinct SVG).
+  `--look` is NOT verb-scoped (a general ViewSpec composition flag like `--orient`);
+  `--at`/`--every` were not added, so no new `VERB_SCOPED_FLAGS` rows beyond the v0.3
+  `--lock`.
+
+### Cross-references (unchanged, still open — surfaced again by compare)
+
+- **[05 — `VerdictDelta.sight_margin_min_m` negative on clean lines]** compare only ECHOES
+  `verdict.sight.margin_min_m`, the pre-carve-out clamped channel already flagged under
+  design/05 below (`solve/verdict.ts`). The fix belongs to the `solve/verdict.ts` owner;
+  compare is not the cause. **needs-decision** (unchanged from v0.2).
+
+---
+
+## Post-run — judge records committed + definitive v0.2 sweep (2026-07-24, read first)
+
+This run committed fresh D36 §7.4 judge records for the three re-baked figures
+(`fig-08-03/04/05`), ran the full suite ONCE, and produced the definitive v0.2
+gate table (`V02-GATES.md`). **No `src/` changed and no golden/hash moved as a
+result of this run's work.**
+
+**Judge records (this run).** `figures/fig-08-03/04/05.judge.json` rewritten with
+fresh `svg_fnv1a` (recomputed from the CURRENT SVGs via the shipped
+`core/hash.ts` `fnv1a`, not reimplemented: 03=`e9dcd6`, 04=`08163c`, 05=`49fd70`),
+`spec_hash` from `figures/manifest.json` (03=`09875f`, 04=`30fcb5`, 05=`2e21e4`,
+each verified `== specHash(lowerScene(scene))`), and the pinned `verify/judge.json`
+identity (`claude` / `claude-sonnet-5` / rubric `1`). **All six figures now grade
+overall `pass`** and all six `T-JUDGE-RECORD` arms are GREEN. Flip table (majority
+verdict changes vs the previous committed records — design/09 §7.4 enumeration):
+- **fig-08-03**: J2 fail→pass, J3 fail→pass, overall fail→pass — the fifty_pence
+  facet-ladder re-bake draws 6 hourglasses (was 10/11) and the apex@good leader no
+  longer collides with a crossing red marker.
+- **fig-08-04**: J5 fail→pass, overall fail→pass — `adj-fig84`'s
+  `overspeed:by_kmh=2.5` makes `bad` diverge progressively wide through the
+  tightening (was a ~475 px near-tangent stub).
+- **fig-08-05**: J1 fail→pass, J2 fail→na, J3 fail→pass, J5 fail→pass, J6 fail→na,
+  J8 fail→pass, overall fail→pass — the re-baked scene now DRAWS the `late` line
+  (was road-only, all lines refused); J6→na is true-mode; J2→na is the split below.
+- **fig-08-05 J2 is FLAKY** (non-unanimous three-way split `na / fail / pass`;
+  majority `na` by the stable-sort tie-break the `T-JUDGE-RECORD` recompute uses).
+  **RATIFICATION (rubric tightening):** J2 ("markers … per the marks setting … none
+  floating") is underspecified for a line whose `.scene` declares NO `marks:` field
+  — one judge read the empty `9-markers` stage as `na` (nothing requested), one as
+  `fail` (a turn_point *should* exist per the marker-from-event law), one as `pass`
+  (zero marks is correct for "ran off before reacting"). Propose: **J2 resolves `na`
+  when the manifest/scene declares no `marks:` setting** (no marker obligation), and
+  scores presence/floating only against a declared marks setting — closing the split.
+
+**`run.ts` warm-cache stamp fix — LANDED (`C-RECOMPUTE-BUDGET` → GREEN).** The
+warm-cache gap recorded below ("Still red after this run", and the v0.2-builder
+ratification item) is FIXED in `src/solve/run.ts`: `runFigure` now honours a
+mistake line's `solved` stamp on the warm path (reconstructs the compiled mistake
+`source`, routes it through `classifySolvedCache` + `executeCachedPlan`,
+double-guarded by `spec_hash` match AND replayed `outcome`/`result_hash ==
+expected`). Measured: fig-08-06 `premature@all` warm → `bad.cache="hit"`,
+`result_hash f5fbeb` / `spec_hash ef0884` byte-identical to cold; the warm
+all-lines recompute meets the 300 ms budget and `test/cli/controls.test.ts` is
+10/10 in the full suite. (Provenance-only note: the design-cleaner fix would
+exclude the solver-output `applied_corners` from the hashed `source` so the raw
+`MistakeSpec` reconstructs the cache key trivially, but that edit lives in
+`solve/mistake.ts` and would move every mistake-sourced golden — a re-bless event,
+flagged for the design owner.)
+
+**`A-RECIPE-C` clauses 2/3 — NEW design-letter deviation (needs-decision).** The
+two clauses design/09 L1435-1437 states ("min(sight_ride_m−ssd_m) strictly larger
+on the governed line; governed entry speed lower") are asserted VERBATIM and
+unweakened in `test/cli/serve.test.ts` and MEASURE A CONTRADICTION on the recipe's
+own fixture: geom (ungoverned) approach-span min ≈ 18.84 m > vis (governed) ≈ 12.61
+m, and geom corner-threshold speed ≈ 49.26 km/h < vis 60.00 — reproduced across the
+ENTIRE feasible `--vis-margin` range (1.0–1.30). ROOT CAUSE: the same `adj-vis`
+mechanism (design/02 §3.1 vs 04 §6 V2.5) — V1's speed governor never binds here;
+the sight requirement is met entirely by V2's hold-wide lateral positioning, while
+the ungoverned line independently brakes hard for its own tight-apex line, so both
+directions invert. Held green via `it.fails` (the codebase's KNOWN_INERT idiom),
+unweakened, so it reddens the day the engine satisfies the letter. **needs-decision**:
+amend 09 L1435-1437 / 08 §6(c) to the V2-hold mechanism (as `adj-vis` already amended
+04 §6 V2.5), OR reshape recipe (c)'s road/occluder so a margin regime exists where V1's
+speed cap binds (like bookBlind's `A-SSD-GOVERNOR`). Consequence: `A-RECIPE-C` is
+**AMBER** (passes on a documented deviation), not fully GREEN. Also filed under
+design/09 below.
+
+**UPDATE (2026-07-24, amend-design APPLIED — `adj-recipe-c`, following `adj-vis`).**
+RESOLVED; `A-RECIPE-C` is now genuinely **GREEN**, not AMBER. The first branch was
+taken: design/09's A-RECIPE-C bullet (§3.6) and design/08 §6(c)'s Expect prose are
+restated to the ratified `adj-vis` HOLD-WIDE signature (the same amend-design move
+`adj-vis` made on 04 §6 V2.5, and `adj-feasibility` made on 02 §8 / 08 §6 speeds),
+and `test/cli/serve.test.ts`'s two stale `it.fails` clauses are rewritten as real,
+green tripwires asserting THAT signature end-to-end through `serveVerb →
+/payload.json → loadSession` (the D1 recompute path a browser takes). The
+speed-governed clauses are gone; the `it.fails` wrappers are removed. Measured
+signature (recipe (c)'s own fixture — road `lane 3.5 | S 30 | L 30 ^100 | S 30`,
+occluder `hedge inside entry:c1 -25x30 margin=1.0`, both legs `--entry 60`, governed
+leg `--vis cautious --vis-margin 1.2`, shared corner c1 `s0=30`/`s1=82.36`):
+- **the wide commitment / hold event** — the governed line carries a vis-hold at c1
+  (`target_f 0.9`, `achieved_f 0.888`, `budget_limited true`, `hold_release_s 30`);
+  the ungoverned geometry-optimal line carries none (`verdict.sight.holds == []`).
+  Tripwire: reddens if the governed line stops generating a hold.
+- **holds wide vs. the tight-apex racing line** — over the shared corner span
+  `[s0, s1]` the governed line's minimum ridden corridor fraction is `f = 0.817`
+  (never leaves the outer band); the ungoverned line dives to a tight apex,
+  min `f = 0.038` (apex pct 69.7). The 0.817-vs-0.038 separation is the hold-wide
+  tripwire (asserted `visMinF > 0.5`, `geomMinF < 0.3`, `visMinF > geomMinF`).
+- **corroborating (recorded, not asserted — why the letter's own two clauses
+  inverted)**: the governed line enters at the authored 60.00 km/h with NO brake
+  event (V1's cap never binds); the ungoverned line brakes `s ∈ [0, 16.76]` down to
+  49.26 km/h for its tight-apex line. So the letter's raw approach
+  `min(sight_ride_m − ssd_m)` (geom 18.84 m > vis 12.61 m) and corner-threshold speed
+  (geom 49.26 < vis 60.00 km/h) both point OPPOSITE to the stale letter — a
+  consequence of the hold-wide mechanism, exactly as `adj-vis` predicts. The two
+  rewritten `it`s carry explicit 120 s per-test timeouts (each does two ~3.7 s
+  serve+loadSession recomputes; the default 5 s times out under full-suite load).
+
+**`fig-08-04` spec_hash arrow — CORRECTED.** The "Still red after this run" bullet
+below (and `V02-GATES.md`) stated fig-08-04's `spec_hash` "moved (30fcb5 → 1a9dd5)".
+That is BACKWARDS. Recomputed on this run's engine: the CURRENT scene (the adj-fig84
+edit) → **`30fcb5`** (matches `manifest.json` + this run's re-committed judge record);
+the pre-edit scene → **`1a9dd5`** (the stale value the old judge.json carried before I
+rewrote it). The move is **`1a9dd5 → 30fcb5`**. Corrected in `V02-GATES.md`; the
+in-place bullet below is annotated.
+
+**Full-suite reality (this run): 4 failed / 1307 passed / 4 todo (1315); typecheck
+exit 0; 171 s.** None is a v0.2-gate regression: 1 is the `A-RECIPE-C` clause-1
+load-timeout flake (serve.test.ts:467 carries no explicit timeout; **24/24 in
+isolation**), and 3 are `fig-08-05` v0.1 test-lag reds newly surfaced by the re-bake +
+`adj-fig-08-05` amendment landing, all out of this task's file grant:
+- `test/cli/scene.test.ts` fig-08-05 lowerScene pins the pre-amendment scene text
+  (`correction@late` / "corrects late") → WP-13 owner re-pin to `run_wide_detect@late`
+  / "ran off before reacting".
+- `test/golden/scenes.test.ts` G-8.5-RED pins `late` as a refusal → golden owner
+  re-pin to solved `runoff` (the design letter is already amended by `adj-fig-08-05`).
+- `test/render/gate.test.ts` fig-08-05 PROPORTION pins the OLD road-only bake
+  (straight_share 0.323 / road_ink 0.43 / frame_aspect 0.719) → WP-17 owner re-pin to
+  the re-baked manifest (0.516 / 0.373 / 0.860). fig-08-05 byte-identity +
+  T-JUDGE-RECORD both PASS; only the value pins are stale.
+
+**Definitive v0.2 tally: 25 GREEN / 1 AMBER (`A-RECIPE-C`) / 0 RED.** No v0.2 exit
+gate is RED; the v0.2 exit-gate SET is met on the merits. A single fully-green CI run
+awaits the three out-of-grant test re-pins above + the one-line serve.test.ts timeout.
+
+---
+
+## Adjudicated — `adj-fig-08-05` fig-08-05 `late` seam (applied; re-baked + judged in the post-run above)
+
+**Ruling: BOTH.** The DESIGN LETTER was wrong (G-8.5-RED's refusal skeleton,
+the `correction@late` label, and §4a.3's unconditional "emitted iff attempted");
+the IMPLEMENTATION is correct. The fig-08-05 `late` line resolves to **Option (2)
+ACCEPT RUNOFF**: on `bookDoubleApex` no believed-road under-read at any entry
+speed produces a visible correction — the hard outer edge forces
+`departed_before_reaction` at every solvable point, so "corrects late" does not
+survive the true physics. Status `adjudicated-fixed`. **No `src/` change was
+required** — `corrective.ts`/`verdict.ts` already publish the correct block (see
+below). This resolves the prior-run "Still red / needs-decision item 0" fig-8.5
+conflict recorded further down this file.
+
+**Alternative attempted (the adj-fig84 pattern — find a milder mistake that
+teaches "corrects late" honestly), and why it fails.** The adjudicator swept the
+believed-road under-read severity × entry speed × believed sweep angle
+exhaustively on the true `bookDoubleApex` road (`lane 3.5 | S 10 | L 12 ^70 |
+L 24 ^40 | L 12 ^70 | S 12`), seeking a `late` line that fires a `correction`
+event and ideally grades `wide`:
+- believed radius {12.5..24} at entry 30 / sweep 130 → EVERY case runoff /
+  off_road / `departed_before_reaction`, NO correction event (even r=12.5, a bare
+  under-read of the true R12, departs at off_road s=35.68);
+- entry {14..30} at r∈{24,20,16} → entries <22 REFUSE `believed_world_not_clean`/
+  `empty_band` (the believed single-R24 corner can't solve clean at low speed);
+  entries ≥22 all runoff / `departed_before_reaction`, no correction;
+- sweep {80..180} at r=16 e=22 → refuse or runoff/departed; never a correction.
+  The mechanism is geometric and decisive: the outer runout strip is f 1.0→1.148
+  (~0.6 m), crossed in **0.098–0.452 s**, while `t_react ≥ 0.7 s` (racer) — the
+  reaction budget is short by **2.317×–10.249×** at every solvable point, so
+  `departed_before_reaction` is forced and no shot ever launches; `f_max` never
+  peaks-and-returns below the physical edge, so `wide` is unreachable. This is the
+  same hard-outer-edge geometry that forced `adj-corrective` (book90, 0.4 m strip)
+  and `adj-fig84` (knife-edge outer edge). Option (1) is physically impossible
+  here; Option (2) ACCEPT RUNOFF is forced.
+
+**Design/scene edits applied (anchor → arithmetic).**
+
+| file | anchor | what changed | arithmetic / why |
+|---|---|---|---|
+| `figures/fig-08-05.scene` | header comment (the `late` teaching sentence) | "corrects late …" → "runs off before it can react … corrective infeasible, `departed_before_reaction`" | the engine departs the outer edge 0.098–0.452 s after run-wide while `t_react ≥ 0.7 s`; `late` never corrects |
+| `figures/fig-08-05.scene` | `labels:` mistake-line label | `correction@late +8` → `run_wide_detect@late +8` | `correction@late` → `UNKNOWN_ID/anchor_no_match` (no correction event on `departed_before_reaction`, verified). `run_wide_detect` is a first-class label feature (design/03 §8 grammar, `FEATURE_EVENT`, `LABEL_FEATURES`); it resolves on the departed line (`late` fires `run_wide_detect` at s≈15.81, verified bake) |
+| `figures/fig-08-05.scene` | `note:` line | "corrects too late" → "runs off before a reaction is possible" | match the engine truth |
+| `design/04-solver-and-authoring.md` | §4a.3 `correction` event definition paragraph | carve the correction event out of the `departed_before_reaction` arm (`t_shot > t_terminated`, no on-line shot instant); state the block still publishes `{feasible:false, fail_reason:departed_before_reaction}` (§4a.6) and `run_wide_detect` is the on-line anchor | ratifies shipped `corrective.ts:283-297` (emits no correction event when `traj.terminated.t < t_shot`); the old unconditional "emitted iff attempted" contradicts the same paragraph's "at (s_shot, t_shot) on the main line" |
+| `design/09-verification-and-testing.md` | §4 A-LABEL-ANCHORS bullet | `correction@late +8` → `run_wide_detect@late +8`; note `apex#1/#2@good` stay gated by `adj-doubleapex` until `good` solves two touches | the label the letter names must be the one that resolves on the departed line |
+| `design/09-verification-and-testing.md` | §3.2 golden roster G-8.5-RED bullet | re-pin `fig-08-05` `late` from a refusal to solved `runoff`: `run_wide_detect` at s≈15.81 (f≈1.01, `s_divergence_m=10`, `kappa_gap.max≈0.04 1/m`) then departs outer edge, `corrective.feasible=false`, `fail_reason=departed_before_reaction`; agrees with A-RECIPE-H `late.outcome ∈ {wide, runoff}` @30; `good` two-touch pins stay `it.todo` | the unamended refusal skeleton was written to the pre-`rescueCoarseBand` engine and contradicts §4's own A-RECIPE-H |
+
+**Code: NO CHANGE REQUIRED (verified on the built engine).**
+- `src/solve/corrective.ts` already publishes `{feasible:false, detect,
+  shot:null, returned:null, fail_reason:'departed_before_reaction'}` on the
+  `traj.terminated.t < t_shot` arm (lines 283-297) and correctly omits the
+  `correction` event there (ratified by the §4a.3 amendment). Problem [B] does
+  NOT reproduce: the block rides `verdict.corners[c1].corrective`; the `Verdict`
+  type has no top-level `corrective` (the "verdict.corrective===undefined"
+  reading was a per-corner-vs-top-level misread).
+- `src/solve/verdict.ts` `assembleVerdict` wires the block via
+  `byCorner.get(row.id) ?? null` (line 304) and `physicsOutcome` maps
+  `ran_wide ∧ ¬feasible → runoff` (lines 161-164). Verified end-to-end on the
+  scene bake: `late` → `verdict.corners[c1].corrective = {feasible:false, …,
+  departed_before_reaction}`, `outcome=runoff`.
+
+**Test added (in ownership).** `test/property/corrective-verdict-wiring.test.ts`
+(NEW) locks the Problem [B] invariant that wire.test.ts leaves untested: a
+`departed_before_reaction` block (shot:null) is PUBLISHED onto
+`verdict.corners[c].corrective` (not `undefined`/`null`), the `Verdict` has no
+top-level `corrective`, and a never-ran-wide corner keeps `corrective:null` (the
+"only publish where attempted" half of the in-hash rule).
+
+**Hashes.**
+- **No `result_hash` moved.** `late`'s `result_hash` is `1a5294` on the post-edit
+  bake — identical to the adjudicator's pre-edit baseline. The corrective block
+  was already in-hash and already published; nothing in `solve/` changed, so no
+  line's `result_hash` moved and no golden roster fixture moved (`late` is not a
+  blessed golden — `test/fixtures/goldens/` has no fig-08-05/`late` fixture; the
+  roster is C30-family + book90-ideal + G-CORR-RUNOFF/WIDE + G-MISJUDGE-DR).
+- **`spec_hash` moved (FIGURE stamp only): `4744ed → 2e21e4`** from the scene
+  label + note edits (measured via `specHash(lowerScene(scene))`; `4744ed` matches
+  the committed `figures/fig-08-05.judge.json` and `figures/manifest.json`
+  stamps). This is a `figures/*` stamp, NOT a `test/fixtures/goldens/*` roster
+  move. Re-baking `figures/fig-08-05.svg` + re-stamping `figures/fig-08-05.judge.json`
+  / `manifest.json`, and the `test/render/gate.test.ts` fig-08-05 byte-identity /
+  proportion / `T-JUDGE-RECORD` arms + the `test/hash/tripwire.test.ts`
+  figure-stamp arm, are the documented DEFERRED re-bake (V02-GATES) — left red
+  here by task instruction ("Do NOT re-bake or re-judge").
+
+**Bake proof.** `linelab figure ../figures/fig-08-05.scene --mode true` →
+**exit 3** (the pinned `test/render/gate.test.ts` fig-08-05 code, line 74 —
+`good` refuses `NO_SOLUTION/no_two_touch_line` under `adj-doubleapex`, a tier-3
+declaration deviation). Draws `late` alone (runoff, mistake/failing) with the
+`run_wide_detect@late` label "ran off before reacting" resolved at the
+departure; `good` is absent (refused) so its `apex#1/#2@good` labels are filtered
+and no longer block the bake. This is the honest render the ruling expects.
+
+**Out of my ownership — flagged for the owning agent.** The adjudicator's
+`code_changes_required` items 1–2 re-pin `test/golden/scenes.test.ts` G-8.5-RED
+(`late` refusal → solved runoff) and its file-header comment. `scenes.test.ts` is
+NOT in this task's file grant (grant = `corrective.ts`, `verdict.ts`,
+`emit.ts` [if a bookmark is needed — none was], `test/property/corrective.test.ts`
++ NEW tests, `figures/fig-08-05.scene`, the named `design/**` sections, this
+file). Per the hard "stay inside assigned files" rule, that re-pin is left to the
+`scenes.test.ts` owner; the exact verified values are in this session's
+open_questions. Until it lands, G-8.5-RED stays red on the `late` arm (asserts the
+old refusal) while `good` legitimately refuses `no_two_touch_line`.
+
+---
+
+## Adjudicated — v0.2 save-window / warn-band / fig-8.4 (this run, read first)
+
+Four seams from the v0.2 save-window and standing work were escalated and came
+back **AMEND-DESIGN** — each adjudicator built a design-compliant implementation
+first and proved the design *letter* unsatisfiable on the frozen engine. All four
+amendment arrays are APPLIED to `design/` (one to `figures/`), and every tied
+code change is in. Status `adjudicated-fixed`.
+
+| id | ruling (why the letter was unsatisfiable) | design edits |
+|---|---|---|
+| `adj-savewin-table` | §4b.5's status table keyed `never_open` on `saved(τ₀)=false`, so F-ORACLE-90 — whose scan is F…T…F (a §4b.3 inside-curl `false` prefix, one save band, a too-late `false` tail) — was reported `never_open`, suppressing the five scalars `G-SAVEWIN-RUNOFF` blesses on that very fixture. Re-keyed on `open_count` (number of `saved=true` bands): 0→never_open, 1→resolved, ≥2→intermittent. | 04 §4b.5 (count defs, status table, first-match prose, resolved bisect), 04 §4b.6, 09 §3.2 (G-SAVEWIN-RUNOFF, G-SAVEWIN-INTERMITTENT), 09 §5 (P-SAVEWIN-REFUSES) |
+| `adj-tshot-grid` | (S4) §4b.6's proof premise "`t_shot` is a mandatory grid point" is false on `departed_before_reaction` (`t_shot > t_terminated`), where `saveAt(t_shot)` is `INTERNAL/save_launch_unresolvable`; the bound `tau_close < t_shot` still holds but only via a two-case argument. (S11) §3.2's blanket "all three rungs satisfy the resolution law" contradicts §4b.5's own worked `book90` v_max 9.44 (`1.0/9.44 = 0.106 > 0.1`); the 1.0 m rung is legal only where v_max ≥ 10 m/s. No src change. | 04 §4b.3, 04 §4b.6, 09 §3.2 (G-SAVEWIN-GRID), 09 §7 (P-SAVEWIN-ANCHOR) |
+| `adj-fig84` | fig 8.4's `overspeed` (+26 km/h → 60) departs bookDecreasing at s=13.48 (12% of the corner, a 475 px near-tangent stub) before any tightening shows — the good line at 34 km/h rides at f≈0.999 entering 0.4 m from the outer edge, a knife-edge, so any overspeed ≥ +4 departs in the first 28%. Only a marginal `overspeed:by_kmh=2.5` marches monotonically wide off the outer edge through the tightening (outcome `wide`). | figures/fig-08-04.scene (bad line + header comment) |
+| `adj-warn-band` | A-STANDING-WARN-BAND's `F-STANDING-WARN` witness (contained ∧ clean ∧ `lean_ceiling=warn`) is STRUCTURALLY unreachable: the §4.1 solver clean door caps a clean line's peak lean at `phiReserve(mu_use)`, the SAME quantity as check-8's non-blind reserve, so a clean line's peak sits AT the reserve and never eats it; the `BLIND_RESERVE_DEG` cap is gated by `blind(c)`, false for every hold-wide (clean) line. Gate redirected to the reachable na-cap rung-3 witness (`fx-standing-straight`). No src change. | 01 §A.6.1, 09 §4 (F-STANDING-WARN lead-in, A-STANDING-WARN-BAND), 09 §10 (witness map rung 3) |
+
+**§4b.6 merge note (judgment call).** `adj-savewin-table` and `adj-tshot-grid`
+independently amended the SAME §4b.6 opening sentence with overlapping `old_text`
+and different replacements. Applied as ONE reconciled paragraph carrying both:
+the "single contiguous band" framing (open_count) AND the two-case
+`tau_close < t_shot` argument ((i) `departed_before_reaction`, (ii)
+integrable-but-no-return). Neither adjudicator's verbatim text could express the
+merge alone; recorded here as the reconciliation.
+
+**Code applied.** `src/solve/saveWindow.ts` (open_count classification + band
+closing-edge bisect, with a defensive open_at_end fallback for the theoretical
+single-band-reaches-horizon case the adjudicator's snippet omitted);
+`test/contract/saveWindow.test.ts`, `test/viewer/saveWindow.test.ts`,
+`test/contract/standing.test.ts` (it.todo → real A-STANDING-WARN-BAND, three
+arms), `test/golden/scenes.test.ts` G-8.4-COMPANION (runoff→wide, drop
+quick_steer). Verified on the built engine: premature→`resolved` tau_close 3.038,
+reaction_budget 0.006 < react_profile 1.0; slow_steer refuses 1.0 m; fig-8.4 bad
+→ `wide`/off_road/[exit_containment,late_apex,out_in_out,stop_within_sight].
+
+**No `test/fixtures/goldens/*` moved.** save-window is out-of-hash (D44);
+standing and stateAt are out-of-hash. The fig-8.4 SVG bake moves (`bad`
+result_hash: runoff→wide) but is DELIBERATELY NOT re-baked this run (a later run
+re-bakes + re-judges all six figures once the solver changes settle).
+
+**Also fixed this run (open-question sweep).**
+- `src/core/stateAt.ts` `lerpAngleDeg` was wrap-direction-aware but NOT
+  range-normalised: the 05 §3.2 worked example (psi 359°→1°) blended
+  359.5/360/360.5 (out of the record's range) then jumped to the `b=1` endpoint
+  the record returns verbatim — a −359.5° discontinuity as a query neared `b`.
+  Fixed by snapping the shortest-arc sweep to the 360-representative nearest the
+  linear chord: lands EXACTLY on both recorded endpoints (no endpoint
+  discontinuity), blends through 0/360, and is a no-op for a signed sub-180°
+  bracket (`phi`/`cmd_lean`), which must keep its own representative. Latent
+  before (core/integrate.ts integrates psi unwrapped, so no shipped record
+  crosses the seam). Pinned: `test/contract/stateAt.test.ts` (the 05 §3.2 psi
+  359→1 worked example + a signed-`phi` no-op guard).
+- `test/contract/stateAt.test.ts` `beforeAll` given an explicit 60 s budget: its
+  ~4 s roster solve can exceed vitest's 10 s default under concurrent suite load,
+  which reports every case as skipped — a phantom failure the task warned about.
+
+**Still red after this run (reported, not fixed — outside the adjudicated scope).**
+*(SUPERSEDED by the "Post-run" section at the top of this file: the figures were
+re-baked + re-judged and `C-RECOMPUTE-BUDGET` was fixed. The list is kept for
+provenance; each item's current status is noted inline below.)*
+- `test/golden/scenes.test.ts` G-8.5-RED and `test/render/gate.test.ts`'s
+  fig-08-05 arms: the solver run's C2 fix (`suggest.ts` rescueCoarseBand) made
+  fig-8.5's `late` line SOLVE (runoff) instead of refusing
+  `believed_world_not_clean`, which contradicts design/09 §5's unamended
+  refusal-skeleton expectation, and the shipped `correction@late` label then
+  cannot anchor (the `departed_before_reaction` corrective emits no `correction`
+  event). **RESOLVED (this run) by `adj-fig-08-05`** (see the top-of-doc section):
+  the design letter is amended (scene label `correction@late`→`run_wide_detect@late`,
+  §4a.3 correction-event carve-out, A-LABEL-ANCHORS + G-8.5-RED re-pinned to the
+  solved runoff truth) and the scene now bakes exit 3 drawing `late` alone with its
+  `run_wide_detect` label. **UPDATE (post-run):** the figure re-bake LANDED
+  (spec_hash `4744ed → 2e21e4`), so fig-08-05's byte-identity + `T-JUDGE-RECORD` arms
+  are now GREEN; the residual reds are (a) `test/render/gate.test.ts` fig-08-05
+  PROPORTION (stale value pins → WP-17 re-pin), (b) `test/golden/scenes.test.ts`
+  G-8.5-RED `late` refusal→runoff re-pin, and (c) `test/cli/scene.test.ts` fig-08-05
+  lowered-spec text re-pin to the amended scene (WP-13) — all out of grant, flagged
+  for the `scenes.test.ts` / WP-13 / WP-17 owners.
+- `test/render/gate.test.ts` fig-08-03 (solver C1, fifty_pence facet ladder moved
+  the `bad` bake) and fig-08-04 (this run's `adj-fig84` scene edit moved the
+  `bad` bake) byte-identity arms: red because the committed SVGs are stale and
+  re-baking is deliberately deferred. **RESOLVED this run**: fig-08-03/04/05 were
+  re-baked; all six `re-bake is byte-identical` arms are GREEN.
+- `test/render/gate.test.ts` `T-JUDGE-RECORD` fig-08-04 and `test/hash/tripwire.test.ts`
+  figure-stamp arm: both recompute `specHash(lowerScene(fig-08-04.scene))`, which
+  moved **`1a9dd5 → 30fcb5`** (ARROW CORRECTED — the original text said "30fcb5→1a9dd5",
+  which is backwards; the current scene hashes `30fcb5`, the pre-edit scene `1a9dd5`)
+  because `adj-fig84` edited the scene text. This is a FIGURE stamp
+  (`figures/*.judge.json` / manifest), NOT a `test/fixtures/goldens/*` roster move — no
+  golden roster fixture moved. **RESOLVED this run**: both arms GREEN after the re-bake +
+  re-stamp (`30fcb5`).
+- `test/cli/controls.test.ts` C-RECOMPUTE-BUDGET "warm spec really is warm": the
+  `run.ts` mistake-line warm-cache gap (see the ratification section). **RESOLVED this
+  run**: the `run.ts` stamp fix landed → `bad.cache="hit"`, `C-RECOMPUTE-BUDGET` GREEN.
+
+---
+
+## Adjudicated — v0.1 seams (prior cycle)
 
 Five seams were escalated to the design owner and came back with rulings.
 Four are `confirmed-pin` (a design decision is still required — filed under
@@ -51,6 +555,19 @@ seams except where a WP-16/17 item below says otherwise.
 ---
 
 ## design/01 — Scope and Doctrine (checks, quality law)
+
+- **[01 §A.6.1 reserve-annex "why pass rather than not-fail"]** `adj-warn-band`
+  (AMEND-DESIGN, applied, no src change): the false premise "the [lean_ceiling]
+  warn band is a `clean ∧ ¬reserved` witness class **that exists by
+  construction**, on a population the catalogue already produces" is corrected.
+  The `clean ∧ ¬reserved` class the catalogue actually produces is the **`na`
+  cap** (a corner-less clean line whose `lean_ceiling` has zero instances); the
+  warn band is NOT such a class because the §4.1 clean door caps clean lines at
+  `phiReserve(mu_use)` — the same quantity as this check's non-blind reserve — so
+  no clean line eats the reserve, and the `BLIND_RESERVE_DEG` cap only opens a
+  warn window where `blind(c)` holds (excluding the hold-wide clean line). The
+  broader point survives (`reserved` is a proper refinement of `clean`). Filed
+  with the 09 §4/§10 amendments above.
 
 - **[01 App.A check 12]** KAPPA_STEP/PHI_JUMP speed-blind per-sample
   thresholds failed the profile-rate exit unwind below ~8.3 m/s (esses/
@@ -261,6 +778,23 @@ seams except where a WP-16/17 item below says otherwise.
 
 ## design/04 — Solver & Authoring
 
+- **[04 §4b.5 save-window status table]** `adj-savewin-table` (AMEND-DESIGN,
+  applied): the status table now keys on `open_count` (number of maximal
+  `saved=true` bands), not `saved(τ₀)`. `never_open` ⟺ 0 bands, `resolved` ⟺ 1
+  band (its trailing edge is `tau_close_s`, tolerating a §4b.3 inside-curl `false`
+  prefix and a too-late `false` tail), `intermittent` ⟺ ≥2 bands. The resolved
+  bisect now targets the band's closing edge (last `true` → first `false`), not a
+  forward scan from k=0 (which bisected between two `false` points on an F…T…F
+  scan). Code: `src/solve/saveWindow.ts`. Pinned:
+  `test/contract/saveWindow.test.ts`.
+- **[04 §4b.3 / §4b.6 save-window anchor & reaction budget]** `adj-tshot-grid`
+  (AMEND-DESIGN, applied, no src change): §4b.3 now states the `t_shot` anchor
+  identity's unstated premise (the main line reached `t_shot`) and defines the
+  extended `saved(t_shot) := false` on `departed_before_reaction`; §4b.6's
+  consistency argument runs over two cases ((i) departed-before-reaction, (ii)
+  integrable-but-no-return) because `t_shot` is not always an in-domain grid
+  point. The §4b.6 opening paragraph is the RECONCILED merge of this amendment and
+  `adj-savewin-table`'s overlapping edit (see the top-of-doc merge note).
 - **[04 §4.6 two-touch / release law]** `adj-doubleapex` (confirmed-pin): the
   two-turn-in double-apex plan cannot persist a commitment across
   bookDoubleApex's three sub-corners under either the per-corner
@@ -509,6 +1043,49 @@ seams except where a WP-16/17 item below says otherwise.
 
 ## design/09 — Verification & Testing
 
+- **[09 §3.2 / §5 G-SAVEWIN-RUNOFF, P-SAVEWIN-REFUSES]** `adj-savewin-table`
+  (AMEND-DESIGN, applied): G-SAVEWIN-RUNOFF now pins `status:"resolved"` on
+  F-ORACLE-90 (its F…T…F scan is `open_count==1`), so the five scalars are
+  producible; P-SAVEWIN-REFUSES is re-keyed on `status=="intermittent"`
+  (`open_count ≥ 2`), NOT `transition_count > 1` — an inside-curl F…T…F scan has
+  `transition_count==2` yet emits the scalars. G-SAVEWIN-INTERMITTENT acceptance
+  keys on `intermittent`/open_count≥2. Pinned: `test/contract/saveWindow.test.ts`.
+- **[09 §3.2 / §7 G-SAVEWIN-GRID, P-SAVEWIN-ANCHOR]** `adj-tshot-grid`
+  (AMEND-DESIGN, applied): G-SAVEWIN-GRID's 1.0 m rung is scoped to in-domain
+  `v_max ≥ 10 m/s` (the resolution law is `scan_ds/v_max ≤ 0.1 s`); the three-rung
+  agreement runs on overspeed/chop/F-ORACLE-90, and `slow_steer` (v_max 9.44)
+  refuses 1.0 m while resolving at 0.25/0.5 m. P-SAVEWIN-ANCHOR takes the extended
+  `saved(t_shot):=false` on `departed_before_reaction` (asserts
+  `corrective.feasible=false ∧ fail_reason=departed_before_reaction`, not a live
+  `saveAt` probe that would return `INTERNAL`). Pinned:
+  `test/contract/saveWindow.test.ts`.
+- **[09 §4 / §10 A-STANDING-WARN-BAND, witness map]** `adj-warn-band`
+  (AMEND-DESIGN, applied, no src change): A-STANDING-WARN-BAND redefined to the
+  reachable engine truth — the `contained ∧ clean ∧ warn` intersection is
+  STRUCTURALLY empty (the §4.1 clean door caps clean lines at `phiReserve`, the
+  same quantity as check-8's non-blind reserve), so the gate asserts three arms
+  (na-cap rung-3 witness, blind-corner warn band ¬clean at rung 2, book90@38
+  `empty_band` pin). §10's rung-3 witness is now NAMED as `fx-standing-straight`,
+  so `G-STANDING-BITES` is a genuine set-equality (was AMBER for the deviation).
+  `F-STANDING-WARN` retained only as the emergent-refusal pin. Pinned:
+  `test/contract/standing.test.ts` (it.todo replaced by a real gate assertion).
+- **[09 §3.6 A-RECIPE-C / 08 §6(c)]** `adj-recipe-c` (AMEND-DESIGN, applied, no src
+  change) — the stale speed-governed compare clauses restated to the ratified
+  `adj-vis` hold-wide signature. The letter's two measurable clauses
+  ("`min(sight_ride_m − ssd_m)` strictly larger on the governed line; governed entry
+  speed lower") MEASURE the reverse on recipe (c)'s own fixture across the whole
+  feasible `--vis-margin` range, because V1's entry-speed cap never binds on this
+  class of blind corner (`adj-vis`) and the sight standoff is bought by V2's hold-wide
+  lateral positioning while the ungoverned line independently brakes for a tight apex.
+  A-RECIPE-C's bullet and 08 §6(c)'s Expect prose now describe the hold-wide trait
+  the physics actually produces (the governed line carries a vis-hold with a held wide
+  `target_f` and holds `f ≥ ~0.82` through the corner; the ungoverned line carries no
+  hold and dives to `f ≈ 0.04`). `test/cli/serve.test.ts`'s two `it.fails` clauses
+  are rewritten as real green tripwires on that signature (removed the `it.fails`
+  wrappers); the honest measured numbers are in the top-of-doc `adj-recipe-c` UPDATE.
+  Same class as `adj-vis`/`adj-feasibility`. Pinned: `test/cli/serve.test.ts`
+  A-RECIPE-C (the two hold-wide clauses + the ratified 1.5-margin `NO_SOLUTION` arm).
+
 - **[09 §3.2a C30-DR]** 02 §8.2's `R40→R25` clothoid letter has an empty
   clean band at every probed entry/sweep/turn-in on this engine. —
   **pinned-engine-truth**: bless roster rides
@@ -525,19 +1102,30 @@ seams except where a WP-16/17 item below says otherwise.
 - **[09 §3.2 C30-chop]** Design pins outcome `runoff`. Engine bakes `wide` at
   default slew 40 (contained at slew 10). **pinned-engine-truth**.
 
-- **[09 §3.2/09 §4 G-8.4-COMPANION / G-8.5-RED]** Both committed scenes bake
-  with all lines refused: fig-08-04 (`bookDecreasing`@34, empty clean band —
-  **now superseded**, see below) and fig-08-05 (`no_two_touch_line`, the
-  `adj-doubleapex` seam). Goldens pin the refusal skeletons under 05 §7's
-  bake-total law; per-line outcome/apex-count/check pins are `it.todo`
-  pending seam resolution.
-  - **fig-08-04 update**: WP-17's re-bake shows fig-08-04's lines now
-    **solve** (the bookDecreasing empty-clean-band seam resolved somewhere
-    in the WP-16→WP-17 window) — declaration-gate exit is now **0**, not 3;
-    `G-8.4-COMPANION`'s refusal skeleton is obsolete and its `it.todo` pins
-    are hostable. Pinned: `test/render/gate.test.ts` PINNED_EXIT (0);
-    `test/golden/scenes.test.ts`.
-  - fig-08-05 stands at declaration-gate exit 3 (the `adj-doubleapex` seam).
+- **[09 §3.2/09 §4 G-8.4-COMPANION / G-8.5-RED]** (updated this run)
+  - **fig-08-04 / G-8.4-COMPANION**: both lines SOLVE. `good` is
+    contained/good with one late apex; `bad` is now **`wide`/failing** under the
+    `adj-fig84` amendment (`overspeed:by_kmh=2.5`, was runoff at the +26 default).
+    `G-8.4-COMPANION` pins `bad` outcome `wide`, terminated `off_road`, fail-set
+    `[exit_containment,late_apex,out_in_out,stop_within_sight]` (drops
+    `quick_steer`). GREEN. The committed `figures/fig-08-04.svg` bake is STALE
+    (bad: runoff→wide) — deliberately not re-baked this run;
+    `test/render/gate.test.ts` fig-08-04 byte-identity is RED until the deferred
+    re-bake.
+  - **fig-08-05 / G-8.5-RED**: `good` still refuses `no_two_touch_line` (the
+    `adj-doubleapex` seam). `late` was `NO_SOLUTION/believed_world_not_clean`,
+    but the solver run's C2 fix (`suggest.ts` rescueCoarseBand — a real false
+    `empty_band` repair) made it SOLVE (runoff/1a5294). G-8.5-RED (which pins
+    `late` as a refusal, per unamended design/09 §5) is therefore RED, and the
+    shipped `correction@late` label cannot anchor (the `departed_before_reaction`
+    corrective emits no `correction` event). **adjudicated-fixed** by
+    `adj-fig-08-05` (this run, top of doc): fig-8.5 `late` SOLVES `runoff` (Option
+    (2) ACCEPT RUNOFF — "corrects late" is physically impossible on `bookDoubleApex`,
+    reaction budget short 2.3×–10.2×); design letter amended (G-8.5-RED re-pinned to
+    solved runoff, A-LABEL-ANCHORS + §4a.3 carve-out, scene label
+    `correction@late`→`run_wide_detect@late`). The `test/golden/scenes.test.ts`
+    G-8.5-RED `late` re-pin is out of the fig-08-05 task's grant (flagged for the
+    `scenes.test.ts` owner); the figure re-bake (spec_hash 4744ed→2e21e4) is DEFERRED.
 
 - **[09 §4 A-CATALOGUE-EXERCISED]** Cannot pass over the committed corpus:
   `quick_steer`/`traction_ceiling`/`lean_ceiling` never fail anywhere,
@@ -591,7 +1179,32 @@ seams except where a WP-16/17 item below says otherwise.
 
 ## Six baked figures — visual-judge results (figures/*.judge.json)
 
-**Re-judged 2026-07-23 (D36 §7.4 ceremony)** after the `fix-render` pass
+**CURRENT (post-run 2026-07-24) — all six committed judge records grade overall
+`pass`.** fig-08-01/02/06 were re-judged GREEN in a 2026-07-24 round (the
+J6-projection-disclosure item is `na` on every true-mode bake, and the render fix
+cleared the marker/label misses); fig-08-03/04/05 were re-baked and their fresh
+records were committed THIS run (see the top-of-file "Post-run" section). Every
+`T-JUDGE-RECORD` arm is GREEN. Current committed per-figure verdict + flaky items:
+
+| figure | judge verdict | flaky items (non-unanimous split, marked `flaky:true`) |
+|---|---|---|
+| fig-08-01 | **pass** | J4 |
+| fig-08-02 | **pass** | J3 |
+| fig-08-03 | **pass** | — |
+| fig-08-04 | **pass** | — |
+| fig-08-05 | **pass** | J2 (na/fail/pass three-way split — rubric-tightening item, top of file) |
+| fig-08-06 | **pass** | J2, J3, J5 |
+
+The 2026-07-23 table below (all six `fail`) is SUPERSEDED — it predates the
+2026-07-24 re-judge and this run's re-bake; kept for provenance. Note: the
+"J6 disclosure-note gap" it flagged is **na** on true-mode bakes (J6 applies to
+diagram mode only), so it never fails a v0.1 figure; the diagram-mode disclosure
+note remains a genuine future gap for the deferred diagram projection, not a v0.1
+judge failure.
+
+---
+
+**Re-judged 2026-07-23 (D36 §7.4 ceremony — SUPERSEDED, see the CURRENT block above)** after the `fix-render` pass
 (role-based draw order, occlusion-wash scoping, gravel stipple patches,
 occluder schematic glyphs — see design/06 below) and the resulting figure
 rebake. All six figures **still fail** the visual judge's overall verdict (3
@@ -631,11 +1244,103 @@ document — **needs-decision**: implement the disclosure-note draw stage (not
 currently in `render/topdown.ts`'s 11-stage draw order at all) before v0.1
 figures can be considered book-faithful.
 
+**STALE after this run (deliberately not re-baked / re-judged).** *(RESOLVED in the
+2026-07-24 post-run: fig-08-03/04/05 WERE re-baked + re-judged — SVGs current, fresh
+judge records committed, all six overall `pass`. Kept for provenance.)* Two of the six
+scenes changed that run, so the table above no longer describes their current bakes:
+- **fig-08-04** — the `adj-fig84` scene edit changes `bad` from `overspeed`
+  (+26 → runoff) to `overspeed:by_kmh=2.5` (→ `wide`). The adjudicator's own
+  re-bake at +2.5 renders the red line 1055 px wide through the tightening
+  (was a 475 px stub) and flips J5 to pass. `figures/fig-08-04.svg` /
+  `.judge.json` are stale until the re-bake.
+- **fig-08-05** — the solver run's C2 fix made `late` SOLVE (runoff) instead of
+  refusing, so the "entire lines/marks/labels absent" note no longer holds; but
+  the bake is now blocked at the `correction@late` label anchor (see the design/09
+  G-8.5-RED entry). Stale until the fig-8.5 conflict is adjudicated and re-baked.
+- **fig-08-03** — unchanged scene, but the solver run's C1 fifty_pence facet-ladder
+  fix moved its `bad` bake (11→7 hourglasses); `figures/fig-08-03.svg` is stale.
+
+---
+
+## Ratification items — v0.2 builders (this run)
+
+Collected from the v0.2 builders' `ratification_items`. Most are implemented
+decisions recorded for the owner's ratification (`done`); two are declared
+deviations left deliberately unrepaired.
+
+- **[05 §7 / 05 §8.1 export figure-spec corridor drop]** *declared deviation,
+  deliberately not repaired.* `src/cli/verbs/export.ts` `figureSpecFromEnvelope`
+  projects `road: {dsl}` only, so `--as figure-spec` / `--as share-url` / `serve`
+  drop `use_full_width` / `bike_margin_m`; feeding that projection back through
+  `run` yields `SCHEMA/line_road_differs` (a typed refusal, not a silently wrong
+  corridor — pinned in `test/cli/road-marshalling.test.ts`). The repair moves
+  `spec_hash`/`result_hash` (measured ac968b→120886 / b8471c→3794aa on the serve
+  fixture) so it belongs to `solve/` (run.ts:720's canonical-JSON road equality)
+  under a re-bless. **needs-decision.**
+- **[05 §7 envelope→corridor marshalling]** *done.* The envelope→corridor rule is
+  declared ONCE in `src/cli/verbs/shared.ts` (`roadWireSpec`), and all four
+  envelope readers (state/controls/render/export-svg) plus export's `--as
+  scenario` branch route through it. No contract defect (no disclosed field is
+  missing).
+- **[ARCHITECTURE §6.1 inline unit conversions]** *shrink-only ratchet.* Six
+  pre-existing sites inline a factor `core/units.ts` should own (solve/chained.ts,
+  solve/doubleApex.ts, solve/vis.ts ×2, plan/doctrine/metrics.ts — all
+  `(180/π)·atan(...)`; cli/bless.ts — `v_kmh/3.6`), held as
+  `INLINE_CONVERSION_KNOWN` in `test/meta/imports.test.ts` with a no-new-offenders
+  lint (render/ and viewer/ carry none). Each fix is a one-line import; not taken
+  this run (minimal-impact). **needs-decision** (or just clean up).
+- **[05 §8.1 / 09 §6.1 warm-cache recompute of mistake lines]** *DONE (landed —
+  was "blocked, declared").* `src/solve/run.ts` `runFigure` now honours a
+  mistake-sourced line's stamped `solved` plan on the warm path (reconstructs the
+  compiled mistake `source` — `kind:mistake`, `base_line_id`, mistakeSpec incl.
+  `applied_corners` recovered by a plan-diff of the cached plan vs the base line —
+  and routes it through `classifySolvedCache` + `executeCachedPlan`, PRESERVED so
+  `spec_hash`/`result_hash` round-trip; double-guarded by `spec_hash` match AND
+  replayed `outcome`/`result_hash == expected`, any miss re-solving via
+  `compileMistake`). Measured: fig-08-06 `premature@all` warm → `bad.cache="hit"`,
+  `result_hash f5fbeb` / `spec_hash ef0884` byte-identical to cold, warm recompute
+  238→30 ms; `test/cli/controls.test.ts` 10/10, `C-RECOMPUTE-BUDGET` GREEN, no golden
+  roster moved. Provenance caveat for the design owner: the plan-diff reconstruction
+  is faithful for the turn-in family (premature / premature_contained / fifty_pence —
+  the only warm mistake cache the committed figures exercise); whole-line kinds
+  (slow_steer / overspeed / chop) leave the plan's turn_ins untouched, so the
+  reconstruction under-determines the source and the line correctly re-solves through
+  `compileMistake` (recording its native `cache="absent"`) — unobserved on any
+  committed figure, and the double guard keeps every path correct regardless. The
+  cleaner design fix (exclude the solver-output `applied_corners` from the hashed
+  `source` in `solve/mistake.ts` so the raw `MistakeSpec` reconstructs the key
+  trivially) would move every mistake-sourced golden — a re-bless event, flagged.
+- **[05 §4 / 07 §3.4 domain-end policy]** *done.* The choice is made once: `stateAt`
+  / `dualAt` REFUSE `BAD_RANGE`, the viewer stepper CLAMPS (through the one
+  `clampTo`). Pinned in `test/viewer/onecore.test.ts`.
+- **[07 §3.1 / §6.2 viewer purity exemptions]** *done.* `src/viewer/host.ts`
+  (performance.now + timers, per 07 §3.1 playback) and `src/viewer/boot.ts`
+  (top-level `bootFromPage`) are declared, self-documenting purity/side-effect
+  exemptions, fenced and asserted as exact sets in `test/meta/imports.test.ts`.
+- **[TASK ownership] no `src/render/saveWindow.ts`.** The save-window overlay
+  correctly lives under `src/viewer/` (stepper-only, out of the exported picture);
+  a `src/render/saveWindow.ts` would fail `C-SAVEWIN-NO-INK`'s structural arm. The
+  original task line naming that file was stale relative to the shipped tree.
+
 ---
 
 ## Summary for the design owner
 
-**Needs an actual decision** (11 items, roughly in priority order):
+**Resolved this run** (four AMEND-DESIGN adjudications applied + open-question
+sweep — see the top-of-doc section): `adj-savewin-table` (open_count status
+table), `adj-tshot-grid` (two-case reaction-budget proof + v_max-scoped
+G-SAVEWIN-GRID), `adj-warn-band` (structural clean∧warn emptiness → na-cap rung-3
+witness; `G-STANDING-BITES` AMBER→GREEN), `adj-fig84` (fig-8.4 bad → marginal
+overspeed → `wide`); plus the `core/stateAt.ts` angle-lerp range-normalisation
+fix. No goldens/hashes moved.
+
+**Needs an actual decision** (roughly in priority order):
+0. ~~fig-8.5 `late`: refuse or solve?~~ **RESOLVED (this run) by `adj-fig-08-05`**
+   — `late` SOLVES `runoff` (Option (2) ACCEPT RUNOFF); design letter amended, no
+   src change (the block was already published, no bookmark on
+   `departed_before_reaction` — `run_wide_detect` is the on-line anchor). Residual:
+   the `test/golden/scenes.test.ts` G-8.5-RED re-pin (out of that task's grant) and
+   the DEFERRED fig-08-05 re-bake (spec_hash 4744ed→2e21e4).
 1. C30 entry speed: 70→63 km/h (or retune the tuning) — `adj-feasibility`.
 2. Recipe-a/b/f canonical speed: 55→~48 km/h (or retune) — `adj-feasibility`.
 3. bookDoubleApex two-touch: reshape the fixture or change the release law —
@@ -647,10 +1352,14 @@ figures can be considered book-faithful.
 7. `chainedSolve`'s "fewest-fails" vs. letter's "gentlest" ranking (rev-solver
    #6 — the other 7 fixable rev-solver findings were fixed this cycle; #10 is
    ratified as-implemented via `adj-corrective`; #12 remains open/unattempted).
-8. Rendering: diagram-mode disclosure note is entirely unimplemented (all 6
-   figure judges still fail on it post-fix — this is a genuine gap, not
-   rev-render #1, which **was fixed** this cycle: role-based draw order is
-   now enforced in `project.ts`).
+8. Rendering: the diagram-mode disclosure note is unimplemented — a genuine
+   FUTURE gap for the deferred diagram projection, but NOT a v0.1 judge failure:
+   the committed bakes are true-mode, where J6 (projection disclosure) is `na`
+   (it applies to diagram mode only), so all six current judge records grade
+   `pass`. (Corrected from an earlier claim that "all 6 figure judges still fail
+   on it"; that was the 2026-07-23 round's mis-scoring of J6 as `fail` on
+   true-mode figures — the 2026-07-24 re-judge scores it `na`.) The note lands
+   with the diagram projection implementation.
 9. C30-DR: 02 §8.2's `R40→R25` letter needs a ratified replacement.
 10. `--brake`/`--throttle`/`--position` zero-file anchor semantics.
 11. `render` on a bare envelope can't draw labels — FigureResult contract gap.

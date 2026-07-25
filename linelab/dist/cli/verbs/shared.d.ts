@@ -26,10 +26,22 @@ export declare function isObject(v: unknown): v is Record<string, unknown>;
 /** design/08 §3's content sniff: leading `{` after trimming → JSON; else scene text (D30). */
 export declare function looksLikeJson(text: string): boolean;
 export declare function schemaErr(at: string, message: string, reason: string, detail?: Record<string, unknown>): LinelabError;
-/** The serialized shape of an envelope's `road` member (data members only). */
+/** The serialized shape of a road as an envelope discloses it (data members only). */
 export interface DisclosedRoad {
     readonly dsl?: unknown;
     readonly bike_margin_m?: unknown;
     readonly use_full_width?: unknown;
 }
+/**
+ * The wire `road` spec (design/03 §2.1's union, `dsl` arm) that reproduces the
+ * disclosed corridor EXACTLY. Key order is fixed so re-emission is byte-stable.
+ */
+export interface RoadWireSpec {
+    readonly dsl: string;
+    readonly use_full_width?: boolean;
+    readonly bike_margin_m?: number;
+}
+/** THE projection: disclosed road → the wire spec that rebuilds its corridor. */
+export declare function roadWireSpec(road: DisclosedRoad | undefined, at?: string): Result<RoadWireSpec>;
+/** THE recompose: the same projection, handed straight to `compose()`. */
 export declare function recomposeEnvelopeRoad(road: DisclosedRoad | undefined, at?: string): Result<ComposedRoad>;

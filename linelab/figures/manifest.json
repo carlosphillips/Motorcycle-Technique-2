@@ -115,7 +115,7 @@
   },
   {
     "figure_id": "fig-08-04",
-    "spec_hash": "1a9dd5",
+    "spec_hash": "30fcb5",
     "mode": "true",
     "view": {
       "window": {
@@ -129,7 +129,7 @@
         "line_id": "bad",
         "role": "mistake",
         "quality": "failing",
-        "outcome": "runoff"
+        "outcome": "wide"
       },
       {
         "line_id": "good",
@@ -153,16 +153,23 @@
   },
   {
     "figure_id": "fig-08-05",
-    "spec_hash": "4744ed",
+    "spec_hash": "2e21e4",
     "mode": "true",
     "view": {
       "window": {
         "from_s": 0,
-        "to_s": 68.07669225265029
+        "to_s": 42.647398319352085
       },
       "orient": 0
     },
-    "legend": [],
+    "legend": [
+      {
+        "line_id": "late",
+        "role": "mistake",
+        "quality": "failing",
+        "outcome": "runoff"
+      }
+    ],
     "proportion_metrics": {
       "width_ratio": [
         {
@@ -178,9 +185,9 @@
           "value": 0.5833333333333334
         }
       ],
-      "straight_share": 0.32334659695015994,
-      "road_ink": 0.42999311610292806,
-      "frame_aspect": 0.7192733092944085
+      "straight_share": 0.5161257361164098,
+      "road_ink": 0.3730989678518587,
+      "frame_aspect": 0.8598021460356738
     },
     "gate_verdict": "fail"
   },

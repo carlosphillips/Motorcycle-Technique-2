@@ -111,3 +111,47 @@ export const WIDTH_RATIO_BAND = Object.freeze({ min: 0.45, max: 0.95 });
 export const STRAIGHT_SHARE_MAX = 0.45;
 export const ROAD_INK_BAND = Object.freeze({ min: 0.25, max: 0.6 });
 export const FRAME_ASPECT_BAND = Object.freeze({ min: ASPECT_FLOOR_MIN, max: ASPECT_FLOOR_MAX });
+
+// ---------------------------------------------------------------------------
+// POV render target (design/07 §5.2/§5.3 — the immersion view, v0.3). These
+// constants are DESIGN/07-owned (the camera model, the occluder presentation
+// heights, the occlusion invariant), copied VERBATIM here because render/pov.ts
+// is the render-layer POV builder that consumes them (task grant: "pov
+// constants — append"). The look-mode closed set and every camera number below
+// is the design letter, never a brief value (ARCHITECTURE §6.6, drift risk #12).
+
+/** m, TUNING (§5.2) — eyes-above-road height for a seated rider; the eye rides the bike's reference point (body position out of scope, D5). */
+export const POV_EYE_HEIGHT_M = 1.4;
+/** deg, TUNING (range 60–90, §5.2) — the maximum head-turn from the bike's heading under `look: limit_point`. */
+export const POV_LOOK_MAX_DEG = 70;
+/** deg, TUNING (§5.2) — the pinhole camera's horizontal field of view; focal length follows from the canvas width. */
+export const POV_FOV_DEG = 60;
+/** m, TUNING (§5.2) — near-plane distance; ground vertices with forward distance ≤ this are dropped before projection. */
+export const POV_NEAR_M = 0.5;
+/** fraction of min(frame_w, frame_h), TUNING (§5.2) — the frame-boundary inset R_inset that keeps a clamped limit-point marker fully visible (§5.3 item 7). */
+export const POV_CHEVRON_INSET_FRAC = 0.05;
+/** ratio, presentation-only style constant (§5.3 item 7) — a clamped chevron's arrowhead length as a multiple of the chevron glyph size. */
+export const POV_ARROW_LEN_RATIO = 1.2;
+/** opacity, TUNING (§5.3 item 3b) — continuation-fan road-edge opacity; the fan is D45-gated/deferred, so this is unreachable from any v0.3 code path (declared for when the fan lands). */
+export const POV_FAN_ALPHA = 0.12;
+
+/**
+ * Occluder presentation heights (metres) — owned HERE (design/07 §5.3 item 4:
+ * "heights are presentation-only and owned *here*"; 03 owns kind/placement).
+ * All TUNING. Every kind satisfies the occlusion invariant by construction (see
+ * `POV_OCCLUDE_CLEAR_M`): a vehicle at 1.8 m reads as a van/SUV — the honest
+ * height for a footprint the plan-view model says fully occludes.
+ */
+export const POV_OCCLUDER_HEIGHT_M: Readonly<Record<"hedge" | "wall" | "bank" | "vehicle", number>> = Object.freeze({
+  hedge: 1.8,
+  wall: 2.0,
+  bank: 1.8,
+  vehicle: 1.8
+});
+/**
+ * m, TUNING (§5.3 item 4) — the occlusion invariant clearance: every occluder
+ * kind's presentation height must exceed `POV_EYE_HEIGHT_M` by at least this,
+ * or the eye would see over an occluder the plan-view model calls opaque — "a
+ * spec violation, not a tuning choice" (C-POV-OCCLUDE's static config arm).
+ */
+export const POV_OCCLUDE_CLEAR_M = 0.4;

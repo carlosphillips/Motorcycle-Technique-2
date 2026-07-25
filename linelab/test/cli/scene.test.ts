@@ -97,7 +97,7 @@ describe("lowerScene — the six committed book-figure scenes lower cleanly", ()
           role: "ideal",
           spec: { road: { preset: "bookDecreasing" }, entry_kmh: 34, turn_in: "auto", style: "single" }
         },
-        { name: "bad", role: "mistake", spec: { kind: "overspeed" } }
+        { name: "bad", role: "mistake", spec: { kind: "overspeed", params: { by_kmh: "2.5" } } }
       ],
       labels: [
         { feature: "apex", line: "good", text: "wait for the radius to open" },
@@ -127,10 +127,10 @@ describe("lowerScene — the six committed book-figure scenes lower cleanly", ()
       labels: [
         { feature: "apex", n: 1, line: "good", text: "first touch" },
         { feature: "apex", n: 2, line: "good", text: "second touch" },
-        { feature: "correction", line: "late", offset_m: 8, text: "believed one steady corner — corrects late" }
+        { feature: "run_wide_detect", line: "late", offset_m: 8, text: "believed one steady corner — ran off before reacting" }
       ],
       view: { mode: "diagram", window: "auto" },
-      note: "Two apexes bridged by an opening; the believed-single-corner line corrects too late."
+      note: "Two apexes bridged by an opening; the believed-single-corner line runs off before a reaction is possible."
     });
   });
 

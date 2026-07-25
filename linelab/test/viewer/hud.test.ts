@@ -44,7 +44,7 @@ let dir = "";
 let envelopePath = "";
 
 beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
+  // dist/ is built once by test/globalSetup.ts before the worker pool starts.
   dir = mkdtempSync(join(tmpdir(), "linelab-hud-"));
   const specPath = join(dir, "c30.spec.json");
   writeFileSync(specPath, JSON.stringify(C30_SPEC), "utf8");

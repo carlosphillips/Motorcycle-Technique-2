@@ -7,10 +7,10 @@
 // Fast unit-level checks import the pure library directly (buildSchemaDoc,
 // explain, args.ts's parser, deferred.ts's table); IO-shaped checks (exit
 // codes, file writes, verb↔library byte-equality across a process boundary)
-// spawn the built CLI (`dist/cli/main.js`) — `npm run build` runs once in
-// `beforeAll`.
+// spawn the built CLI (`dist/cli/main.js`), which test/globalSetup.ts builds
+// once before the worker pool starts.
 
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect } from "vitest";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -52,9 +52,8 @@ function cli(args: readonly string[], cwd = repoRoot, input?: string): CliResult
   }
 }
 
-beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
-}, 120_000);
+// dist/ is built once by test/globalSetup.ts before the worker pool starts, so
+// this file spawns the CLI directly with no build hook of its own.
 
 // ---------------------------------------------------------------------------
 // A-SCHEMA-SHAPE / A-SCHEMA-JSON
@@ -202,6 +201,7 @@ function sampleValueFor(field: string): string {
   if (field.startsWith("view.rays")) return "off";
   if (field.startsWith("view.legend")) return "on";
   if (field.startsWith("view.orient")) return "90";
+  if (field.startsWith("view.look")) return "limit_point";
   if (field === "config.rubric") return "parks-street";
   if (field === "config.checks_version") return "2";
   if (field === "bike_margin_m") return "0.4";
@@ -565,13 +565,23 @@ describe("deferred-token rejections (ARCHITECTURE §6.4, verbatim table)", () =>
     expect((r.stdout as { error: { deferred?: string } }).error.deferred).toBe("ensembles (v2)");
   });
 
-  it("--look rejects immersion (v0.3)", () => {
+  it("--look is a shipped ViewSpec flag (v0.3 immersion) — it drives the pov camera, no longer deferred", () => {
     const dir = mkdtempSync(join(tmpdir(), "linelab-look-"));
     const base = cli(["solve", "--road", "preset book90", "--entry", "34", "--turn-in", "auto", "--out", join(dir, "e.json")]);
     expect(base.exit).toBe(0);
-    const r = cli(["render", join(dir, "e.json"), "--look", "heading"]);
-    expect(r.exit).toBe(2);
-    expect((r.stdout as { error: { deferred?: string } }).error.deferred).toBe("immersion (v0.3)");
+    // heading vs limit_point are the two legal camera aims — both render pov
+    const h = cli(["render", join(dir, "e.json"), "--views", "pov", "--look", "heading", "--out", join(dir, "h")]);
+    const l = cli(["render", join(dir, "e.json"), "--views", "pov", "--look", "limit_point", "--out", join(dir, "l")]);
+    expect(h.exit).toBe(0);
+    expect(l.exit).toBe(0);
+    expect((h.stdout as { value: { pov: string } }).value.pov).toContain(".pov.svg");
+    // an unknown look is a plain closed-set SCHEMA refusal (D8), never a deferral
+    const bad = cli(["render", join(dir, "e.json"), "--views", "pov", "--look", "chase"]);
+    expect(bad.exit).toBe(2);
+    const err = (bad.stdout as { error: { code: string; deferred?: string; detail?: { reason?: string } } }).error;
+    expect(err.code).toBe("SCHEMA");
+    expect(err.deferred).toBeUndefined();
+    expect(err.detail?.reason).toBe("look_unknown");
   });
 
   it("view.mode=diagram rejects projection (post-v0.1) — reachable through `render`", () => {
@@ -582,16 +592,19 @@ describe("deferred-token rejections (ARCHITECTURE §6.4, verbatim table)", () =>
     expect((r.stdout as { error: { deferred?: string } }).error.deferred).toBe("projection (post-v0.1)");
   });
 
-  it("the deferred table has shrunk to the rows that are still unshipped, and SHIPPED_VERBS is the 9 v0.1 verbs plus the four v0.2 inspection verbs", () => {
+  it("the deferred table has shrunk to the rows that are still unshipped, and SHIPPED_VERBS is the 9 v0.1 verbs plus the four v0.2 inspection verbs plus the v0.3 immersion verb compare", () => {
     // ARCHITECTURE §6.4's v0.1 table had six rows. The `inspection (v0.2)` row
     // is GONE — `state`, `save-window`, `serve`, `sweep`, `--standing` and
-    // `--scan-ds` all shipped, and the phase-gating law says a token leaves the
-    // table the moment it ships. Five rows remain, none of them naming a token
-    // this build answers.
-    expect(DEFERRED_TABLE).toHaveLength(5);
+    // `--scan-ds` all shipped. The `immersion (v0.3)` row is GONE too — `compare`
+    // (verb), `pov` (render target) and `--look` (its ViewSpec flag) all shipped.
+    // The phase-gating law says a token leaves the table the moment it ships, so
+    // FOUR rows remain (projection, continuation, ensembles, fit), none naming a
+    // token this build answers.
+    expect(DEFERRED_TABLE).toHaveLength(4);
     expect(DEFERRED_TABLE.map((r) => r.deferred)).not.toContain("inspection (v0.2)");
+    expect(DEFERRED_TABLE.map((r) => r.deferred)).not.toContain("immersion (v0.3)");
     expect([...SHIPPED_VERBS].sort()).toEqual(
-      ["run", "solve", "mistake", "figure", "render", "check", "state", "save-window", "serve", "sweep", "schema", "explain", "export"].sort()
+      ["run", "solve", "mistake", "figure", "render", "check", "state", "save-window", "serve", "sweep", "compare", "schema", "explain", "export"].sort()
     );
     for (const v of SHIPPED_VERBS) expect(isShippedVerb(v)).toBe(true);
     expect(isShippedVerb("sweep")).toBe(true);

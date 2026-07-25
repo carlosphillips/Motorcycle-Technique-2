@@ -1022,10 +1022,16 @@ Validation at pack load, typed:
 
 **Why these two ids, and why `pass` rather than not-`fail`.** Check 8
 `lean_ceiling` is a three-band ladder — `pass iff phi_max ≤ reserve`, `warn iff ≤
-ceiling` ("ate the reserve"), `fail` beyond — and `clean` keys on fails only. The
-warn band is therefore a `clean ∧ ¬reserved` witness class **that exists by
-construction**: requiring `pass` is strictly stronger than `clean`, on a
-population the catalogue already produces. Check 10 `stop_within_sight` is the
+ceiling` ("ate the reserve"), `fail` beyond — and `clean` keys on fails only. Requiring `pass`
+is strictly stronger than `clean`, so `reserved` is a proper refinement of
+`clean`. The `clean ∧ ¬reserved` witness class the catalogue actually produces is
+the **`na` cap** — a corner-less clean line whose `lean_ceiling` has zero
+instances. The `lean_ceiling` **warn** band is NOT such a class: a solved
+`accept=clean` line's peak lean is capped at `phiReserve(mu_use)` by the §4.1
+clean door, the same quantity as this check's non-blind `reserve`, so no clean
+line eats the reserve; the `BLIND_RESERVE_DEG` cap opens a warn window only where
+`blind(c)` holds, which excludes the hold-wide (clean) line, so the warn band is
+witnessed only as `¬clean` (`09-…md` §4, `A-STANDING-WARN-BAND`). Check 10 `stop_within_sight` is the
 same shape: `pass` requires `max deficit ≤ 0` **and** `min margin ≥
 SIGHT_WARN_M` (§A.3 check 10), strictly above the bar `clean` enforces, which
 tolerates the warn band. Both conjuncts bite, at zero engine runs, on quantities

@@ -9,10 +9,19 @@
 // all: no easing, no interpolation memory, no smoothing (07 §5.2 pins that
 // "no smoothing state is introduced — it would break frame purity").
 //
-// The cursor's VALUE is a `stateAt` query coordinate, nothing else. Clamping
-// to the domain is a viewer policy (05 §4 explicitly leaves it to the caller:
-// "the function never clamps silently; clamping is a caller (viewer) policy"),
-// and it happens here, once, in `clampTo`.
+// The cursor's VALUE is a `stateAt` query coordinate, nothing else.
+//
+// THE DOMAIN-END DECISION, MADE ONCE, HERE: **the stepper CLAMPS.** 05 §4 hands
+// the choice to the caller — "the function never clamps silently; clamping is a
+// caller (viewer) policy" — and 07 §3.4 fixes which way the viewer must go: a
+// line that ends early "freezes at its terminal sample", and "the cursor remains
+// draggable across the full scenario extent so surviving lines in compare mode
+// keep stepping". A refusal here would blank a pane mid-drag and stop compare
+// mode dead; the freeze is the specified UX. So: `stateAt`/`dualAt` refuse
+// `BAD_RANGE` past the domain and never clamp; this file clamps, in exactly one
+// function — `clampTo` — which both the cursor transitions and the axis
+// conversion below route through. Pinned by test/viewer/onecore.test.ts's
+// "the domain-end policy is ONE decision" case.
 
 import { dualAt } from "../core/stateAt.js";
 import type { LineResult } from "../solve/types.js";
@@ -165,8 +174,8 @@ function lastIndexAtOrBefore(length: number, key: (i: number) => number, value: 
 // `core/stateAt.ts`'s `dualAt`, which shares `stateAt`'s own bracket search and
 // `linear` blend — so the axis toggle, the playback schedule and the HUD can
 // never land on different instants (C-ONE-CORE). The only thing this file adds
-// is the CLAMP, which 05 §4 explicitly assigns to the caller: "the function
-// never clamps silently; clamping is a caller (viewer) policy."
+// is the CLAMP declared at the top of this module, and it adds it through the
+// same `clampTo` the cursor transitions use — one policy, one implementation.
 
 function convert(line: LineResult, value: number, from: "s" | "t"): number {
   const samples = line.trajectory.samples;
@@ -174,11 +183,10 @@ function convert(line: LineResult, value: number, from: "s" | "t"): number {
   const last = samples[samples.length - 1];
   if (first === undefined || last === undefined) return 0;
   const to: "s" | "t" = from === "s" ? "t" : "s";
-  if (value <= first[from]) return first[to];
-  if (value >= last[from]) return last[to];
-  const dual = dualAt(line.trajectory, from === "s" ? { s: value } : { t: value });
-  // in-domain by the two guards above, so `dualAt` cannot refuse; the fallback
-  // keeps the function total rather than asserting
+  const inDomain = clampTo(value, { axis: from, min: first[from], max: last[from] });
+  const dual = dualAt(line.trajectory, from === "s" ? { s: inDomain } : { t: inDomain });
+  // in-domain by the clamp above, so `dualAt` cannot refuse; the fallback keeps
+  // the function total rather than asserting
   return dual.ok ? dual.value : first[to];
 }
 

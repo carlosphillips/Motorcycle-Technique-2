@@ -332,13 +332,14 @@ function viewSection(): SchemaSection {
   return {
     name: "view",
     prose:
-      "design/06 §2.1 — the v0.1-legal ViewSpec surface: mode (\"true\" only — \"diagram\" is deferred, ARCHITECTURE §6.5/§6.4), window, orient, rays, legend. look is deferred (immersion, v0.3).",
+      "design/06 §2.1 — the ViewSpec surface: mode (\"true\" only — \"diagram\" is deferred, ARCHITECTURE §6.5/§6.4), window, orient, rays, legend, and look (the pov camera toggle, design/07 §5.2 — shipped with immersion, v0.3).",
     fields: [
       field("mode", "\"true\"", "the v0.1 top-down projection", "view", { default: "true" }),
       field("window", "auto|all|{from,to}", "station crop", "view", { default: "auto" }),
       field("orient", "auto|0|90|180|270", "rotation only — never a mirror (D26: handedness lives on the road)", "view", { default: "auto" }),
       field("rays", "auto|off|all_turn_ins", "sight-ray drawing", "view", { default: "auto" }),
-      field("legend", "auto|on|off", "legend visibility", "view", { default: "auto" })
+      field("legend", "auto|on|off", "legend visibility", "view", { default: "auto" }),
+      field("look", "heading|limit_point", "pov camera aim (design/07 §5.2) — ignored by topdown/controls", "view", { default: "heading" })
     ]
   };
 }

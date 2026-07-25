@@ -40,19 +40,26 @@ interface CliResult {
   readonly stdout: unknown;
 }
 
-function cli(args: readonly string[], cwd = repoRoot): CliResult {
+function spawnCli(args: readonly string[], cwd: string): { readonly exit: number; readonly raw: string } {
   try {
-    const out = execFileSync("node", [mainJs, ...args], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-    return { exit: 0, stdout: JSON.parse(out) };
+    return { exit: 0, raw: execFileSync("node", [mainJs, ...args], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }) };
   } catch (e) {
     const err = e as { status: number; stdout: string };
-    return { exit: err.status, stdout: JSON.parse(err.stdout) };
+    return { exit: err.status, raw: err.stdout ?? "" };
   }
 }
 
-beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
-}, 120_000);
+/**
+ * Every verb prints exactly ONE JSON document (design/08 §3.2), so EMPTY stdout
+ * is never a valid answer. `dist/` is built once by test/globalSetup.ts before
+ * the worker pool starts, so a build can no longer race this spawn; empty
+ * stdout now means a real bug and fails the case honestly (no retry mask).
+ */
+function cli(args: readonly string[], cwd = repoRoot): CliResult {
+  const r = spawnCli(args, cwd);
+  expect(r.raw.trim(), `the CLI produced no stdout for: ${args.join(" ")}`).not.toBe("");
+  return { exit: r.exit, stdout: JSON.parse(r.raw) };
+}
 
 interface EnvLine {
   readonly line_id: string;

@@ -1,10 +1,10 @@
 # Fig 8.4 — decreasing radius entered too fast: the tightening exit forces the line wide.
 # The correct line waits for the radius to open (single late apex); `overspeed`
-# enters +26 km/h too fast and cannot hold it.
+# enters +2.5 km/h too fast — the 34 km/h line already rides at the grip limit, so even that small excess is progressively forced wide off the outer edge as the radius tightens.
 road:      preset bookDecreasing
 lines:
   good:    ride entry=34 turnIn=auto style=single
-  bad:     mistake overspeed
+  bad:     mistake overspeed:by_kmh=2.5
 labels:
   apex@good            "wait for the radius to open"
   run_wide_detect@bad  "too fast — pushed wide as it tightens"

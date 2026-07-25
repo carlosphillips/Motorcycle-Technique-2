@@ -592,12 +592,17 @@ linelab solve --road "lane 3.5 | S 30 | L 30 ^100 | S 30" --entry 60 --turn-in a
 linelab solve … (same road/occluder) --vis cautious --vis-margin 1.5 --out out/vis.json
 linelab compare out/geom.json out/vis.json --lock station
 ```
-Expect: a station-aligned diff showing the visibility-governed line's larger
-sight margin (`sight_ride_m` against the lean-aware `ssd`) through the approach,
-its lower entry speed (governed to the authored 1.5× stopping-distance
-standoff), and both verdicts; `world_delta` is empty (same world); the overlay
-figure shows the hold-wide entry. `serve` on either envelope scrubs it
-(**07** §4.3).
+Expect: a station-aligned diff and both verdicts; `world_delta` is empty (same
+world); the overlay figure shows the hold-wide entry. The visibility-governed
+line's distinguishing trait is its **wide commitment**: it carries a vis-hold at
+the corner (a held wide `target_f`) that the geometry-optimal line lacks, and it
+holds wide **through** the corner — its ridden corridor fraction never diving to
+the tight apex the ungoverned line takes — the ratified `adj-vis` hold-wide
+mechanism buying the sight standoff through lateral positioning rather than a
+lower entry speed (V1's speed governor does not bind on this class of blind
+corner; the ungoverned line instead brakes on the approach for its tight-apex
+racing line — see DEVIATIONS.md `adj-recipe-c`). `serve` on either envelope
+scrubs it (**07** §4.3).
 
 **(d) Linked chain with a per-corner mistake.**
 ```

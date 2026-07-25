@@ -54,3 +54,32 @@ export declare const FRAME_ASPECT_BAND: Readonly<{
     min: 0.55;
     max: 1.8;
 }>;
+/** m, TUNING (§5.2) — eyes-above-road height for a seated rider; the eye rides the bike's reference point (body position out of scope, D5). */
+export declare const POV_EYE_HEIGHT_M = 1.4;
+/** deg, TUNING (range 60–90, §5.2) — the maximum head-turn from the bike's heading under `look: limit_point`. */
+export declare const POV_LOOK_MAX_DEG = 70;
+/** deg, TUNING (§5.2) — the pinhole camera's horizontal field of view; focal length follows from the canvas width. */
+export declare const POV_FOV_DEG = 60;
+/** m, TUNING (§5.2) — near-plane distance; ground vertices with forward distance ≤ this are dropped before projection. */
+export declare const POV_NEAR_M = 0.5;
+/** fraction of min(frame_w, frame_h), TUNING (§5.2) — the frame-boundary inset R_inset that keeps a clamped limit-point marker fully visible (§5.3 item 7). */
+export declare const POV_CHEVRON_INSET_FRAC = 0.05;
+/** ratio, presentation-only style constant (§5.3 item 7) — a clamped chevron's arrowhead length as a multiple of the chevron glyph size. */
+export declare const POV_ARROW_LEN_RATIO = 1.2;
+/** opacity, TUNING (§5.3 item 3b) — continuation-fan road-edge opacity; the fan is D45-gated/deferred, so this is unreachable from any v0.3 code path (declared for when the fan lands). */
+export declare const POV_FAN_ALPHA = 0.12;
+/**
+ * Occluder presentation heights (metres) — owned HERE (design/07 §5.3 item 4:
+ * "heights are presentation-only and owned *here*"; 03 owns kind/placement).
+ * All TUNING. Every kind satisfies the occlusion invariant by construction (see
+ * `POV_OCCLUDE_CLEAR_M`): a vehicle at 1.8 m reads as a van/SUV — the honest
+ * height for a footprint the plan-view model says fully occludes.
+ */
+export declare const POV_OCCLUDER_HEIGHT_M: Readonly<Record<"hedge" | "wall" | "bank" | "vehicle", number>>;
+/**
+ * m, TUNING (§5.3 item 4) — the occlusion invariant clearance: every occluder
+ * kind's presentation height must exceed `POV_EYE_HEIGHT_M` by at least this,
+ * or the eye would see over an occluder the plan-view model calls opaque — "a
+ * spec violation, not a tuning choice" (C-POV-OCCLUDE's static config arm).
+ */
+export declare const POV_OCCLUDE_CLEAR_M = 0.4;

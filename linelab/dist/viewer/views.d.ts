@@ -1,6 +1,8 @@
 import type { InstantState } from "../core/types.js";
 import type { Result } from "../core/result.js";
 import { type SaveWindowOverlay } from "./saveWindow.js";
+import { type CorrectiveGhostOverlay } from "./correctiveGhost.js";
+import { type CompareModel } from "./compare.js";
 import { type ViewerSession } from "./session.js";
 import { type ViewerView } from "./types.js";
 export interface ViewRender {
@@ -23,6 +25,26 @@ export interface ViewRequest {
      * either way (C-SAVEWIN-NO-INK), because `render/` cannot reach this module.
      */
     readonly saveWindow?: SaveWindowOverlay | null;
+    /**
+     * design/07 §3.5's corrective-ghost toggle — OFF BY DEFAULT, per line, a
+     * third overlay class (07 §5.6). Same discipline as `saveWindow`: a
+     * once-per-toggle object passed in, one extra `<g>` on the top-down, the
+     * exported figure untouched — the ghost is stepper-only (D18).
+     */
+    readonly correctiveGhost?: CorrectiveGhostOverlay | null;
+    /**
+     * design/07 §5.2's `look` camera toggle (`heading | limit_point`), consumed by
+     * the `pov` view. Default `heading`; an unknown value is `SCHEMA` (closed set,
+     * D8). Ignored by `topdown`/`controls`.
+     */
+    readonly look?: string;
+    /**
+     * design/07 §4.2's compare model — when present, the top-down draws the
+     * NON-focused lines as ghost glyphs (reduced opacity, verdict colour retained)
+     * at their own state at the shared lock coordinate. Absent (the v0.2 default)
+     * draws no ghosts, so the top-down is byte-identical to the export + cursor.
+     */
+    readonly compare?: CompareModel | null;
 }
 /**
  * Render one view of one session at the cursor. Pure: it never touches a DOM,

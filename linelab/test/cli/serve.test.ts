@@ -16,8 +16,8 @@
 //      the CLI-vs-viewer identity D1 exists for. The server is torn down in
 //      `afterAll` on every path.
 //
-// Recipe (c) (design/08 §6) is exercised end to end at the bottom, with its
-// `compare` leg recorded honestly as still phase-gated to immersion (v0.3).
+// Recipe (c) (design/08 §6) is exercised end to end at the bottom; its
+// `compare` leg SHIPS in v0.3 immersion (leg 3 runs the real verb, exit 0).
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { execFileSync, spawn, type ChildProcess } from "node:child_process";
@@ -27,7 +27,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { serveVerb, SERVE_DEFAULT_PORT, SERVE_MODULE_ROOT } from "../../src/cli/verbs/serve.js";
-import { loadSession } from "../../src/viewer/session.js";
+import { loadSession, type ViewerSession } from "../../src/viewer/session.js";
+import type { Sample } from "../../src/core/types.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../..");
@@ -55,7 +56,7 @@ function cli(args: readonly string[]): CliResult {
 }
 
 beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
+  // dist/ is built once by test/globalSetup.ts before the worker pool starts.
   dir = mkdtempSync(join(tmpdir(), "linelab-serve-"));
 }, 180_000);
 
@@ -228,7 +229,7 @@ describe("serve — a real listening server (design/08 §3: print the URL; run u
     expect(serveDoc).not.toBeNull();
     expect(serveDoc!.url).toBe(`http://127.0.0.1:${TEST_PORT}/`);
     expect(serveDoc!.port).toBe(TEST_PORT);
-    expect(serveDoc!.views).toEqual(["topdown", "controls"]);
+    expect(serveDoc!.views).toEqual(["topdown", "controls", "pov"]);
   });
 
   it("GET / serves the workstation page", async () => {
@@ -318,12 +319,74 @@ describe("serve — a real listening server (design/08 §3: print the URL; run u
 //     STORY — a visibility-governed line that holds wide and enters slower —
 //     is reproduced at the largest margin this geometry admits, and both arms
 //     are asserted so neither can rot.
-//   · the third command is `compare`, which is immersion (v0.3): it is still
-//     phase-gated here, and design/07 §4.3's own closing line — "`serve` on
-//     either envelope scrubs it" — is the v0.2 leg this package delivers.
+//   · the third command is `compare`, which ships with immersion (v0.3): leg 3
+//     runs the real verb (exit 0, both verdicts pair), and design/07 §4.3's own
+//     closing line — "`serve` on either envelope scrubs it" — is also delivered.
 
 const RECIPE_C_ROAD = "lane 3.5 | S 30 | L 30 ^100 | S 30";
 const RECIPE_C_OCCLUDER = "hedge inside entry:c1 -25x30 margin=1.0";
+
+// ---------------------------------------------------------------------------
+// Real teeth for A-RECIPE-C's compare clauses, as AMENDED by `adj-recipe-c`
+// (design/09 §3.6 A-RECIPE-C bullet + design/08 §6(c); DEVIATIONS.md
+// `adj-recipe-c`, following `adj-vis`). The design letter's original clauses
+// ("min(sight_ride_m − ssd_m) strictly larger on the governed line; governed
+// entry speed lower") describe a SPEED-GOVERNED mechanism the ratified engine
+// deliberately does NOT use on this class of blind corner: V1's entry-speed cap
+// never binds, and the sight standoff is bought entirely by V2's HOLD-WIDE
+// lateral positioning (`adj-vis`). So the letter — and these tests — assert the
+// hold-wide signature the physics actually produces.
+//
+// The gate's clauses, as amended:
+//   1. both solves succeed
+//   2. the WIDE COMMITMENT / hold event — the governed line carries a vis-hold
+//      at the shared corner (a held wide `target_f`) that the geometry-optimal
+//      line lacks
+//   3. it HOLDS WIDE through the corner — its minimum ridden corridor fraction
+//      never collapses to the tight apex the ungoverned braked racing line
+//      dives to
+//   4. both verdicts present in the compare output — asserted by leg 3 above,
+//      which now runs the shipped `compare` (exit 0, one pair, two verdicts)
+//   5. (08 §6(c)'s closing sentence) `serve` on either envelope scrubs it —
+//      already asserted above
+//
+// Clauses 1–3 are asserted against the RECOMPUTED session — through `serveVerb`
+// → the served `/payload.json` → `loadSession`, the same D1 recompute path a
+// real browser would take, not the CLI's raw --out file — using the
+// already-ratified STORY arm (vis_margin 1.2, ok:true, quality caution)
+// established above, since the doc's own --vis-margin 1.5 refuses NO_SOLUTION
+// before any line exists to measure.
+
+/**
+ * Minimum ridden corridor fraction `f` over the shared corner span [s0, s1] —
+ * how close to the inner (usable) edge the line ever comes inside the corner
+ * (`f`: 0 = inner usable edge, 1 = outer edge; core/types.ts). A hold-wide line
+ * stays out near the outer edge (large min `f`); a tight-apex racing line dives
+ * to the inner edge (small min `f`). Both recipe-(c) lines ride the SAME road
+ * (`compare`'s own road-hash precondition), so the corner's `s0`/`s1` are
+ * station-identical boundaries for both.
+ */
+function minCorridorFractionOverCorner(samples: readonly Sample[], s0: number, s1: number): number {
+  const inCorner = samples.filter((s) => s.s >= s0 && s.s <= s1);
+  return Math.min(...inCorner.map((s) => s.f));
+}
+
+/**
+ * Recompute one recipe-(c) leg through the FULL serve pipeline
+ * (`serveVerb` → `/payload.json` → `loadSession`) — never the CLI's raw
+ * `--out` file — so "run recipe (c) end to end including `serve`, fetching
+ * the payload" is literally what produces the measured numbers below.
+ */
+function loadRecipeCLegViaServe(dirPath: string, name: string): ViewerSession {
+  const envelopeText = readFileSync(join(dirPath, name), "utf8");
+  const plan = serveVerb({ loadedText: envelopeText, argv: [], engineSemver: ENGINE_SEMVER });
+  expect(plan.plan, `${name} did not plan: ${JSON.stringify(plan.outcome.stdout)}`).not.toBeNull();
+  const payload = JSON.parse(plan.plan!.documents.find((d) => d.path === "/payload.json")!.body);
+  const loaded = loadSession(payload);
+  expect(loaded.ok, `${name}: ${loaded.ok ? "" : JSON.stringify(loaded.error)}`).toBe(true);
+  if (!loaded.ok) throw new Error(`unreachable — asserted above`);
+  return loaded.value;
+}
 
 describe("A-RECIPE-C — blind-corner visibility compare, through `serve` (08 §6(c), 07 §4.3)", () => {
   it("leg 1 verbatim: the geometry-optimal line solves clean", () => {
@@ -355,13 +418,22 @@ describe("A-RECIPE-C — blind-corner visibility compare, through `serve` (08 §
     expect(line.verdict.sight!.holds.length).toBeGreaterThan(0); // the hold-wide entry
   }, 120_000);
 
-  it("leg 3 (`compare`) is still phase-gated to immersion (v0.3) — the honest v0.2 statement", () => {
+  it("leg 3 (`compare`) SHIPS in v0.3: the geometry-optimal and visibility-governed lines pair and diff", () => {
+    // recipe (c)'s closing clause: `compare geom.json vis.json --lock station`.
+    // Both legs carry the SAME hedge occluder (only the --vis governance differs,
+    // a rider/plan difference), so the WORLD is identical (world_delta.differs
+    // false); both are single-line solves → line_id "solved" → one pair whose two
+    // members are the two lines' verdicts (D6: compare recomputes each from its
+    // FigureSpec through the one engine).
     const r = cli(["compare", join(dir, "geom.json"), join(dir, "vis.json"), "--lock", "station"]);
-    expect(r.exit).toBe(2);
-    const doc = r.stdout as { error: { code: string; deferred: string } };
-    expect(doc.error.code).toBe("SCHEMA");
-    expect(doc.error.deferred).toBe("immersion (v0.3)");
-  });
+    expect(r.exit).toBe(0);
+    const doc = r.stdout as { ok: boolean; value: { kind: string; pairs: { line_id: string; verdict: unknown[] }[]; world_delta: { differs: boolean } } };
+    expect(doc.ok).toBe(true);
+    expect(doc.value.kind).toBe("compare");
+    expect(doc.value.pairs.map((p) => p.line_id)).toEqual(["solved"]);
+    expect(doc.value.pairs[0]!.verdict.length).toBe(2);
+    expect(doc.value.world_delta.differs).toBe(false);
+  }, 120_000);
 
   it("`serve` on EITHER envelope scrubs it (07 §4.3): both load, boot both views, and step", async () => {
     // this is the v0.2 delivery of recipe (c)'s closing sentence
@@ -391,4 +463,96 @@ describe("A-RECIPE-C — blind-corner visibility compare, through `serve` (08 §
       }
     }
   }, 180_000);
+
+  it(
+    "clause 1 — 'both solves succeed' (design/09 §3.6): real trajectories, zero refusals, through the served/recomputed session",
+    () => {
+      for (const name of ["geom.json", "vis.json"]) {
+        const session = loadRecipeCLegViaServe(dir, name);
+        expect(session.refusals.length, name).toBe(0);
+        expect(session.lines.length, name).toBe(1);
+        expect(session.lines[0]!.trajectory.samples.length, name).toBeGreaterThan(0);
+        expect(session.lines[0]!.verdict.outcome, name).toBe("contained");
+      }
+    },
+    120_000
+  );
+
+  // -------------------------------------------------------------------------
+  // Clauses 2 and 3 — the HOLD-WIDE signature (`adj-recipe-c`, following
+  // `adj-vis`; DEVIATIONS.md). The design letter's original clauses ("min(
+  // sight_ride_m − ssd_m) strictly larger on the governed line; governed entry
+  // speed lower") describe a speed-governed mechanism the ratified engine does
+  // NOT use on this class of blind corner, and MEASURE the reverse across the
+  // whole feasible `--vis-margin` range — so 09 §3.6 / 08 §6(c) are amended to
+  // the hold-wide signature and the two clauses below assert THAT signature as
+  // real green tripwires (no `it.fails`).
+  //
+  // MEASURED (this engine, this fixture — the ratified `vis_margin 1.2` STORY
+  // arm used throughout this describe block; road `S 30 | L 30 ^100 | S 30`,
+  // occluder `hedge inside entry:c1 -25x30 margin=1.0`, both legs `--entry 60`;
+  // shared corner c1 s0=30 / s1≈82.36):
+  //   governed (vis)   sight.holds = [{c1, target_f 0.9, achieved_f 0.888, …}]
+  //   ungoverned (geom) sight.holds = []
+  //   governed  min corridor fraction f over [s0, s1] ≈ 0.817  (holds wide)
+  //   ungoverned min corridor fraction f over [s0, s1] ≈ 0.038  (tight apex)
+  //
+  // Corroborating (recorded in DEVIATIONS `adj-recipe-c`, NOT asserted here —
+  // the reason the letter's own two clauses inverted): the governed line enters
+  // at the authored 60.00 km/h with no brake event (V1's cap never binds); the
+  // ungoverned line brakes s∈[0, 16.76] down to 49.26 km/h for its tight-apex
+  // racing line, so the raw approach `min(sight_ride_m − ssd_m)` (18.84 geom >
+  // 12.61 vis) and the corner-threshold speed both point OPPOSITE the stale
+  // letter — a consequence of the hold-wide mechanism, exactly as `adj-vis`
+  // predicts.
+
+  it(
+    "clause 2 — the wide commitment: the governed line carries a vis-hold at the shared corner (a held wide target_f) that the geometry-optimal line lacks (design/09 §3.6, adj-recipe-c)",
+    () => {
+      const geom = loadRecipeCLegViaServe(dir, "geom.json");
+      const vis = loadRecipeCLegViaServe(dir, "vis.json");
+
+      // the ungoverned geometry-optimal line negotiates the corner on grip
+      // alone — no visibility hold
+      expect(geom.lines[0]!.verdict.sight!.holds.length, "geom carries no vis-hold").toBe(0);
+
+      // the governed line negotiates it under a WIDE COMMITMENT: a vis-hold at
+      // the shared corner carrying a held wide target_f (the adj-vis mechanism
+      // that replaces the never-binding speed governor)
+      const c1 = vis.road.corners[0]!.id;
+      const holds = vis.lines[0]!.verdict.sight!.holds;
+      expect(holds.length, "vis holds wide for sight").toBeGreaterThan(0);
+      const hold = holds.find((h) => h.corner_id === c1);
+      expect(hold, `a hold at the shared corner ${c1}`).toBeDefined();
+      // "wide": target_f sits in the OUTER band of the corridor (f=1 is the
+      // outer edge) — a held wide commitment, not a speed cap
+      expect(hold!.target_f, `held commitment target_f=${hold!.target_f} is wide (outer band)`).toBeGreaterThan(0.5);
+    },
+    120_000
+  );
+
+  it(
+    "clause 3 — holds wide vs. the tight-apex racing line: over the shared corner the governed line's min corridor fraction stays in the outer band while the ungoverned line dives to a tight apex (design/09 §3.6, adj-recipe-c)",
+    () => {
+      const geom = loadRecipeCLegViaServe(dir, "geom.json");
+      const vis = loadRecipeCLegViaServe(dir, "vis.json");
+
+      // shared road ⇒ station-identical corner boundaries
+      const cg = geom.road.corners[0]!;
+      const cv = vis.road.corners[0]!;
+      expect(cv.s0, "shared corner entry station").toBe(cg.s0);
+      expect(cv.s1, "shared corner exit station").toBe(cg.s1);
+
+      const geomMinF = minCorridorFractionOverCorner(geom.lines[0]!.trajectory.samples, cg.s0, cg.s1);
+      const visMinF = minCorridorFractionOverCorner(vis.lines[0]!.trajectory.samples, cg.s0, cg.s1);
+
+      // the ungoverned line dives to a tight apex (near the inner edge)…
+      expect(geomMinF, `geom min f over [${cg.s0}, ${cg.s1.toFixed(2)}]=${geomMinF.toFixed(3)} (tight apex)`).toBeLessThan(0.3);
+      // …the governed line holds wide (never leaves the outer band)…
+      expect(visMinF, `vis min f=${visMinF.toFixed(3)} (holds wide)`).toBeGreaterThan(0.5);
+      // …the hold-wide signature, in its true (adj-vis) direction
+      expect(visMinF, `hold-wide: vis min f ${visMinF.toFixed(3)} > geom min f ${geomMinF.toFixed(3)}`).toBeGreaterThan(geomMinF);
+    },
+    120_000
+  );
 });

@@ -1,7 +1,10 @@
 // cli/verbs/render.ts — the `render` verb (design/08 §3): write SVG(s) + a
-// manifest from an already-computed envelope. v0.1 ships `topdown` only
-// (ARCHITECTURE §1 scope; `pov` rejects SCHEMA/deferred inside renderViews
-// itself). View flags (`--marks`/`--rays`/`--legend`/`--orient`) override the
+// manifest from an already-computed envelope. `topdown` (default) writes the
+// figure SVG + proportion manifest; `pov` (v0.3 immersion, design/07 §5) writes
+// the first-person `<figure_id>.pov.svg`. args.ts parses `pov` as a legal
+// `--views` NAME and leaves the phase gate "in exactly one place, the render
+// layer" — that gate is now the shipped render. View flags (`--marks`/`--rays`/
+// `--legend`/`--orient`/`--look`, the pov camera toggle) override the
 // envelope's own view (§4.2 precedence) since the envelope carries no
 // authored labels/marks (those are FigureSpec-level input data — `figure`
 // bakes render from the spec directly; `render` on a bare envelope draws
@@ -64,40 +67,52 @@ export function renderVerb(input: RenderVerbInput): VerbOutcome {
   if (!recomposed.ok) return errOutcome(recomposed.error);
   const envelope = { ...rawEnvelope, road: recomposed.value };
 
-  if (parsed.value.views !== undefined && parsed.value.views.includes("pov")) {
-    return errOutcome({
-      code: "SCHEMA",
-      at: "render.views",
-      message: 'render target "pov" is not shipped yet',
-      deferred: "immersion (v0.3)",
-      detail: { reason: "deferred" }
-    });
-  }
+  // `pov` (the immersion view, design/07 §5) is UN-DEFERRED: `--views pov`
+  // now renders the first-person target. args.ts parses `pov` as a legal view
+  // NAME and leaves the (former) phase gate "in exactly one place, the render
+  // layer" — that gate is now the shipped render itself. The requested-view
+  // set is honoured: pov-only draws pov only; the default (no `--views`) stays
+  // topdown, so every existing render invocation is unchanged.
+  const requested = parsed.value.views ?? ["topdown"];
+  const wantPov = requested.includes("pov");
+  const wantTopdown = requested.includes("topdown") || !wantPov;
 
   const lines = (envelope.lines as unknown[]).filter((l): l is LineResult => !isLineRefusal(l as never)) as LineResult[];
 
   const view: Record<string, string> = { ...(parsed.value.draft.view ?? {}) };
   if (parsed.value.mode !== undefined) view["mode"] = parsed.value.mode;
-
-  const rendered = renderViews({
-    road: envelope.road,
-    lines,
-    viewSpec: Object.keys(view).length > 0 ? view : undefined,
-    marks: parsed.value.draft.marks !== undefined ? parseMarkSpec(parsed.value.draft.marks) : "auto"
-  });
-  if (!rendered.ok) return errOutcome(rendered.error);
+  const viewSpec = Object.keys(view).length > 0 ? view : undefined;
+  const marks = parsed.value.draft.marks !== undefined ? parseMarkSpec(parsed.value.draft.marks) : "auto";
 
   const writes: WriteFile[] = [];
   const outDir = parsed.value.out ?? ".";
-  const svgPath = `${outDir}/${envelope.figure_id}.svg`;
-  writes.push({ path: svgPath, content: rendered.value.svg });
+  const report: Record<string, string> = { figure_id: envelope.figure_id };
 
-  const metrics = computeProportionMetrics(rendered.value.scene, envelope.road.corners, straightLenM(envelope.road));
-  const gate = gateProportions(metrics);
-  const canon = canonicalize(envelope);
-  const envelopeHash = canon.ok ? fnv1a(canon.value) : "000000";
-  const manifest = buildManifestRecord(envelope.figure_id, envelopeHash, rendered.value.scene, metrics, gate.verdict);
-  writes.push({ path: `${outDir}/manifest.json`, content: JSON.stringify(manifest, null, 2) });
+  if (wantTopdown) {
+    const rendered = renderViews({ road: envelope.road, lines, viewSpec, marks });
+    if (!rendered.ok) return errOutcome(rendered.error);
+    const svgPath = `${outDir}/${envelope.figure_id}.svg`;
+    writes.push({ path: svgPath, content: rendered.value.svg });
+    const metrics = computeProportionMetrics(rendered.value.scene, envelope.road.corners, straightLenM(envelope.road));
+    const gate = gateProportions(metrics);
+    const canon = canonicalize(envelope);
+    const envelopeHash = canon.ok ? fnv1a(canon.value) : "000000";
+    const manifest = buildManifestRecord(envelope.figure_id, envelopeHash, rendered.value.scene, metrics, gate.verdict);
+    writes.push({ path: `${outDir}/manifest.json`, content: JSON.stringify(manifest, null, 2) });
+    report["svg"] = svgPath;
+    report["manifest"] = `${outDir}/manifest.json`;
+  }
 
-  return okOutcome({ figure_id: envelope.figure_id, svg: svgPath, manifest: `${outDir}/manifest.json` }, writes, EXIT.OK);
+  if (wantPov) {
+    // the POV target: true-geometry first-person SVG (render/pov.ts). No
+    // proportion gate/manifest — POV is not a DrawnScene and 06 §6.2's gate is
+    // topdown-only ("mode: true renders are exempt"); the pov svg stands alone.
+    const rendered = renderViews({ road: envelope.road, lines, viewSpec, marks, target: "pov" });
+    if (!rendered.ok) return errOutcome(rendered.error);
+    const povPath = `${outDir}/${envelope.figure_id}.pov.svg`;
+    writes.push({ path: povPath, content: rendered.value.svg });
+    report["pov"] = povPath;
+  }
+
+  return okOutcome(report, writes, EXIT.OK);
 }

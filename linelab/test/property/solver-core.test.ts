@@ -713,3 +713,107 @@ describe("merge contract (design/04 §4.9)", () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// The coarse band's sweep-angle hole (design/04 §3 step 1 vs §4.2).
+//
+// The coarse sweep runs ONE cheap engine run per candidate with two of the
+// pipeline's own search variables held fixed — decel at nominal, drive roll-on
+// at the type-aware aim station. §4.2 says what the placement filter is for:
+// "a placement problem cannot be braked or throttled away". A candidate that
+// only runs wide because the fixed drive opens too early is the complement of
+// that — the §4.2 roll-on bisection contains it — so refusing the road on that
+// evidence is a false `empty_band`, and the size of the un-turned sweep after
+// the aim station makes the gap sweep-angle-shaped.
+//
+// These gates are the regression: an ordinary corner must solve, and every
+// refusal the pipeline made before the repair it must still make.
+
+describe("coarse-band rescue — the sweep-angle hole (design/04 §3 / §4.2)", () => {
+  const HOLE_DSL = (deg: number): string => `lane 3.5 | S 10 | L 24 ^${deg} | S 12`;
+
+  it("a 130° R24 corner at 30 km/h solves clean — the fig-8.5 believed road", { timeout: 300_000 }, () => {
+    const line = solved({ road: HOLE_DSL(130), entry_kmh: 30 });
+    expect(line.verdict.outcome).toBe("contained");
+    expect(line.verdict.ok).toBe(true);
+    // the returned line is a SWEPT station, self-verified — never fabricated
+    const ctxR = buildSolveContext({ road: HOLE_DSL(130), entry_kmh: 30 });
+    expect(ctxR.ok).toBe(true);
+    if (!ctxR.ok) return;
+    const ti = line.resolved_scenario.rider.plan.find((a) => a.do === "turn_in");
+    expect(ti).toBeDefined();
+    const swept = ctxR.value.stations.sweep.candidates;
+    expect(swept.some((s) => Math.abs(s - (ti as { at_s: number }).at_s) < 1e-9)).toBe(true);
+    // and the drive really is what the coarse run got wrong: the solved onset
+    // sits LATER than the aim station the coarse run pinned it to
+    const c1 = ctxR.value.corner;
+    const aim = c1.s0 + 0.58 * (c1.s1 - c1.s0); // constant-type target_apex_pct
+    const rollOn = line.resolved_scenario.rider.plan.filter((a) => a.do === "throttle" && a.accel > 0).at(-1);
+    expect(rollOn).toBeDefined();
+    expect((rollOn as { at_s: number }).at_s).toBeGreaterThan(aim);
+  });
+
+  it("the hole is closed across the whole sweep band, not patched at one angle", { timeout: 600_000 }, () => {
+    for (const deg of [45, 70, 90, 110, 120, 130, 150, 170]) {
+      const r = solve({ road: HOLE_DSL(deg), entry_kmh: 30 });
+      expect(r.ok, `^${deg} refused: ${r.ok ? "" : JSON.stringify(r.error.detail)}`).toBe(true);
+      if (!r.ok) continue;
+      expect(r.value.verdict.ok).toBe(true);
+    }
+  });
+
+  it("entry speed is not the variable: the same road solves clean at 25–40 km/h", { timeout: 600_000 }, () => {
+    for (const entry_kmh of [25, 28, 30, 32, 35, 40]) {
+      const r = solve({ road: HOLE_DSL(130), entry_kmh });
+      expect(r.ok, `${entry_kmh} km/h refused`).toBe(true);
+      if (!r.ok) continue;
+      expect(r.value.verdict.outcome).toBe("contained");
+    }
+  });
+
+  it("the rescue only ever returns a CLEAN self-verified line — a genuinely empty band still refuses empty_band", { timeout: 600_000 }, () => {
+    // ≤ 43° of R24 does not demand the doctrinal apex lean
+    // (lean_frac · phiReserve = 28.25°, which R24 asks for only above
+    // 40.5 km/h), so the decel bisection rails, the emergent lean stays under
+    // ~16°, and the near-straight chord ends on the INSIDE — out_in_out's exit
+    // leg fails at every swept station. No clean line exists, and the refusal
+    // is the road/speed one.
+    for (const spec of [
+      { road: HOLE_DSL(40), entry_kmh: 30 },
+      { road: C30_DSL, entry_kmh: 70 }
+    ] as SolveInput[]) {
+      const r = refusal(spec);
+      expect(r.code).toBe("NO_SOLUTION");
+      expect(r.detail["sub_reason"]).toBe("empty_band");
+    }
+    // and the claim underneath: nothing in the ^40 sweep verifies clean
+    const ctxR = buildSolveContext({ road: HOLE_DSL(40), entry_kmh: 30 });
+    expect(ctxR.ok).toBe(true);
+    if (!ctxR.ok) return;
+    for (const s_ti of ctxR.value.stations.sweep.candidates) {
+      const r = fullSolveAtStation(ctxR.value, s_ti, { short_circuit_probe: true });
+      if (!r.ok) continue;
+      expect(r.value.ranked.line.verdict.ok).toBe(false);
+    }
+  });
+
+  it("the rescue spends the §3 budget and no more (SUGGEST_TOPN full solves, station order)", { timeout: 300_000 }, () => {
+    // the ^120 case: only the FIRST swept station verifies clean, so a rescue
+    // ordered by the coarse |apex_pct − target| rank (the key measured on the
+    // very run that is unrepresentative) would spend all four solves elsewhere
+    // and refuse. Station order finds it inside the same budget.
+    const ctxR = buildSolveContext({ road: HOLE_DSL(120), entry_kmh: 30 });
+    expect(ctxR.ok).toBe(true);
+    if (!ctxR.ok) return;
+    const swept = ctxR.value.stations.sweep.candidates;
+    const clean: number[] = [];
+    for (const s_ti of swept.slice(0, SUGGEST_TOPN)) {
+      const r = fullSolveAtStation(ctxR.value, s_ti, { short_circuit_probe: true });
+      if (r.ok && r.value.ranked.line.verdict.ok) clean.push(s_ti);
+    }
+    expect(clean.length).toBeGreaterThan(0);
+    const line = solved({ road: HOLE_DSL(120), entry_kmh: 30 });
+    const ti = line.resolved_scenario.rider.plan.find((a) => a.do === "turn_in") as { at_s: number };
+    expect(ti.at_s).toBeCloseTo(clean[0]!, 9);
+  });
+});

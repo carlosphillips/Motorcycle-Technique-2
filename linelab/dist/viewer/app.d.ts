@@ -4,14 +4,19 @@ import { scenarioDomain } from "./stepper.js";
 import { type ViewerSession } from "./session.js";
 import { type ViewRender } from "./views.js";
 import { type SaveWindowOverlay } from "./saveWindow.js";
+import { type CorrectiveGhostOverlay } from "./correctiveGhost.js";
+import { type CompareModel } from "./compare.js";
+import { type PovLook } from "./pov.js";
 import type { Bookmark, HudRow, LockMode, StepperState } from "./types.js";
 import type { ViewerHost } from "./host.js";
 /** The complete view-level state of the workstation (07 §6.3). */
 export interface AppState {
     readonly session: ViewerSession;
     readonly stepper: StepperState;
-    /** 07 §4.1's lock toggle; compare-mode ghost rendering itself is v0.3 */
+    /** 07 §4.1's lock toggle; drives compare-mode ghost stepping (viewer/compare.ts) */
     readonly lock: LockMode;
+    /** 07 §5.2's `look` camera toggle (`heading | limit_point`) — drives the `pov` view */
+    readonly look: PovLook;
     /**
      * design/07 §3.6's save-window toggle — OFF BY DEFAULT (null), per line, and
      * computed ONCE PER TOGGLE rather than per frame. Holding the finished
@@ -19,6 +24,13 @@ export interface AppState {
      * only ever READS it.
      */
     readonly saveWindow: SaveWindowOverlay | null;
+    /**
+     * design/07 §3.5's corrective-ghost toggle — OFF BY DEFAULT (null), per line,
+     * and likewise computed ONCE PER TOGGLE (one `correctiveShot` call). `null`
+     * means either off, or the toggle is inert for the focused line (no corner
+     * ran wide, or the shot departed before reaction).
+     */
+    readonly correctiveGhost: CorrectiveGhostOverlay | null;
 }
 /** One legend entry — 07 §6.1's "line legend (role, verdict colour, focus control)". */
 export interface LegendEntry {
@@ -39,7 +51,27 @@ export interface AppFrame {
     readonly instant: InstantState | null;
     readonly hud: readonly HudRow[];
     readonly bookmarks: readonly Bookmark[];
+    /**
+     * The two SVG panes 07 §6.1 lays across the top+bottom: `topdown` and
+     * `controls`, in that order — the exported picture plus the linked cursor. The
+     * `pov` view rides its OWN field (below) rather than this array, so the v0.2
+     * two-pane contract this array carries is unchanged.
+     */
     readonly views: readonly ViewRender[];
+    /**
+     * 07 §5's `pov` view (the immersion first-person frame), rendered for the
+     * focused line at the cursor under `AppState.look`. Its own field (not in
+     * `views`) — a projection of TRUE geometry (render/pov.ts), never through the
+     * diagram path. Null only when no line is drawable.
+     */
+    readonly pov: ViewRender | null;
+    /**
+     * 07 §4's compare model: every line's OWN state at the shared lock coordinate
+     * (C-COMPARE). Drives the top-down ghost glyphs and the per-line HUD/legend a
+     * multi-line envelope compares. Null only when no line is drawable / the
+     * cursor could not resolve.
+     */
+    readonly compare: CompareModel | null;
     readonly legend: readonly LegendEntry[];
     /**
      * 07 §3.6's scrubber ticks, "in the overlay register and visually distinct
@@ -49,6 +81,12 @@ export interface AppFrame {
         readonly corner_id: string;
         readonly t: number;
     }[];
+    /**
+     * 07 §3.5's corrective ghost, once-per-toggle — null while the toggle is off
+     * (the default) or inert for the focused line. Carries the lean-only
+     * disclosure sentence (04 §4c.7) for the legend.
+     */
+    readonly corrective_ghost: CorrectiveGhostOverlay | null;
     /** terminal badge text keyed to `terminated.reason` (07 §3.4), or "" while running */
     readonly terminal: string;
     /** non-empty when the frame could not be fully built (never throws) */
@@ -64,6 +102,14 @@ export declare function createApp(session: ViewerSession): AppState;
  * throwing — the viewer's never-throw stance.
  */
 export declare function toggleSaveWindow(app: AppState): AppState;
+/**
+ * design/07 §3.5's corrective-ghost toggle. ON computes the ghost ONCE (one
+ * `correctiveShot(line)` call for the focused line); OFF drops it. The toggle is
+ * inert — stays null — when the focused line has no ran-wide corrective (07
+ * §3.5: "the toggle is inert for that line"), and a refusal likewise leaves it
+ * off (never-throw).
+ */
+export declare function toggleCorrectiveGhost(app: AppState): AppState;
 /**
  * The scrubber's extent: the whole scenario, not the focused line (07 §3.4 —
  * "the cursor remains draggable across the full scenario extent so surviving
@@ -86,6 +132,12 @@ export declare function nudgeFrame(app: AppState, direction: 1 | -1): AppState;
 export declare function nudgeSample(app: AppState, direction: 1 | -1): AppState;
 export declare function flipAxis(app: AppState): AppState;
 export declare function setLock(app: AppState, lock: LockMode): AppState;
+/**
+ * 07 §5.2's `look` camera toggle. The closed set is validated once, here: an
+ * unknown value leaves `look` unchanged (the viewer never crashes on a bad
+ * toggle — a bad `--look` was already refused `SCHEMA` at the CLI/scene door).
+ */
+export declare function setLook(app: AppState, look: string): AppState;
 export declare function focusLine(app: AppState, lineId: string): AppState;
 /** Bookmark jump — the events-only pathway (07 §3.1, `C-BOOKMARKS`). */
 export declare function jumpToBookmark(app: AppState, token: string): AppState;

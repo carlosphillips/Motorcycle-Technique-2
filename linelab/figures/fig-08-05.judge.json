@@ -1,7 +1,7 @@
 {
   "figure_id": "fig-08-05",
-  "spec_hash": "4744ed",
-  "svg_fnv1a": "2a41c5",
+  "spec_hash": "2e21e4",
+  "svg_fnv1a": "49fd70",
   "judge_identity": {
     "judge_model": "claude",
     "judge_model_version": "claude-sonnet-5",
@@ -14,15 +14,15 @@
         "items": [
           {
             "id": "J1",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J2",
-            "verdict": "fail"
+            "verdict": "na"
           },
           {
             "id": "J3",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J4",
@@ -30,11 +30,11 @@
           },
           {
             "id": "J5",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J6",
-            "verdict": "fail"
+            "verdict": "na"
           },
           {
             "id": "J7",
@@ -42,21 +42,21 @@
           },
           {
             "id": "J8",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J9",
             "verdict": "na"
           }
         ],
-        "evidence": "The rendered PNG shows ONLY the road surface (a grey double-apex/hairpin-shaped corridor) with a single dashed white centerline down its middle, on a cream background. Nothing else is drawn.\n\nJ1 (colour-verdict) FAIL: neither declared line (\"good\", entry=30, style=double_apex — implicit good/planned verdict) nor \"late\" (role=mistake) is rendered at all. There is no colored line of any kind on the "
+        "evidence": "Manifest mode=\"true\" (J6→na per instructions), legend declares exactly one line: late/mistake/failing/runoff. SVG confirms: stage 5-occluders and 7-sight-rays both empty (J4→na, no occluders declared or drawn), and this .scene has no \"marks:\" field at all (unlike sibling fig-08-01/02/03 which declare marks:turn_point) — stage 9-markers group is empty, consistent with no marks requested rather than a missing-marker defect, so J2→na. J9→na per policy (D45-only).\n\nJ1 (pass): the single rendered line uses stroke #b32e2e with marker-end url(#arrow-failing) (also #b32e2e), matching data-quality=\"failing\"; legend swatch top-left uses the identical red and reads \"misjudge 30 km/h — mistake · failing (runoff)\", matching the manifest's late/mistake/failing/runoff legend entry exactly.\n\nJ3 (pass): only one label is declared as renderable here (run_wide_detect@late; apex#1/#2@good have no anchor since good is road-only this round, an honest omission per task context). That label's leader line runs cleanly from the line's off-road departure point (~19.22,0.46 in SVG user units) to the text \"believed one steady corner — ran off before reacting\", fully inside the frame, not clipped, not floating, not overlapping other ink (verified in crops /tmp/crop_mid.png, /tmp/crop_end2.png).\n\nJ5 (pass, the judgmental item): the red line hugs the road's lower/inside edge through the wide early part of the curve (matching a single-radius R24 belief), then as the road visibly tightens toward the upper-right the line holds a shallower curvature than the road, drifts to the outer edge, and is cut by an explicit off_road terminal segment (data-terminal-reason=\"off_road\") ending in an arrowhead planted exactly at the road/grass boundary (crop /tmp/crop_end2.png — tip sits right at the edge, not wandering into the grass, not exiting the frame uncropped, satisfying the standing sentence). This legibly reads as \"believed one steady corner, ran off when the road tightened.\"\n\nJ7 (pass): only the declared late line is drawn; no good line, no occluders, no undeclared markers/labels/glyphs anywhere in the full raster (checked all four quadrants and legend region).\n\nJ8 (pass): red mistake line, white dashed lane divider, and grey road are all clearly distinguishable against the pale-green background at native 2000x2326 px; legend and callout text render crisp black-on-white-halo and are fully legible at native resolution (/tmp/crop_legend.png, /tmp/crop_end2.png)."
       },
       {
         "attempt": 2,
         "items": [
           {
             "id": "J1",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J2",
@@ -64,7 +64,7 @@
           },
           {
             "id": "J3",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J4",
@@ -72,7 +72,7 @@
           },
           {
             "id": "J5",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J6",
@@ -84,29 +84,29 @@
           },
           {
             "id": "J8",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J9",
             "verdict": "na"
           }
         ],
-        "evidence": "Viewed png/fig-08-05.png directly. The raster contains ONLY the road surface: grey pavement in a D-shaped (near-180°) bend with a white dashed centerline lane marking. There is no trace of either ride line (`good` or `late`), no apex/turn-point markers, no labels, and no note text anywhere in the image.\n\nJ1 colour-verdict: FAIL — no lines are rendered at all, so no verdict-class colours (e.g. gree"
+        "evidence": "Manifest mode=\"true\" (confirmed by svg root data-mode=\"true\") → J6 na. No occluders declared/drawn (stage-5/7 groups empty in SVG) → J4 na. J9 na (D45-only).\n\nImage shows only ONE rendered line: \"late\" (crimson #b32e2e), running along the inside of the road from the left frame edge, gently curving, terminating in a plain arrowhead + a short perpendicular tick right at the road/grass edge (~px 1445,2016 of the 2000x2326 raster) where the road pinches into its tightest section (c2, width_ratio 0.29). SVG confirms this is a `data-terminal-reason=\"off_road\"` glyph pair (arrowhead + edge tick), matching the design-doc off_road termination spec. No \"good\" line is drawn anywhere (verified by full-resolution left/right crops and by the manifest legend, which lists only \"late\") — consistent with the round's context note that a road-only \"good\" is legitimate here (A-DOUBLEAPEX no-two-touch seam), so this is not J7 fabrication, and the two apex#1/apex#2@good labels being absent (only run_wide_detect@late is rendered, cleanly anchored with a leader to the arrow region, not floating/clipped) is not a J3 defect since there's no live line to anchor them to.\n\nJ2 FAIL, concrete and located: the SVG's marker stage is completely empty — `<g data-stage=\"9-markers\"></g>` — zero hourglass/ring/dot/chevron glyphs for the whole figure. I confirmed this against the raster too: scanning the \"late\" line's crimson pixels in 3px x-buckets across its full span (x=74 to x=1445) shows constant stroke thickness (~3-4px) everywhere except the terminal arrowhead/tick cluster at x=1407-1443 — no bulge anywhere else that would indicate a carried hourglass. Per design/06 §9 (\"marker-from-event law\") and the .scene's own narrative (\"believed one steady R24 corner\" — i.e. one turn_in commitment before departing with \"no reaction time\"), this line should carry exactly one turn_point hourglass at its steering-input station. Sibling figures rendered in the same batch (fig-08-01, 08-02, 08-03, 08-04, 08-06) all correctly populate data-stage=\"9-markers\" with turn_point/apex/exit/release glyphs for their good and/or mistake lines, so the pipeline clearly supports this — fig-08-05 is the outlier with an empty marker stage.\n\nJ1 pass: the single rendered line's fill/stroke (#b32e2e) matches the failing/mistake red used consistently for this verdict class elsewhere in the batch (e.g. arrow-failing marker def, fig-08-01/03's \"bad\" line).\nJ5 pass: the red line's shallow, near-constant-radius arc drifts toward the outside edge exactly as the road tightens into its sharpest section, departing (off-road glyph) right at that tightening point — this legibly reads as \"held a single steady-corner line, ran out of road when it actually tightened,\" reinforced by the adjacent label text.\nJ8 pass: red line and grey road are clearly distinguishable in hue/value; both label and legend text render crisp with a white halo against the grey/green backgrounds at native 2000x2326 resolution."
       },
       {
         "attempt": 3,
         "items": [
           {
             "id": "J1",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J2",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J3",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J4",
@@ -114,40 +114,41 @@
           },
           {
             "id": "J5",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J6",
-            "verdict": "fail"
+            "verdict": "na"
           },
           {
             "id": "J7",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J8",
-            "verdict": "fail"
+            "verdict": "pass"
           },
           {
             "id": "J9",
             "verdict": "na"
           }
         ],
-        "evidence": "Viewed /Users/carlos/Documents/Claude/Projects/Motorcycle Technique 2/linelab/figures/png/fig-08-05.png directly. The image contains only: a light olive/cream background, a gray road-surface corridor shaped like a hairpin/double-apex bend, and a single dashed white centerline running down the middle of the corridor. Nothing else is rendered.\n\nJ1 (colour-verdict): FAIL — no rider lines are drawn at"
+        "evidence": "Image: linelab/figures/png/fig-08-05.png (2000x2326). Only one line is drawn — \"late\" (role=mistake) — plus the road; manifest legend lists only late (no \"good\" entry), matching the render exactly: no apex#1/apex#2 markers or labels for \"good\" appear anywhere, consistent with \"good\" not having solved (road-only, no fabrication).\n\nJ1 pass: sampled line pixel RGB=(179,46,46), a solid red; legend swatch same red, text reads \"misjudge 30 km/h — mistake · failing (runoff)\" — matches manifest legend {role:mistake, quality:failing, outcome:runoff} and D9 (red=failing).\n\nJ2 pass: no hourglass/ring/dot marks are drawn on the late line, and none are required — the line's story is \"ran off before reacting,\" i.e. it never turns/apexes/exits cleanly before departure, so zero marks is correct, not missing. No floating marks anywhere in frame.\n\nJ3 pass: single callout \"believed one steady corner — ran off before reacting\" (run_wide_detect@late +8) sits above the road with a leader line pointing precisely to the arrowhead termination point (~x=1440,y=1990 in full-res coords, crop /tmp/crop_endpoint.png) — anchored, not floating/clipped/swallowed.\n\nJ5 pass: pixel-traced the line's y-position across x-bins (74→1446): flat/straight from x≈74–650 (y≈2211, matching the believed straight lane), then a smooth, gradually-steepening curve from x≈650 to the terminus at x≈1446 — a single constant-taper bend consistent with a believed steady L24, while the road (visible in /tmp/crop_upper.png) keeps tightening beyond that point. The line runs onto the outer edge and terminates with an arrowhead exactly at the road-boundary/grass seam (not wandering into the grass, not exiting the frame uncropped — satisfies the standing sentence) — legibly reads as \"believed one steady corner, ran wide, departed before reacting.\"\n\nJ7 pass: nothing beyond road + late line + its one label + legend is drawn; matches manifest's legend (late only) and view (mode=true, no occluders declared).\n\nJ8 pass: legend and callout text crisp at 1x and clearly legible when zoomed (/tmp/legend_zoom.png); red line vs. grey road vs. white dashed centerline are all clearly distinguishable, no anti-aliasing mush.\n\nJ4 na: manifest fig-08-05 entry has no occluders field.\nJ6 na: manifest \"mode\":\"true\" for fig-08-05.\nJ9 na: D45-only, not applicable to v0.1 judging.\n\nAside (not a rubric item, noted for completeness): manifest's own \"gate_verdict\":\"fail\" for fig-08-05 is a separate automated gate (likely geometry/proportion-metrics based) — I found no visual defect in the raster tied to any J1–J9 item that would explain it, so it does not change any per-item verdict here."
       }
     ],
     "items": [
       {
         "id": "J1",
-        "verdict": "fail"
+        "verdict": "pass"
       },
       {
         "id": "J2",
-        "verdict": "fail"
+        "verdict": "na",
+        "flaky": true
       },
       {
         "id": "J3",
-        "verdict": "fail"
+        "verdict": "pass"
       },
       {
         "id": "J4",
@@ -155,27 +156,25 @@
       },
       {
         "id": "J5",
-        "verdict": "fail"
+        "verdict": "pass"
       },
       {
         "id": "J6",
-        "verdict": "fail",
-        "flaky": true
+        "verdict": "na"
       },
       {
         "id": "J7",
-        "verdict": "pass",
-        "flaky": true
+        "verdict": "pass"
       },
       {
         "id": "J8",
-        "verdict": "fail"
+        "verdict": "pass"
       },
       {
         "id": "J9",
         "verdict": "na"
       }
     ],
-    "verdict": "fail"
+    "verdict": "pass"
   }
 }

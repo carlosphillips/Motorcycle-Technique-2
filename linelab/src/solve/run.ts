@@ -33,11 +33,14 @@ import type { Segment } from "../road/types.js";
 import { validate } from "../plan/validate.js";
 import { validateFigureSpec } from "../plan/figure.js";
 import { loadShippedRubricPack, resolveCheckId } from "../plan/doctrine/pack.js";
+import { printMistakeToken, type MistakeKind } from "../plan/mistakes.js";
 import { CONFIG_RUBRIC_DEFAULT } from "../plan/constants.js";
 import type {
+  AcceptPolicy,
   FigureRole,
   FigureSpec,
   MistakeSpec,
+  PlanAction,
   Scenario,
   SolveSpec
 } from "../plan/types.js";
@@ -375,7 +378,7 @@ function runSolveLine(
 
   if (cache === "hit" && stamps?.solved !== undefined && stamps.expected !== undefined) {
     // skip the search: ONE engine run on the cached plan, verdict fresh
-    const cachedR = executeCachedPlan(spec, stamps.solved, source, world);
+    const cachedR = executeCachedPlan(spec, stamps.solved, source, world, spec.accept ?? "clean");
     if (cachedR.ok) {
       const line = cachedR.value;
       const fresh = { outcome: line.verdict.outcome, result_hash: line.verdict.result_hash };
@@ -396,7 +399,8 @@ function executeCachedPlan(
   spec: SolveInput,
   solved: SolvedStamp,
   source: LineSource,
-  world: WorldSkeleton
+  world: WorldSkeleton,
+  policy: AcceptPolicy
 ): Result<LineResult> {
   // the cached plan is an INPUT (a wire plan, no trajectory): validate it in
   // the line's own scenario and run the one engine pass
@@ -418,11 +422,81 @@ function executeCachedPlan(
   if (!validated.ok) return validated;
   return executeLine({
     validated: validated.value,
-    policy: spec.accept ?? "clean",
+    policy,
     source,
     constraints: null,
     brake_gap_m: figureBrakeGap(world.road)
   });
+}
+
+// ---------------------------------------------------------------------------
+// Mistake-line cache-load (design/05 §8.1): the `solved` stamp is written "for
+// every `solve`- AND `mistake`-sourced line", so a mistake line's warm path
+// MUST honour it too — skip the ~20-integrate compileMistake perturbation and
+// run the engine ONCE on the cached plan. `spec_hash` (hence `result_hash`) is
+// computed OVER the line's `source` (solve/solve.ts `lineSpecHash`), so the
+// mistake `source` must be PRESERVED for the stamp to round-trip — a
+// `{kind:"scenario"}` rewrite would move both hashes.
+//
+// The compiled mistake source (solve/mistake.ts) carries two members the raw
+// FigureSpec MistakeSpec omits: resolved (numeric) `params`, and `applied_corners`
+// — the scoped corners that actually received the perturbation (04 §5.1.5), a
+// set liveness-truncated when the mistaken line departs mid-chain. `applied_corners`
+// is recovered here by diffing the cached plan against the base line: a corner
+// is applied iff its base turn_in was moved earlier (premature / premature_contained)
+// or replaced by facet actions `<id>_f*` (fifty_pence) in the cached plan. That
+// covers exactly the turn-in family, whose applied set is truncatable and whose
+// warm cache the committed figures exercise (fig-08-06 `premature@all`); the
+// whole-line kinds (slow_steer / overspeed / chop) leave the plan's turn_ins
+// untouched, so this yields no applied corners, the recomputed spec_hash misses
+// the stamp, and the line re-solves through compileMistake. Every path is kept
+// honest by TWO guards below — the spec_hash match (classifySolvedCache) AND the
+// replayed outcome+result_hash matching `expected` — so the cache only ever
+// moves the time, never the answer (D6/D7).
+
+function reconstructMistakeSource(
+  spec: MistakeSpec,
+  base: LineResult,
+  cachedPlan: readonly PlanAction[]
+): LineSource {
+  const basePlan = base.resolved_scenario.rider.plan;
+  const baseTurnInStation = (id: string): number | null => {
+    const a = basePlan.find((x) => x.do === "turn_in" && x.id === id);
+    return a !== undefined ? a.at_s : null;
+  };
+  const applied: string[] = [];
+  const seen = new Set<string>();
+  for (const e of base.trajectory.events) {
+    if (e.kind !== "turn_in" || e.corner_id === undefined || e.action_id === undefined) continue;
+    if (seen.has(e.corner_id)) continue;
+    seen.add(e.corner_id);
+    const baseS = baseTurnInStation(e.action_id);
+    if (baseS === null) continue;
+    const movedEarly = cachedPlan.some(
+      (x) => x.do === "turn_in" && x.id === e.action_id && typeof x.at_s === "number" && x.at_s < baseS - 1e-6
+    );
+    const faceted = cachedPlan.some((x) => x.do === "turn_in" && x.id.startsWith(`${e.action_id}_f`));
+    if (movedEarly || faceted) applied.push(e.corner_id);
+  }
+  // params ride resolved (numeric) in the compiled source (solve/mistake.ts's
+  // coerceParams); execution kinds carry no string params (the `of` corner ref
+  // belongs to the misjudgment sugar, a `misjudge` source, not this one).
+  const params: Record<string, number | string> = {};
+  for (const [k, v] of Object.entries(spec.params ?? {})) {
+    params[k] = k === "of" ? String(v) : Number(v);
+  }
+  const mistakeSpec: MistakeSpec & { readonly applied_corners: readonly string[] } = {
+    kind: spec.kind,
+    params,
+    ...(spec.scope !== undefined ? { scope: spec.scope } : {}),
+    applied_corners: applied
+  };
+  return { kind: "mistake", base_line_id: base.line_id, mistakeSpec };
+}
+
+/** MistakeSpec params → the printMistakeToken form (all values as strings). */
+function stringifyParams(params: Readonly<Record<string, number | string>>): Record<string, string> {
+  return Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]));
 }
 
 // ---------------------------------------------------------------------------
@@ -618,6 +692,39 @@ function runFigure(
           )
         );
         continue;
+      }
+      // warm-cache fast path (05 §8.1): honour a valid `solved` stamp — run the
+      // engine ONCE on the cached plan with the mistake `source` PRESERVED
+      // (reconstructMistakeSource) instead of re-running the search. Guarded by
+      // classifySolvedCache (spec_hash match) AND the replayed outcome+result_hash
+      // matching `expected`; either miss falls through to a full compile.
+      if (lineStamps?.solved !== undefined && lineStamps.expected !== undefined) {
+        const source = reconstructMistakeSource(line.spec, firstRideResult, lineStamps.solved.plan);
+        const cache = classifySolvedCache({
+          solved: lineStamps.solved,
+          spec_engine_semver: stamps.engine_semver,
+          engine_semver,
+          recomputed_spec_hash: recomputeLineSpecHash(world, source)
+        });
+        if (cache === "hit") {
+          const cachedR = executeCachedPlan(firstRideSpec, lineStamps.solved, source, world, "clean");
+          if (
+            cachedR.ok &&
+            cachedR.value.verdict.outcome === lineStamps.expected.outcome &&
+            cachedR.value.verdict.result_hash === lineStamps.expected.result_hash
+          ) {
+            const label = printMistakeToken({
+              // the stamp round-tripped, so the kind is a validated MistakeKind
+              // (MistakeSpec.kind stays `string` to avoid a types.ts→mistakes.ts cycle)
+              kind: line.spec.kind as MistakeKind,
+              ...(line.spec.params !== undefined ? { params: stringifyParams(line.spec.params) } : {}),
+              ...(line.spec.scope !== undefined ? { scope: line.spec.scope } : {})
+            });
+            entries.push(relabel(withCache(cachedR.value, "hit"), line.name, line.role, label));
+            continue;
+          }
+        }
+        // spec_hash miss or divergence → fall through to the full compile below
       }
       const compiled = compileMistake(line.spec.kind, line.spec.params, {
         base: firstRideResult,

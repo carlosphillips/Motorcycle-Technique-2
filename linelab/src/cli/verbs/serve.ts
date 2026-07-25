@@ -25,6 +25,7 @@
 
 import { lowerScene } from "../../plan/scene.js";
 import { viewerPageHtml } from "../../viewer/page.js";
+import { VIEWER_VIEWS } from "../../viewer/types.js";
 import { parseZeroFileFlags } from "../args.js";
 import { EXIT } from "../exit.js";
 import { exportVerb } from "./export.js";
@@ -179,7 +180,9 @@ export function serveVerb(input: ServeVerbInput): ServeVerbResult {
         port,
         source: normalized.value.kind,
         figure_id: title,
-        views: ["topdown", "controls"],
+        // the views the viewer actually offers (single source — design/07 §2.3;
+        // `pov` joined the set with v0.3 immersion), never a hand-kept duplicate
+        views: [...VIEWER_VIEWS],
         routes: documents.map((d) => d.path).concat(`${SERVE_MODULE_ROOT}/*`)
       },
       undefined,

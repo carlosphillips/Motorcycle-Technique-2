@@ -424,6 +424,21 @@ export const FLAG_TABLE = [
         }
     },
     {
+        // design/08 §4.1 View flag group + design/06 §2.1: `--look <heading|limit_point>`
+        // is the ViewSpec `look` camera toggle for the `pov` render target (design/07
+        // §5.2). It SHIPS in v0.3 immersion — a closed-set violation is a plain
+        // `SCHEMA`, never a `deferred` (the token left the deferred table when pov
+        // shipped). `render/index.ts`'s pov path reads `viewSpec.look`.
+        field: "view.look", scene_key: "view.look", flag: "--look", arity: "value", group: "View",
+        apply: (d, v, at) => {
+            if (v !== "heading" && v !== "limit_point") {
+                return err(schemaErr(at, 'look must be "heading" or "limit_point"', "look_unknown"));
+            }
+            d.view = { ...(d.view ?? {}), look: v };
+            return ok(undefined);
+        }
+    },
+    {
         field: "config.rubric", scene_key: "", flag: "--rubric", arity: "value", group: "Config",
         apply: (d, v, at) => {
             if (v !== "parks-street") {
@@ -464,7 +479,7 @@ for (const f of FLAG_TABLE) {
 // `deferred` phase rather than falling through to "unknown flag".
 const DEFERRED_FLAG_NAMES = new Set([
     "--commitment", "--prior",
-    "--jitter", "--jitter-seed", "--jitter-spread", "--look"
+    "--jitter", "--jitter-seed", "--jitter-spread"
 ]);
 /**
  * 00-README §5's CLOSED view vocabulary, as `--views` spells it. `pov` is a
@@ -494,7 +509,8 @@ export const VERB_SCOPED_FLAGS = [
     { flag: "--range", verbs: ["sweep"] },
     { flag: "--range2", verbs: ["sweep"] },
     { flag: "--metric", verbs: ["sweep"] },
-    { flag: "--format", verbs: ["sweep"] }
+    { flag: "--format", verbs: ["sweep"] },
+    { flag: "--lock", verbs: ["compare"] }
 ];
 /**
  * `ineffectualFlagFor(verb, parsed)` — the D8 verb-scope check, pure so the
@@ -520,7 +536,8 @@ export function ineffectualFlagFor(verb, parsed) {
         "--range": parsed.range,
         "--range2": parsed.range2,
         "--metric": parsed.metric,
-        "--format": parsed.format
+        "--format": parsed.format,
+        "--lock": parsed.lock
     };
     const legacyReason = {
         "--standing": "standing_without_check",
@@ -546,7 +563,7 @@ export function ineffectualFlagFor(verb, parsed) {
 }
 const VALUE_ONLY_FLAGS = new Set([
     "--out", "--trace", "--views", "--mode", "--as", "--line", "--on", "--corner",
-    "--s", "--t", "--scan-ds",
+    "--s", "--t", "--scan-ds", "--lock",
     "--param", "--param2", "--range", "--range2", "--metric", "--format", "--port"
 ]);
 const BOOLEAN_ONLY_FLAGS = new Set(["--gate", "--suggest", "--check", "--all", "--no-cache", "--pretty", "--quiet", "--standing"]);
@@ -584,6 +601,7 @@ export function parseZeroFileFlags(argv) {
     let metric;
     let format;
     let port;
+    let lock;
     // pass 1: reject any deferred flag on sight, wherever it lands (§10 pin #19 extended)
     for (const tok of argv) {
         if (DEFERRED_FLAG_NAMES.has(tok)) {
@@ -714,6 +732,12 @@ export function parseZeroFileFlags(argv) {
                     return n;
                 port = n.value;
             }
+            else if (tok === "--lock") {
+                // design/07 §3.7 / design/08 §3.5 — closed 2-value set, `station` default
+                if (v !== "station" && v !== "time")
+                    return err(schemaErr(tok, '--lock must be "station" or "time"', "lock_unknown"));
+                lock = v;
+            }
             continue;
         }
         const spec = FLAG_BY_NAME.get(tok);
@@ -752,7 +776,8 @@ export function parseZeroFileFlags(argv) {
         ...(range2 !== undefined ? { range2 } : {}),
         ...(metric !== undefined ? { metric } : {}),
         ...(format !== undefined ? { format } : {}),
-        ...(port !== undefined ? { port } : {})
+        ...(port !== undefined ? { port } : {}),
+        ...(lock !== undefined ? { lock } : {})
     });
 }
 // ---------------------------------------------------------------------------

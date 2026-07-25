@@ -31,6 +31,7 @@ import { exportVerb } from "./verbs/export.js";
 import { sweepVerb } from "./verbs/sweep.js";
 import { controlsView } from "./verbs/controls.js";
 import { serveVerb, type ServePlan } from "./verbs/serve.js";
+import { compareVerb } from "./verbs/compare.js";
 
 const ENGINE_SEMVER: string = pkg.version;
 
@@ -221,6 +222,19 @@ function main(): void {
       // (cli/verbs/serve.ts); everything below is the IO shell.
       startViewerServer(served.plan, served.outcome, pretty);
       return;
+    }
+    case "compare": {
+      // design/08 §3.5 — `compare <A> <B> […]`: two or more positional inputs.
+      // main.ts owns the IO (read each positional file, or stdin for "-"); the
+      // verb recomputes them purely. A "nothing to compare" (<2 inputs) refusal
+      // is the verb's own typed SCHEMA, so the empty-input case still routes in.
+      const paths = preParsed.value.positional;
+      const loadedTexts: string[] = [];
+      for (const p of paths) {
+        loadedTexts.push(p === "-" ? readStdin() : loadFileOrFail("compare", p));
+      }
+      outcome = compareVerb({ loadedTexts, argv: rest, engineSemver: ENGINE_SEMVER });
+      break;
     }
     case "mistake": {
       const onPath = preParsed.value.on;

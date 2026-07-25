@@ -1,7 +1,9 @@
 # Fig 8.5 — the double apex: a compound corner that rewards two touches.
 # `good` plans the compound with two apexes; `late` believes a single steady R24
-# corner (an under-read of the tightening R12 touches), so it corrects late when
-# the actual road turns out tighter than believed. believeRoad is TUNING.
+# corner (an under-read of the tightening R12 touches), so it runs off before it
+# can react when the actual road turns out tighter than believed — the under-read
+# leaves no reaction time (corrective infeasible, departed_before_reaction).
+# believeRoad is TUNING.
 road:      preset bookDoubleApex
 lines:
   good:    ride entry=30 style=double_apex
@@ -9,6 +11,6 @@ lines:
 labels:
   apex#1@good         "first touch"
   apex#2@good         "second touch"
-  correction@late +8  "believed one steady corner — corrects late"
+  run_wide_detect@late +8  "believed one steady corner — ran off before reacting"
 view:      mode=diagram window=auto
-note:      "Two apexes bridged by an opening; the believed-single-corner line corrects too late."
+note:      "Two apexes bridged by an opening; the believed-single-corner line runs off before a reaction is possible."

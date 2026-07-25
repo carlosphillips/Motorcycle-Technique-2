@@ -1216,3 +1216,51 @@ describe("sight properties (rider-eye cast, 03 §5.1)", () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// The shipped fig-8.5 `late` line (figures/fig-08-05.scene, read-only).
+//
+// The scene authors `believeRoad="lane 3.5 | S 10 | L 24 ^130 | S 12"` at
+// 30 km/h against `preset bookDoubleApex`. That believed world used to refuse
+// NO_SOLUTION/`believed_world_not_clean` carrying an inner `empty_band` — not
+// because the belief is unridable but because the §3 coarse sweep judged
+// containment with the drive pinned at the aim station (see the coarse-band
+// rescue gates in solver-core.test.ts). The believed world is an ordinary R24
+// corner; §4.7 step 1's clean bar must be MET, so the mistake line exists and
+// the figure has two lines to draw.
+
+describe("fig-8.5's believed world is solvable (design/04 §4.7 step 1)", () => {
+  const SCENE_BELIEVED = "lane 3.5 | S 10 | L 24 ^130 | S 12";
+
+  it("the believed world self-verifies clean, so the `late` line compiles and executes", { timeout: 300_000 }, () => {
+    const believed = solve({ road: SCENE_BELIEVED, entry_kmh: 30 });
+    expect(believed.ok).toBe(true);
+    if (!believed.ok) return;
+    expect(believed.value.verdict.outcome).toBe("contained");
+    expect(believed.value.verdict.ok).toBe(true);
+
+    const late = solveBelieved({
+      road: "bookDoubleApex",
+      entry_kmh: 30,
+      believed_road: SCENE_BELIEVED
+    });
+    expect(late.ok).toBe(true);
+    if (!late.ok) return;
+    const mj = late.value.verdict.misjudgment;
+    expect(mj).not.toBeNull();
+    if (mj === null || mj === undefined) return;
+    // the belief is an under-read of the R12 first touch, diverging exactly at
+    // the corner's own entry station (S 10) — computed, never sampled
+    expect(mj.believed.outcome).toBe("clean");
+    expect(mj.s_divergence_m).toBeCloseTo(10, 12);
+    expect(mj.divergence.kind).toBe("radius");
+    expect(mj.divergence.believed).toBe(24);
+    expect(mj.divergence.actual).toBe(12);
+    // the executed plan is the believed world's, byte-for-byte (§4.7 step 2)
+    expect(JSON.stringify(late.value.resolved_scenario.rider.plan)).toBe(
+      JSON.stringify(believed.value.resolved_scenario.rider.plan)
+    );
+    // and it is graded on the ACTUAL road with no misjudgment discount (D9)
+    expect(["wide", "runoff", "crash"]).toContain(late.value.verdict.outcome);
+  });
+});

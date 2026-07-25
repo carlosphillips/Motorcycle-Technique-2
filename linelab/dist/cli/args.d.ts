@@ -86,6 +86,14 @@ export interface ParsedInvocation {
     readonly format?: "tsv" | "json";
     /** design/08 §3 `serve` verb — parsed now, consumed once `serve` ships */
     readonly port?: number;
+    /**
+     * design/08 §3.5 / design/07 §3.7 `compare` verb: `--lock station|time`.
+     * Closed 2-value set, `station` the default (07 §4.1) — the lock mode that
+     * governs how the paired lines align in the diff (station-locked = same road
+     * station; time-locked = same elapsed t). INEFFECTUAL off `compare` (main.ts,
+     * VERB_SCOPED_FLAGS below).
+     */
+    readonly lock?: "station" | "time";
 }
 /**
  * 00-README §5's CLOSED view vocabulary, as `--views` spells it. `pov` is a

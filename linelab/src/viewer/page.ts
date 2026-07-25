@@ -2,7 +2,7 @@
 //
 // The layout, verbatim from §6.1:
 //   Left:   topdown with its mode toggle
-//   Right:  pov  — ABSENT: immersion (v0.3). The pane is not stubbed.
+//   Right:  pov (immersion, v0.3) with its `look` toggle (heading | limit point)
 //   Bottom: the controls strip with the linked cursor, the timeline scrubber,
 //           and the named-event ticks
 //   Side:   the HUD panel, the line legend (role, verdict colour, focus
@@ -49,7 +49,7 @@ header .sub { color:var(--muted); }
 main { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:12px; padding:12px; align-items:start; }
 section { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:8px; min-width:0; }
 section h2 { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 6px; }
-#topdown svg, #controls svg { width:100%; height:auto; display:block; }
+#topdown svg, #controls svg, #pov svg { width:100%; height:auto; display:block; }
 footer { padding:0 12px 16px; }
 .strip { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
 .strip button, .strip select { font:inherit; padding:3px 8px; border:1px solid var(--rule); border-radius:4px; background:#fff; }
@@ -84,6 +84,10 @@ export function viewerPageHtml(opts: PageOptions): string {
     '<span class="sub" id="readout">loading…</span></header>',
     "<main>",
     '<section><h2>topdown</h2><div id="topdown"></div></section>',
+    // 07 §6.1's right pane: the pov view with its `look` toggle
+    '<section><h2>pov</h2><div id="pov"></div>',
+    '<div class="strip"><select id="look"><option value="heading" selected>heading</option>',
+    '<option value="limit_point">limit point</option></select></div></section>',
     '<section><h2>hud</h2><div id="hud"></div>',
     '<h2 style="margin-top:10px">lines</h2><select id="legend" size="4" style="width:100%"></select>',
     '<h2 style="margin-top:10px">lock</h2><select id="lock"><option value="station">station</option><option value="time">time</option></select>',

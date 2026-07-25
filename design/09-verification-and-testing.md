@@ -366,7 +366,16 @@ tests but never replace the blessed fixture.
   per-line pinned outcomes, apex counts (`double`: 2 in the taper corner; `good`:
   1 in c1 + 1 in c3), check verdicts (including the `wrong_strategy_for_corner`
   fail on `double` and the double-apex `na` carve-outs on `good`), colours per
-  06 §5.1.
+  06 §5.1. For `fig-08-05` the `late` misjudgment line **solves `runoff`**, not a
+  refusal: the believed single-R24 under-read of the true R12 touches fires
+  `run_wide_detect` at s≈15.81 (f≈1.01, `s_divergence_m = 10`, `kappa_gap.max ≈
+  0.04 1/m`) then departs the outer edge before a reaction is possible —
+  `corrective.feasible = false`, `fail_reason = departed_before_reaction`, block
+  published per §4a.6. This is the governing engine truth (the prior
+  `believed_world_not_clean`/`empty_band` refusal was a false `empty_band` solver
+  bug, repaired by `suggest.ts rescueCoarseBand`) and it agrees with `A-RECIPE-H`'s
+  teaching-window pin `late.outcome ∈ {wide, runoff}` at 30 km/h; the `good`
+  two-touch pins stay gated by `adj-doubleapex` (hosted `it.todo`).
 - `G-APEXLIST` — `bookDoubleApex` + `style=double_apex`: `apexes` lists
   `[1, 0, 1]` across c1..c3 under the one hysteresis detector; `late_apex` reads
   the final apex; `apex` events carry `detail.index`.
@@ -413,8 +422,13 @@ and `F-STANDING-WARN` (§4) adds a fixture.
 *Save window (D44).*
 
 - `G-SAVEWIN-RUNOFF` — on the existing `G-CORR-RUNOFF` fixture (`F-ORACLE-90` =
-  `book90` + `premature`): `status`, `tau_close_s`, `s_close_m`, `s_star_m`,
-  `reaction_budget_s`, `runs`. Blessed, never hand-computed.
+  `book90` + `premature`): `status: "resolved"` with `tau_close_s`, `s_close_m`,
+  `s_star_m`, `reaction_budget_s`, `runs`. The scan is F…T…F — an early inside-curl
+  `false` prefix (§4b.3), a single genuine save band, then a too-late `false`
+  tail — so `open_count == 1` and the band's closing edge (`tau_close_s ≈ t_detect`)
+  is the blessed instant; `reaction_budget_s` is small and outcome-consistent
+  (`< react_profile_s`, the `corrective.feasible = false` arm of
+  `P-SAVEWIN-OUTCOME-CONSISTENT`). Blessed, never hand-computed.
 - `G-SAVEWIN-WIDE` — on the mirrored `G-CORR-WIDE` twin (`book90 hand=R`):
   `status: "resolved"`, `reaction_budget_s > 0`. Recorded beside it, as a
   **declared limitation of the scalar's cross-hand comparability**: the
@@ -424,10 +438,20 @@ and `F-STANDING-WARN` (§4) adds a fixture.
   not across one; the goldens pin both numbers and the docs do not invite the
   comparison.
 - `G-SAVEWIN-GRID` — the `HORIZON_SCAN_DS_M` sensitivity, at **0.25 / 0.5 /
-  1.0 m** (all three satisfy the resolution law of `04-…md` §4b.5; the retired
-  2.0 / 4.0 m rungs do not and are now refusals, asserted as such). All three
-  agree on `status` and on `tau_close_s` within `HORIZON_EPS_S`. Failure is a
-  tuning finding, never a licence to widen the tolerance.
+  1.0 m**. The resolution law (`04-…md` §4b.5) is `scan_ds / v_max ≤
+  HORIZON_TAU_QUANTUM_S = 0.1 s`, so a rung's legality is **`v_max`-dependent**:
+  0.25 m and 0.5 m clear it on every book-corpus line (`book90` in-domain `v_max ≈
+  9.2–16.7 m/s`), but 1.0 m clears it only where `v_max ≥ 1.0 / 0.1 = 10 m/s` —
+  and §4b.5's own worked `book90` figure is 9.44 m/s (`1.0 / 9.44 = 0.106 s >
+  0.1 s`), so the 1.0 m rung is **not** universally legal. The three-rung
+  agreement therefore runs on a `resolved` line whose in-domain `v_max ≥ 10 m/s`
+  (a `book90` `overspeed` or `chop` line, `v_max ≈ 10.1–16.6 m/s`); on such a line
+  all three agree on `status` and on `tau_close_s` within `HORIZON_EPS_S`.
+  Separately pinned: a slower `resolved` line (`slow_steer` @34, in-domain
+  `v_max ≈ 9.22 m/s`) **refuses** the 1.0 m rung `SCHEMA/scan_ds_too_coarse` while
+  resolving at 0.25 / 0.5 m — the law governs, not the rung list — and the retired
+  2.0 / 4.0 m rungs refuse at every book `v_max`. Agreement failure is a tuning
+  finding, never a licence to widen the tolerance.
 - `G-SAVEWIN-INTERMITTENT` — the refusal-branch fixture; §8.1 forbids dead
   branches, and this branch is what keeps D11 closed, so it must be reachable by
   a committed fixture. **The originally proposed mechanism does not exist and is
@@ -437,8 +461,8 @@ and `F-STANDING-WARN` (§4) adds a fixture.
   the path — a hazard patch under the *probe's* path that bites through the
   friction ellipse for a band of start instants only, so `saved` genuinely
   alternates. Construction is a named deliverable of the D44 work and the fixture
-  is not blessed until `transition_count > 1` is observed at all three
-  `G-SAVEWIN-GRID` rungs. The golden additionally pins that `rider`, `predicate`,
+  is not blessed until `status: "intermittent"` — `open_count ≥ 2`, ≥ 2 disjoint
+  save bands (§4b.5) — is observed at all three `G-SAVEWIN-GRID` rungs. The golden additionally pins that `rider`, `predicate`,
   `policy` and `placard` are **present** on the refusing object.
 - `G-SAVEWIN-NEVER` — an `overspeed` line on `F-ORACLE-DR` where no reserve-lean
   save exists even at the earliest legal `τ`: `status: "never_open"`, no scalar,
@@ -709,9 +733,18 @@ constants belong to `02-physics-model.md`.
 *Save window (D44):*
 
 - `P-SAVEWIN-ANCHOR` — for every fixture with `corrective ≠ null`:
-  `saved(t_shot) ≡ corrective.feasible`. *Regression test, not a premise:*
-  `04-…md` §4b.3 makes the identity structural, and this asserts the
-  implementation realises the structure. Fuzzed over the committed corner corpus.
+  `saved(t_shot) ≡ corrective.feasible`, where `saved(t_shot)` takes its
+  **extended value `false`** when `t_shot > t_terminated` — the
+  `departed_before_reaction` case (`04-…md` §4a.3/§4b.3): the launch instant is
+  off the recorded line, so `saveAt(t_shot)` is `INTERNAL/save_launch_unresolvable`
+  by design and the identity is discharged by asserting `corrective.feasible =
+  false ∧ fail_reason = departed_before_reaction`, **not** by a live probe. When
+  `t_shot ≤ t_terminated`, `saved(t_shot)` is the direct `saveAt` probe.
+  *Regression test, not a premise:* `04-…md` §4b.3 makes the identity structural,
+  and this asserts the implementation realises the structure. Fuzzed over the
+  committed corner corpus, with `slow_steer` @34 and `underread`
+  (`departed_before_reaction`; `t_shot_s` published past the record) as explicit
+  witnesses alongside an integrable-but-unfeasible line.
 - `P-SAVEWIN-HORIZON` — for every evaluated `τ`, the shadow's retained samples
   end at `s*` or at a termination, and `s* ≥ max(s_detect, s(τ))`, with
   `s_detect` read from the **main line's** recorded event. **The predicate is
@@ -741,18 +774,22 @@ constants belong to `02-physics-model.md`.
   `HORIZON_SCAN_DS_M / v_max ≤ HORIZON_TAU_QUANTUM_S` over the scan domain (the
   resolution law, `04-…md` §4b.5); and a `--scan-ds` violating it is refused
   `SCHEMA/scan_ds_too_coarse` rather than run.
-- `P-SAVEWIN-REFUSES` — `transition_count > 1 ⇒` the returned object contains
-  none of `tau_close_s`, `s_close_m`, `reaction_budget_s`. Asserted structurally
-  on field presence. **The antecedent `transition_count > 1` is produced by exactly
-  one status, `intermittent`, whose only fixture `G-SAVEWIN-INTERMITTENT` is
-  explicitly unbuilt (`09 L380`) — so this implication is vacuously true on the
-  committed corpus.** It is therefore restated existentially and **gates D44
-  promotion**: the suite must carry ≥ 1 committed witness with `transition_count > 1`
-  (i.e. `G-SAVEWIN-INTERMITTENT` must be built) on which the field-absence holds;
-  until it does, D44 does not promote on this gate. Complementary to
-  `P-COUNTERFACTUAL-NAMED`, which asserts that `rider`, `predicate`, `policy` and
-  `placard` **are** present on the same object: the two tests partition the fields
-  and neither weakens the other.
+- `P-SAVEWIN-REFUSES` — `status == "intermittent"` (equivalently `open_count ≥ 2`,
+  §4b.5) `⇒` the returned object contains none of `tau_close_s`, `s_close_m`,
+  `reaction_budget_s`. Asserted structurally on field presence. **The refusal is
+  keyed on the status, not on `transition_count`: an F…T…F scan carrying a §4b.3
+  inside-curl prefix has `transition_count == 2` yet is `resolved` and DOES emit
+  the scalars — its window opened and closed exactly once — so `transition_count > 1`
+  is NOT the refusal antecedent; `open_count ≥ 2` (≥ 2 disjoint save bands) is.**
+  The `intermittent` branch is reached only by genuine flicker; its only fixture
+  `G-SAVEWIN-INTERMITTENT` is the hazard-patch construction (§3.2), so the
+  implication is vacuously true on the committed corpus until that fixture is
+  built. It is therefore restated existentially and **gates D44 promotion**: the
+  suite must carry ≥ 1 committed witness with `status == "intermittent"` on which
+  the field-absence holds; until it does, D44 does not promote on this gate.
+  Complementary to `P-COUNTERFACTUAL-NAMED`, which asserts that `rider`,
+  `predicate`, `policy` and `placard` **are** present on the same object: the two
+  tests partition the fields and neither weakens the other.
 - `P-SAVEWIN-DETERMINISM` — same envelope twice → deep-equal `SaveWindow`;
   cross-runtime tolerance-equality with **exact** equality on `status` and
   `transition_count` (discrete fields must not flip). `saveWindow` is
@@ -1404,9 +1441,19 @@ walk-through the educational-test rule (§8) demands:
 - `A-RECIPE-B` (ideal + mistake overlay): exit 0 (the pin table is the mistake
   line's declaration); two lines; mistake-line outcome = the `premature` fixture
   pin (`runoff`); render exit 0; proportion gate passes.
-- `A-RECIPE-C` (blind compare): both solves succeed; over the shared approach
-  span, `min(sight_ride_m − ssd_m)` is strictly larger on the governed line; governed
-  entry speed is lower; both verdicts present in the compare output.
+- `A-RECIPE-C` (blind compare): both solves succeed; both verdicts present in the
+  compare output. The visibility-governed line negotiates the blind corner under a
+  **wide commitment** — the ratified `adj-vis` hold-wide mechanism (DEVIATIONS.md;
+  design/02 §3.1 vs 04 §6 V2.5), not a speed governor: it carries a vis-hold at the
+  corner (a held wide `target_f`) that the geometry-optimal line lacks, and it holds
+  wide **through** the corner — its ridden corridor fraction `f` never collapses to
+  the tight apex the ungoverned line dives to — whereas the ungoverned line brakes on
+  the approach for that tight-apex racing line. On this class of blind corner V1's
+  entry-speed cap structurally does not bind, so the sight standoff is bought by
+  lateral hold-wide positioning, not a lower entry speed (measured on recipe (c)'s
+  own fixture: the governed line enters at the authored speed and holds `f ≥ ~0.82`
+  through the corner while the ungoverned line brakes and apexes at `f ≈ 0.04` — the
+  distinguishing tripwire; see DEVIATIONS.md `adj-recipe-c`, following `adj-vis`).
 - `A-RECIPE-D` (linked chain + per-corner mistake): the chained ideal line
   grades by the chain-aware check set to green (outcome `contained`, quality
   `good`); the mistake line's per-corner deviation **increases**
@@ -1669,7 +1716,11 @@ steady-state line first demands exactly that lean is
 36.01 km/h`, against the preset's 34. A doctrinally correct out-in-out line rides
 a **larger** radius than the corridor centreline, so 36.01 km/h is a **floor** on
 the entry that reaches the warn band, not the value. The pin is therefore
-calibrated within `[36, 44] km/h`, and the pin is:
+calibrated within `[36, 44] km/h`. **On this engine no entry in the band yields
+the intersection below: the clean band's peak lean sits *at* the reserve and
+never above it, so `clean(line)` and `lean_ceiling="warn"` are mutually exclusive
+by construction (`A-STANDING-WARN-BAND` below carries the arithmetic). The
+calibration target the finding retired was:**
 
 ```
 outcome = "contained"  ∧  clean(line) = true
@@ -1684,7 +1735,29 @@ moves. If no entry in the band yields `contained ∧ warn`, that is an engine or
 doctrine finding reported under the oracle's iron rule — never an edited
 expectation.
 
-- `A-STANDING-WARN-BAND` — `F-STANDING-WARN` matches the pin above, in full.
+- `A-STANDING-WARN-BAND` — resolves the seam: **the `contained ∧ clean(line) ∧
+  lean_ceiling="warn"` intersection is empty on this engine, and the emptiness is
+  structural, not a calibration miss.** A solved `accept=clean` line's peak lean is
+  capped at `phiReserve(mu_use)` by the §4.1 clean door — the reserve is the lean the
+  widest containable out-in-out line already sits at; beyond it the line either runs
+  wide (`¬contained`) or cuts in (`¬out_in_out`). Check 8 `lean_ceiling` passes iff
+  `phi_max ≤ phiReserve(mu_use)` on a non-blind corner (`01-…md` §A.3): the clean-door
+  cap and the check's non-blind `reserve` are the **same quantity**, so the clean
+  band's peak sits *at* `phiReserve`, never above it (measured on
+  `book90`/`bookHairpin`/`bookDecreasing`). The `BLIND_RESERVE_DEG = 35°` cap that
+  would open a warn window is gated by `blind(c)`, a per-line predicate false for every
+  hold-wide line; a line that cuts in far enough to keep `blind(c)` true and reach
+  `phi_max > 35°` fails `hold_wide_for_sight` and `out_in_out`, so it is never
+  `clean` (rung 2, witnessed on `bookBlind`). The gate therefore asserts the reachable
+  truth in three arms: (a) the **rung-3 `clean` witness is the corner-less na-cap
+  fixture `fx-standing-straight`** — `lean_ceiling` has zero instances → verdict `na`
+  → `reserved` unattainable → `standing` caps at 3, `reserved_blocked_by =
+  [{lean_ceiling, "na"}]` (05 §6.4's `na`-cap); (b) the `lean_ceiling` **warn band is
+  non-empty**, witnessed on a blind corner where it grades contained ∧ warn ∧
+  `¬clean` (rung 2); (c) the committed `F-STANDING-WARN` input (`book90`, entry 38)
+  refuses `NO_SOLUTION/empty_band`, pinned so any engine drift that opens the
+  clean∧warn band re-opens this gate. `F-STANDING-WARN` is retained only as that
+  emergent-refusal pin.
 - `A-STANDING-RESERVED` — on `F-ORACLE-90`, the good `book90` line grades
   `standing = "reserved"`, both reserve rows `pass`, `reserved_blocked_by = []`.
 - `A-STANDING-LADDER-CUMULATIVE` — a table-driven test over synthesised
@@ -1858,8 +1931,12 @@ against pixels:
   projection).
 - `A-LABEL-ANCHORS` — the shipped label sets for figs 8.1/8.3/8.4/8.5 all
   resolve on their fixtures (8.5 on the shipped scene's `good`/`late` roster,
-  including the `correction@late +8` spaced-offset anchor); leader endpoints
-  pass `P-PROJ-LEADER`.
+  including the `run_wide_detect@late +8` spaced-offset anchor — the `late` line
+  departs before reacting (`departed_before_reaction`, `04-…md` §4a.3), so it
+  emits no `correction` event and the run-wide bookmark carries the mistake-line
+  label; the `good` line's `apex#1`/`apex#2` anchors remain gated by the
+  `adj-doubleapex` seam until `good` solves two touches); leader endpoints pass
+  `P-PROJ-LEADER`.
 - `A-ANCHOR-ERRORS` — `turn_point#7@bad` (facets=6) → `UNKNOWN_ID`/
   `anchor_no_match` listing six candidates; `apex@double` on a two-touch line →
   `anchor_ambiguous` listing both stations with `#n` spellings.
@@ -2318,7 +2395,7 @@ in §§3.2–3.6 and §4):
   | rung | witness |
   |---|---|
   | 4 `reserved` | `F-ORACLE-90` good line (`A-STANDING-RESERVED`) |
-  | 3 `clean` | `F-STANDING-WARN` (`A-STANDING-WARN-BAND`) |
+  | 3 `clean` | corner-less na-cap fixture `fx-standing-straight` (`A-STANDING-WARN-BAND`) — `lean_ceiling` zero instances → `na` → `reserved` unattainable → capped at 3 (05 §6.4); the solved clean∧warn line originally named here is unreachable on this engine (see §4) |
   | 2 `caution` | `F-ORACLE-90` + `premature_contained` (contained, `late_apex` fails) |
   | 1 `failing` | `F-ORACLE-90` + `premature` (`runoff`, not `crash`) |
   | 0 `crash` | the `lean_ceiling`-fail fixture required by `A-CATALOGUE-EXERCISED` and cited by `A-DANGER-DWELL` |

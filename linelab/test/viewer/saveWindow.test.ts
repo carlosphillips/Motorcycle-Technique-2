@@ -57,7 +57,7 @@ const { saveWindowOverlay, saveWindowHudRows, saveWindowTicks, saveWindowOverlay
 const { SAVE_WINDOW_INK } = await import("../../src/viewer/constants.js");
 const { renderView } = await import("../../src/viewer/views.js");
 const { HORIZON_DISPLAY_DP } = await import("../../src/solve/constants.js");
-const { SAVE_WINDOW_PLACARD, SAVE_WINDOW_STATUS_SENTENCES, horizonDisplay } = await import(
+const { SAVE_WINDOW_PLACARD, horizonDisplay } = await import(
   "../../src/solve/saveWindow.js"
 );
 const { QUALITY_COLOUR } = await import("../../src/render/constants.js");
@@ -172,26 +172,34 @@ describe("C-SAVEWIN-HUD — every displayed save-window field equals the returne
     for (const p of placards) expect(p.text).toBe(SAVE_WINDOW_PLACARD);
   }, 300_000);
 
-  it("a REFUSING window prints its sentence instead of any scalar (07 §3.6, 04 §4b.5)", () => {
-    // book90 + premature is `never_open` (see test/contract/saveWindow.test.ts's
-    // ratified-defect case), so it is the refusing witness.
-    const loaded = loadSession({ ...MISTAKE_SPEC, mistake: { kind: "premature" } }, { engine_semver: "0.1.0" });
+  it("a non-scalar window draws nothing and adds no scalar row (07 §3.6, 04 §4b.5)", () => {
+    // book90 + premature is now `resolved` (the amended §4b.5 open_count table —
+    // its F…T…F scan is a single save band, not `never_open`). After that repair
+    // NO committed line yields `never_open`/`intermittent`; the reachable
+    // non-scalar witness is `not_applicable` — a contained line's corner, whose
+    // corrective is null. The overlay is inert for it: no HUD row, no scalar, no
+    // ink. (`never_open`/`intermittent` still print a status sentence in
+    // saveWindowHudRows, but are a recorded dead branch on this corpus — see
+    // test/contract/saveWindow.test.ts and the G-SAVEWIN-NEVER ratification item.)
+    const loaded = loadSession({ road: { preset: "book90" }, entry_kmh: 34, turn_in: "auto" }, { engine_semver: "0.1.0" });
     expect(loaded.ok).toBe(true);
     if (!loaded.ok) return;
-    const line = loaded.value.lines.find((l) => l.role === "mistake")!;
+    const line = loaded.value.lines[0]!; // the contained ideal line
     const overlay = saveWindowOverlay(line);
     expect(overlay.ok).toBe(true);
     if (!overlay.ok) return;
-    const refusing = overlay.value.windows.find((w) => w.status === "never_open");
-    expect(refusing, "the premature fixture must carry a refusing window").toBeDefined();
+    const inert = overlay.value.windows.find((w) => w.status === "not_applicable");
+    expect(inert, "the contained line's corner must carry a not_applicable window").toBeDefined();
+    // no committed line yields the sentence-printing refusals
+    expect(overlay.value.windows.some((w) => w.status === "never_open" || w.status === "intermittent")).toBe(false);
     const rows = saveWindowHudRows(overlay.value, 0);
-    const row = rows.find((r) => r.label.endsWith(refusing!.corner_id))!;
-    expect(row.text).toBe(SAVE_WINDOW_STATUS_SENTENCES["never_open"]);
+    // the toggle is inert for that corner: no row at all, and certainly no scalar
+    expect(rows.some((r) => r.label.endsWith(inert!.corner_id))).toBe(false);
     expect(rows.some((r) => r.path === "tau_close_s")).toBe(false);
     expect(rows.some((r) => r.path === "reaction_budget_s")).toBe(false);
     // and NOTHING is drawn for it
-    expect(overlay.value.probes.some((p) => p.corner_id === refusing!.corner_id)).toBe(false);
-    expect(saveWindowTicks(overlay.value).some((t) => t.corner_id === refusing!.corner_id)).toBe(false);
+    expect(overlay.value.probes.some((p) => p.corner_id === inert!.corner_id)).toBe(false);
+    expect(saveWindowTicks(overlay.value).some((t) => t.corner_id === inert!.corner_id)).toBe(false);
   }, 300_000);
 });
 

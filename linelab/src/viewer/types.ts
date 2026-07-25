@@ -3,20 +3,22 @@
 // read-mostly: it offers view-level state only — cursor, focus, lock mode,
 // view toggles, line visibility"); no physics value is ever declared here.
 //
-// Phase law (00 §3, ARCHITECTURE §6.4): `pov` is v0.3 (immersion) and is
-// therefore ABSENT from `VIEWER_VIEWS`, not stubbed — the same discipline
-// `render/index.ts` applies to its own `pov` target. Compare mode (07 §4) is
-// v0.3 too, so `LOCK_MODES` ships its closed set (the toggle is spelled in the
-// v0.2 layout, 07 §6.1) while multi-line ghost rendering does not.
+// Phase law (00 §3, ARCHITECTURE §6.4): `pov` is IMMERSION (v0.3) and now that
+// immersion lands it JOINS `VIEWER_VIEWS` (its render target un-defers in
+// render/index.ts; the viewer's POV view builds on render/pov.ts). Compare mode
+// (07 §4) also lands at v0.3 — `LOCK_MODES` was always the closed set (the
+// toggle is spelled in the 07 §6.1 layout) and multi-line ghost rendering now
+// ships beside it (viewer/compare.ts).
 
 import type { EventKind } from "../core/types.js";
 
 /**
- * The views the v0.2 viewer offers, in 07 §6.1 layout order (left, bottom).
- * 00 §5's full view vocabulary is `topdown | controls | pov`; `pov` lands with
- * immersion (v0.3) and is absent here.
+ * The views the viewer offers, in 07 §6.1 layout order (left, right, bottom).
+ * 00 §5's full view vocabulary is `topdown | controls | pov`; all three ship
+ * once immersion (v0.3) lands — `pov` is a first-person pinhole projection of
+ * TRUE geometry (render/pov.ts, design/07 §5).
  */
-export const VIEWER_VIEWS = ["topdown", "controls"] as const;
+export const VIEWER_VIEWS = ["topdown", "controls", "pov"] as const;
 export type ViewerView = (typeof VIEWER_VIEWS)[number];
 
 /** design/07 §4.1 — the compare-mode lock toggle; `station` is the default. */

@@ -13,6 +13,11 @@
 //      vs non_clean_band (solver brackets or profile are the problem); a
 //      coarse-stage promise contradicted at full resolution is
 //      coarse_fine_disagreement, never a silently-shipped line.
+//      Symmetrically (see rescueCoarseBand): a coarse-stage REFUSAL is not
+//      shipped unverified either — an empty survivor set spends the same §3
+//      step-3 budget at full resolution before the sweep may blame the
+//      road/speed, because the cheap run holds the pipeline's own drive
+//      control fixed and that alone empties the band on long sweeps.
 //
 // The §4.8 best_failing pooling for the auto path also lives here (the pool is
 // the full-resolution, self-verified candidates this loop produces).
@@ -50,6 +55,65 @@ export function autoSolve(ctx) {
     const { candidates, survivors } = sweepR.value;
     return ctx.policy === "clean" ? cleanLoop(ctx, candidates, survivors) : bestFailingLoop(ctx, candidates, survivors);
 }
+/**
+ * The coarse band's escape hatch (the other half of §3's coarse/fine
+ * discipline).
+ *
+ * The doc forbids shipping a coarse *promise* unverified — a coarse winner
+ * must re-verify at full resolution or the refusal is
+ * `coarse_fine_disagreement`. The same discipline binds in the other
+ * direction, and was missing: a coarse *refusal* is equally unverified,
+ * because the one cheap run per candidate holds two of the pipeline's own
+ * search variables FIXED — decel at nominal, and the drive roll-on at the
+ * type-aware aim station (`solve.ts`'s `aimStation`, clamped into the §4.1a
+ * bracket). §4.2 states what the coarse filter is actually for: the probe
+ * asks whether "this *turn-in placement* can work at all", because "a
+ * placement problem cannot be braked or throttled away". A candidate that
+ * only runs wide because the fixed drive starts too early is the exact
+ * complement of that: it IS throttled away, by the §4.2 roll-on bisection
+ * that runs next.
+ *
+ * That gap is sweep-angle-shaped. The aim station sits at
+ * `target_apex_pct` of the arc, so the sweep still to be turned after the
+ * drive opens is `(1 − target/100) · angle_deg` — 37.8° on a 90° corner,
+ * 54.6° on a 130° one. Past roughly 85° the fixed-drive run leaves the
+ * corridor on every swept station, the survivor set empties, and the solver
+ * refuses `empty_band` — whose own message blames the road and speed.
+ * Worked counter-example: `lane 3.5 | S 10 | L 24 ^130 | S 12` at 30 km/h,
+ * candidate `s_ti = 6.69` — coarse run `off_road` at s 63.5 with the drive
+ * pinned at the aim station 41.58; full solve at the SAME station bisects
+ * the drive to 50.76 and self-verifies `contained`, `verdict.ok`.
+ *
+ * So the sweep spends a bounded full-resolution budget before it may claim
+ * the road/speed is at fault: the same `SUGGEST_TOPN` full solves §3 step 3
+ * already licenses, walked in STATION order. Station order, not §3.2's
+ * `|apex_pct − target|` rank: that rank is read off the very run whose
+ * containment verdict we have just established is unrepresentative, so it
+ * cannot order the rescue; ascending station is §4.8.4(v)'s own
+ * deterministic, hash-stable tie-break and leans on nothing measured by the
+ * fixed-drive run.
+ *
+ * Only a CLEAN self-verified line rescues the sweep — a failing line proves
+ * nothing the coarse band did not already say — so every refusal this
+ * pipeline made before, it still makes, with the same sub-reason and
+ * payload.
+ */
+function rescueCoarseBand(ctx, candidates) {
+    const pool = candidates
+        .filter((c) => c.error === null && c.constraint_ok)
+        .slice(0, SUGGEST_TOPN);
+    for (const cand of pool) {
+        const r = fullSolveAtStation(ctx, cand.s_ti, { short_circuit_probe: true });
+        if (!r.ok)
+            continue; // a typed placement refusal at this station
+        const c = r.value;
+        if (!constraintsSatisfied(c.constraint_rows))
+            continue;
+        if (c.ranked.line.verdict.ok)
+            return c.ranked.line;
+    }
+    return null;
+}
 function cleanLoop(ctx, candidates, survivors) {
     if (survivors.length === 0) {
         // §4.5: when candidates exist but every one violates an authored bound,
@@ -58,6 +122,9 @@ function cleanLoop(ctx, candidates, survivors) {
         if (constraintKilled.length > 0) {
             return err(constraintUnmet(constraintKilled[0].constraint_rows, "solve.suggest"));
         }
+        const rescued = rescueCoarseBand(ctx, candidates);
+        if (rescued !== null)
+            return ok(rescued);
         return err(noSolution("empty_band", "solve.suggest", "no contained candidate with an in-band apex exists — the road/speed combination is the problem", {
             corner_id: ctx.corner.id,
             sweep: [ctx.stations.sweep.lo, ctx.stations.sweep.hi],

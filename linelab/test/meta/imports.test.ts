@@ -141,27 +141,31 @@ const PURITY_EXEMPT = new Set(["cli/main.ts", "cli/bless.ts", "viewer/host.ts"])
 /** The files allowed to run anything at import time. Pinned so growth is explicit. */
 const SIDE_EFFECT_ENTRY_POINTS = new Set(["cli/main.ts", "cli/bless.ts", "viewer/boot.ts"]);
 
-const FORBIDDEN_IDENTIFIERS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
-  { name: "Date.now", pattern: /Date\.now/ },
-  { name: "Math.random", pattern: /Math\.random/ },
-  { name: "process.", pattern: /process\./ },
-  { name: "node:fs", pattern: /node:fs/ },
-  { name: "Intl.", pattern: /Intl\./ },
-  { name: "toLocale", pattern: /toLocale/ },
+// Each row carries a `sample` — one canonical offending CODE line — so the
+// pattern set itself can be graded ("the lint has teeth", below). A row whose
+// regex is typo'd, or whose spelling the comment-skipper swallows, fails there
+// instead of silently passing every file forever.
+const FORBIDDEN_IDENTIFIERS: ReadonlyArray<{ name: string; pattern: RegExp; sample: string }> = [
+  { name: "Date.now", pattern: /Date\.now/, sample: "const stamp = Date.now();" },
+  { name: "Math.random", pattern: /Math\.random/, sample: "const jitter = Math.random();" },
+  { name: "process.", pattern: /process\./, sample: "const mu = process.env.MU;" },
+  { name: "node:fs", pattern: /node:fs/, sample: 'import { readFileSync } from "node:fs";' },
+  { name: "Intl.", pattern: /Intl\./, sample: "const f = new Intl.NumberFormat();" },
+  { name: "toLocale", pattern: /toLocale/, sample: "return v.toLocaleString();" },
   // ---- added after a review found the clock surface unlinted --------------
   // §6.2's "no clock" is about REAL TIME, not about `Date.now` in particular:
   // a `performance.now()` or a `setInterval` anywhere else in src/ is the same
   // determinism break by a different spelling, and until this row existed the
   // lint could not see either.
-  { name: "performance", pattern: /\bperformance\b/ },
-  { name: "setInterval / clearInterval", pattern: /\b(set|clear)Interval\b/ },
-  { name: "setTimeout / clearTimeout", pattern: /\b(set|clear)Timeout\b/ },
-  { name: "requestAnimationFrame", pattern: /\brequestAnimationFrame\b/ },
-  { name: "queueMicrotask", pattern: /\bqueueMicrotask\b/ },
-  { name: "globalThis", pattern: /\bglobalThis\b/ },
+  { name: "performance", pattern: /\bperformance\b/, sample: "const t0 = performance.now();" },
+  { name: "setInterval / clearInterval", pattern: /\b(set|clear)Interval\b/, sample: "const h = setInterval(tick, 16);" },
+  { name: "setTimeout / clearTimeout", pattern: /\b(set|clear)Timeout\b/, sample: "setTimeout(tick, 16);" },
+  { name: "requestAnimationFrame", pattern: /\brequestAnimationFrame\b/, sample: "requestAnimationFrame(draw);" },
+  { name: "queueMicrotask", pattern: /\bqueueMicrotask\b/, sample: "queueMicrotask(draw);" },
+  { name: "globalThis", pattern: /\bglobalThis\b/, sample: "const g = globalThis as DomLike;" },
   // `Buffer` is a NODE global: a file using it cannot run in the browser, which
   // is the half of D1 the DAG alone does not enforce.
-  { name: "Buffer", pattern: /\bBuffer\b/ }
+  { name: "Buffer", pattern: /\bBuffer\b/, sample: "return Buffer.from(s, \"utf8\");" }
 ];
 
 /**
@@ -176,18 +180,31 @@ function isCommentLine(line: string): boolean {
   return s.startsWith("//") || s.startsWith("/*") || s.startsWith("*");
 }
 
+/**
+ * The scan, as a PURE function of text: the 1-indexed code lines of `text`
+ * matching `pattern`. Split out from the file walk so the pattern set can be
+ * graded against sample lines without touching the disk.
+ */
+function scanText(pattern: RegExp, text: string): number[] {
+  const hits: number[] = [];
+  const lines = text.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? "";
+    if (isCommentLine(line)) continue;
+    if (pattern.test(line)) hits.push(i + 1);
+  }
+  return hits;
+}
+
 function findForbiddenUses(pattern: RegExp): Violation[] {
   const violations: Violation[] = [];
   for (const file of srcFiles) {
     const fileRel = relSrc(file);
     if (PURITY_EXEMPT.has(fileRel)) continue;
-    const lines = readFileSync(file, "utf8").split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i] ?? "";
-      if (isCommentLine(line)) continue;
-      if (pattern.test(line)) {
-        violations.push({ file: fileRel, line: i + 1, detail: line.trim() });
-      }
+    const text = readFileSync(file, "utf8");
+    const lines = text.split("\n");
+    for (const n of scanText(pattern, text)) {
+      violations.push({ file: fileRel, line: n, detail: (lines[n - 1] ?? "").trim() });
     }
   }
   return violations;
@@ -203,6 +220,22 @@ describe("purity lint — forbidden identifiers (§6.2, no RNG/no clock/no local
       }
     });
   }
+
+  it("the lint has teeth: every row catches its own spelling in CODE, and none of them fires on a comment", () => {
+    // Without this, a typo'd regex (or a row whose spelling `isCommentLine`
+    // swallows) passes every file forever and the lint reads green while seeing
+    // nothing — which is precisely how `performance.now()` and `setInterval`
+    // went unlinted until the review found them.
+    for (const { name, pattern, sample } of FORBIDDEN_IDENTIFIERS) {
+      expect(scanText(pattern, sample), `"${name}" does not match its own sample line: ${sample}`).toEqual([1]);
+      expect(scanText(pattern, `// ${sample}`), `"${name}" fires on a comment`).toEqual([]);
+      expect(scanText(pattern, ` * ${sample}`), `"${name}" fires on a jsdoc continuation`).toEqual([]);
+    }
+    // …and a clean line matches nothing at all
+    for (const { name, pattern } of FORBIDDEN_IDENTIFIERS) {
+      expect(scanText(pattern, "const y = lerp(a.s, b.s, alpha);"), `"${name}" fires on clean code`).toEqual([]);
+    }
+  });
 
   it("the exemption set is exactly the three declared shells — growing it is an explicit edit, never a drift", () => {
     expect([...PURITY_EXEMPT].sort()).toEqual(["cli/bless.ts", "cli/main.ts", "viewer/host.ts"]);
@@ -243,6 +276,85 @@ describe("purity lint — forbidden identifiers (§6.2, no RNG/no clock/no local
     }
     expect(offenders).toEqual([]);
     expect([...SIDE_EFFECT_ENTRY_POINTS].sort()).toEqual(["cli/bless.ts", "cli/main.ts", "viewer/boot.ts"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// (b2) The units law (ARCHITECTURE §6.1 + drift risk #1): `core/units.ts` holds
+// "the ONLY conversion helpers", and "any formula touching roll_rate or record
+// angles converts via these — never an inline `* Math.PI / 180`". An inline
+// factor is invisible to every numeric test — `p.v * 3.6` and `msToKmh(p.v)`
+// are the same f64 — so a source lint is the only thing that can hold the law.
+// (The strip's chips and its `v` channel both inlined `* 3.6` until a review
+// found them; nothing numeric could have caught it.)
+
+const CONVERSION_FACTORS: ReadonlyArray<{ name: string; pattern: RegExp; sample: string }> = [
+  { name: "km/h ↔ m/s (× or ÷ 3.6)", pattern: /[*/]\s*3\.6\b/, sample: "const kmh = p.v * 3.6;" },
+  {
+    name: "deg ↔ rad (180 / Math.PI)",
+    pattern: /180\s*\/\s*Math\.PI|Math\.PI\s*\/\s*180/,
+    sample: "const deg = rad * (180 / Math.PI);"
+  }
+];
+
+/**
+ * The conversion helpers' own home, plus the files that already inlined a
+ * factor before this lint existed. This is a RATCHET, not a blessing: the set
+ * may only shrink. Each entry is a live finding — the fix is to route the line
+ * through `core/units.ts` and delete the entry.
+ *
+ *   solve/chained.ts:518, solve/doubleApex.ts:485, solve/vis.ts:352, :373,
+ *   plan/doctrine/metrics.ts:275   — `(180 / Math.PI) * …` instead of `radToDeg`
+ *   cli/bless.ts:367               — `v_kmh / 3.6` instead of `kmhToMs`
+ */
+const INLINE_CONVERSION_KNOWN = new Set([
+  "core/units.ts", // the owner: the factors live here and nowhere else
+  "solve/chained.ts",
+  "solve/doubleApex.ts",
+  "solve/vis.ts",
+  "plan/doctrine/metrics.ts",
+  "cli/bless.ts"
+]);
+
+describe("units law — core/units.ts holds the only conversion helpers (ARCHITECTURE §6.1)", () => {
+  it("the factor patterns have teeth", () => {
+    for (const { name, pattern, sample } of CONVERSION_FACTORS) {
+      expect(scanText(pattern, sample), `"${name}" does not match its own sample`).toEqual([1]);
+      expect(scanText(pattern, `// ${sample}`), `"${name}" fires on a comment`).toEqual([]);
+      // the section marks that riddle these files ("07 §3.6", "design/03 §2")
+      // are not conversion factors
+      expect(scanText(pattern, 'const label = "07 §3.6 overlay";'), `"${name}" fires on a section mark`).toEqual([]);
+    }
+  });
+
+  it("no file inlines a unit-conversion factor outside the declared ratchet — and the ratchet never grows", () => {
+    const offenders = new Map<string, string[]>();
+    for (const file of srcFiles) {
+      const rel = relSrc(file);
+      const text = readFileSync(file, "utf8");
+      const lines = text.split("\n");
+      for (const { name, pattern } of CONVERSION_FACTORS) {
+        for (const n of scanText(pattern, text)) {
+          const at = `${rel}:${n} [${name}] ${(lines[n - 1] ?? "").trim()}`;
+          offenders.set(rel, [...(offenders.get(rel) ?? []), at]);
+        }
+      }
+    }
+    const unexpected = [...offenders.entries()]
+      .filter(([rel]) => !INLINE_CONVERSION_KNOWN.has(rel))
+      .flatMap(([, hits]) => hits);
+    if (unexpected.length > 0) {
+      expect.fail(
+        `inline unit conversion outside core/units.ts (ARCHITECTURE §6.1 names it "the ONLY conversion helpers"):\n${unexpected
+          .map((h) => `  ${h}`)
+          .join("\n")}`
+      );
+    }
+    // the display layers — where a stray `* 3.6` is likeliest and least visible
+    // — carry none at all
+    for (const rel of offenders.keys()) {
+      expect(rel.startsWith("render/") || rel.startsWith("viewer/"), `${rel} inlines a conversion factor`).toBe(false);
+    }
   });
 });
 

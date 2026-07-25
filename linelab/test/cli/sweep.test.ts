@@ -81,7 +81,7 @@ function errorOf(args: readonly string[]): { exit: number; code: string; reason:
 let dir: string;
 
 beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
+  // dist/ is built once by test/globalSetup.ts before the worker pool starts.
   dir = mkdtempSync(join(tmpdir(), "linelab-sweep-"));
 }, 300_000);
 

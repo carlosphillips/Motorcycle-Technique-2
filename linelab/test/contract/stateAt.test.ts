@@ -189,7 +189,7 @@ function firstGolden(fixture: string): GoldenLine {
 // honestly timed.
 beforeAll(() => {
   goldenLines();
-});
+}, 60_000); // explicit hook budget: the ~4 s solve can exceed vitest's 10 s default under concurrent suite load, which would report every case as skipped (a phantom failure)
 
 // ===========================================================================
 // C-STATEAT-LAWS — hand-built trajectories
@@ -286,6 +286,43 @@ describe("C-STATEAT-LAWS — the three interpolation rule families (05 §3.2)", 
     expect(Math.min(norm(st.sample.cmd_lean), 360 - norm(st.sample.cmd_lean))).toBeCloseTo(0, 9);
     // phi 10 → 30 is the plain short way
     expect(st.sample.phi).toBeCloseTo(20, 12);
+  });
+
+  it("angle blend is range-normalised AND endpoint-continuous: the 05 §3.2 psi 359°→1° worked example", () => {
+    // The design's own worked example (05 §3.2). The shortest arc from 359° to 1°
+    // is +2° THROUGH 360/0, not −358° through 180. A wrap-direction-aware but
+    // un-normalised blend runs 359.5 / 360 / 360.5 — out of the record's range and
+    // a full 360° from the `b = 1°` endpoint the record hands back verbatim, so a
+    // query approaching `b` jumps −359.5°. This asserts the blend stays in range,
+    // passes through 0, and lands on the endpoint.
+    const p = mkSample(10, 1, { psi: 359, cmd_lean: 359, phi: -5 });
+    const q = mkSample(20, 2, { psi: 1, cmd_lean: 1, phi: 5 });
+    const inp = mkInput(traj([p, q]));
+    const norm = (deg: number): number => ((deg % 360) + 360) % 360;
+
+    for (const alpha of [0.25, 0.5, 0.75, 0.99]) {
+      const st = get(stateAt(inp, { s: 10 + 10 * alpha }));
+      // psi / cmd_lean stay inside the record's [0, 360) range across the seam
+      for (const v of [st.sample.psi, st.sample.cmd_lean]) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThan(360);
+      }
+    }
+    // blends THROUGH 0/360, never 180
+    const mid = get(stateAt(inp, { s: 15 })); // alpha 0.5
+    expect(Math.min(norm(mid.sample.psi), 360 - norm(mid.sample.psi))).toBeCloseTo(0, 9);
+    // continuous with the `b = 1°` endpoint (the bug's tell): near alpha=1 the
+    // value approaches 1, NOT 361
+    const near = get(stateAt(inp, { s: 19.9 })); // alpha 0.99
+    expect(Math.abs(near.sample.psi - 1)).toBeLessThan(0.5);
+    expect(Math.abs(near.sample.cmd_lean - 1)).toBeLessThan(0.5);
+    const end = get(stateAt(inp, { s: 20 })); // endpoint, verbatim from the record
+    expect(end.sample.psi).toBe(1);
+    // a signed sub-180° bracket must NOT be forced into [0, 360): phi −5°→5° stays
+    // signed and passes through 0 (proving the fix is a no-op off the seam)
+    const q25 = get(stateAt(inp, { s: 12.5 })); // alpha 0.25
+    expect(q25.sample.phi).toBeCloseTo(-2.5, 9); // negative, not 357.5
+    expect(mid.sample.phi).toBeCloseTo(0, 9);
   });
 
   it("hold fields take sample i0's value at every interior alpha (below_validity's OR happened at resampling)", () => {

@@ -724,10 +724,10 @@ describe("phase-gated ViewSpec fields (§6.4)", () => {
     expect(e.deferred).toBe("continuation envelope (D45)");
   });
 
-  it("render target 'pov' rejects SCHEMA/deferred \"immersion (v0.3)\" via renderViews", () => {
-    const e = unwrapErr(renderViews({ road: STRAIGHT_ROAD, lines: [line], target: "pov" }));
-    expect(e.code).toBe("SCHEMA");
-    expect(e.deferred).toBe("immersion (v0.3)");
+  it("render target 'pov' SHIPS in v0.3 immersion — renderViews renders the first-person view, not a deferral", () => {
+    const r = renderViews({ road: STRAIGHT_ROAD, lines: [line], target: "pov" });
+    expect(r.ok, r.ok ? "" : JSON.stringify(r.error)).toBe(true);
+    if (r.ok) expect(r.value.svg).toContain('data-view="pov"');
   });
 });
 

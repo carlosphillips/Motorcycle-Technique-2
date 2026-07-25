@@ -33,7 +33,14 @@ export const DEFERRED_TABLE: readonly DeferredRow[] = [
   // because "The printed `schema` is the phase" — a phase with nothing left to
   // defer prints nothing. `DeferredPhase` keeps the string so goldens and
   // tombstone prose that quote it still typecheck.
-  { tokens: ["compare", "pov", "--look"], deferred: "immersion (v0.3)" },
+  // The `immersion (v0.3)` row is now RETIRED as well: `compare` (the verb),
+  // the `pov` render target and its `--look` ViewSpec flag have ALL shipped
+  // (design/08 §3 line 83 + §4.1's View flag group ship `pov`/`--look` in the
+  // render verb; design/07 §5 ships the POV view). By the same phase-gating law
+  // that retired the empty `inspection (v0.2)` row, a phase with nothing left to
+  // defer prints nothing, so the row is dropped rather than kept token-less.
+  // `DeferredPhase` keeps the `"immersion (v0.3)"` string so any prose/golden
+  // that quotes the phase still typechecks. Four rows remain.
   {
     tokens: ["view.mode=diagram", "width_exag", "straight_compress", "taper_compress"],
     deferred: "projection (post-v0.1)"
@@ -48,9 +55,13 @@ export const DEFERRED_TABLE: readonly DeferredRow[] = [
 
 /**
  * The closed set of shipped verbs: the 9 v0.1 verbs (ARCHITECTURE scope line,
- * §8 WP-15 row) plus the four v0.2 inspection verbs — `state`, `save-window`,
+ * §8 WP-15 row), the four v0.2 inspection verbs — `state`, `save-window`,
  * `serve`, `sweep` (design/08 §3 verb table; the inspection verbs exit 0/2/4
- * only — no exit-3 tier, "inspection is not a gate").
+ * only — no exit-3 tier, "inspection is not a gate") — and the v0.3 immersion
+ * verb `compare` (design/08 §3.5, §6(c); design/07 §4). `compare` is a pure
+ * consumer of the one engine: it recomputes its inputs through `run()` and
+ * reads each line's own `stateAt` (never a second engine — C-ONE-CORE), so it
+ * carries no exit-3 gate tier of its own (it produces a diff, it does not gate).
  */
 export const SHIPPED_VERBS = [
   "run",
@@ -63,6 +74,7 @@ export const SHIPPED_VERBS = [
   "save-window",
   "serve",
   "sweep",
+  "compare",
   "schema",
   "explain",
   "export"
@@ -73,10 +85,10 @@ export function isShippedVerb(v: string): v is ShippedVerb {
   return (SHIPPED_VERBS as readonly string[]).includes(v);
 }
 
-/** Deferred verbs named in the design of record but not shipped yet. */
+/** Deferred verbs named in the design of record but not shipped yet.
+ *  (`compare` shipped with v0.3 immersion — it is now in SHIPPED_VERBS.) */
 export const DEFERRED_VERBS: Readonly<Record<string, DeferredPhase>> = Object.freeze({
   commitment: "continuation envelope (D45)",
-  compare: "immersion (v0.3)",
   fit: "fit (post-v1)"
 });
 

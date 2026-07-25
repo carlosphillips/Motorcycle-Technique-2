@@ -62,8 +62,9 @@ function cli(args: readonly string[], cwd = repoRoot): CliResult {
 }
 
 beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
-  if (!existsSync(mainJs)) throw new Error(`build did not produce ${mainJs}`);
+  // dist/ is built once by test/globalSetup.ts before the worker pool starts;
+  // this only asserts that build produced the CLI binary this file spawns.
+  if (!existsSync(mainJs)) throw new Error(`test/globalSetup.ts did not produce ${mainJs}`);
 }, 120_000);
 
 // ---------------------------------------------------------------------------

@@ -32,5 +32,10 @@ export interface CompiledMistake {
     readonly applied_corners: readonly string[];
 }
 type RawParams = Readonly<Record<string, number | string>> | undefined;
+/**
+ * `facets` commanded leans, alternating bite / give-back, walking the probed
+ * [kiss, eased] band upward. Deterministic and total for any `facets ≥ 2`.
+ */
+export declare function facetLadder(kiss: number, eased: number, facets: number): readonly number[];
 export declare function compileMistake(kind: string, params: RawParams, ctx: MistakeCtx): Result<CompiledMistake>;
 export {};

@@ -44,4 +44,33 @@ export const SAVE_WINDOW_INK = "#3d3d3d";
 export const SAVE_WINDOW_RING_R_M = 0.55;
 /** m — the ring's tick, drawn outward so the glyph cannot read as a closed apex ring */
 export const SAVE_WINDOW_TICK_M = 0.45;
+// ---------------------------------------------------------------------------
+// Corrective-ghost overlay presentation (07 §3.5 — "drawn from the `correction`
+// bookmark onward as a ghost overlay … at GHOST OPACITY and VISUALLY DISTINCT
+// from compare-mode ghosts (it is a counterfactual, not a line of the
+// figure)"). Compare-mode ghosts retain the line's VERDICT colour at reduced
+// opacity (07 §4.2, §5.6); the corrective ghost must therefore NOT be verdict-
+// coloured — it is neutral ink at ghost opacity, so it can never read as a
+// graded line (D9: `quality` is the single total colour function per line).
+//
+// 07 spells the overlay but no dimension/ink, so these are presentation-only
+// locals with no TUNING status (ARCHITECTURE §6.6's rule for unnamed design
+// literals). The ink is deliberately NOT a member of QUALITY_COLOUR, and
+// deliberately distinct from SAVE_WINDOW_INK (07 §3.6 requires the save glyph
+// be "visually distinct from the corrective ghost's stroke"); a test asserts
+// both.
+/** the corrective ghost's one neutral ink — not a verdict colour, not the save ink */
+export const CORRECTIVE_GHOST_INK = "#4a5a6a";
+/** ghost opacity (07 §3.5) — a counterfactual overlay reads under the figure */
+export const CORRECTIVE_GHOST_OPACITY = 0.5;
+// ---------------------------------------------------------------------------
+// Compare-mode ghost presentation (07 §4.2, §5.6 — "Non-focused lines draw as
+// ghost glyphs, reduced opacity, VERDICT COLOUR RETAINED, on the topdown").
+// Unlike the corrective ghost (neutral ink), a compare ghost keeps the line's
+// verdict colour (D9) at reduced opacity — it IS a line of the figure, just not
+// the focused one. `placeGlyph` already colours by `verdict.quality`; only the
+// opacity is added here. 07 spells "reduced opacity" but no number, so this is
+// a presentation-only local with no TUNING status (ARCHITECTURE §6.6).
+/** the opacity a non-focused line's ghost glyph draws at (07 §4.2 "reduced opacity") */
+export const COMPARE_GHOST_OPACITY = 0.4;
 //# sourceMappingURL=constants.js.map

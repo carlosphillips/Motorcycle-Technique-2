@@ -15,10 +15,13 @@
 //
 // plus the structural laws that keep the object honest: disclosure survives
 // every refusal (§4b.5), a refusing status carries NO derived scalar
-// (P-SAVEWIN-REFUSES), and the status table's first-match-wins order is pinned
-// against the engine's own behaviour on F-ORACLE-90 (see the RATIFIED-DEFECT
-// case — the letter and the measurement disagree there, and the test records
-// which one the code follows so the disagreement cannot rot silently).
+// (P-SAVEWIN-REFUSES, now keyed on `open_count ≥ 2`, not `transition_count`),
+// and the §4b.5 status table's `open_count` classification is pinned against the
+// engine on F-ORACLE-90: its saved(τ) scan is F…T…F — an inside-curl `false`
+// prefix (§4b.3), one genuine save band, a too-late `false` tail — so it is a
+// single-band `resolved` window (open_count == 1), NOT `never_open`. This is the
+// AMENDED §4b.5 (the adjudicated open_count repair): the leading `false` prefix
+// no longer masks a window that demonstrably opened and closed once.
 //
 // Everything here reads a FINISHED line: `saveWindow` adds no engine run to any
 // figure path (04 §4b.8), so nothing in this file touches a bake.
@@ -81,14 +84,25 @@ function mistakeLine(kind: string, entry: number): LineResult {
   return line!;
 }
 
-let oracle90: LineResult; // F-ORACLE-90 — book90 + premature @34
+function cleanLine(entry: number): LineResult {
+  const r = run({ road: { preset: "book90" }, entry_kmh: entry, turn_in: "auto" }, { engine_semver: "0.1.0" });
+  expect(r.ok, `book90 clean @${entry} must solve`).toBe(true);
+  if (!r.ok) throw new Error("unreachable");
+  const line = r.value.lines.find((l): l is LineResult => !isLineRefusal(l));
+  expect(line, `book90 clean @${entry} produced no line`).toBeDefined();
+  return line!;
+}
+
+let oracle90: LineResult; // F-ORACLE-90 — book90 + premature @34 (now a single-band `resolved`)
 let resolvedOverspeed: LineResult;
 let resolvedChop: LineResult;
+let cleanGood: LineResult; // a contained book90 line — its corner has corrective == null → `not_applicable`
 
 beforeAll(() => {
   oracle90 = mistakeLine("premature", 34);
   resolvedOverspeed = mistakeLine("overspeed", 34);
   resolvedChop = mistakeLine("chop", 34);
+  cleanGood = cleanLine(34);
 }, 300_000);
 
 // ---------------------------------------------------------------------------
@@ -267,11 +281,18 @@ describe("G-SAVEWIN-GRID — the scan-resolution sensitivity (09 §3.2)", () => 
     expect(rungs(resolvedOverspeed, "c1")[0]!.t_freeze_end_s).toBeUndefined();
   }, 300_000);
 
-  it("F-ORACLE-90 agrees on status across all three rungs (the refusing branch is rung-stable too)", () => {
+  it("F-ORACLE-90 is `resolved` and agrees on status + tau_close_s across all three rungs (its in-domain v_max ≈ 11.7 ≥ 10, so 1.0 m is legal for it)", () => {
+    // Under the amended §4b.5 open_count table F-ORACLE-90's F…T…F scan is a
+    // single-band `resolved` window, not `never_open`. Its in-domain v_max is
+    // ~11.7 m/s ≥ 10, so unlike `slow_steer` the 1.0 m rung IS legal here.
+    let vMax = 0;
+    for (const p of oracle90.trajectory.samples) vMax = Math.max(vMax, p.v);
+    expect(vMax).toBeGreaterThanOrEqual(1.0 / HORIZON_TAU_QUANTUM_S); // ≥ 10 m/s
     const ws = rungs(oracle90, "c1");
-    expect(new Set(ws.map((w) => w.status)).size).toBe(1);
-    // no rung invents a scalar the status suppresses
-    for (const w of ws) expect(w.tau_close_s).toBeUndefined();
+    expect(ws.map((w) => w.status)).toEqual(["resolved", "resolved", "resolved"]);
+    const taus = ws.map((w) => w.tau_close_s!);
+    for (const tau of taus) expect(typeof tau).toBe("number");
+    expect(Math.max(...taus) - Math.min(...taus)).toBeLessThanOrEqual(HORIZON_EPS_S);
   }, 300_000);
 
   it("the retired 2.0 / 4.0 m rungs refuse on the same fixture — the law is what retired them", () => {
@@ -281,13 +302,14 @@ describe("G-SAVEWIN-GRID — the scan-resolution sensitivity (09 §3.2)", () => 
     }
   }, 120_000);
 
-  it("RATIFIED DEFECT — the 1.0 m rung is not universally legal: it refuses on any line whose v_max < 10 m/s", () => {
-    // design/09's G-SAVEWIN-GRID says all three rungs "satisfy the resolution
-    // law of 04 §4b.5". They do not: the law is scan_ds / v_max ≤ 0.1 s, so
-    // 1.0 m is legal only above 10 m/s, and §4b.5's OWN worked number for
-    // book90 is 9.44 m/s ⟹ 0.106 s. `slow_steer` is a witness. The code is
-    // faithful to §4b.5 (the normative statement); this case pins the
-    // contradiction so the ratification cannot rot.
+  it("the 1.0 m rung's legality is v_max-dependent (amended G-SAVEWIN-GRID): `slow_steer` (v_max < 10 m/s) refuses 1.0 m while resolving at 0.25 / 0.5 m", () => {
+    // The AMENDED design/09 G-SAVEWIN-GRID now agrees with the code: the
+    // resolution law is scan_ds / v_max ≤ HORIZON_TAU_QUANTUM_S = 0.1 s, so the
+    // 1.0 m rung is legal only where in-domain v_max ≥ 10 m/s. §4b.5's own worked
+    // book90 figure is 9.44 m/s ⟹ 1.0/9.44 = 0.106 > 0.1, so 1.0 m is NOT
+    // universally legal. The three-rung agreement above runs on overspeed/chop/
+    // F-ORACLE-90 (v_max ≥ 10); this case pins the sub-10 refusal the amended
+    // letter names.
     const slow = mistakeLine("slow_steer", 34);
     let vMax = 0;
     for (const p of slow.trajectory.samples) vMax = Math.max(vMax, p.v);
@@ -324,18 +346,40 @@ describe("disclosure survives every refusal (04 §4b.5) and a refusing status ca
     }
   }, 300_000);
 
-  it("P-SAVEWIN-REFUSES — a `never_open` / `intermittent` / `not_applicable` window carries none of the derived scalars", () => {
+  it("P-SAVEWIN-REFUSES (amended, keyed on `open_count ≥ 2`) — a refusing window carries none of the derived scalars, and F-ORACLE-90 is NOT such a window", () => {
+    // Amended §4b.5 / design/09 §5: the refusal antecedent is `open_count ≥ 2`
+    // (status `intermittent`), NOT `transition_count > 1`. F-ORACLE-90's F…T…F
+    // scan has transition_count == 2 yet open_count == 1 → `resolved`, so it DOES
+    // emit the scalars. `intermittent` (≥ 2 disjoint bands) is reachable only via
+    // the still-unbuilt hazard-patch fixture G-SAVEWIN-INTERMITTENT.
     const suppressed = ["tau_close_s", "s_close_m", "s_star_m", "reaction_budget_s", "open_at_end"] as const;
-    for (const line of [oracle90, resolvedOverspeed, resolvedChop]) {
+    // (a) the structural refusal law over every window in the corpus — the
+    //     `not_applicable` witness (a contained line's corner) makes the loop
+    //     non-vacuous now that F-ORACLE-90's corner resolves.
+    const refusingSeen = new Set<string>();
+    for (const line of [oracle90, resolvedOverspeed, resolvedChop, cleanGood]) {
       const all = saveWindow(inputOf(line));
       expect(all.ok).toBe(true);
       if (!all.ok) continue;
       for (const w of all.value) {
         if (w.status === "resolved" || w.status === "open_at_end") continue;
+        refusingSeen.add(w.status);
         for (const k of suppressed) {
           expect(w[k], `${line.line_id}/${w.corner_id} (${w.status}) leaked ${k}`).toBeUndefined();
         }
       }
+    }
+    expect(refusingSeen.has("not_applicable")).toBe(true); // the clean line exercises the suppression
+    expect(refusingSeen.has("intermittent")).toBe(false); // unbuilt on the committed corpus (§3.2)
+    // (b) the positive half of the amendment: F-ORACLE-90 moved from the
+    //     refusing set into the scalar-present set.
+    const w = saveWindow(inputOf(oracle90), "c1");
+    expect(w.ok).toBe(true);
+    if (!w.ok) return;
+    expect(w.value.status).toBe("resolved");
+    expect(w.value.transition_count).toBe(2); // the inside-curl prefix's F→T plus the band's T→F
+    for (const k of ["tau_close_s", "s_close_m", "s_star_m", "reaction_budget_s"] as const) {
+      expect(w.value[k], `F-ORACLE-90 (resolved) is missing ${k}`).toBeDefined();
     }
   }, 300_000);
 
@@ -357,11 +401,11 @@ describe("disclosure survives every refusal (04 §4b.5) and a refusing status ca
 });
 
 // ---------------------------------------------------------------------------
-// The status table's first-match-wins order (04 §4b.5) — pinned against the
-// engine so the design-letter conflict cannot rot.
+// The §4b.5 `open_count` classification (as amended) — pinned against the engine
+// so the leading-`false`-prefix reading cannot rot.
 
-describe("RATIFIED DEFECT — §4b.5's table order reports `never_open` on a scan that demonstrably opened", () => {
-  it("F-ORACLE-90's saved(τ) is F…T…F, so the window OPENED — yet the letter's row order classifies it `never_open`", () => {
+describe("F-ORACLE-90's F…T…F scan is a single-band `resolved` window (the amended §4b.5 open_count table)", () => {
+  it("saved(τ) is F…T…F — an inside-curl `false` prefix, ONE save band, a too-late `false` tail — so open_count == 1 and the window is `resolved` with every scalar", () => {
     const input = inputOf(oracle90);
     const events = oracle90.trajectory.events;
     const turnIn = events.find((e) => e.kind === "turn_in")!;
@@ -374,40 +418,41 @@ describe("RATIFIED DEFECT — §4b.5's table order reports `never_open` on a sca
       expect(r.ok).toBe(true);
       if (r.ok) verdicts.push(r.value.saved);
     }
-    // measurement: the window is open over a genuine interior band
+    // measurement: an inside-curl `false` prefix (§4b.3), then exactly ONE
+    // contiguous save band — the window opened and closed once.
     expect(verdicts[0]).toBe(false);
-    expect(verdicts.some((v) => v)).toBe(true);
-    let transitions = 0;
-    for (let i = 0; i + 1 < verdicts.length; i++) if (verdicts[i] !== verdicts[i + 1]) transitions++;
-    expect(transitions).toBeGreaterThan(1);
+    let openCount = 0;
+    for (let i = 0; i < verdicts.length; i++) {
+      if (verdicts[i] && (i === 0 || !verdicts[i - 1])) openCount++;
+    }
+    expect(openCount).toBe(1);
 
-    // the letter: `saved(τ₀) = false → never_open` is row 2 and
-    // `transition_count > 1 → intermittent` is row 5, first-match-wins, so
-    // `never_open` wins — and with it the five scalars G-SAVEWIN-RUNOFF wants
-    // to bless on this very fixture disappear.
+    // the amended table: open_count == 1 → `resolved`, with the FULL scalar set
+    // that G-SAVEWIN-RUNOFF blesses on this very fixture.
     const w = saveWindow(input, "c1");
     expect(w.ok).toBe(true);
     if (!w.ok) return;
-    expect(w.value.status).toBe("never_open");
-    expect(w.value.transition_count).toBeGreaterThan(1);
-    expect(w.value.tau_close_s).toBeUndefined();
-    expect(w.value.reaction_budget_s).toBeUndefined();
+    expect(w.value.status).toBe("resolved");
+    for (const k of ["tau_close_s", "s_close_m", "s_star_m", "reaction_budget_s"] as const) {
+      expect(w.value[k], `resolved is missing ${k}`).toBeDefined();
+    }
+    // P-SAVEWIN-OUTCOME-CONSISTENT (the corrective.feasible = false arm): the
+    // budget the rider actually had is smaller than the reaction it needed.
+    expect(w.value.reaction_budget_s!).toBeLessThan(w.value.react_profile_s!);
   }, 300_000);
 
-  it("`intermittent` is consequently UNREACHABLE in this build — its gate G-SAVEWIN-INTERMITTENT cannot be built until the order is ratified", () => {
-    // `intermittent` needs verdicts[0] === true AND transition_count ≥ 2. Every
-    // probed shape here starts false (an early τ cuts inside and departs), so
-    // the branch is dead under the current table order. Recorded, not faked:
-    // 09 §8.1 forbids dead branches, and this is the evidence that the branch
-    // is dead for a DESIGN reason rather than an implementation one.
+  it("`intermittent` (open_count ≥ 2) is unreachable on the committed corpus — it needs the still-unbuilt hazard-patch fixture G-SAVEWIN-INTERMITTENT (§3.2)", () => {
+    // Recorded, not faked (09 §8.1 forbids dead branches): the branch is dead for
+    // a DESIGN reason — an inside-curl `false` prefix is a single band, not
+    // flicker, so no committed line produces ≥ 2 disjoint save bands.
     const statuses = new Set<string>();
-    for (const line of [oracle90, resolvedOverspeed, resolvedChop]) {
+    for (const line of [oracle90, resolvedOverspeed, resolvedChop, cleanGood]) {
       const all = saveWindow(inputOf(line));
       if (!all.ok) continue;
       for (const w of all.value) statuses.add(w.status);
     }
     expect(statuses.has("intermittent")).toBe(false);
-    expect(SAVE_WINDOW_STATUSES).toContain("intermittent"); // declared, unreachable
+    expect(SAVE_WINDOW_STATUSES).toContain("intermittent"); // declared, unreachable until the fixture lands
   }, 300_000);
 });
 
@@ -430,11 +475,15 @@ describe("A-SAVEWIN-PLACARD — no scalar is ever printed without the §4b.7 pla
   }, 300_000);
 
   it("a REFUSING window still prints its sentence and its placard — and no scalar", () => {
-    const w = saveWindow(inputOf(oracle90), "c1");
+    // F-ORACLE-90 now resolves, so the refusing witness is a `not_applicable`
+    // window: a contained line's corner has corrective == null (§4b.5). No
+    // committed line yields `never_open` after the open_count repair.
+    const w = saveWindow(inputOf(cleanGood), "c1");
     expect(w.ok).toBe(true);
     if (!w.ok) return;
+    expect(w.value.status).toBe("not_applicable");
     const summary = saveWindowSummary(w.value);
-    expect(summary).toContain(SAVE_WINDOW_STATUS_SENTENCES["never_open"]);
+    expect(summary).toContain(SAVE_WINDOW_STATUS_SENTENCES["not_applicable"]);
     expect(summary).toContain(SAVE_WINDOW_PLACARD);
     expect(summary).toContain("lean_only_reserve");
     // the placard itself names `tau_close_s` in prose, so the absence is

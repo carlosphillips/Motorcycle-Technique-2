@@ -52,7 +52,7 @@ let dir: string;
 let envelopePath: string;
 
 beforeAll(() => {
-  execFileSync("npm", ["run", "build"], { cwd: repoRoot, stdio: "ignore" });
+  // dist/ is built once by test/globalSetup.ts before the worker pool starts.
   dir = mkdtempSync(join(tmpdir(), "linelab-controls-"));
   envelopePath = join(dir, "env.json");
   const solved = cli([
@@ -205,7 +205,7 @@ describe("C-RECOMPUTE-BUDGET (as re-scoped by design/09 §6.1)", () => {
     };
   }, 300_000);
 
-  it("the warm spec really is warm — the solver line loads its cached plan, never re-searches", () => {
+  it("the warm spec really is warm — EVERY line loads its cached plan, never re-searches", () => {
     const warm = run(warmSpec, { engine_semver: "0.1.0", figure_id: "fig-08-06" });
     expect(warm.ok).toBe(true);
     if (!warm.ok) return;
@@ -214,10 +214,23 @@ describe("C-RECOMPUTE-BUDGET (as re-scoped by design/09 §6.1)", () => {
     expect(good).toBeDefined();
     expect(isLineRefusal(good!)).toBe(false);
     expect((good as LineResult).cache).toBe("hit");
-    // the mistake line has no cached-plan path by design: `solved` is the
-    // SOLVER's conclusion (05 §8.1), and a mistake line is compiled off its
-    // base rather than solved — so `absent` here is the honest record.
-    expect((byId.get("bad") as LineResult).cache).toBe("absent");
+    // 05 §8.1 (verbatim): `solved` is written "for every `solve`- AND
+    // `mistake`-sourced line", and on load a valid stamp means "skip the search,
+    // run the engine ONCE on the cached plan". So the MISTAKE line is ALSO a
+    // cache hit on the warm path — it is NOT re-probed. The warm spec above
+    // stamps it (the `.map` covers every non-refused line), and replaying the
+    // stamped plan with the mistake `source` preserved reproduces the mistake
+    // line's result_hash AND spec_hash exactly (verified: f5fbeb / ef0884),
+    // proving the cache is honest (D6/D7 — the cache moves the time, never the
+    // answer). If this line reads `absent`, run(figure) is re-solving the whole
+    // premature@all chain on every recompute — the C-RECOMPUTE-BUDGET defect.
+    const bad = byId.get("bad") as LineResult;
+    expect(bad.cache).toBe("hit");
+    const stamped = (warmSpec["lines"] as { name: string; expected?: { outcome: string; result_hash: string } }[])
+      .find((l) => l.name === "bad")?.expected;
+    expect(stamped).toBeDefined();
+    expect(bad.verdict.outcome).toBe(stamped!.outcome);
+    expect(bad.verdict.result_hash).toBe(stamped!.result_hash);
   });
 
   it(`recomputes every line of the largest committed figure inside ${BUDGET_MS} ms on the warm path`, () => {

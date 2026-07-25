@@ -1,10 +1,11 @@
 import type { EventKind } from "../core/types.js";
 /**
- * The views the v0.2 viewer offers, in 07 §6.1 layout order (left, bottom).
- * 00 §5's full view vocabulary is `topdown | controls | pov`; `pov` lands with
- * immersion (v0.3) and is absent here.
+ * The views the viewer offers, in 07 §6.1 layout order (left, right, bottom).
+ * 00 §5's full view vocabulary is `topdown | controls | pov`; all three ship
+ * once immersion (v0.3) lands — `pov` is a first-person pinhole projection of
+ * TRUE geometry (render/pov.ts, design/07 §5).
  */
-export declare const VIEWER_VIEWS: readonly ["topdown", "controls"];
+export declare const VIEWER_VIEWS: readonly ["topdown", "controls", "pov"];
 export type ViewerView = (typeof VIEWER_VIEWS)[number];
 /** design/07 §4.1 — the compare-mode lock toggle; `station` is the default. */
 export declare const LOCK_MODES: readonly ["station", "time"];

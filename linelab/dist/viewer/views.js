@@ -1,24 +1,30 @@
-// viewer/views.ts — per-view rendering (design/07 §2.3, §3.2).
+// viewer/views.ts — per-view rendering (design/07 §2.3, §3.2, §5).
 //
 // | View       | Technology | Where the drawing comes from                    |
 // |------------|------------|-------------------------------------------------|
 // | `topdown`  | SVG DOM    | `render/index.ts`'s `renderViews`, VERBATIM,     |
-// |            |            | plus viewer/glyph.ts's cursor overlay            |
+// |            |            | plus viewer/glyph.ts's cursor + ghost overlays   |
 // | `controls` | SVG DOM    | `render/controls.ts`'s `renderControls`, VERBATIM|
+// | `pov`      | SVG        | `render/pov.ts` via `viewer/pov.ts` (TRUE geom)  |
 //
 // 07 §2.3: "the interactive top-down is the *same picture* as the exported
 // figure, plus a glyph layer". That is enforced structurally: the SVG this
 // file returns for `topdown` is byte-identical to the export up to the appended
 // overlay `<g>`, because the export IS the string it starts from.
 //
-// `pov` is immersion (v0.3) and is absent from `VIEWER_VIEWS`; asking for it
-// by string reaches the same phase-gated `SCHEMA`/`deferred` refusal
-// `render/index.ts` already owns, so there is exactly one deferral statement.
+// `pov` is IMMERSION (v0.3) and now that immersion lands it is a real view: the
+// POV path routes through `viewer/pov.ts` → `render/pov.ts`, which never imports
+// the diagram-projection module (C-POV-TRUE-GEOMETRY). It is NOT built through
+// `renderViews({target:"pov"})` — that would drag `project.ts` onto the viewer's
+// POV path; the viewer needs only the pure builder.
 import { ok, err } from "../core/result.js";
 import { renderViews } from "../render/index.js";
 import { renderControls } from "../render/controls.js";
 import { glyphSvg, placeGlyph, withOverlay } from "./glyph.js";
 import { saveWindowOverlaySvg } from "./saveWindow.js";
+import { correctiveGhostSvg } from "./correctiveGhost.js";
+import { renderPovView, parsePovLook } from "./pov.js";
+import { compareGhostsSvg } from "./compare.js";
 import { focusedLine } from "./session.js";
 import { VIEWER_VIEWS } from "./types.js";
 function unknownView(view) {
@@ -47,14 +53,24 @@ export function renderView(session, req) {
         return topdownView(session, line, req);
     if (req.view === "controls")
         return controlsViewOf(session, line, req);
-    if (req.view === "pov") {
-        // ONE deferral statement for `pov`, render/index.ts's own — this file
-        // does not restate the phase (ARCHITECTURE §6.4: one table, one source).
-        const deferred = renderViews({ road: session.road, lines: session.lines, target: "pov" });
-        if (!deferred.ok)
-            return deferred;
-    }
+    if (req.view === "pov")
+        return povViewOf(session, line, req);
     return unknownView(req.view);
+}
+/**
+ * The `pov` view (design/07 §5): a first-person pinhole projection of TRUE
+ * geometry, built by `render/pov.ts` (via `viewer/pov.ts`) — NOT through the
+ * diagram-projection path, so C-POV-TRUE-GEOMETRY holds structurally. The camera
+ * reads the cursor `instant.sample` verbatim (`limit_x`/`limit_y` consumed, not
+ * re-derived — C-POV-LIMIT-CONSISTENT), or a mid-corner default when the cursor
+ * is absent. `renderPovView` never throws (renderPov's catch-all).
+ */
+function povViewOf(session, line, req) {
+    const look = parsePovLook(req.look);
+    if (!look.ok)
+        return look;
+    const svg = renderPovView(session.road, line, req.instant ?? null, look.value);
+    return ok(Object.freeze({ view: "pov", line_id: line.line_id, svg }));
 }
 function topdownView(session, line, req) {
     const rendered = renderViews({
@@ -65,11 +81,17 @@ function topdownView(session, line, req) {
     if (!rendered.ok)
         return rendered;
     const instant = req.instant ?? null;
-    // Overlay layers, in painter's order: the save-window probe/glyph first (it
-    // is scene furniture), then the cursor glyph on top. Both are appended to the
-    // EXPORTED svg string, so `topdown` remains "the same picture as the exported
-    // figure, plus a glyph layer" (07 §2.3) and the export itself never changes.
-    const overlays = (req.saveWindow === undefined || req.saveWindow === null ? "" : saveWindowOverlaySvg(req.saveWindow)) +
+    // Overlay layers, in painter's order: the counterfactual scene furniture
+    // first (the corrective ghost, then the save-window probe/glyph), then the
+    // compare-mode ghost glyphs of the OTHER lines (07 §4.2), then the focused
+    // line's own cursor glyph on top. All are appended to the EXPORTED svg string,
+    // so `topdown` remains "the same picture as the exported figure, plus a glyph
+    // layer" (07 §2.3) and the export itself never changes. The corrective/
+    // save-window overlays stay the leading substrings they were in v0.2, so their
+    // overlay-isolation `replace()` gates are unaffected by the ghost layer.
+    const overlays = (req.correctiveGhost === undefined || req.correctiveGhost === null ? "" : correctiveGhostSvg(req.correctiveGhost)) +
+        (req.saveWindow === undefined || req.saveWindow === null ? "" : saveWindowOverlaySvg(req.saveWindow)) +
+        (req.compare === undefined || req.compare === null ? "" : compareGhostsSvg(session, req.compare, rendered.value.scene)) +
         (instant === null ? "" : glyphSvg(placeGlyph(instant, line, rendered.value.scene)));
     const svg = overlays === "" ? rendered.value.svg : withOverlay(rendered.value.svg, overlays);
     return ok(Object.freeze({ view: "topdown", line_id: line.line_id, svg }));

@@ -45,9 +45,23 @@ function lerp(a, b, alpha) {
 function wrapDeg(x) {
     return ((((x + 180) % 360) + 360) % 360) - 180;
 }
-/** Shortest-arc lerp in degrees (05 §3.2 `angle` rule — wrap-aware). */
+/**
+ * Shortest-arc lerp in degrees (05 §3.2 `angle` rule — wrap-aware).
+ *
+ * The sweep `a + wrapDeg(b−a)·alpha` takes the short arc, but a bracket that
+ * straddles the 0/360 seam (e.g. psi 359°→1°) leaves the sweep running past 360
+ * (359.5, 360, 360.5, …) — out of the record's range and a full 360° from the
+ * `b` endpoint the record hands back verbatim, so a query approaching `b` would
+ * jump. Snapping the sweep to the 360-representative nearest the linear chord
+ * fixes both: it lands **exactly** on `a` at alpha=0 and on `b` at alpha=1 (no
+ * endpoint discontinuity), blends *through* 0 for a seam-crossing bracket, and
+ * is a no-op for a signed sub-180° bracket (`phi`, `cmd_lean`), which never
+ * wraps and so must keep its own representative. `Math.round` is deterministic.
+ */
 function lerpAngleDeg(a, b, alpha) {
-    return a + wrapDeg(b - a) * alpha;
+    const swept = a + wrapDeg(b - a) * alpha; // shortest-arc sweep from `a`
+    const chord = a + (b - a) * alpha; // linear chord — the reference representative
+    return swept - 360 * Math.round((swept - chord) / 360);
 }
 /** Verbatim copy of one recorded sample (endpoint exactness — the pinned 32 fields). */
 function copySample(p) {

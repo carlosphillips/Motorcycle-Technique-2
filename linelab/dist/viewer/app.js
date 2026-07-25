@@ -22,11 +22,21 @@ import { advance, domainOf, initialStepper, jumpTo, pause, play, scenarioDomain,
 import { loadSession, lineOf, withFocus } from "./session.js";
 import { renderView } from "./views.js";
 import { saveWindowHudRows, saveWindowOverlay, saveWindowTicks } from "./saveWindow.js";
+import { correctiveGhostOverlay } from "./correctiveGhost.js";
+import { compareModel } from "./compare.js";
+import { parsePovLook } from "./pov.js";
 /** design/07 §3.4's placard, verbatim — the off-road badge's disclosure. */
 export const OFF_ROAD_PLACARD = "left the road — off-road behaviour not modelled";
 export function createApp(session) {
     const domain = scenarioDomain(session.lines, "t");
-    return Object.freeze({ session, stepper: initialStepper(domain), lock: "station", saveWindow: null });
+    return Object.freeze({
+        session,
+        stepper: initialStepper(domain),
+        lock: "station",
+        look: "heading",
+        saveWindow: null,
+        correctiveGhost: null
+    });
 }
 /**
  * design/07 §3.6's toggle. ON computes the overlay ONCE (one `saveWindow(line)`
@@ -42,6 +52,22 @@ export function toggleSaveWindow(app) {
         return app;
     const overlay = saveWindowOverlay(line);
     return Object.freeze({ ...app, saveWindow: overlay.ok ? overlay.value : null });
+}
+/**
+ * design/07 §3.5's corrective-ghost toggle. ON computes the ghost ONCE (one
+ * `correctiveShot(line)` call for the focused line); OFF drops it. The toggle is
+ * inert — stays null — when the focused line has no ran-wide corrective (07
+ * §3.5: "the toggle is inert for that line"), and a refusal likewise leaves it
+ * off (never-throw).
+ */
+export function toggleCorrectiveGhost(app) {
+    if (app.correctiveGhost !== null)
+        return Object.freeze({ ...app, correctiveGhost: null });
+    const line = lineOf(app.session, app.session.focus);
+    if (line === null)
+        return app;
+    const ghost = correctiveGhostOverlay(line);
+    return Object.freeze({ ...app, correctiveGhost: ghost.ok ? ghost.value : null });
 }
 /**
  * The scrubber's extent: the whole scenario, not the focused line (07 §3.4 —
@@ -90,7 +116,10 @@ export function frameOf(app) {
             hud: [],
             bookmarks: [],
             save_window_ticks: [],
+            corrective_ghost: null,
             views: [],
+            pov: null,
+            compare: null,
             legend: legendOf(app),
             terminal: "",
             problems: ["no drawable line in this envelope"]
@@ -107,17 +136,37 @@ export function frameOf(app) {
         return null;
     })();
     const instant = queried === null ? null : queried.instant;
-    // 07 §3.6: the overlay belongs to the FOCUSED line; a stale overlay from a
-    // previous focus is dropped rather than drawn against the wrong trajectory.
+    // 07 §3.5/§3.6: each overlay belongs to the FOCUSED line; a stale overlay
+    // from a previous focus is dropped rather than drawn against the wrong
+    // trajectory.
     const overlay = app.saveWindow !== null && app.saveWindow.line_id === line.line_id ? app.saveWindow : null;
+    const ghost = app.correctiveGhost !== null && app.correctiveGhost.line_id === line.line_id ? app.correctiveGhost : null;
+    // 07 §4 compare model — every line's OWN state at the shared lock coordinate,
+    // computed from the focused line's instant (C-COMPARE, no shared state). Drives
+    // the top-down ghost glyphs of the non-focused lines; a single-line envelope
+    // yields no ghosts, so its top-down stays byte-identical to the v0.2 picture.
+    const compare = instant === null ? null : compareModel(app.session, instant, app.lock);
     const views = [];
     for (const view of ["topdown", "controls"]) {
-        const r = renderView(app.session, { view, instant, line_id: line.line_id, saveWindow: overlay });
+        const r = renderView(app.session, {
+            view,
+            instant,
+            line_id: line.line_id,
+            saveWindow: overlay,
+            correctiveGhost: ghost,
+            compare: view === "topdown" ? compare : null
+        });
         if (r.ok)
             views.push(r.value);
         else
             problems.push(`${view}: ${r.error.message}`);
     }
+    // 07 §5 the POV view (its own field, not in `views`): the focused line at the
+    // cursor under `app.look`. `renderPovView` never throws and `app.look` is a
+    // valid closed-set value, so this Result is always ok — a pov failure would
+    // only surface as a `fallbackSvg`, never a frame `problem`.
+    const povR = renderView(app.session, { view: "pov", instant, line_id: line.line_id, look: app.look });
+    const pov = povR.ok ? povR.value : null;
     // 07 §3.6's HUD rows ride in the Verdict group, after the line's own rows.
     // `instant.sample.t` is the cursor's run time on BOTH scrubber axes, so the
     // countdown reads the same instant the rest of the HUD does.
@@ -129,7 +178,10 @@ export function frameOf(app) {
         hud: queried === null ? [] : Object.freeze([...queried.rows, ...saveRows]),
         bookmarks: bookmarksOf(line),
         save_window_ticks: overlay === null ? [] : saveWindowTicks(overlay),
+        corrective_ghost: ghost,
         views: Object.freeze(views),
+        pov,
+        compare,
         legend: legendOf(app),
         terminal: terminalBadge(app),
         problems: Object.freeze(problems)
@@ -170,6 +222,15 @@ export function flipAxis(app) {
 }
 export function setLock(app, lock) {
     return Object.freeze({ ...app, lock });
+}
+/**
+ * 07 §5.2's `look` camera toggle. The closed set is validated once, here: an
+ * unknown value leaves `look` unchanged (the viewer never crashes on a bad
+ * toggle — a bad `--look` was already refused `SCHEMA` at the CLI/scene door).
+ */
+export function setLook(app, look) {
+    const parsed = parsePovLook(look);
+    return parsed.ok ? Object.freeze({ ...app, look: parsed.value }) : app;
 }
 export function focusLine(app, lineId) {
     return lineOf(app.session, lineId) === null ? app : Object.freeze({ ...app, session: withFocus(app.session, lineId) });
@@ -239,6 +300,9 @@ export function boot(host, payloadText, engineSemver) {
         const f = frameOf(current);
         for (const v of f.views)
             host.byId(v.view)?.setHtml(v.svg);
+        // 07 §6.1's right pane — the pov view rides its own field (not `f.views`)
+        if (f.pov !== null)
+            host.byId("pov")?.setHtml(f.pov.svg);
         host.byId("hud")?.setHtml(hudHtml(f.hud));
         host.byId("legend")?.setHtml(legendHtml(f.legend));
         // the range control carries a 0..1 FRACTION of the domain (see page.ts) —
@@ -279,6 +343,10 @@ export function boot(host, payloadText, engineSemver) {
     host.byId("lock")?.on("change", () => {
         const raw = host.byId("lock")?.getValue() ?? "station";
         apply(setLock(current, raw === "time" ? "time" : "station"));
+    });
+    // 07 §5.2's `look` toggle beside the pov pane (07 §6.1)
+    host.byId("look")?.on("change", () => {
+        apply(setLook(current, host.byId("look")?.getValue() ?? "heading"));
     });
     host.byId("bookmarks")?.on("change", () => {
         const token = host.byId("bookmarks")?.getValue() ?? "";

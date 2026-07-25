@@ -277,14 +277,28 @@ describe("per-view boot smoke (00 §3 phase table)", () => {
     expect(withCursor.value.svg.replace(overlay, "")).toBe(bare.value.svg);
   });
 
-  it("`pov` is still phase-gated — one deferral statement, render/'s own", () => {
-    const r = renderView(session(), { view: "pov", instant: null });
-    expect(r.ok).toBe(false);
-    if (!r.ok) {
-      expect(r.error.code).toBe("SCHEMA");
-      expect(r.error.deferred).toBe("immersion (v0.3)");
+  it("`pov` is a first-class view now that immersion (v0.3) landed — it renders true geometry", () => {
+    const s = session();
+    const hud = hudAt(s, s.focus, { s: 20 });
+    expect(hud.ok).toBe(true);
+    const instant = hud.ok ? hud.value.instant : null;
+    const r = renderView(s, { view: "pov", instant });
+    expect(r.ok, r.ok ? "" : JSON.stringify(r.error)).toBe(true);
+    if (r.ok) {
+      expect(r.value.view).toBe("pov");
+      expect(r.value.svg).toContain('data-view="pov"');
+      // the limit-point marker invariant survives at the viewer layer (D40)
+      expect((r.value.svg.match(/data-marker="limit_point"/g) ?? []).length).toBe(1);
     }
-    expect(VIEWER_VIEWS as readonly string[]).not.toContain("pov");
+    // and `pov` now joins the closed view set the viewer offers
+    expect(VIEWER_VIEWS as readonly string[]).toContain("pov");
+    // an unknown look is a closed-set SCHEMA refusal (D8), NOT a deferral
+    const bad = renderView(s, { view: "pov", instant, look: "chase" });
+    expect(bad.ok).toBe(false);
+    if (!bad.ok) {
+      expect(bad.error.code).toBe("SCHEMA");
+      expect(bad.error.detail?.["reason"]).toBe("unknown_look");
+    }
   });
 
   it("an unknown view name is SCHEMA/unknown_view naming the views that exist", () => {

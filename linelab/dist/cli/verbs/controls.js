@@ -45,17 +45,10 @@ export function controlsView(input) {
     if (input.loadedText === undefined) {
         return errOutcome(schemaErr("render", "render needs an <envelope.json> argument", "render_input_missing"));
     }
-    // `pov` stays phase-gated on this route too (ARCHITECTURE §6.4's table) —
-    // naming it beside `controls` must not smuggle it past the deferral.
-    if (parsed.value.views !== undefined && parsed.value.views.includes("pov")) {
-        return errOutcome({
-            code: "SCHEMA",
-            at: "render.views",
-            message: 'render target "pov" is not shipped yet',
-            deferred: "immersion (v0.3)",
-            detail: { reason: "deferred" }
-        });
-    }
+    // `pov` SHIPS in v0.3 (design/07 §5) — naming it beside `controls` composes
+    // the two views: the non-controls half (topdown and/or pov) is produced by
+    // the `render` verb itself (one renderer, no second code path), exactly as the
+    // topdown half already is, so the phase decision for `pov` stays in ONE place.
     const j = parseJson(input.loadedText, "input");
     if (!j.ok)
         return errOutcome(j.error);
@@ -106,8 +99,13 @@ export function controlsView(input) {
         writes.push({ path, content: renderControls(line, strip, cursor) });
         files.push(path);
     }
-    const alsoTopdown = parsed.value.views !== undefined && parsed.value.views.includes("topdown");
-    if (!alsoTopdown) {
+    // Compose with the other render views: `topdown` and/or `pov`, whichever the
+    // `--views` set also names, are produced by the `render` verb itself (it reads
+    // the same `--views` from argv and honours the requested subset). `controls`
+    // alone → no delegation.
+    const requestedViews = parsed.value.views ?? [];
+    const alsoRender = requestedViews.includes("topdown") || requestedViews.includes("pov");
+    if (!alsoRender) {
         return okOutcome({
             figure_id: envelope.figure_id,
             views: ["controls"],
@@ -116,17 +114,23 @@ export function controlsView(input) {
             controls: files
         }, writes, EXIT.OK);
     }
-    const topdown = renderVerb({ loadedText: input.loadedText, argv: input.argv });
-    if (typeof topdown.stdout === "object" && topdown.stdout !== null && topdown.stdout.ok === false) {
-        return topdown;
+    const rendered = renderVerb({ loadedText: input.loadedText, argv: input.argv });
+    if (typeof rendered.stdout === "object" && rendered.stdout !== null && rendered.stdout.ok === false) {
+        return rendered;
     }
-    const topValue = topdown.stdout.value;
+    const renderedValue = rendered.stdout.value;
+    // report the views actually produced, in layout order (topdown, controls, pov)
+    const producedViews = [
+        ...(requestedViews.includes("topdown") ? ["topdown"] : []),
+        "controls",
+        ...(requestedViews.includes("pov") ? ["pov"] : [])
+    ];
     return okOutcome({
-        ...topValue,
-        views: ["topdown", "controls"],
+        ...renderedValue,
+        views: producedViews,
         window: { from_s: strip.from, to_s: strip.to },
         ...(cursor !== undefined ? { cursor_s: cursor } : {}),
         controls: files
-    }, [...(topdown.writes ?? []), ...writes], topdown.exit);
+    }, [...(rendered.writes ?? []), ...writes], rendered.exit);
 }
 //# sourceMappingURL=controls.js.map

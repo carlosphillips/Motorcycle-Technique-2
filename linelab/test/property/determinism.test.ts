@@ -14,9 +14,8 @@
 //
 // Assertion discipline: byte equality on the exact strings the tool emits —
 // the CLI's own JSON.stringify spelling — never a paraphrased re-encoding.
-// The cross-process leg spawns the BUILT CLI (dist/); the phase-exit CI run
-// builds before testing (package.json `bless`/`cli` both require it, and
-// test/analytic/bless.test.ts builds in its beforeAll).
+// The cross-process leg spawns the BUILT CLI (dist/), which test/globalSetup.ts
+// builds exactly once before the worker pool starts — this file never builds.
 
 import { describe, it, expect } from "vitest";
 import { execFileSync } from "node:child_process";

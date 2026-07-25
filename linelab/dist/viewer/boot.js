@@ -1,5 +1,16 @@
-// viewer/boot.ts — the BROWSER entry point, and the only module in src/ with
-// a top-level side effect.
+// viewer/boot.ts — the BROWSER entry point (design/07 §6.2), and the third
+// declared side-effect entry point in src/.
+//
+// THE EXEMPTION, STATED ONCE, HERE. Every other module in src/ is importable
+// without consequence; this one runs `bootFromPage()` at module scope, because
+// that is what `<script type="module">` means — the browser has no other way to
+// start an application. `test/meta/imports.test.ts` pins the set of files
+// allowed a top-level call to EXACTLY `{cli/main.ts, cli/bless.ts,
+// viewer/boot.ts}` and fails on any fourth, so this is a declared door rather
+// than a drift. The side effect is also inert off-browser: under Node
+// `browserHost()` returns null and `bootFromPage()` returns a string having
+// done nothing, which is why every test can import this module freely.
+// Recorded as a ratification item against design/07 §6.2.
 //
 // `<script type="module" src="<module-root>/viewer/boot.js">` (viewer/page.ts)
 // loads this file; its relative imports pull in the compiled `core/ road/

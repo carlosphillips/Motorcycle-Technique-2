@@ -202,7 +202,7 @@ const PINS: Record<FigureId, MetricPins> = {
   "fig-08-02": { width_ratio: [0.583], straight_share: 0.598, road_ink: 0.377, frame_aspect: 0.872, verdict: "fail", orient: 0 },
   "fig-08-03": { width_ratio: [0.583], straight_share: 0.598, road_ink: 0.377, frame_aspect: 0.872, verdict: "fail", orient: 0 },
   "fig-08-04": { width_ratio: [0.56], straight_share: 0.459, road_ink: 0.368, frame_aspect: 0.772, verdict: "warn", orient: 0 },
-  "fig-08-05": { width_ratio: [0.583, 0.292, 0.583], straight_share: 0.323, road_ink: 0.43, frame_aspect: 0.719, verdict: "fail", orient: 0 },
+  "fig-08-05": { width_ratio: [0.583, 0.292, 0.583], straight_share: 0.516, road_ink: 0.373, frame_aspect: 0.86, verdict: "fail", orient: 0 },
   "fig-08-06": { width_ratio: [0.583, 0.583, 0.583, 0.583], straight_share: 0.365, road_ink: 0.173, frame_aspect: 0.737, verdict: "fail", orient: 90 }
 };
 

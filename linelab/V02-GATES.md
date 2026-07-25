@@ -1,5 +1,279 @@
 # V02-GATES — the v0.2 PHASE-EXIT gate sweep
 
+## CURRENT STATE — 2026-07-24 (build race fixed; v0.2 phase exit MET, green in ONE run)
+
+**Definitive v0.2 exit-gate tally: 26 GREEN / 0 AMBER / 0 RED.**
+
+This section is the single authority. Every block below it (the earlier "POST-RUN",
+"POST-FIX", and "original audit" sweeps) is **SUPERSEDED** and kept only for
+provenance — do not read their tallies (25/1/0, 24/0/2, 12/1/13) or their
+A-RECIPE-C AMBER as current.
+
+**The test build is now DETERMINISTIC.** `dist/` is built exactly once, in a vitest
+`globalSetup` (`test/globalSetup.ts` → `test/helpers/build.ts`), before the worker
+pool starts. No test file builds in its own `beforeAll` anymore, so no build ever
+rewrites `dist/` while a sibling spawns `node dist/cli/main.js` against it. The
+build race that produced phantom reds throughout this project — empty stdout /
+`SyntaxError: Unexpected end of JSON input` in whichever CLI-spawning file was
+unlucky under the parallel thread pool — is now **structurally impossible**, not
+merely rare. (Before: ~9 files ran `npm run build` in `beforeAll`, two behind a
+stale-mtime guard, plus two sleep-3s retry masks. After: one globalSetup build,
+mtime-guarded so a warm tree writes nothing, and the retry masks are gone.)
+
+**Suite (this run, measured):** `npm run typecheck` → exit 0. `npx vitest run` (full)
+run **three times back-to-back**, all three identical and green:
+
+| run | Test Files | Tests | duration |
+|---|---|---|---|
+| 1 | 46 passed (46) | 1311 passed \| 4 todo (1315) | 169.19 s |
+| 2 | 46 passed (46) | 1311 passed \| 4 todo (1315) | 172.17 s |
+| 3 | 46 passed (46) | 1311 passed \| 4 todo (1315) | 170.70 s |
+
+Zero failures in every run. The 4 `todo` are the design-declared open seams (not
+silent skips), all gated on the A-DOUBLEAPEX / believed-band pins:
+`G-APEXLIST` (`test/golden/gates.test.ts`), `G-8.5-RED as designed`
+(`test/golden/scenes.test.ts`), and the two rubric seams
+(`A-CATALOGUE` `hold_wide_for_sight` PASS witness and `A-CHAIN-GREEN`,
+`test/oracle/rubric.test.ts`).
+
+**The two formerly not-fully-green gates are now GREEN:**
+- **`C-RECOMPUTE-BUDGET` → GREEN** (was RED): the `solve/run.ts` warm-cache
+  mistake-line fix landed; `fig-08-06`'s warm all-lines recompute meets the 300 ms
+  budget in the full run (`test/cli/controls.test.ts` 10/10 in every run above).
+- **`A-RECIPE-C` → GREEN** (was AMBER): `adj-recipe-c` amended design/09 §3.6 and
+  08 §6(c) to the ratified `adj-vis` hold-wide signature; `test/cli/serve.test.ts`'s
+  two former `it.fails` clauses are now real green tripwires (24/24), and its
+  clause-1 case no longer load-timeout-flakes now that the build race is gone
+  (serve.test.ts ~34 s in every run above, inside its explicit per-test timeouts).
+
+### The 26 v0.2 exit gates (all GREEN this run)
+
+design/00 §3 v0.2 row = design/09 §10 v0.2 list; anchors are design/09 line refs.
+
+| gate | design anchor | enforcing test (file :: name-fragment) | result | note |
+|---|---|---|---|---|
+| G2 | 01 §2 L29-32 | `viewer/hud.test.ts` :: C-HUD-EQUALS-STATEAT (+ byte-identity) | **GREEN** | HUD populated entirely from one `stateAt`; a computed row can't pass |
+| G3 | 01 §2 L33-36 | `viewer/viewer.test.ts` :: stepper + `contract/viewer-goals.test.ts` (0 integrate calls) | **GREEN** | 200+-sample scrub adds 0 `core/integrate` calls |
+| G5 (inspection half) | 01 §2 L44-48 | `contract/viewer-goals.test.ts` (scrub a real `premature` line) | **GREEN** | mistake line scrubbed trajectory + HUD |
+| C-STATEAT-LAWS | 09 §6 L1886-1890 | `contract/stateAt.test.ts` | **GREEN** | endpoint exactness, 3 interp families, domain refusals, derived block |
+| C-HUD-EQUALS-STATEAT | 09 §6 L1919-1921 | `viewer/hud.test.ts` | **GREEN** | byte-identity in-proc HUD vs spawned `state` |
+| C-BOOKMARKS | 09 §6 L1926-1927 | `viewer/viewer.test.ts` + `contract/stateAt.test.ts` + `cli/controls.test.ts` | **GREEN** | jump points === events array; no probe/tau mark leaks |
+| C-ONE-CORE | 09 §6 L1957-1964 | `meta/imports.test.ts` (served-graph one `integrate.js`) + `viewer/onecore.test.ts` | **GREEN** | bundle-graph lint (real, not grep) |
+| C-RECOMPUTE-BUDGET | 09 §6.1 L2013-2018 | `cli/controls.test.ts` :: C-RECOMPUTE-BUDGET | **GREEN** | **was RED** — `run.ts` warm-cache mistake fix; `bad.cache="hit"`, budget met (deterministic now the build race is gone) |
+| A-RECIPE-C | 09 §4 L1435-1437 | `cli/serve.test.ts` :: A-RECIPE-C (24) | **GREEN** | **was AMBER** — `adj-recipe-c`: the two clauses are now real green tripwires on the hold-wide signature (no `it.fails`); clause-1 no longer load-flakes |
+| G-STANDING-BITES | 09 §10 L2312-2327 | `contract/standing.test.ts` | **GREEN** | `fx-standing-straight` named rung-3 → genuine set-equality |
+| G-STANDING-NO-HASH-MOVE | 09 §10 L2328-2331 | `contract/standing.test.ts` (annex A/B) | **GREEN** | real A/B: `spec_hash` + every `result_hash` + all 6 scenes byte-identical |
+| A-STANDING-WARN-BAND | 09 §4 L1687 | `contract/standing.test.ts` (3 arms) | **GREEN** | `adj-warn-band` reachable 3-arm gate |
+| A-STANDING-RESERVED | 09 §4 L1688-1689 | `contract/standing.test.ts` | **GREEN** | rung 4, reserve rows pass, 0 integrate calls |
+| A-STANDING-LADDER-CUMULATIVE | 09 §4 L1690-1693 | `contract/standing.test.ts` | **GREEN** | 250-case product vs retyped 05 §6.4 table |
+| A-STANDING-REFUSAL | 09 §4 L1694-1695 | `contract/standing.test.ts` | **GREEN** | refusal → `standing:null`, `refused:true`, no throw |
+| A-RESERVE-CHECKS-RESOLVE | 09 §4 L1696-1699 | `contract/standing.test.ts` | **GREEN** | all 4 typed errors on code + reason |
+| A-LADDER-PROSE | 09 §4 L1700-1707 | `contract/standing.test.ts` | **GREEN** | placard byte-identical across shipped surfaces |
+| A-STANDING-TOMBSTONE | 09 §4 L1505-1509 | `contract/standing.test.ts` | **GREEN** | 4 struck names → `struck_by_decision`, never deferred |
+| C-SAVEWIN-HUD | 09 §10 L2332-2334 | `viewer/saveWindow.test.ts` | **GREEN** | overlay built; every field === returned object |
+| C-SAVEWIN-CLIP | 09 §10 L2335-2338 | `viewer/saveWindow.test.ts` + `viewer/correctiveGhost.test.ts` | **GREEN** | probe/ghost clipped at `s*` |
+| C-SAVEWIN-NO-INK | 09 §10 L2339-2342 | `viewer/overlayHash.test.ts` (v0.2 leg) + `contract/wire.test.ts` (v0.1 sentinel) | **GREEN** | byte-identical export toggle on/off × 6 scenes |
+| C-SAVEWIN-REFUSE-COARSE | 09 §10 L2347-2349 | `contract/saveWindow.test.ts` | **GREEN** | `--scan-ds 2.0` → `SCHEMA/scan_ds_too_coarse`, no value |
+| C-SAVEWIN-BUDGET | 09 §10 L2343-2346 | `contract/saveWindow.test.ts` | **GREEN** | timing + `⌈domain/scan_ds⌉+5+≤8` bound |
+| G-SAVEWIN-GRID | 09 §3.2 L426-430 | `contract/saveWindow.test.ts` | **GREEN** | real 0.25/0.5/1.0 m suite; `adj-tshot-grid` v_max≥10 scope |
+| A-SAVEWIN-PLACARD | 09 §4 L1502-1504 | `cli/inspection.test.ts` | **GREEN** | `explain save-window` un-deferred; placard byte-identical |
+| A-SAVEWIN-VERB | 09 §4 L1500-1501 | `cli/inspection.test.ts` + `contract/saveWindow.test.ts` | **GREEN** | CLI stdout byte-equals library `saveWindow` |
+
+---
+
+## SUPERSEDED HISTORY (provenance only — not current state)
+
+The three sweeps below are earlier snapshots, kept for provenance. Their tallies
+(25/1/0, 24/0/2, 12/1/13), their A-RECIPE-C AMBER, and their references to the
+build-race flake and the fig-08-05 test-lag reds are all **corrected by the CURRENT
+STATE section above** (26/0/0, A-RECIPE-C GREEN, flake fixed, one fully-green run).
+
+> **POST-RUN UPDATE — 2026-07-24 (judge-commit + full v0.2 sweep, this run).**
+> This run committed fresh judge records for the three re-baked figures
+> (`fig-08-03/04/05`) and ran the full suite ONCE. **Both previously-RED v0.2 gates were
+> addressed:**
+> - **`C-RECOMPUTE-BUDGET` → GREEN.** The `solve/run.ts` mistake-line warm-cache fix
+>   landed: on the fig-08-06 `premature@all` chain the warm path now reports
+>   `good.cache="hit"` AND `bad.cache="hit"` (the mistake line is no longer re-`compileMistake`d),
+>   and the all-lines warm recompute meets the 300 ms budget in the full run
+>   (`test/cli/controls.test.ts` 10/10 green in-suite).
+> - **`A-RECIPE-C` → AMBER.** Its two never-asserted clauses are now asserted VERBATIM and
+>   unweakened, but the engine MEASURES a CONTRADICTION of the design letter's direction on
+>   this fixture (geom approach-span `min(sight_ride_m−ssd_m)` ≈ 18.84 m > vis ≈ 12.61 m;
+>   geom corner-threshold speed ≈ 49.26 km/h < vis 60.00) — the same `adj-vis` hold-wide
+>   mechanism (V1's speed governor never binds; V2 negotiates the blind corner under a wide
+>   commitment). So clauses 2/3 ride `it.fails` as a tracked, recorded design-letter
+>   deviation (a tripwire that reddens the day the engine ever satisfies the letter), NOT
+>   coverage theater. This is the AMBER definition exactly: passes, on a documented
+>   deviation. Filed in DEVIATIONS this run.
+>
+> **Final v0.2 exit-gate tally: 25 GREEN / 1 AMBER / 0 RED.**
+>
+> **Suite (this run, measured):** `npm run typecheck` → exit 0. `npx vitest run` (full,
+> once) → **4 failed / 1307 passed / 4 todo (1315); 171.25 s.** Of the 4 red, **none is a
+> real v0.2-gate regression:**
+> - **1 touches a v0.2 gate and is a load-timeout FLAKE, not a real failure.**
+>   `test/cli/serve.test.ts` A-RECIPE-C "clause 1 — both solves succeed" hit the default
+>   5000 ms test timeout under full-suite parallel load — that one `it` (serve.test.ts:467)
+>   carries no explicit timeout while its siblings carry 60–180 s. Re-run in ISOLATION:
+>   `npx vitest run test/cli/serve.test.ts` → **24/24 passed** (clause 1 = 3730 ms; clauses
+>   2/3 `it.fails` pass as expected). A one-line explicit timeout on serve.test.ts:467
+>   removes it (out of this task's file grant — flagged).
+> - **3 are v0.1 figure/golden gates — NOT v0.2 exit gates** — all `fig-08-05`-specific, all
+>   consequences of the fig-08-05 re-bake + `adj-fig-08-05` scene amendment landing while
+>   their test expectations lag (all out of this task's file grant — flagged for the owning
+>   agents):
+>   · `test/cli/scene.test.ts` fig-08-05 lowerScene — pins the PRE-amendment scene text
+>     (`correction@late` / "corrects late" / "corrects too late" note); the scene now reads
+>     `run_wide_detect@late` / "ran off before reacting" (adj-fig-08-05). → WP-13 re-pin.
+>   · `test/golden/scenes.test.ts` G-8.5-RED — pins `late` as a refusal; the engine now
+>     SOLVES `late` (runoff, `result_hash 1a5294`). adj-fig-08-05 already amended the design
+>     letter (09 §3.2/§4) to the solved-runoff truth; the golden-owner re-pin is the residual.
+>   · `test/render/gate.test.ts` fig-08-05 PROPORTION — the hardcoded `PINS` constant
+>     (straight_share 0.323 / road_ink 0.43 / frame_aspect 0.719) is the OLD road-only bake;
+>     the re-baked manifest is 0.516 / 0.373 / 0.860. → WP-17 re-pin. (Note: fig-08-05's
+>     byte-identity and T-JUDGE-RECORD arms both PASS — only the stale value pins fail.)
+>
+> **What the re-bake DID clear:** all six `re-bake is byte-identical` arms PASS
+> (fig-08-03/04/05 SVGs are current), all six `T-JUDGE-RECORD` arms PASS (fig-08-04
+> `spec_hash` tripwire now `30fcb5`; fig-08-03/04 byte-identity + proportion green), all six
+> judge records grade overall **pass**, `test/hash/tripwire.test.ts` green, and
+> `test/cli/schema.test.ts` deferred-token green (`serve`/`sweep` are in `SHIPPED_VERBS`).
+> No v0.2 gate regressed.
+>
+> **Correction to the POST-FIX block below (the fig-08-04 `spec_hash` arrow was backwards).**
+> Recomputed on this run's engine: `specHash(lowerScene(current fig-08-04.scene))` =
+> **`30fcb5`** (the adj-fig84 edit — matches the current `manifest.json` + this run's
+> re-committed judge record); the pre-edit scene hashed **`1a9dd5`** (the stale value the
+> committed judge.json carried before I rewrote it). So the move is **`1a9dd5 → 30fcb5`**,
+> NOT "`30fcb5 → 1a9dd5`". The POST-FIX block below and DEVIATIONS.md both stated it
+> backwards; corrected here and in DEVIATIONS.
+>
+> **Is v0.2 phase exit MET?** The v0.2 exit-gate SET is satisfied on the merits — **no v0.2
+> exit gate is RED** (25 GREEN / 1 AMBER / 0 RED), and the one AMBER (A-RECIPE-C) is a
+> documented design-letter deviation now recorded in DEVIATIONS, the same class as the
+> already-ratified `adj-vis`/`adj-feasibility` recipe pins. But a single **fully-green CI
+> run** is not yet achievable, ONLY because of (a) the A-RECIPE-C clause-1 load-timeout
+> flake and (b) the three `fig-08-05` v0.1 test-lag reds above — all out of this task's file
+> grant, none a v0.2 gate. Once the WP-13 / WP-17 / golden owners land the three test
+> re-pins and serve.test.ts:467 gets an explicit timeout, the full suite is green and the
+> phase exits cleanly.
+>
+> **The 26 v0.2 exit gates (design/00 §3 v0.2 row = design/09 §10 v0.2 list; every named
+> test GREEN this run unless noted; anchors are design/09 line refs from the audit below):**
+>
+> | gate | design anchor | enforcing test (file :: name-fragment) | result | note |
+> |---|---|---|---|---|
+> | G2 | 01 §2 L29-32 | `viewer/hud.test.ts` :: C-HUD-EQUALS-STATEAT (+ byte-identity) | **GREEN** | HUD populated entirely from one `stateAt`; computed row can't pass |
+> | G3 | 01 §2 L33-36 | `viewer/viewer.test.ts` :: stepper + `contract/viewer-goals.test.ts` (0 integrate calls) | **GREEN** | 200+-sample scrub adds 0 `core/integrate` calls |
+> | G5 (inspection half) | 01 §2 L44-48 | `contract/viewer-goals.test.ts` (scrub a real `premature` line) | **GREEN** | mistake line scrubbed trajectory + HUD |
+> | C-STATEAT-LAWS | 09 §6 L1886-1890 | `contract/stateAt.test.ts` (33) | **GREEN** | endpoint exactness, 3 interp families, domain refusals, derived block |
+> | C-HUD-EQUALS-STATEAT | 09 §6 L1919-1921 | `viewer/hud.test.ts` (12) | **GREEN** | byte-identity in-proc HUD vs spawned `state` |
+> | C-BOOKMARKS | 09 §6 L1926-1927 | `viewer/viewer.test.ts` + `contract/stateAt.test.ts` + `cli/controls.test.ts` | **GREEN** | jump points === events array; no probe/tau mark leaks |
+> | C-ONE-CORE | 09 §6 L1957-1964 | `meta/imports.test.ts` (served-graph one `integrate.js`) + `viewer/onecore.test.ts` | **GREEN** | bundle-graph lint (real, not grep) |
+> | C-RECOMPUTE-BUDGET | 09 §6.1 L2013-2018 | `cli/controls.test.ts` :: C-RECOMPUTE-BUDGET | **GREEN** | **was RED** — `run.ts` warm-cache mistake fix; `bad.cache="hit"`, budget met |
+> | A-RECIPE-C | 09 §4 L1435-1437 | `cli/serve.test.ts` :: A-RECIPE-C (24) | **AMBER** | **was RED (weak)** — clauses 2/3 now VERBATIM via `it.fails` = MEASURED CONTRADICTION (adj-vis); clause-1 full-run timeout is a load flake (24/24 isolated) |
+> | G-STANDING-BITES | 09 §10 L2312-2327 | `contract/standing.test.ts` | **GREEN** | **was AMBER** — `fx-standing-straight` named rung-3 → genuine set-equality |
+> | G-STANDING-NO-HASH-MOVE | 09 §10 L2328-2331 | `contract/standing.test.ts` (annex A/B) | **GREEN** | **was RED (weak)** — real A/B: `spec_hash` + every `result_hash` + all 6 scenes byte-identical |
+> | A-STANDING-WARN-BAND | 09 §4 L1687 | `contract/standing.test.ts` (3 arms) | **GREEN** | **was it.todo** — `adj-warn-band` reachable 3-arm gate |
+> | A-STANDING-RESERVED | 09 §4 L1688-1689 | `contract/standing.test.ts` | **GREEN** | rung 4, reserve rows pass, 0 integrate calls |
+> | A-STANDING-LADDER-CUMULATIVE | 09 §4 L1690-1693 | `contract/standing.test.ts` | **GREEN** | 250-case product vs retyped 05 §6.4 table |
+> | A-STANDING-REFUSAL | 09 §4 L1694-1695 | `contract/standing.test.ts` | **GREEN** | refusal → `standing:null`, `refused:true`, no throw |
+> | A-RESERVE-CHECKS-RESOLVE | 09 §4 L1696-1699 | `contract/standing.test.ts` | **GREEN** | all 4 typed errors on code + reason |
+> | A-LADDER-PROSE | 09 §4 L1700-1707 | `contract/standing.test.ts` | **GREEN** | placard byte-identical across shipped surfaces |
+> | A-STANDING-TOMBSTONE | 09 §4 L1505-1509 | `contract/standing.test.ts` | **GREEN** | 4 struck names → `struck_by_decision`, never deferred |
+> | C-SAVEWIN-HUD | 09 §10 L2332-2334 | `viewer/saveWindow.test.ts` | **GREEN** | **was RED (no impl)** — overlay built; every field === returned object |
+> | C-SAVEWIN-CLIP | 09 §10 L2335-2338 | `viewer/saveWindow.test.ts` + `viewer/correctiveGhost.test.ts` | **GREEN** | **was RED (no impl)** — probe/ghost clipped at `s*` |
+> | C-SAVEWIN-NO-INK | 09 §10 L2339-2342 | `viewer/overlayHash.test.ts` (v0.2 leg) + `contract/wire.test.ts` (v0.1 sentinel) | **GREEN** | **was RED (weak)** — byte-identical export toggle on/off × 6 scenes |
+> | C-SAVEWIN-REFUSE-COARSE | 09 §10 L2347-2349 | `contract/saveWindow.test.ts` | **GREEN** | **was RED (no test)** — `--scan-ds 2.0` → `SCHEMA/scan_ds_too_coarse`, no value |
+> | C-SAVEWIN-BUDGET | 09 §10 L2343-2346 | `contract/saveWindow.test.ts` | **GREEN** | **was RED (no test)** — timing + `⌈domain/scan_ds⌉+5+≤8` bound |
+> | G-SAVEWIN-GRID | 09 §3.2 L426-430 | `contract/saveWindow.test.ts` | **GREEN** | **was RED (scratch)** — real 0.25/0.5/1.0 m suite; `adj-tshot-grid` v_max≥10 scope |
+> | A-SAVEWIN-PLACARD | 09 §4 L1502-1504 | `cli/inspection.test.ts` | **GREEN** | **was RED** — `explain save-window` un-deferred; placard byte-identical |
+> | A-SAVEWIN-VERB | 09 §4 L1500-1501 | `cli/inspection.test.ts` + `contract/saveWindow.test.ts` | **GREEN** | **was RED (theater)** — CLI stdout byte-equals library `saveWindow` |
+>
+> ─────────────────────────────────────────────────────────────────────────────
+> The POST-FIX block (2026-07-24, earlier the same day) follows for provenance; it is
+> SUPERSEDED by the POST-RUN block above (its 24/0/2 tally and its backwards fig-08-04 arrow
+> are both corrected above).
+
+> **POST-FIX UPDATE — 2026-07-24 (SUPERSEDED — see the POST-RUN block above).** The original audit below (12 GREEN /
+> 1 AMBER / 13 RED) predates the v0.2 build-out: since then the entire save-window
+> surface was built, the standing suites landed, `C-ONE-CORE` got its real
+> bundle-graph lint, `G3`/`G5` got `test/contract/viewer-goals.test.ts`, the
+> `serve`/`sweep` deferred-token break was fixed, `explain save-window` was
+> un-deferred, and this run applied the four AMEND-DESIGN adjudications
+> (`adj-savewin-table`, `adj-tshot-grid`, `adj-warn-band`, `adj-fig84`). Verified
+> post-fix state: **24 GREEN / 0 AMBER / 2 RED.**
+>
+> **Suite (this run, measured):** `npm run typecheck` → exit 0. `npx vitest run`
+> (full) → **4–5 files / 9–10 tests failed, ~1296 passed, 4 todo (1309); ~174 s**
+> (the range is the flake variance below). Every failure is a figure re-bake /
+> cache / flake, NONE a v0.2 gate regression from the amendments.
+>
+> DETERMINISTIC red (7 tests across 4 files):
+> - `test/render/gate.test.ts` — fig-08-03 / fig-08-04 / fig-08-05 byte-identity +
+>   proportion(fig-08-05) — the committed figure SVGs are STALE (fig-08-03 from the
+>   solver run's fifty_pence fix, fig-08-04 from this run's `adj-fig84` scene edit,
+>   fig-08-05 from the solver run's C2 + the `correction@late` label anchor).
+> - `test/render/gate.test.ts` `T-JUDGE-RECORD` fig-08-04 + `test/hash/tripwire.test.ts`
+>   figure-stamp arm — both recompute `specHash(lowerScene(fig-08-04.scene))`, which
+>   moved (30fcb5 → 1a9dd5) because `adj-fig84` edited the scene. This is a FIGURE
+>   stamp, not a `test/fixtures/goldens/*` roster move; NO golden roster fixture
+>   moved. Re-baking + re-blessing the figure stamps is DELIBERATELY deferred to a
+>   later run (task instruction).
+> - `test/golden/scenes.test.ts` G-8.5-RED — the solver run's C2 fix made fig-8.5's
+>   `late` line SOLVE instead of refuse (contradicts unamended design/09 §5); an
+>   unadjudicated design-vs-engine conflict, left red.
+> - `test/cli/controls.test.ts` C-RECOMPUTE-BUDGET "warm spec really is warm" — the
+>   `run.ts` mistake-line warm-cache gap (`cache 'absent'` not `'hit'`); out of
+>   adjudicated scope. The one genuine v0.2-gate RED.
+>
+> FLAKY (pass in isolation — the phantom failures the task warned about; 7 test
+> files run `npm build` in `beforeAll` under the parallel pool and clobber `dist/`
+> mid-read): `test/cli/serve.test.ts` (21/21 isolated), `test/cli/sweep.test.ts`,
+> and C-RECOMPUTE-BUDGET's 300 ms timing arm (load-sensitive). These come and go
+> run-to-run; none is a code regression.
+>
+> **v0.2 gate tally, item by item (post-fix):**
+>
+> | gate | was | now | why the status moved |
+> |---|---|---|---|
+> | G2 | GREEN | **GREEN** | unchanged |
+> | G3 (no re-solve while scrubbing) | RED (weak) | **GREEN** | `viewer-goals.test.ts` asserts a 200+-sample scrub adds 0 integrate calls |
+> | G5 (mistake line first-class) | RED (no test) | **GREEN** | `viewer-goals.test.ts` scrubs a real premature line's trajectory + HUD |
+> | C-STATEAT-LAWS | GREEN | **GREEN** | + this run's `lerpAngleDeg` range-normalisation fix and the 05 §3.2 psi 359→1 worked-example test |
+> | C-HUD-EQUALS-STATEAT | GREEN | **GREEN** | unchanged |
+> | C-BOOKMARKS | GREEN | **GREEN** | unchanged |
+> | C-ONE-CORE | RED (grep only) | **GREEN** | `imports.test.ts` now asserts the SERVED `dist/` graph holds exactly one `core/integrate.js` |
+> | C-RECOMPUTE-BUDGET | RED (fails) | **RED** | `run.ts` re-solves mistake lines on the warm path (`cache 'absent'`, not `'hit'`); budget arm also load-flaky — `solve/run.ts` fix, out of scope |
+> | A-RECIPE-C | RED (weak) | **RED (weak)** | serve half passes, but the min-sight-margin and lower-entry-speed clauses are still unasserted (not strengthened this run) |
+> | G-STANDING-BITES | AMBER | **GREEN** | `adj-warn-band` amended §10 to NAME `fx-standing-straight` the rung-3 witness → genuine set-equality, no deviation |
+> | G-STANDING-NO-HASH-MOVE | RED (weak) | **GREEN** | real annex A/B + all six book scenes bake byte-identical before/after a varied valid annex (`spec_hash` + every `result_hash`) |
+> | A-STANDING-WARN-BAND | RED (it.todo) | **GREEN** | `adj-warn-band`: the `it.todo` is a real three-arm gate (na-cap rung-3, blind-corner warn ¬clean, book90@38 empty_band) |
+> | A-STANDING-RESERVED / -LADDER-CUMULATIVE / -REFUSAL / -TOMBSTONE, A-RESERVE-CHECKS-RESOLVE, A-LADDER-PROSE | GREEN | **GREEN** | unchanged |
+> | C-SAVEWIN-HUD | RED (no impl) | **GREEN** | overlay built under `src/viewer/`; `viewer/saveWindow.test.ts` compares every displayed field to the returned object |
+> | C-SAVEWIN-CLIP | RED (no impl) | **GREEN** | overlay + corrective ghost clip at `s*`, asserted |
+> | C-SAVEWIN-NO-INK | RED (sentinel) | **GREEN** | real gate: byte-identical export toggle on/off across all six committed book scenes |
+> | C-SAVEWIN-REFUSE-COARSE | RED (no test) | **GREEN** | `--scan-ds 2.0` → `SCHEMA/scan_ds_too_coarse` + full payload, no value, asserted (lib + CLI) |
+> | C-SAVEWIN-BUDGET | RED (no test) | **GREEN** | timing arm + `runs` asserted against the ⌈domain_len/scan_ds⌉+5+≤8 bound |
+> | G-SAVEWIN-GRID | RED (scratch) | **GREEN** | real suite; `adj-tshot-grid` scoped the 1.0 m rung to v_max ≥ 10 m/s (overspeed/chop/F-ORACLE-90 agree, slow_steer refuses 1.0 m) |
+> | A-SAVEWIN-PLACARD | RED (explain deferred) | **GREEN** | `explain save-window` un-deferred; placard byte-identical on CLI summary + verb; `not_applicable` witness carries sentence + placard, no scalar |
+> | A-SAVEWIN-VERB | RED (theater) | **GREEN** | `inspection.test.ts` now asserts CLI stdout BYTE-EQUALS the library `saveWindow` output |
+>
+> `adj-savewin-table` moved F-ORACLE-90 from `never_open` to a single-band
+> `resolved` window (`open_count` classification), which is what makes
+> `G-SAVEWIN-RUNOFF` producible; that gate lives on the v0.1 golden roster, not the
+> v0.2 exit list, and its contract (`saveWindow.test.ts`) is green.
+>
+> The remaining RED v0.2 gate is **C-RECOMPUTE-BUDGET** (the `run.ts`
+> mistake-line warm-cache gap, a scoped `solve/` follow-up). A-RECIPE-C passes but
+> is still weak on two clauses. Neither was introduced by this run.
+>
+> ─────────────────────────────────────────────────────────────────────────────
+> The original audit follows verbatim, for provenance.
+
+# V02-GATES — the v0.2 PHASE-EXIT gate sweep (original audit)
+
 Auditor's report. Scope: every gate named in `design/00-README.md` §3's **v0.2 — inspection**
 row (line 550), cross-read against its normative statement in `design/09-verification-and-testing.md`
 (and `design/01` §2 for the G-goals), then against the test that claims to enforce it, then run.

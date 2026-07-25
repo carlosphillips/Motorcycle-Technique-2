@@ -38,6 +38,9 @@ import {
 import { loadSession, lineOf, withFocus, type ViewerSession } from "./session.js";
 import { renderView, type ViewRender } from "./views.js";
 import { saveWindowHudRows, saveWindowOverlay, saveWindowTicks, type SaveWindowOverlay } from "./saveWindow.js";
+import { correctiveGhostOverlay, type CorrectiveGhostOverlay } from "./correctiveGhost.js";
+import { compareModel, type CompareModel } from "./compare.js";
+import { parsePovLook, type PovLook } from "./pov.js";
 import type { Bookmark, HudRow, LockMode, StepperState } from "./types.js";
 import type { ViewerHost } from "./host.js";
 
@@ -45,8 +48,10 @@ import type { ViewerHost } from "./host.js";
 export interface AppState {
   readonly session: ViewerSession;
   readonly stepper: StepperState;
-  /** 07 §4.1's lock toggle; compare-mode ghost rendering itself is v0.3 */
+  /** 07 §4.1's lock toggle; drives compare-mode ghost stepping (viewer/compare.ts) */
   readonly lock: LockMode;
+  /** 07 §5.2's `look` camera toggle (`heading | limit_point`) — drives the `pov` view */
+  readonly look: PovLook;
   /**
    * design/07 §3.6's save-window toggle — OFF BY DEFAULT (null), per line, and
    * computed ONCE PER TOGGLE rather than per frame. Holding the finished
@@ -54,6 +59,13 @@ export interface AppState {
    * only ever READS it.
    */
   readonly saveWindow: SaveWindowOverlay | null;
+  /**
+   * design/07 §3.5's corrective-ghost toggle — OFF BY DEFAULT (null), per line,
+   * and likewise computed ONCE PER TOGGLE (one `correctiveShot` call). `null`
+   * means either off, or the toggle is inert for the focused line (no corner
+   * ran wide, or the shot departed before reaction).
+   */
+  readonly correctiveGhost: CorrectiveGhostOverlay | null;
 }
 
 /** One legend entry — 07 §6.1's "line legend (role, verdict colour, focus control)". */
@@ -73,13 +85,39 @@ export interface AppFrame {
   readonly instant: InstantState | null;
   readonly hud: readonly HudRow[];
   readonly bookmarks: readonly Bookmark[];
+  /**
+   * The two SVG panes 07 §6.1 lays across the top+bottom: `topdown` and
+   * `controls`, in that order — the exported picture plus the linked cursor. The
+   * `pov` view rides its OWN field (below) rather than this array, so the v0.2
+   * two-pane contract this array carries is unchanged.
+   */
   readonly views: readonly ViewRender[];
+  /**
+   * 07 §5's `pov` view (the immersion first-person frame), rendered for the
+   * focused line at the cursor under `AppState.look`. Its own field (not in
+   * `views`) — a projection of TRUE geometry (render/pov.ts), never through the
+   * diagram path. Null only when no line is drawable.
+   */
+  readonly pov: ViewRender | null;
+  /**
+   * 07 §4's compare model: every line's OWN state at the shared lock coordinate
+   * (C-COMPARE). Drives the top-down ghost glyphs and the per-line HUD/legend a
+   * multi-line envelope compares. Null only when no line is drawable / the
+   * cursor could not resolve.
+   */
+  readonly compare: CompareModel | null;
   readonly legend: readonly LegendEntry[];
   /**
    * 07 §3.6's scrubber ticks, "in the overlay register and visually distinct
    * from event ticks" — empty while the toggle is off, which is the default.
    */
   readonly save_window_ticks: readonly { readonly corner_id: string; readonly t: number }[];
+  /**
+   * 07 §3.5's corrective ghost, once-per-toggle — null while the toggle is off
+   * (the default) or inert for the focused line. Carries the lean-only
+   * disclosure sentence (04 §4c.7) for the legend.
+   */
+  readonly corrective_ghost: CorrectiveGhostOverlay | null;
   /** terminal badge text keyed to `terminated.reason` (07 §3.4), or "" while running */
   readonly terminal: string;
   /** non-empty when the frame could not be fully built (never throws) */
@@ -91,7 +129,14 @@ export const OFF_ROAD_PLACARD = "left the road — off-road behaviour not modell
 
 export function createApp(session: ViewerSession): AppState {
   const domain = scenarioDomain(session.lines, "t");
-  return Object.freeze({ session, stepper: initialStepper(domain), lock: "station", saveWindow: null });
+  return Object.freeze({
+    session,
+    stepper: initialStepper(domain),
+    lock: "station",
+    look: "heading",
+    saveWindow: null,
+    correctiveGhost: null
+  });
 }
 
 /**
@@ -106,6 +151,21 @@ export function toggleSaveWindow(app: AppState): AppState {
   if (line === null) return app;
   const overlay = saveWindowOverlay(line);
   return Object.freeze({ ...app, saveWindow: overlay.ok ? overlay.value : null });
+}
+
+/**
+ * design/07 §3.5's corrective-ghost toggle. ON computes the ghost ONCE (one
+ * `correctiveShot(line)` call for the focused line); OFF drops it. The toggle is
+ * inert — stays null — when the focused line has no ran-wide corrective (07
+ * §3.5: "the toggle is inert for that line"), and a refusal likewise leaves it
+ * off (never-throw).
+ */
+export function toggleCorrectiveGhost(app: AppState): AppState {
+  if (app.correctiveGhost !== null) return Object.freeze({ ...app, correctiveGhost: null });
+  const line = lineOf(app.session, app.session.focus);
+  if (line === null) return app;
+  const ghost = correctiveGhostOverlay(line);
+  return Object.freeze({ ...app, correctiveGhost: ghost.ok ? ghost.value : null });
 }
 
 /**
@@ -158,7 +218,10 @@ export function frameOf(app: AppState): AppFrame {
       hud: [],
       bookmarks: [],
       save_window_ticks: [],
+      corrective_ghost: null,
       views: [],
+      pov: null,
+      compare: null,
       legend: legendOf(app),
       terminal: "",
       problems: ["no drawable line in this envelope"]
@@ -176,15 +239,35 @@ export function frameOf(app: AppState): AppFrame {
   })();
 
   const instant = queried === null ? null : queried.instant;
-  // 07 §3.6: the overlay belongs to the FOCUSED line; a stale overlay from a
-  // previous focus is dropped rather than drawn against the wrong trajectory.
+  // 07 §3.5/§3.6: each overlay belongs to the FOCUSED line; a stale overlay
+  // from a previous focus is dropped rather than drawn against the wrong
+  // trajectory.
   const overlay = app.saveWindow !== null && app.saveWindow.line_id === line.line_id ? app.saveWindow : null;
+  const ghost = app.correctiveGhost !== null && app.correctiveGhost.line_id === line.line_id ? app.correctiveGhost : null;
+  // 07 §4 compare model — every line's OWN state at the shared lock coordinate,
+  // computed from the focused line's instant (C-COMPARE, no shared state). Drives
+  // the top-down ghost glyphs of the non-focused lines; a single-line envelope
+  // yields no ghosts, so its top-down stays byte-identical to the v0.2 picture.
+  const compare = instant === null ? null : compareModel(app.session, instant, app.lock);
   const views: ViewRender[] = [];
   for (const view of ["topdown", "controls"] as const) {
-    const r = renderView(app.session, { view, instant, line_id: line.line_id, saveWindow: overlay });
+    const r = renderView(app.session, {
+      view,
+      instant,
+      line_id: line.line_id,
+      saveWindow: overlay,
+      correctiveGhost: ghost,
+      compare: view === "topdown" ? compare : null
+    });
     if (r.ok) views.push(r.value);
     else problems.push(`${view}: ${r.error.message}`);
   }
+  // 07 §5 the POV view (its own field, not in `views`): the focused line at the
+  // cursor under `app.look`. `renderPovView` never throws and `app.look` is a
+  // valid closed-set value, so this Result is always ok — a pov failure would
+  // only surface as a `fallbackSvg`, never a frame `problem`.
+  const povR = renderView(app.session, { view: "pov", instant, line_id: line.line_id, look: app.look });
+  const pov = povR.ok ? povR.value : null;
   // 07 §3.6's HUD rows ride in the Verdict group, after the line's own rows.
   // `instant.sample.t` is the cursor's run time on BOTH scrubber axes, so the
   // countdown reads the same instant the rest of the HUD does.
@@ -198,7 +281,10 @@ export function frameOf(app: AppState): AppFrame {
     hud: queried === null ? [] : Object.freeze([...queried.rows, ...saveRows]),
     bookmarks: bookmarksOf(line),
     save_window_ticks: overlay === null ? [] : saveWindowTicks(overlay),
+    corrective_ghost: ghost,
     views: Object.freeze(views),
+    pov,
+    compare,
     legend: legendOf(app),
     terminal: terminalBadge(app),
     problems: Object.freeze(problems)
@@ -247,6 +333,16 @@ export function flipAxis(app: AppState): AppState {
 
 export function setLock(app: AppState, lock: LockMode): AppState {
   return Object.freeze({ ...app, lock });
+}
+
+/**
+ * 07 §5.2's `look` camera toggle. The closed set is validated once, here: an
+ * unknown value leaves `look` unchanged (the viewer never crashes on a bad
+ * toggle — a bad `--look` was already refused `SCHEMA` at the CLI/scene door).
+ */
+export function setLook(app: AppState, look: string): AppState {
+  const parsed = parsePovLook(look);
+  return parsed.ok ? Object.freeze({ ...app, look: parsed.value }) : app;
 }
 
 export function focusLine(app: AppState, lineId: string): AppState {
@@ -336,6 +432,8 @@ export function boot(host: ViewerHost, payloadText: string, engineSemver?: strin
   const paint = (): void => {
     const f = frameOf(current);
     for (const v of f.views) host.byId(v.view)?.setHtml(v.svg);
+    // 07 §6.1's right pane — the pov view rides its own field (not `f.views`)
+    if (f.pov !== null) host.byId("pov")?.setHtml(f.pov.svg);
     host.byId("hud")?.setHtml(hudHtml(f.hud));
     host.byId("legend")?.setHtml(legendHtml(f.legend));
     // the range control carries a 0..1 FRACTION of the domain (see page.ts) —
@@ -380,6 +478,10 @@ export function boot(host: ViewerHost, payloadText: string, engineSemver?: strin
   host.byId("lock")?.on("change", () => {
     const raw = host.byId("lock")?.getValue() ?? "station";
     apply(setLock(current, raw === "time" ? "time" : "station"));
+  });
+  // 07 §5.2's `look` toggle beside the pov pane (07 §6.1)
+  host.byId("look")?.on("change", () => {
+    apply(setLook(current, host.byId("look")?.getValue() ?? "heading"));
   });
   host.byId("bookmarks")?.on("change", () => {
     const token = host.byId("bookmarks")?.getValue() ?? "";
