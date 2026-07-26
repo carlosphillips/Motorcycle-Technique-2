@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // Paths derive from this file's location: the gallery has to rebuild on any
 // clone, not only on the machine that first baked it.
@@ -9,6 +9,19 @@ const ROOT = resolve(HERE, '../..');
 const BAKE = resolve(process.env['CH8_BAKE_DIR'] ?? join(HERE, '.bake'));
 const SCENES = join(ROOT, 'figures');
 const GALLERY_OUT = join(HERE, 'gallery.html');
+
+// The rider phrasing of the sixteen checks comes from the ENGINE's own lexicon
+// (plan/doctrine/lexicon.ts), never from a copy in this file: a second table
+// would drift the moment a check was renamed, and the page would be teaching
+// something the rubric no longer says.
+const { CHECK_LEXICON, riderMessage } = await import(
+  pathToFileURL(join(ROOT, 'linelab', 'dist', 'plan', 'doctrine', 'lexicon.js')).href
+);
+
+const KMH_TO_MPH = 0.621371;
+const M_TO_FT = 3.28084;
+const mph = (kmh) => Math.round(kmh * KMH_TO_MPH);
+const feet = (m) => Math.round(m * M_TO_FT);
 const summary = JSON.parse(readFileSync(`${BAKE}/summary.json`, 'utf8'));
 
 const esc = (s) =>
@@ -199,6 +212,108 @@ const LEGEND_GROUPS = [
       },
     ],
   },
+  {
+    title: 'Where the road ends, and how far',
+    note:
+      'The grey you can ride on is not the same as the band you are graded against, and the figures now draw both.',
+    rows: [
+      {
+        art: swatch(
+          `<rect x="1" y="4" width="24" height="18" fill="#c9c9c9"/>` +
+            `<line x1="1" y1="8" x2="25" y2="8" stroke="#5f6552" stroke-width="1.1" stroke-dasharray="1.5 3" stroke-opacity="0.75"/>` +
+            `<line x1="1" y1="18" x2="25" y2="18" stroke="#5f6552" stroke-width="1.1" stroke-dasharray="1.5 3" stroke-opacity="0.75"/>`
+        ),
+        term: 'the graded corridor',
+        desc:
+          'Two fine dotted lines inside the tarmac: your own lane, inset by the room a motorcycle needs. Every verdict that says a line “ran wide” is measured against THESE, not against the painted edge — which is why a line can be on the road and still be wrong.',
+      },
+      {
+        art: swatch(
+          `<line x1="2" y1="20" x2="24" y2="8" stroke="${QC.good}" stroke-width="2.4"/>` +
+            `<polyline points="12,17 17,12.5 12,10.5" fill="none" stroke="${QC.good}" stroke-width="1.6" stroke-linejoin="round"/>`
+        ),
+        term: 'direction and distance',
+        desc:
+          'A chevron every ten true metres, pointing the way the rider is going. On the ideal line each one is numbered, so the figure carries one scale of distance and the others stay quiet.',
+      },
+      {
+        art: swatch(
+          `<line x1="1" y1="16" x2="17" y2="16" stroke="${QC.failing}" stroke-width="2.4"/>` +
+            `<polygon points="15,12 23,16 15,20" fill="${QC.failing}"/>` +
+            `<text x="13" y="8" font-size="7" font-family="sans-serif" fill="${QC.failing}" text-anchor="middle">ran off</text>`
+        ),
+        term: 'the outcome, in a word',
+        desc:
+          'Each line says how it ended beside its own end: clean, caution, ran wide, ran off. The word is what makes the verdict survive a grey print — or a reader who cannot separate red from green.',
+      },
+      {
+        art: swatch(
+          `<line x1="1" y1="20" x2="12" y2="14" stroke="${QC.failing}" stroke-width="2.2"/>` +
+            `<line x1="12" y1="14" x2="25" y2="6" stroke="${NEUTRAL}" stroke-width="1.4" stroke-dasharray="2 4" stroke-opacity="0.6"/>`
+        ),
+        term: 'where it was pointing',
+        desc:
+          'Past a runoff, a hatched neutral ray continues at the heading the line left with, cut at the first thing it meets. The engine did not integrate it — it carries no arrowhead and no verdict colour, because it is a consequence, not a trajectory. Figure 8.1 is the one that asks for it.',
+      },
+      {
+        art: swatch(
+          `<line x1="3" y1="14" x2="23" y2="14" stroke="#3a3f34" stroke-width="1.4"/>` +
+            `<line x1="3" y1="10" x2="3" y2="18" stroke="#3a3f34" stroke-width="1.4"/>` +
+            `<line x1="23" y1="10" x2="23" y2="18" stroke="#3a3f34" stroke-width="1.4"/>` +
+            `<text x="13" y="8" font-size="7" font-family="sans-serif" fill="#3a3f34" text-anchor="middle">10 m</text>`
+        ),
+        term: 'scale bar',
+        desc:
+          'A round distance in metres and feet, plus the lane width. Without it every distance in the figure — how early the turn-in was, how much road the mistake ate — has no unit.',
+      },
+    ],
+  },
+  {
+    title: 'From the rider’s seat',
+    note:
+      'The first-person frames are drawn from each line’s OWN recorded position, so two frames of the same corner differ by exactly what the mistake cost.',
+    rows: [
+      {
+        art: swatch(
+          `<rect x="1" y="1" width="24" height="24" fill="#aec6de"/>` +
+            `<rect x="1" y="13" width="24" height="12" fill="#7f8f63"/>` +
+            `<line x1="1" y1="13" x2="25" y2="13" stroke="#ffffff" stroke-width="1" stroke-opacity="0.7"/>`
+        ),
+        term: 'the horizon stays level',
+        desc:
+          'The engine can roll the whole frame with the bike — the horizon angle IS the lean. For the book the camera is held upright instead and the lean moves to a dial, because a reader of a still picture has no sense of balance to cancel a 30° tilt with: it reads as a road falling over, not as a rider leaning.',
+      },
+      {
+        art: swatch(
+          `<line x1="4" y1="18" x2="22" y2="18" stroke="#e8e8e8" stroke-width="1.4" stroke-opacity="0.7"/>` +
+            `<line x1="13" y1="18" x2="19" y2="7" stroke="#e8e8e8" stroke-width="2"/>` +
+            `<circle cx="13" cy="18" r="2" fill="#e8e8e8"/>`,
+          26,
+          26
+        ),
+        term: 'lean dial',
+        desc: 'Top right of every frame: how far the bike is leaned, in degrees, against a level ground line.',
+      },
+      {
+        art: swatch(
+          `<rect x="2" y="6" width="12" height="7" rx="2.5" fill="#22262b"/>` +
+            `<line x1="8" y1="13" x2="12" y2="22" stroke="#22262b" stroke-width="2.5"/>`
+        ),
+        term: 'your own mirrors',
+        desc:
+          'Bar ends and mirrors in the near corners. A first-person view with none of the bike in it gives the reader nothing to sit on.',
+      },
+      {
+        art: swatch(
+          `<line x1="4" y1="13" x2="18" y2="13" stroke="${QC.failing}" stroke-width="2.4"/>` +
+            `<polyline points="15,9 20,13 15,17" fill="none" stroke="${QC.failing}" stroke-width="2.4"/>`
+        ),
+        term: '“your line” marker',
+        desc:
+          'When the rider is looking somewhere their own line does not go, the line leaves the frame — and an arrow on the edge says which way it went, rather than the frame quietly showing no line at all.',
+      },
+    ],
+  },
 ];
 
 const legendSection = `<section class="legend-block">
@@ -230,51 +345,103 @@ const legendSection = `<section class="legend-block">
   </div>
 </section>`;
 
+// Each figure carries a DRILL: the one thing to do differently, on a bike, next
+// time. Six pictures of what not to do leave a reader with nothing to practise.
 const META = {
   'fig-08-01': {
     n: '8.1',
     title: 'The premature turn point',
     lesson:
       'Turn in before the geometry is ready and the exit points wide — here, straight at an oncoming vehicle the rider cannot yet see.',
+    drill:
+      'Pick your turn point where you can see the exit — not where the corner starts. If the exit is still hidden, you are early.',
   },
   'fig-08-02': {
     n: '8.2',
     title: 'Slow steering',
     lesson:
       'The same turn point, steered lazily. The roll-in never finishes inside the corner, so the bike is still leaning when it needs to be tracking.',
+    drill:
+      'Press the inside bar once, deliberately, and be done leaning before the apex. Count it: lean in, then hold.',
   },
   'fig-08-03': {
     n: '8.3',
     title: 'Fifty-pencing',
     lesson:
       'Six small steering inputs instead of one. Each correction resets the arc, and the line becomes a polygon rather than a curve.',
+    drill:
+      'Decide the whole arc before the corner, make one input, and resist correcting. If you need a second input, you turned in at the wrong place.',
   },
   'fig-08-04': {
     n: '8.4',
     title: 'Decreasing radius, entered too fast',
     lesson:
       'Only 2.5 km/h over, but the radius tightens after the turn point — the error compounds where the road gives least room.',
+    drill:
+      'On a corner that tightens, get your braking done early and turn in late. Ride the first half slower than feels necessary — the second half is where the road takes it back.',
   },
   'fig-08-05': {
     n: '8.5',
     title: 'The double apex, and the cost of an early one',
     lesson:
       'Three linked corners taken as one. Touch the inside of the first too soon and there is no geometry left for the second — the early-apex line is off the outside edge before the third corner exists.',
+    drill:
+      'On linked corners, give something up in the first one. Plan the pair as one shape and arrive at the second corner placed, not fast.',
   },
   'fig-08-06': {
     n: '8.6',
     title: 'The esses',
     lesson:
       'One early turn-in at the first corner, then error amplification: each corner is entered worse than the last until the chain leaves the road.',
+    drill:
+      'Fix the FIRST corner. In a sequence, every corner inherits the exit of the one before, so a chain is saved at its start or not at all.',
   },
 };
 
+/**
+ * Why an IDEAL line can carry a caution grade. On a linked chain the rubric
+ * reads each corner separately, so the connecting corner's brief inside touch
+ * scores as an early apex even though the chained line is the best one the
+ * engine can find. Stated on the plate, because a reader who sees "caution" on
+ * the line they are being told to copy will otherwise conclude the page is
+ * wrong.
+ */
+const CAUTION_NOTE =
+  'This ideal line is graded <strong>caution</strong>, and that grade is part of the lesson. The rubric scores every corner on its own; on a linked chain the middle corner is really just the transit between two real ones, so the line touches its inside early and takes a shape fail for it. A line that apexes each corner of a compound corner in turn is already compromised — which is exactly what the figure is about.';
+
 const QUALITY_LABEL = { good: 'good', caution: 'caution', failing: 'failing' };
+
+/**
+ * The street question, drawn: how far this rider can see against how far they
+ * need to stop. It is the most valuable number in the figure and it was buried
+ * in a HUD string, so it gets a bar — one length against the other, with the
+ * shortfall in the failing ink when there is one.
+ */
+function sightBar(frame) {
+  if (frame.sight === null || frame.ssd === null) return '';
+  const see = Math.round(frame.sight);
+  const need = Math.round(frame.ssd);
+  const scale = Math.max(see, need, 1);
+  const short = need > see;
+  return `<span class="sightbar" title="sight against stopping distance">
+    <span class="sb-row"><span class="sb-key">can see</span><span class="sb-track"><span class="sb-fill sb-fill--see" style="width:${(see / scale) * 100}%"></span></span><span class="sb-val num">${see} m</span></span>
+    <span class="sb-row"><span class="sb-key">need to stop</span><span class="sb-track"><span class="sb-fill sb-fill--need${short ? ' sb-fill--short' : ''}" style="width:${(need / scale) * 100}%"></span></span><span class="sb-val num">${need} m</span></span>
+    <span class="sb-verdict${short ? ' sb-verdict--short' : ''}">${
+      short ? `${need - see} m short &mdash; cannot stop in what is visible` : `${see - need} m in hand`
+    }</span>
+  </span>`;
+}
 
 const viewFile = (id, dir, suffix) => {
   const p = `${BAKE}/${dir}/${id}${suffix}`;
   return existsSync(p) ? readFileSync(p, 'utf8') : null;
 };
+
+// Receipts are COUNTED, never typed: a claim about how many frames the chapter
+// carries has to move when the bake moves.
+const povCount = readdirSync(HERE).filter((f) => f.endsWith('.pov.svg')).length;
+const controlsCount = readdirSync(HERE).filter((f) => f.endsWith('.controls.svg')).length;
+const framesPerFigure = Math.round((povCount + controlsCount + 6) / 6);
 
 const plates = summary.map((rec) => {
   const id = rec.figure;
@@ -296,19 +463,53 @@ const plates = summary.map((rec) => {
   // ideal first, then the mistakes — the reader needs the reference frame before
   // the one they are being asked to find fault with.
   const roleOrder = (f) => (f.includes('.good.') ? 0 : 1);
+
+  // A POV frame reads off the HUD's DATA attributes, never its prose: the words
+  // are written for a rider and are free to change, the numbers are the contract.
+  const readPov = (path, key) => {
+    const raw = readFileSync(path, 'utf8');
+    const num = (attr) => {
+      const m = raw.match(new RegExp(`data-${attr}="([-\\d.]+)"`));
+      return m ? Number(m[1]) : null;
+    };
+    const hudMatch = raw.match(/<text[^>]*data-hud="true"[^>]*>([^<]*)<\/text>/);
+    return {
+      hud: hudMatch ? hudMatch[1].replace(/\s+/g, ' ').trim() : null,
+      sight: num('sight-m'),
+      ssd: num('ssd-m'),
+      lean: num('lean-deg'),
+      v: num('v-kmh'),
+      svg: namespace(raw, key),
+    };
+  };
+
   const povFiles = readdirSync(`${BAKE}/${dir}`)
     .filter((f) => f.endsWith('.pov.svg'))
     .sort((a, b) => roleOrder(a) - roleOrder(b) || a.localeCompare(b));
   const povs = povFiles.map((f) => {
-    const raw = readFileSync(`${BAKE}/${dir}/${f}`, 'utf8');
     const lineId = f.replace(`${id}.`, '').replace('.pov.svg', '');
-    const hudMatch = raw.match(/<text[^>]*>([^<]*km\/h[^<]*)<\/text>/);
-    return {
-      line: lineId,
-      hud: hudMatch ? hudMatch[1].replace(/\s+/g, ' ').trim() : null,
-      svg: namespace(raw, `${id}-pov-${lineId}`),
-    };
+    return { line: lineId, ...readPov(`${BAKE}/${dir}/${f}`, `${id}-pov-${lineId}`) };
   });
+
+  // The three stations, baked from each line's OWN recorded events (bake.sh).
+  // A mistake line that ran off before it ever exited has no exit frame, and
+  // the plate says so rather than showing the reader a frame that never was.
+  const STATIONS = [
+    { tag: 'turnin', label: 'At the turn-in', lede: 'The moment the steering went in. What each rider could see when they committed.' },
+    { tag: 'apex', label: 'At the apex', lede: 'The closest each line came to the inside — and what the road ahead looked like from there.' },
+    { tag: 'exit', label: 'At the exit', lede: 'Where the corner hands the road back. A line that never got here left the road first.' },
+  ];
+  const lineIds = rec.lines.filter((L) => L.tally.pass !== undefined).map((L) => L.id);
+  const stationViews = STATIONS.map((st) => {
+    const frames = lineIds
+      .map((lineId) => {
+        const p = `${HERE}/${id}.${lineId}.${st.tag}.pov.svg`;
+        if (!existsSync(p)) return { line: lineId, missing: true };
+        return { line: lineId, ...readPov(p, `${id}-${st.tag}-${lineId}`) };
+      })
+      .sort((a, b) => (a.line === 'good' ? -1 : b.line === 'good' ? 1 : a.line.localeCompare(b.line)));
+    return { ...st, frames };
+  }).filter((sv) => sv.frames.some((f) => !f.missing));
 
   const controlFiles = readdirSync(`${BAKE}/${dir}`)
     .filter((f) => f.endsWith('.controls.svg'))
@@ -341,16 +542,25 @@ const plates = summary.map((rec) => {
         )
         .join('');
 
+      // Verdict cards speak the LEXICON, not the catalogue's identifiers. The
+      // check id stays, small, so the finding can still be looked up — but the
+      // first thing a reader meets is the rider's name for it and the thing to
+      // do about it.
       const flags = L.flags.length
         ? `<ul class="flags">${L.flags
-            .map(
-              (f) =>
-                `<li class="flag flag--${f.v}"><span class="flag-v">${esc(f.v)}</span><span class="flag-id mono">${esc(
-                  f.id
-                )}${f.corner ? `<span class="flag-corner">@${esc(f.corner)}</span>` : ''}</span><span class="flag-msg">${esc(
-                  f.msg ?? ''
-                )}</span></li>`
-            )
+            .map((f) => {
+              const lex = CHECK_LEXICON[f.id];
+              const rider = riderMessage(f.id, f.metrics);
+              return `<li class="flag flag--${f.v}">
+                <span class="flag-v">${esc(f.v)}</span>
+                <span class="flag-title">${esc(lex ? lex.title : f.id)}${
+                  f.corner ? `<span class="flag-corner"> &mdash; ${esc(f.corner)}</span>` : ''
+                }</span>
+                <span class="flag-msg">${esc(rider ?? f.msg ?? '')}</span>
+                ${lex ? `<span class="flag-fix"><strong>Do this instead:</strong> ${esc(lex.fix)}</span>` : ''}
+                <span class="flag-id mono">${esc(f.id)}</span>
+              </li>`;
+            })
             .join('')}</ul>`
         : `<p class="clean-note">No check failures. Every rubric item this line is in scope for passed.</p>`;
 
@@ -406,24 +616,48 @@ const plates = summary.map((rec) => {
 
   const views = [
     { key: 'top', label: 'Top-down', body: `<div class="viewbox">${topdown}</div>` },
-    povs.length
+    stationViews.length
       ? {
           key: 'pov',
-          label: povs.length > 1 ? `Rider POV ×${povs.length}` : 'Rider POV',
+          label: 'Rider&rsquo;s view',
           body:
-            `<p class="pov-lede">Both frames are the same corner, same instant of the road. The camera is each
-             line&rsquo;s own recorded position and lean, so the difference between them is the difference the
-             mistake makes to what the rider can see.</p>` +
-            `<div class="pov-row">${povs
-              .map((p) => {
-                const q = QUALITY_LABEL[qualityOf(p.line)] ?? 'failing';
-                return `<figure class="pov"><div class="viewbox viewbox--pov">${p.svg}</div>
-                  <figcaption>
-                    <span class="pov-line"><span class="dot dot--${q}"></span><span class="mono">${esc(p.line)}</span></span>
-                    ${p.hud ? `<span class="pov-hud mono">${esc(p.hud)}</span>` : ''}
-                  </figcaption></figure>`;
-              })
-              .join('')}</div>`,
+            `<p class="pov-lede">Each frame is one rider at one moment of this corner &mdash; the camera is that
+             line&rsquo;s own recorded position, so the difference between the frames is the difference the mistake
+             makes to what the rider can see. Step through the corner with the buttons.</p>` +
+            `<div class="station-tabs" role="tablist">${stationViews
+              .map(
+                (sv, i) =>
+                  `<button class="station-tab${i === 0 ? ' is-active' : ''}" data-fig="${id}" data-station="${sv.tag}" type="button" role="tab" aria-selected="${
+                    i === 0 ? 'true' : 'false'
+                  }">${sv.label}</button>`
+              )
+              .join('')}</div>` +
+            stationViews
+              .map(
+                (sv, i) =>
+                  `<div class="station-pane${i === 0 ? ' is-active' : ''}" data-fig="${id}" data-station="${sv.tag}">
+                    <p class="station-lede">${sv.lede}</p>
+                    <div class="pov-row">${sv.frames
+                      .map((f) => {
+                        const q = QUALITY_LABEL[qualityOf(f.line)] ?? 'failing';
+                        if (f.missing) {
+                          return `<figure class="pov pov--missing">
+                            <div class="viewbox viewbox--missing">
+                              <p>This line never reached the ${sv.label.replace('At the ', '')}.<br><span>It left the road first &mdash; there is no frame to show, and inventing one would be a lie.</span></p>
+                            </div>
+                            <figcaption><span class="pov-line"><span class="dot dot--${q}"></span><span class="mono">${esc(f.line)}</span></span></figcaption>
+                          </figure>`;
+                        }
+                        return `<figure class="pov"><div class="viewbox viewbox--pov">${f.svg}</div>
+                          <figcaption>
+                            <span class="pov-line"><span class="dot dot--${q}"></span><span class="mono">${esc(f.line)}</span></span>
+                            ${sightBar(f)}
+                          </figcaption></figure>`;
+                      })
+                      .join('')}</div>
+                  </div>`
+              )
+              .join(''),
         }
       : null,
     controls.length
@@ -460,18 +694,30 @@ const plates = summary.map((rec) => {
 
   const gate = manifest.gate_verdict;
 
+  // The ideal line's entry speed, in both units — this is a book about riding
+  // on roads, and roads are signed in different ones on different continents.
+  const idealLine = envLines.find((L) => L.line_id === 'good');
+  const entryKmh = idealLine?.trajectory?.samples?.[0]?.v ? idealLine.trajectory.samples[0].v * 3.6 : null;
+  const cautionIdeal = rec.lines.find((L) => L.id === 'good' && L.quality === 'caution') !== undefined;
+
   return `<section class="plate" id="${id}">
     <div class="plate-head">
       <div class="plate-title">
         <span class="eyebrow">Figure ${meta.n}</span>
         <h2>${esc(meta.title)}</h2>
         <p class="lesson">${esc(meta.lesson)}</p>
+        <p class="drill"><span class="drill-label">Practise this</span>${esc(meta.drill)}</p>
       </div>
       <dl class="plate-meta">
-        <div><dt>spec hash</dt><dd class="mono">${esc(manifest.spec_hash)}</dd></div>
-        <div><dt>road window</dt><dd class="mono num">${manifest.view.window.to_s.toFixed(1)} m</dd></div>
-        <div><dt>orient</dt><dd class="mono num">${manifest.view.orient}°</dd></div>
-        <div><dt>proportion gate</dt><dd><span class="gate gate--${gate}">${esc(gate)}</span></dd></div>
+        ${
+          entryKmh !== null
+            ? `<div><dt>ideal entry</dt><dd class="mono num">${Math.round(entryKmh)} km/h <small>${mph(entryKmh)} mph</small></dd></div>`
+            : ''
+        }
+        <div><dt>road drawn</dt><dd class="mono num">${manifest.view.window.to_s.toFixed(0)} m <small>${feet(
+          manifest.view.window.to_s
+        )} ft</small></dd></div>
+        <div><dt>corners</dt><dd class="mono num">${rec.lines[0]?.corners.length ?? 0}</dd></div>
       </dl>
     </div>
 
@@ -481,14 +727,22 @@ const plates = summary.map((rec) => {
         ${panels}
       </div>
       <div class="plate-side">
-        <div class="source">
-          <div class="source-head"><span class="source-label">input</span><span class="source-path mono">figures/${id}.scene</span></div>
-          <pre class="mono"><code>${esc(scene)}</code></pre>
-        </div>
         <div class="verdicts">
-          <div class="source-head"><span class="source-label">output</span><span class="source-path">graded lines</span></div>
+          <div class="source-head"><span class="source-label">graded</span><span class="source-path">what the rubric found</span></div>
+          ${cautionIdeal ? `<p class="caution-explainer">${CAUTION_NOTE}</p>` : ''}
           ${lineCards}${refusalCards}
         </div>
+        <details class="provenance">
+          <summary>How this figure was made</summary>
+          <p class="prov-note">Every plate is baked from the scene text below by one command; the drawing is the
+            solver&rsquo;s own output, never a hand-drawn illustration of it.</p>
+          <dl class="prov-meta">
+            <div><dt>spec hash</dt><dd class="mono">${esc(manifest.spec_hash)}</dd></div>
+            <div><dt>orient</dt><dd class="mono num">${manifest.view.orient}&deg;</dd></div>
+            <div><dt>proportion gate</dt><dd><span class="gate gate--${gate}">${esc(gate)}</span></dd></div>
+          </dl>
+          <pre class="mono"><code>${esc(scene)}</code></pre>
+        </details>
       </div>
     </div>
   </section>`;
@@ -729,7 +983,13 @@ const analysisSection = `<section class="analysis">
   </div>
 </section>`;
 
-const html = `<title>linelab — Chapter 8 figure bake</title>
+// The published artifact's wrapper supplies a head; the COMMITTED file has to
+// stand on its own, and without a viewport meta a phone lays it out at 980 px
+// and then shrinks the whole page — the reason the plates read as unreadably
+// small on a phone rather than as a single column.
+const html = `<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>linelab — Chapter 8 figure bake</title>
 <style>
   :root {
     --ground: #f4f5ee;
@@ -956,10 +1216,77 @@ const html = `<title>linelab — Chapter 8 figure bake</title>
   }
   .flag--fail .flag-v { color: var(--fail); background: var(--fail-soft); }
   .flag--warn .flag-v { color: var(--warn); background: var(--warn-soft); }
-  .flag-id { font-size: 12px; font-weight: 600; }
+  /* A finding leads with the rider's name for it and ends with what to do; the
+     engine's own check id survives as the small print, so a reader can still
+     look the rule up without meeting it first. */
+  .flag-title { font-size: 12.5px; font-weight: 600; }
   .flag-corner { color: var(--ink-3); font-weight: 400; }
   .flag-msg { grid-column: 2; color: var(--ink-2); }
+  .flag-fix { grid-column: 2; color: var(--ink-2); font-size: 12px; margin-top: 3px; }
+  .flag-fix strong { color: var(--ink); font-weight: 600; }
+  .flag-id { grid-column: 2; font-size: 10px; color: var(--ink-3); margin-top: 2px; }
   .clean-note { margin: 11px 0 0; font-size: 12.5px; color: var(--ink-3); font-style: italic; }
+
+  /* ---- the drill, the caution explainer, the provenance fold ---- */
+  .drill {
+    margin: 14px 0 0; max-width: 60ch; font-size: 14.5px; color: var(--ink);
+    border-left: 3px solid var(--accent); padding: 8px 0 8px 12px; background: var(--accent-soft);
+  }
+  .drill-label {
+    display: block; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 3px;
+  }
+  .caution-explainer {
+    margin: 0 0 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink-2);
+    border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 10px 12px; border-radius: 2px;
+  }
+  .provenance { border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); padding: 10px 14px; }
+  .provenance summary {
+    cursor: pointer; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+  .prov-note { margin: 10px 0 0; font-size: 12px; color: var(--ink-3); }
+  .prov-meta { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 10px 0 0; }
+  .prov-meta div { display: flex; flex-direction: column; gap: 2px; }
+  .prov-meta dt { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+  .prov-meta dd { margin: 0; font-size: 12.5px; }
+  .provenance pre {
+    margin: 12px 0 0; padding: 12px; background: var(--panel-2); border: 1px solid var(--rule-2);
+    border-radius: 3px; overflow-x: auto; font-size: 11.5px; line-height: 1.55;
+  }
+  .provenance pre code { white-space: pre; }
+
+  /* ---- the station stepper ---- */
+  .station-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+  .station-tab {
+    font-size: 12.5px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--rule); background: var(--panel); color: var(--ink-2);
+  }
+  .station-tab:hover { border-color: var(--ink-3); color: var(--ink); }
+  .station-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .station-tab.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .station-pane { display: none; }
+  .station-pane.is-active { display: block; }
+  .station-lede { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-3); }
+  .viewbox--missing {
+    display: flex; align-items: center; justify-content: center; min-height: 180px;
+    background: var(--panel-2); border: 1px dashed var(--rule);
+  }
+  .viewbox--missing p { margin: 0; text-align: center; font-size: 13px; color: var(--ink-2); padding: 18px; }
+  .viewbox--missing span { font-size: 12px; color: var(--ink-3); }
+
+  /* ---- sight against stopping distance ---- */
+  .sightbar { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+  .sb-row { display: grid; grid-template-columns: 74px minmax(0, 1fr) 46px; gap: 8px; align-items: center; font-size: 11.5px; }
+  .sb-key { color: var(--ink-3); }
+  .sb-track { height: 9px; background: var(--panel-2); border: 1px solid var(--rule-2); border-radius: 2px; overflow: hidden; }
+  .sb-fill { display: block; height: 100%; }
+  .sb-fill--see { background: var(--accent); opacity: 0.75; }
+  .sb-fill--need { background: var(--ink-3); opacity: 0.6; }
+  .sb-fill--short { background: var(--fail); opacity: 0.75; }
+  .sb-val { color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+  .sb-verdict { font-size: 11.5px; color: var(--accent); }
+  .sb-verdict--short { color: var(--fail); font-weight: 600; }
 
   /* ---- shared section furniture (legend + analysis) ---- */
   .section-h {
@@ -997,8 +1324,10 @@ const html = `<title>linelab — Chapter 8 figure bake</title>
 
   /* ---- POV pair ---- */
   .pov-lede { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-3); line-height: 1.55; max-width: 68ch; }
-  /* A 1000x600 frame at 300 px wide is unreadable; stack until there is real room. */
-  .pov-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 16px; }
+  /* A 1000x600 frame at 300 px wide is unreadable; stack until there is real room.
+     On a phone the single column IS the full width, so the frame is legible there —
+     what has to give is the two-up comparison, not the size of either frame. */
+  .pov-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
   .pov { margin: 0; }
   .pov figcaption { margin-top: 7px; display: flex; flex-direction: column; gap: 3px; }
   .pov-line { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
@@ -1049,6 +1378,35 @@ const html = `<title>linelab — Chapter 8 figure bake</title>
   .cc-msg { color: var(--ink-2); }
   @media (max-width: 560px) { .cc-fails li { grid-template-columns: minmax(0, 1fr); } }
 
+  /* ---- contents ---- */
+  .contents { border-bottom: 1px solid var(--rule); padding: 22px 0 26px; }
+  .contents-list {
+    list-style: none; margin: 12px 0 0; padding: 0; display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 4px 24px;
+  }
+  .contents-list a {
+    display: flex; gap: 10px; align-items: baseline; padding: 6px 0; text-decoration: none;
+    color: var(--ink); border-bottom: 1px solid var(--rule-2);
+  }
+  .contents-list a:hover .c-t { text-decoration: underline; }
+  .c-n { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+  .c-t { font-size: 14px; }
+  .contents-note { margin: 14px 0 0; font-size: 12.5px; color: var(--ink-3); max-width: 76ch; }
+
+  /* ---- phone ---- */
+  @media (max-width: 640px) {
+    .inner { padding: 0 16px; }
+    .plate-body { gap: 20px; }
+    .plate-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pov-row { grid-template-columns: minmax(0, 1fr); }
+    .station-tab { font-size: 13px; padding: 8px 14px; }  /* thumb-sized, not mouse-sized */
+    .lesson, .drill { font-size: 15px; }
+    .flag { grid-template-columns: minmax(0, 1fr); }
+    .flag-msg, .flag-fix, .flag-id { grid-column: 1; }
+    .provenance pre { font-size: 11px; }
+    .receipts { gap: 0 20px; }
+  }
+
   /* ---- footer ---- */
   .colophon { padding: clamp(34px, 5vw, 56px) 0 clamp(48px, 7vw, 80px); }
   .colophon h2 { font-family: var(--serif); font-size: 22px; margin: 0 0 14px; font-weight: 600; }
@@ -1064,14 +1422,15 @@ const html = `<title>linelab — Chapter 8 figure bake</title>
       <p class="standfirst">
         Each plate below started as a few lines of scene text. linelab composed the road, integrated a
         single-track motorcycle over it with RK4, graded the resulting line against sixteen
-        <em>Total Control</em> riding checks, and drew what it found — top-down, from the rider's eye, and
-        as a strip of control inputs.
+        <em>Total Control</em> riding checks, and drew what it found — from above, from the rider&rsquo;s seat at
+        the turn-in, the apex and the exit, and as a strip of what the hands were doing.
+        Every figure ends with the one thing to practise.
       </p>
       <dl class="receipts">
         <div><dt>figures baked</dt><dd>6</dd></div>
         <div><dt>lines graded</dt><dd>12 <small>6 ideal · 6 mistakes</small></dd></div>
         <div><dt>re-bake drift</dt><dd>0 bytes <small>all six byte-identical</small></dd></div>
-        <div><dt>views per figure</dt><dd>5 <small>1 top-down, 2 POV, 2 control strips</small></dd></div>
+        <div><dt>frames per figure</dt><dd>${framesPerFigure} <small>1 top-down, ${Math.round(povCount / 6)} rider frames, ${Math.round(controlsCount / 6)} control strips</small></dd></div>
         <div><dt>riding checks</dt><dd>16</dd></div>
         <div><dt>runtime deps</dt><dd>0</dd></div>
       </dl>
@@ -1084,12 +1443,34 @@ const html = `<title>linelab — Chapter 8 figure bake</title>
         Everything here came out of one command per figure. The engine is the only source of truth —
         the renderers never re-derive physics, they only draw what the solver already computed.
       </p>
-      <pre class="mono"><code>node dist/cli/main.js figure figures/fig-08-01.scene --mode true --out out/fig-08-01
-node dist/cli/main.js render out/fig-08-01/fig-08-01.json --views topdown,controls --mode true --out views-01
-node dist/cli/main.js render out/fig-08-01/fig-08-01.json --views pov --line good --mode true --out views-01
-node dist/cli/main.js render out/fig-08-01/fig-08-01.json --views pov --line bad  --mode true --out views-01</code></pre>
+      <pre class="mono"><code>node dist/cli/main.js figure figures/fig-08-01.scene --mode true --out .bake/fig-08-01
+node dist/cli/main.js render .bake/fig-08-01/fig-08-01.json --views topdown,controls --mode true --out views-01
+node dist/cli/main.js render .bake/fig-08-01/fig-08-01.json --views pov --line good \
+    --look limit_point --roll level --s 12 --mode true --out stations-01</code></pre>
+      <p class="howto-note">
+        <code>--look limit_point</code> turns the rider&rsquo;s head through the corner, <code>--roll level</code>
+        holds the horizon flat and puts the lean on a dial, and <code>--s</code> puts the camera at one
+        station &mdash; the turn-in, the apex or the exit of that line&rsquo;s own recorded events. The whole
+        chapter rebuilds with <code>npm run bake:ch8</code>.
+      </p>
     </div>
   </section>
+
+  <nav class="contents">
+    <div class="inner">
+      <span class="kicker">The six figures</span>
+      <ol class="contents-list">
+        ${summary
+          .map((rec) => {
+            const m = META[rec.figure];
+            return `<li><a href="#${rec.figure}"><span class="c-n">${m.n}</span><span class="c-t">${esc(m.title)}</span></a></li>`;
+          })
+          .join('')}
+      </ol>
+      <p class="contents-note">They build on each other: 8.1 is the early turn-in on one corner, 8.4 is the same
+        error where the road tightens, and 8.6 is what it costs when five corners inherit it in turn.</p>
+    </div>
+  </nav>
 
   ${legendSection}
 
@@ -1143,6 +1524,22 @@ node dist/cli/main.js render out/fig-08-01/fig-08-01.json --views pov --line bad
       });
       document.querySelectorAll('.viewpane[data-fig="' + fig + '"]').forEach(function (p) {
         p.classList.toggle('is-active', p.dataset.view === view);
+      });
+    });
+  });
+
+  // The station stepper: turn-in → apex → exit, within one figure's rider view.
+  document.querySelectorAll('.station-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var fig = tab.dataset.fig;
+      var station = tab.dataset.station;
+      document.querySelectorAll('.station-tab[data-fig="' + fig + '"]').forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.station-pane[data-fig="' + fig + '"]').forEach(function (p) {
+        p.classList.toggle('is-active', p.dataset.station === station);
       });
     });
   });

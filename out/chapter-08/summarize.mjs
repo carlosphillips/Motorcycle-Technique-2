@@ -45,6 +45,10 @@ for (const f of ids) {
         id: c.id,
         corner: c.corner_id,
         msg: c.evidence?.message,
+        // the check's own recorded metrics ride along: the gallery re-says the
+        // finding in riding words through the engine's lexicon, and that
+        // rewrite is allowed to read ONLY what the check actually measured
+        metrics: c.evidence?.metrics,
       })),
     });
   }

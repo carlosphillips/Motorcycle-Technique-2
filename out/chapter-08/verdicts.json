@@ -64,25 +64,46 @@
       "v": "fail",
       "id": "late_apex",
       "corner": "c1",
-      "msg": "apex at 31.8% of sweep, before the 50% bar"
+      "msg": "apex at 31.8% of sweep, before the 50% bar",
+      "metrics": {
+       "apex_pct": 31.83,
+       "bar": 50
+      }
      },
      {
       "v": "fail",
       "id": "exit_containment",
       "corner": "c1",
-      "msg": "terminated off-road before the exit sample"
+      "msg": "terminated off-road before the exit sample",
+      "metrics": {
+       "crossing_s": 27.47
+      }
      },
      {
       "v": "fail",
       "id": "stop_within_sight",
       "corner": null,
-      "msg": "stopping distance exceeds sight by 22.2 m"
+      "msg": "stopping distance exceeds sight by 22.2 m",
+      "metrics": {
+       "max_deficit_m": 22.22,
+       "min_margin_m": -22.22,
+       "worst": {
+        "s": 27.47,
+        "v": 11.71,
+        "phi": -14.51
+       }
+      }
      },
      {
       "v": "fail",
       "id": "rideability",
       "corner": null,
-      "msg": "tracker overdrive"
+      "msg": "tracker overdrive",
+      "metrics": {
+       "max_excess_dps": 3.65,
+       "max_dkappa": 0,
+       "phi_jump_deg": 0
+      }
      }
     ]
    }
@@ -152,31 +173,59 @@
       "v": "fail",
       "id": "late_apex",
       "corner": "c1",
-      "msg": "apex at 2.7% of sweep, before the 50% bar"
+      "msg": "apex at 2.7% of sweep, before the 50% bar",
+      "metrics": {
+       "apex_pct": 2.65,
+       "bar": 50
+      }
      },
      {
       "v": "fail",
       "id": "out_in_out",
       "corner": "c1",
-      "msg": "out-in-out shape broken"
+      "msg": "out-in-out shape broken",
+      "metrics": {
+       "ti_f": 1,
+       "apex_f": 0.967,
+       "exit_f": 1.148,
+       "chained": false
+      }
      },
      {
       "v": "fail",
       "id": "quick_steer",
       "corner": "c1",
-      "msg": "roll-in never completed inside the record — it ate every ridden metre of the corner"
+      "msg": "roll-in never completed inside the record — it ate every ridden metre of the corner",
+      "metrics": {
+       "steer_share": 0.24,
+       "dt_steer_s": null,
+       "phi_c_deg": 30.47,
+       "roll_in_completed": false
+      }
      },
      {
       "v": "fail",
       "id": "exit_containment",
       "corner": "c1",
-      "msg": "terminated off-road before the exit sample"
+      "msg": "terminated off-road before the exit sample",
+      "metrics": {
+       "crossing_s": 16.61
+      }
      },
      {
       "v": "fail",
       "id": "stop_within_sight",
       "corner": null,
-      "msg": "stopping distance exceeds sight by 19.7 m"
+      "msg": "stopping distance exceeds sight by 19.7 m",
+      "metrics": {
+       "max_deficit_m": 19.73,
+       "min_margin_m": -19.73,
+       "worst": {
+        "s": 16.61,
+        "v": 9.22,
+        "phi": -17.88
+       }
+      }
      }
     ]
    }
@@ -248,31 +297,56 @@
       "v": "fail",
       "id": "late_apex",
       "corner": "c1",
-      "msg": "apex at 21.2% of sweep, before the 50% bar"
+      "msg": "apex at 21.2% of sweep, before the 50% bar",
+      "metrics": {
+       "apex_pct": 21.22,
+       "bar": 50
+      }
      },
      {
       "v": "fail",
       "id": "single_input",
       "corner": "c1",
-      "msg": "3 steering input(s), 1 allowed"
+      "msg": "3 steering input(s), 1 allowed",
+      "metrics": {
+       "count": 3,
+       "allowed": 1
+      }
      },
      {
       "v": "fail",
       "id": "exit_containment",
       "corner": "c1",
-      "msg": "terminated off-road before the exit sample"
+      "msg": "terminated off-road before the exit sample",
+      "metrics": {
+       "crossing_s": 23.83
+      }
      },
      {
       "v": "fail",
       "id": "stop_within_sight",
       "corner": null,
-      "msg": "stopping distance exceeds sight by 19.8 m"
+      "msg": "stopping distance exceeds sight by 19.8 m",
+      "metrics": {
+       "max_deficit_m": 19.79,
+       "min_margin_m": -19.79,
+       "worst": {
+        "s": 23.83,
+        "v": 10.99,
+        "phi": -5.83
+       }
+      }
      },
      {
       "v": "fail",
       "id": "rideability",
       "corner": null,
-      "msg": "tracker overdrive"
+      "msg": "tracker overdrive",
+      "metrics": {
+       "max_excess_dps": 3.65,
+       "max_dkappa": 0,
+       "phi_jump_deg": 0
+      }
      }
     ]
    }
@@ -342,25 +416,47 @@
       "v": "fail",
       "id": "late_apex",
       "corner": "c1",
-      "msg": "apex at 1.4% of sweep, before the 60% bar"
+      "msg": "apex at 1.4% of sweep, before the 60% bar",
+      "metrics": {
+       "apex_pct": 1.38,
+       "bar": 60
+      }
      },
      {
       "v": "fail",
       "id": "out_in_out",
       "corner": "c1",
-      "msg": "out-in-out shape broken"
+      "msg": "out-in-out shape broken",
+      "metrics": {
+       "ti_f": 1,
+       "apex_f": 0.995,
+       "exit_f": 1.148,
+       "chained": false
+      }
      },
      {
       "v": "fail",
       "id": "exit_containment",
       "corner": "c1",
-      "msg": "terminated off-road before the exit sample"
+      "msg": "terminated off-road before the exit sample",
+      "metrics": {
+       "crossing_s": 27.51
+      }
      },
      {
       "v": "fail",
       "id": "stop_within_sight",
       "corner": null,
-      "msg": "stopping distance exceeds sight by 15.7 m"
+      "msg": "stopping distance exceeds sight by 15.7 m",
+      "metrics": {
+       "max_deficit_m": 15.67,
+       "min_margin_m": -15.67,
+       "worst": {
+        "s": 27.51,
+        "v": 9.01,
+        "phi": -24.78
+       }
+      }
      }
     ]
    }
@@ -411,49 +507,96 @@
       "v": "fail",
       "id": "late_apex",
       "corner": "c2",
-      "msg": "apex at 5.0% of sweep, before the 50% bar"
+      "msg": "apex at 5.0% of sweep, before the 50% bar",
+      "metrics": {
+       "apex_pct": 5.01,
+       "bar": 50
+      }
      },
      {
       "v": "fail",
       "id": "out_in_out",
       "corner": "c2",
-      "msg": "out-in-out shape broken — exit leg waived (chained)"
+      "msg": "out-in-out shape broken — exit leg waived (chained)",
+      "metrics": {
+       "ti_f": 0.227,
+       "apex_f": 0.227,
+       "exit_f": 0.725,
+       "chained": true
+      }
      },
      {
       "v": "fail",
       "id": "out_in_out",
       "corner": "c3",
-      "msg": "out-in-out shape broken"
+      "msg": "out-in-out shape broken",
+      "metrics": {
+       "ti_f": 0.778,
+       "apex_f": 0.255,
+       "exit_f": 0.255,
+       "chained": false
+      }
      },
      {
       "v": "fail",
       "id": "single_input",
       "corner": "c1",
-      "msg": "2 steering input(s), 1 allowed"
+      "msg": "2 steering input(s), 1 allowed",
+      "metrics": {
+       "count": 2,
+       "allowed": 1
+      }
      },
      {
       "v": "fail",
       "id": "single_input",
       "corner": "c3",
-      "msg": "2 steering input(s), 1 allowed"
+      "msg": "2 steering input(s), 1 allowed",
+      "metrics": {
+       "count": 2,
+       "allowed": 1
+      }
      },
      {
       "v": "warn",
       "id": "throttle_rule",
       "corner": "c1",
-      "msg": "missed legs: roll_on"
+      "msg": "missed legs: roll_on",
+      "metrics": {
+       "apex_s": 24.5,
+       "vmin_s": 8.5,
+       "onset_s": null,
+       "discipline": [],
+       "missed": [
+        "roll_on"
+       ]
+      }
      },
      {
       "v": "warn",
       "id": "throttle_rule",
       "corner": "c2",
-      "msg": "missed legs: roll_on"
+      "msg": "missed legs: roll_on",
+      "metrics": {
+       "apex_s": 29,
+       "vmin_s": 29,
+       "onset_s": null,
+       "discipline": [],
+       "missed": [
+        "roll_on"
+       ]
+      }
      },
      {
       "v": "fail",
       "id": "link_continuity",
       "corner": null,
-      "msg": "link broken: entry_side"
+      "msg": "link broken: entry_side",
+      "metrics": {
+       "entry_f": 0.164,
+       "peak_brake": 0,
+       "extrema_count": 0
+      }
      }
     ]
    },
@@ -501,61 +644,123 @@
       "v": "fail",
       "id": "late_apex",
       "corner": "c2",
-      "msg": "apex at 2.0% of sweep, before the 50% bar"
+      "msg": "apex at 2.0% of sweep, before the 50% bar",
+      "metrics": {
+       "apex_pct": 2.02,
+       "bar": 50
+      }
      },
      {
       "v": "fail",
       "id": "out_in_out",
       "corner": "c2",
-      "msg": "out-in-out shape broken — exit leg waived (chained)"
+      "msg": "out-in-out shape broken — exit leg waived (chained)",
+      "metrics": {
+       "ti_f": 0.941,
+       "apex_f": 0.941,
+       "exit_f": 1.148,
+       "chained": true
+      }
      },
      {
       "v": "fail",
       "id": "single_input",
       "corner": "c2",
-      "msg": "0 steering input(s), 1 allowed"
+      "msg": "0 steering input(s), 1 allowed",
+      "metrics": {
+       "count": 0,
+       "allowed": 1
+      }
      },
      {
       "v": "fail",
       "id": "throttle_rule",
       "corner": "c1",
-      "msg": "missed legs: roll_on, discipline"
+      "msg": "missed legs: roll_on, discipline",
+      "metrics": {
+       "apex_s": 17.5,
+       "vmin_s": 7.5,
+       "onset_s": null,
+       "discipline": [
+        "mid-corner brake at s=7"
+       ],
+       "missed": [
+        "roll_on",
+        "discipline"
+       ]
+      }
      },
      {
       "v": "warn",
       "id": "throttle_rule",
       "corner": "c2",
-      "msg": "missed legs: roll_on"
+      "msg": "missed legs: roll_on",
+      "metrics": {
+       "apex_s": 29,
+       "vmin_s": 29,
+       "onset_s": null,
+       "discipline": [],
+       "missed": [
+        "roll_on"
+       ]
+      }
      },
      {
       "v": "fail",
       "id": "exit_containment",
       "corner": "c2",
-      "msg": "terminated off-road before the exit sample"
+      "msg": "terminated off-road before the exit sample",
+      "metrics": {
+       "crossing_s": 30.78
+      }
      },
      {
       "v": "fail",
       "id": "stop_within_sight",
       "corner": null,
-      "msg": "stopping distance exceeds sight by 11.4 m"
+      "msg": "stopping distance exceeds sight by 11.4 m",
+      "metrics": {
+       "max_deficit_m": 11.45,
+       "min_margin_m": -11.45,
+       "worst": {
+        "s": 30.78,
+        "v": 7.3,
+        "phi": -11.92
+       }
+      }
      },
      {
       "v": "fail",
       "id": "link_continuity",
       "corner": null,
-      "msg": "link broken: entry_side"
+      "msg": "link broken: entry_side",
+      "metrics": {
+       "entry_f": 0.475,
+       "peak_brake": 0,
+       "extrema_count": 0
+      }
      },
      {
       "v": "fail",
       "id": "link_continuity",
       "corner": null,
-      "msg": "link broken: entry_side"
+      "msg": "link broken: entry_side",
+      "metrics": {
+       "entry_f": null,
+       "peak_brake": 0,
+       "extrema_count": 0
+      }
      },
      {
       "v": "fail",
       "id": "chain_containment",
       "corner": null,
-      "msg": "chain leaves the corridor on the outside side"
+      "msg": "chain leaves the corridor on the outside side",
+      "metrics": {
+       "max_f": 1.148,
+       "min_f": 0.022,
+       "worst_side": "outside"
+      }
      }
     ]
    }
@@ -613,31 +818,70 @@
       "v": "fail",
       "id": "out_in_out",
       "corner": "c3",
-      "msg": "out-in-out shape broken — exit leg waived (chained)"
+      "msg": "out-in-out shape broken — exit leg waived (chained)",
+      "metrics": {
+       "ti_f": 0.795,
+       "apex_f": 0.471,
+       "exit_f": 0.471,
+       "chained": true
+      }
      },
      {
       "v": "fail",
       "id": "out_in_out",
       "corner": "c4",
-      "msg": "out-in-out shape broken"
+      "msg": "out-in-out shape broken",
+      "metrics": {
+       "ti_f": 0.526,
+       "apex_f": 0.526,
+       "exit_f": 0.535,
+       "chained": false
+      }
      },
      {
       "v": "warn",
       "id": "throttle_rule",
       "corner": "c1",
-      "msg": "missed legs: roll_on"
+      "msg": "missed legs: roll_on",
+      "metrics": {
+       "apex_s": 23.5,
+       "vmin_s": 6.5,
+       "onset_s": null,
+       "discipline": [],
+       "missed": [
+        "roll_on"
+       ]
+      }
      },
      {
       "v": "warn",
       "id": "throttle_rule",
       "corner": "c2",
-      "msg": "missed legs: roll_on"
+      "msg": "missed legs: roll_on",
+      "metrics": {
+       "apex_s": 45,
+       "vmin_s": 27.5,
+       "onset_s": null,
+       "discipline": [],
+       "missed": [
+        "roll_on"
+       ]
+      }
      },
      {
       "v": "warn",
       "id": "throttle_rule",
       "corner": "c3",
-      "msg": "missed legs: roll_on"
+      "msg": "missed legs: roll_on",
+      "metrics": {
+       "apex_s": 67,
+       "vmin_s": 49,
+       "onset_s": null,
+       "discipline": [],
+       "missed": [
+        "roll_on"
+       ]
+      }
      }
     ]
    },
@@ -685,73 +929,144 @@
       "v": "fail",
       "id": "late_apex",
       "corner": "c2",
-      "msg": "apex at 27.3% of sweep, before the 50% bar"
+      "msg": "apex at 27.3% of sweep, before the 50% bar",
+      "metrics": {
+       "apex_pct": 27.32,
+       "bar": 50
+      }
      },
      {
       "v": "fail",
       "id": "out_in_out",
       "corner": "c2",
-      "msg": "out-in-out shape broken — exit leg waived (chained)"
+      "msg": "out-in-out shape broken — exit leg waived (chained)",
+      "metrics": {
+       "ti_f": 0.038,
+       "apex_f": -0.355,
+       "exit_f": 1.148,
+       "chained": true
+      }
      },
      {
       "v": "fail",
       "id": "single_input",
       "corner": "c2",
-      "msg": "2 steering input(s), 1 allowed"
+      "msg": "2 steering input(s), 1 allowed",
+      "metrics": {
+       "count": 2,
+       "allowed": 1
+      }
      },
      {
       "v": "fail",
       "id": "throttle_rule",
       "corner": "c1",
-      "msg": "missed legs: roll_on, discipline"
+      "msg": "missed legs: roll_on, discipline",
+      "metrics": {
+       "apex_s": 19,
+       "vmin_s": 6.5,
+       "onset_s": null,
+       "discipline": [
+        "mid-corner brake at s=5.5"
+       ],
+       "missed": [
+        "roll_on",
+        "discipline"
+       ]
+      }
      },
      {
       "v": "warn",
       "id": "throttle_rule",
       "corner": "c2",
-      "msg": "missed legs: roll_on"
+      "msg": "missed legs: roll_on",
+      "metrics": {
+       "apex_s": 34,
+       "vmin_s": 17.5,
+       "onset_s": null,
+       "discipline": [],
+       "missed": [
+        "roll_on"
+       ]
+      }
      },
      {
       "v": "fail",
       "id": "exit_containment",
       "corner": "c2",
-      "msg": "terminated off-road before the exit sample"
+      "msg": "terminated off-road before the exit sample",
+      "metrics": {
+       "crossing_s": 42.49
+      }
      },
      {
       "v": "fail",
       "id": "stop_within_sight",
       "corner": null,
-      "msg": "stopping distance exceeds sight by 13.7 m"
+      "msg": "stopping distance exceeds sight by 13.7 m",
+      "metrics": {
+       "max_deficit_m": 13.7,
+       "min_margin_m": -13.7,
+       "worst": {
+        "s": 42.49,
+        "v": 8.16,
+        "phi": 25.55
+       }
+      }
      },
      {
       "v": "fail",
       "id": "link_continuity",
       "corner": null,
-      "msg": "link broken: entry_side"
+      "msg": "link broken: entry_side",
+      "metrics": {
+       "entry_f": -0.106,
+       "peak_brake": 0,
+       "extrema_count": 0
+      }
      },
      {
       "v": "fail",
       "id": "link_continuity",
       "corner": null,
-      "msg": "link broken: entry_side"
+      "msg": "link broken: entry_side",
+      "metrics": {
+       "entry_f": null,
+       "peak_brake": 0,
+       "extrema_count": 0
+      }
      },
      {
       "v": "fail",
       "id": "link_continuity",
       "corner": null,
-      "msg": "link broken: entry_side"
+      "msg": "link broken: entry_side",
+      "metrics": {
+       "entry_f": null,
+       "peak_brake": 0,
+       "extrema_count": 0
+      }
      },
      {
       "v": "fail",
       "id": "chain_containment",
       "corner": null,
-      "msg": "chain leaves the corridor on the inside side"
+      "msg": "chain leaves the corridor on the inside side",
+      "metrics": {
+       "max_f": 1.148,
+       "min_f": -0.355,
+       "worst_side": "inside"
+      }
      },
      {
       "v": "fail",
       "id": "chain_flow",
       "corner": null,
-      "msg": "flow broken: rhythm"
+      "msg": "flow broken: rhythm",
+      "metrics": {
+       "rhythm_sign_changes": 0,
+       "hand_alternations": 1
+      }
      }
     ]
    }
