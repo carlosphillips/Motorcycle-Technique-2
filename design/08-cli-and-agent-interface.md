@@ -258,7 +258,7 @@ vice versa — flags are sugar, not a second schema.
 | Plan channels | `--turn-in <auto\|s>` · `--brake <auto\|decel>` · `--brake-slew <m/s³>` · `--throttle <spec>` · `--throttle-slew <m/s³>` · `--throttle-freeze <s>` (the throttle action's `freeze_steer_s`, **03** §6.1) · `--position <spec>` (`over_m` defaults `"auto"`, **03** §6.1) |
 | Solver intent (D10) | `--style <single\|double_apex>` · `--vis <none\|cautious>` (sugar: `--visibility-governed`) · `--vis-hold <f>` · `--vis-margin <×>` (**04** §6 — either knob without `--vis cautious` is rejected `INEFFECTUAL`, per D8) · `--constraint "<token>"` (repeatable; the compact bound grammar of **04** §4.5) · `--believe-road "<dsl \| preset name>"` (**04** §4.6) · `--accept <clean\|best_failing>` (**04** §4.7) |
 | Lines & mistakes | `--mistake "<mistake-token>"` (repeatable) · `--line-id <id>` |
-| View | `--marks "<MarkSpec>"` · `--rays <auto\|off\|all_turn_ins>` · `--legend <auto\|on\|off>` · `--look <heading\|limit_point>` · `--orient <auto\|0\|90\|180\|270>` (all ViewSpec fields, **06** §2.1; flag-over-file per §4.2) |
+| View | `--marks "<MarkSpec>"` · `--rays <auto\|off\|all_turn_ins>` · `--legend <auto\|on\|off>` · `--look <heading\|limit_point>` · `--roll <lean\|level>` · `--orient <auto\|0\|90\|180\|270>` (all ViewSpec fields, **06** §2.1; flag-over-file per §4.2). `--roll` (D48) is POV-only: `level` holds the horizon flat and moves lean to the HUD dial. `--s <m>` on `render --views pov` puts the camera at that true station's nearest RECORDED sample (never an interpolated pose) and names the file for it, which is how one figure carries a turn-in, an apex and an exit frame of the same line. |
 | Config | `--rubric <pack-id>` (reserved; exactly one legal value today — unknown pack → `SCHEMA`) · `--checks-version <n>` |
 | Analysis (out-of-hash, exit-code-neutral) | `--standing` · `--scan-ds <m>` · `--commitment` · `--prior <name>` |
 
@@ -520,6 +520,12 @@ manifest's `requires_checks_version` is the single source linking them.
   teaching-table row for that kind plus its naming note — same data source, no
   duplicated prose. `explain premature` returns the teaching row;
   `explain early_apex` returns the `UNKNOWN_ID`/`renamed_kind` tombstone hint.
+  A check id additionally carries a **`rider` block** (D49) — `{title, why,
+  fix}` from `plan/doctrine/lexicon.ts`: the check's name in riding words, why
+  it matters on a road, and what to do differently. It is presentation only and
+  grades nothing; the rubric pack's own `teaches` sentence is unchanged beside
+  it, and a lexicon entry can never contradict the catalogue because it reads no
+  thresholds.
 
 Disambiguation order, pinned: (1) `-` or an existing readable file → envelope;
 (2) else exact match against the closed vocabularies in the order check ids →

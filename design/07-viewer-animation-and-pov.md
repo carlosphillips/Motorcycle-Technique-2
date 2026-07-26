@@ -368,10 +368,25 @@ Per frame, from the focused Sample:
   `look?` in the ViewSpec (**06** §2.1), `look=` on the scene `view:` line
   (**04** §7), `--look` on the CLI (**08**), and the viewer toggle (§6.1);
   unknown values are rejected `SCHEMA` (closed set, D8).
-- **Roll** = `phi` in **both** `look` modes — the head rides the bike: the whole
-  image rotates with lean, so the horizon tilts exactly as much as the bike
-  leans. This is the POV's signature honesty: the horizon angle *is* the lean
-  readout.
+- **Roll** = `phi` in **both** `look` modes by default — the head rides the bike:
+  the whole image rotates with lean, so the horizon tilts exactly as much as the
+  bike leans. This is the POV's signature honesty: the horizon angle *is* the
+  lean readout.
+
+  **`roll: lean | level` (D48).** The ViewSpec field (`--roll` on the CLI,
+  default `lean`) selects which channel carries the lean. Under `level` the
+  frame is *not* rotated and the recorded `phi` is drawn instead as a **lean
+  dial** in the HUD — a bike-tail silhouette tilted by `phi` against a fixed
+  ground line, with the angle in degrees. Nothing is hidden and nothing is
+  invented: both modes draw the same recorded lean.
+
+  Why the option exists, given that `lean` is the honest default: a *moving*
+  view is read by a viewer whose own balance cancels the roll, and a **still
+  figure in a book is not**. At 30° of lean the rolled frame reads as a road
+  falling out of the picture rather than as a rider leaning into it, and the
+  road slides into a corner of the frame where the reader cannot see what the
+  figure is about. `level` is the book's setting for that reason and that reason
+  only; the viewer keeps `lean`.
 - **Pinhole projection** with horizontal field of view `fov_deg = 60` (TUNING);
   focal length follows from the canvas width. Near-plane distance
   `near_m = 0.5` (TUNING). Marker inset `CHEVRON_INSET = 0.05 ×
@@ -390,10 +405,23 @@ v = v_horizon + f · eye_height_m / F
 
 (with `v` measured downward from the horizon row — every ground point of a flat
 world lands below the horizon, approaching it as `F → ∞`), and the completed 2-D
-frame is rotated by `−phi` about the principal point. The horizon is the eye-level
-line through the principal point, rotated with the frame. Polygons are **clipped**
-against the near plane before projection (dropping vertices instead of clipping
-produces spray artifacts at the frame edges).
+frame is rotated by `−roll` about the principal point, where `roll = phi` under
+`roll: lean` and `0` under `roll: level`. The horizon is the eye-level line
+through the principal point, rotated with the frame.
+
+**The road surface is a strip of per-station quads, not one ring (D48).** Drawn
+far→near, each quad spanning two adjacent stations, so a span that cannot be
+seen is simply not drawn. The single outer-edge-forward + inner-edge-reversed
+polygon this replaces is a valid ring only while the whole strip is in front of
+the camera: on a road that bends both ways inside the lookahead the two chains
+cross and the surface folds through itself — the spike readers of the fig-08-06
+POV described as a mountain. Polylines are projected as **contiguous visible
+runs**: a vertex behind the near plane drops, *and so does the join across it*,
+because joining the survivors stitches a segment over ground that was dropped.
+
+The invariant with teeth, and the one to test: **a flat world never draws above
+the horizon.** Every projected ground point satisfies `v > v_horizon` by
+construction, so any drawn road pixel in the sky is a projection defect.
 
 ### 5.3 Draw order
 
@@ -401,10 +429,12 @@ Painter's algorithm, far to near, fixed:
 
 1. **Sky** above the (rolled) horizon; **ground** below it — flat fills in the
    neutral palette (**06** owns colours).
-2. **Road surface** — the closed polygon formed by projecting `roadOuter` ahead of
-   the camera and `roadInner` reversed; drawn to the visible extent of the road
-   model (the LUT ahead of the current station), not merely to `sight_m` — sight
-   is enforced by occlusion, not by truncating the world.
+2. **Road surface** — a strip of per-station quads (§5.2), drawn far→near to the
+   visible extent of the road model (the LUT ahead of the current station), not
+   merely to `sight_m` — sight is enforced by occlusion, not by truncating the
+   world. (Formerly one closed polygon of `roadOuter` ahead + `roadInner`
+   reversed; that construction folds through itself wherever the road bends both
+   ways inside the lookahead — D48.)
 3. **Lane markings** — centreline and lane-edge polylines, projected the same way.
 3b. **The continuation fan (D45, gated)** — between lane markings (3) and
    occluders (4). Each admissible member's two road edges are extruded and drawn
@@ -500,6 +530,30 @@ Painter's algorithm, far to near, fixed:
    (`look: limit point`) plus a small **heading tick** on the horizon line
    marking where `psi` points, so the head-turn amount is always disclosed
    in-frame — a rotated camera must not read as a rotated bike.
+
+   **In riding words (D48).** The strip is the one place the frame explains
+   itself, so it says `37 km/h · lean 30° left · see 27 m · need 19 m to stop ·
+   7 m spare`, in the failing ink when the last figure is a shortfall. Whole
+   numbers: a simulated metre to two decimals claims precision the integrator
+   does not. `φ`, `ssd` and `▶ deficit` were the engine's spelling of the same
+   three facts, and they made the reader do the subtraction that IS the lesson.
+   The same values ride the text element as data attributes (`data-v-kmh`,
+   `data-lean-deg`, `data-sight-m`, `data-ssd-m`) so a consumer reads numbers
+   rather than parsing prose. Under `roll: level` the strip also carries the
+   **lean dial** (§5.2).
+9. **Rider anchor (D48)** — the rider's own bar ends and mirrors in the near
+   corners, drawn in FRAME space (they are where the hands are, so they do not
+   roll with the camera under either roll mode). A first-person frame with none
+   of the machine in it gives the reader nothing to sit on: it reads as a camera
+   hovering beside the bike rather than a view from it.
+
+   **Path off-frame marker (D48).** When the focused line's overlay (stage 6)
+   has no run touching the frame at all — a rider looking through the corner
+   whose own line goes elsewhere, which is precisely the fig 8.1 mistake — an
+   edge marker in the line's verdict colour points the way it went, labelled
+   `your line`. Same convention as the clamped limit marker (stage 7): the
+   teaching device is never silently dropped, because a frame that draws no line
+   reads as a rider who had none.
 
 ### 5.4 Honesty placards
 

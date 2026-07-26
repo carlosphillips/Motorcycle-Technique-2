@@ -49,7 +49,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 1 — full 2000x2590 raster. Legend: red \"overspeed:by_kmh=2.5 — mistake · failing (wide)\", green \"solved 34 km/h — ideal · good\", both matching the manifest, including the `wide` outcome word (J1 pass). The green ideal carries the full auto marker set: an hourglass turn point low on the entry straight, an open ring apex late in the corner, a filled dot exit, and double-chevron release glyphs on the exit — all on the green line, and the red mistake carries none, which is exactly what `auto` means for a scene with no marks: field (ideal-role only). No glyph floats off a line (J2 pass, J7 pass). \"wait for the radius to open\" leads to the green apex ring and \"too fast — pushed wide as it tightens\" leads to the red line's run-wide detection station on the entry; both are anchored and legible (J3 pass). No occluders (J4 na). J5: the red line sits fractionally outside the green all the way through and the gap grows as the radius tightens, ending with the red arrowhead on the outer edge — a marginal overspeed progressively pushed off the tightening exit, drawn rather than asserted (J5 pass). At 2x everything is legible (J8 pass). J6 na, J9 na."
+        "evidence": "Pass 1 — full 2000x2590 colour raster. Legend rows match the manifest; the +2.5 km/h line is red/failing (wide), the solved line green (J1). The ideal line carries a ring at its apex, a filled dot at the exit and a release double-chevron, each on its own line and none floating (J2). \"wait for the radius to open\" leads to the green apex ring and \"too fast — pushed wide as it tightens\" to the red line on the entry straight (J3). No occluders (J4 na). The two lines run together through the entry and separate exactly where the radius tightens, the red one washing out to the corridor edge and terminating \"ran wide\" — which is the error the figure teaches (J5)."
       },
       {
         "attempt": 2,
@@ -91,7 +91,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 2 — SVG draw list against the manifest. Two polylines: bad #b32e2e / arrow-failing, good #1f6f43 / arrow-good, matching declared failing and good (J1 pass). data-marker-class inventory: {good, turn_point} x1, {good, apex} x1, {good, exit} x1, {good, release} x4 — every glyph on the ideal, none on the mistake, and the single apex confirms the ONE late apex the scene's note claims (J2 pass). No {bad, ...} entry anywhere, so the J2 finding that once put a red apex ring on this figure's overspeed line at its first metre has not returned (J7 pass). Two <text> callouts beyond the legend for the two declared labels (J3 pass). Zero rays, zero occluders (J4 na). data-terminal-reason=\"off_road\" on bad only."
+        "evidence": "Pass 2 — same raster, read for fabrication. The entry stamps read 34 km/h (ideal) and 37 km/h (mistake), which is the declared +2.5 km/h at display rounding, and nothing else is drawn that the envelope does not carry (J7)."
       },
       {
         "attempt": 3,
@@ -133,7 +133,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 3 — close read of the marker vocabulary at 2x. The apex glyph is an OPEN ring with a visible hole and the exit glyph is a smaller FILLED disc; at this raster the two are plainly different marks rather than two dots of different sizes, which is the separation APEX_RING_STROKE_PX and EXIT_DOT_R exist to guarantee. The release glyphs read as paired chevrons, distinct from both. The proportion gate on this figure is `warn` rather than `fail`, and nothing in the drawing contradicts that — the corner fills the frame without the road being squeezed to a ribbon (J8 pass)."
+        "evidence": "Pass 3 — greyscale. Honest observation: through the first 20 m the two strokes overlap so closely that in grey they read as one line — but they separate where the figure's claim lives, at the tightening exit, and the captions \"clean\" and \"ran wide\" divide them without hue. Ladder numbers, both labels and the scale bar stay readable (J8)."
       }
     ],
     "items": [

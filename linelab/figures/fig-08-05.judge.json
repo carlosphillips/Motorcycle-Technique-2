@@ -49,7 +49,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 1 — full 2000x2774 raster, first judging of the rebuilt scene. Legend: red \"premature — mistake · failing (runoff)\" and AMBER \"chained 30 km/h — ideal · caution (contained)\". The ideal's stroke is #b07d1e, the caution colour, not the green of a clean line — the colour follows the verdict, not the role, which is the D9 law working correctly on the first figure in this set whose ideal is graded caution (J1 pass). Markers: three amber hourglasses and four amber rings on the ideal, one red hourglass and one red ring on the mistake, every one of them planted on its own stroke (J2 pass). Three callouts, all anchored: \"first touch\" to the ideal's first apex ring, \"early apex - hard on the inside of c1\" to the mistake's apex ring low in the frame, and \"no geometry left for c2 - off the outside edge\" to the mistake's terminal arrowhead. None clipped, none overlapping (J3 pass). No occluders (J4 na). J5 is the whole point of the rebuild: the red line turns in at the very start, runs inside the amber line, touches the inside edge of the first corner near the middle of its sweep, and then — having spent the geometry — crosses the amber line and departs the OUTSIDE edge before the second corner is over. Early apex, lost exit, off the road, in one legible sweep (J5 pass). Nothing undeclared is drawn (J7 pass); amber and red separate cleanly at 2x and every callout is crisp (J8 pass). J6 na, J9 na."
+        "evidence": "Pass 1 — full 2000x2774 colour raster. The chained ideal line is AMBER and its legend row reads \"chained 30 km/h — ideal · caution (contained)\", which is the manifest's own verdict for it; the mistake line is red/failing (runoff) (J1 — amber here is the colour law working, not a defect). Rings, hourglasses and release chevrons sit on their own lines through all three corners (J2). All three labels resolve: \"first touch\" on the ideal's first apex ring, \"early apex - hard on the inside of c1\" on the mistake's ring, \"no geometry left for c2 - off the outside edge\" at the runoff (J3). No occluders (J4 na). The mistake line touches the inside of c1 visibly earlier, then has nothing left for c2 and departs the outside edge before c3 — the compound-corner lesson is legible in the geometry alone (J5)."
       },
       {
         "attempt": 2,
@@ -91,7 +91,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 2 — SVG draw list against the manifest. The manifest declares early/mistake/failing/runoff and good/ideal/caution/contained. The file carries data-line-id=\"early\" stroke #b32e2e marker-end url(#arrow-failing) and data-line-id=\"good\" stroke #b07d1e marker-end url(#arrow-caution) — both the stroke AND the arrowhead marker follow the caution class, so the ideal is not quietly drawn green (J1 pass). data-marker-class inventory: good turn_point x3, good apex x4, early turn_point x2, early apex x1 — `marks: turn_point,apex` is a class LIST, so it licenses both classes on EVERY line, and the counts match the recorded events (good has 3 turn_in and 4 apex; early has 2 turn_in and 2 apex). Early's SECOND apex is not separately drawn: it sits 0.99 m from the ideal's first apex, inside MARK_COINCIDE_EPS_M = 1.0 m in both station and drawn position, so stage 9 collapsed the pair to one glyph coloured by the ideal. That is the documented collapse rule operating within a hair of its threshold, not a dropped marker — recorded here because it hides a mistake-line apex behind an ideal-line ring (J2 pass, with that caveat). Three <text> callouts beyond the legend for the three declared labels; zero rays and zero occluders (J3 pass, J4 na, J7 pass)."
+        "evidence": "Pass 2 — same raster, read for fabrication. Every marker corresponds to a recorded event of the chained line or the mistake; the amber line's outcome word is \"caution\" and the red line's \"ran off\", each matching its verdict; no glyph is drawn for a corner the mistake never reached (J7)."
       },
       {
         "attempt": 3,
@@ -133,7 +133,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 3 — two high-zoom crops. (a) The terminal at (1740,1450)+260x260: the red arrowhead's tip is planted exactly on the road/grass boundary with the edge tick visible along it, and the leader from \"...off the outside edge\" lands on the stroke just short of the tip. Standing sentence holds. (b) The line crossing at (1560,1830)+340x300: the two amber apex rings sit centred on the amber stroke with the \"first touch\" leader on the lower of them, and the red line passes clearly OUTSIDE them with no red ring in the crop — the visual confirmation of the collapse read in pass 2. Both crops confirm no glyph is floating and no callout is swallowed (J2 pass, J3 pass, J8 pass)."
+        "evidence": "Pass 3 — greyscale. This is the hardest case for hue-free reading, because amber and red converge to nearly the same grey — and it holds: the ideal line is the wider stroke, is captioned \"caution\" at its arrowhead, and the mistake is captioned \"ran off\". Without the outcome words the two would be hard to separate in grey, which is exactly why they are drawn (J8)."
       }
     ],
     "items": [

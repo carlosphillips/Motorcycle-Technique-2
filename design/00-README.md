@@ -520,6 +520,74 @@ Sibling documents must conform to all of them.
   *Supersedes* D45's spike and pass condition, `03 §3.1`'s `bookBlind` row and `book90`
   inheritance, `03 §7a.2`'s rate bound, and `03 §7a.4`'s ladder.
 
+- **D47 — A figure must show what its own verdict is measured against, which way the line runs,
+  and how far anything is.** A learner's reading of the six Chapter-8 plates (2026-07-25) found
+  three things absent from every one of them. **(1) The graded corridor had no ink.** `off_road`
+  fires at the carriageway edge, and stage 8's terminal glyph does land there (measured: 2–4 cm on
+  all six figures). But every check that grades a line as running *wide* — `exit_containment`,
+  `chain_containment`, and the apex percentages, all measured in `f` — is graded against the
+  rider's lane inset by `bike_margin_m`, and that band was drawn nowhere: the verdict card said
+  "ran wide" and the figure showed nothing to be wide *of*. **(2) Direction, distance and entry
+  speed were absent**, so a reader could not tell which way a line ran without hunting for the
+  arrowhead, and no distance in the figure had a unit. **(3) Verdict rode on hue alone** — the
+  whole semantic axis was green/amber/red, which is exactly the axis ~8% of male readers cannot
+  separate, and which a greyscale print destroys. Three stages are added to `06 §3.1`: **3b** the
+  usable-corridor edges (neutral, finely dotted, from `road/corridor.ts`'s own `corridorEdgeOffsets`
+  — the renderer re-derives nothing); **8b** line chrome (a direction chevron every 10 true metres,
+  numbered on the ideal line only; the entry speed at each line's first drawn sample; and the
+  outcome **in a word** — `clean` / `caution` / `ran wide` / `ran off` / `crashed` / `stopped` —
+  beside the terminal glyph, which is the redundant channel that makes a verdict survive hue-blind
+  or greyscale reading); and **11** a scale bar in metres and feet with the lane width. The colour
+  law of `06 §5` is **untouched**: redundancy is added, no palette is changed. `DrawnLine` gains
+  `stations` (the true station of every drawn point, also emitted as `data-stations`) and
+  `entry_kmh`. Stage **8b** additionally carries a **consequence ray**, gated on a new ViewSpec
+  field `consequence: on | off` (default **off**, `06 §2.1`): past an `off_road` terminal, the
+  heading the line left with, extrapolated at constant heading and cut at the first occluder it
+  meets. It is not a trajectory and `06 §3.2`'s "no line the engine did not produce" stands — it is
+  drawn in neutral hatched ink with no arrowhead and never a verdict colour, the same treatment
+  D45's fan takes for the same reason. Only `fig-08-01` asks for it, because only that figure's
+  lesson is about what the runoff was pointing *at*. Specified in `06 §2.1`, `06 §3.1`.
+
+- **D48 — The POV frame may be held level, and says its numbers in riding words.** Three defects,
+  same reading. **(1) The road surface was one polygon** — outer edge forward, inner edge reversed —
+  which is a valid ring only while the whole strip is in front of the camera. On `bookEsses` and
+  `bookDoubleApex` the 140 m lookahead bends both ways, the two chains cross, and the surface
+  folded into a spike with the rider's line looping through it. The surface is now a **strip of
+  per-station quads sorted far→near**; polylines split at the near plane into contiguous runs,
+  because dropping a vertex and joining its neighbours (`07 §5.2`'s "drop vertices, do not
+  edge-clip") stitches a segment across ground that was dropped. Pinned by an invariant with teeth:
+  **a flat road never draws above the horizon**. **(2) Roll.** `07 §5.3`'s "the horizon angle IS
+  the lean" remains the engine default and the honest one — but a reader of a *still* figure has no
+  vestibular sense to cancel a 30° roll with, so the tilt reads as a road falling out of frame
+  rather than a bike leaning. A new ViewSpec field **`roll: lean | level`** (CLI `--roll`, default
+  `lean`) holds the camera upright and moves lean to a HUD dial; the book bakes `level`. Lean is
+  never lost, only carried on another channel. **(3) The HUD spoke engine**: `φ -14.51° … ssd
+  18.29 m ▶ deficit` became `lean 15° left · see 7 m · need 18 m to stop · SHORT by 11 m`, whole
+  numbers, red when short — and the values also ride as data attributes so a consumer never regexes
+  prose. Two additions of the same kind: the rider's own bar ends and mirrors in the near corners
+  (a first-person frame with none of the machine in it gives the reader nothing to sit on), and,
+  when the focused line projects entirely off-frame — a rider looking where their line does not go,
+  which *is* the fig 8.1 mistake — an edge marker naming it, rather than a frame that silently
+  draws no line. `render --views pov` gains `--s <m>`: the camera at a chosen true station, at the
+  nearest **recorded** sample, never an interpolated pose. Specified in `06 §2.1`, `07 §5.2`,
+  `07 §5.3`.
+
+- **D49 — Findings are named for the rider; the rubric is not renamed.** The verdict cards handed a
+  reader `late_apex`, `out_in_out`, `single_input`, `stop_within_sight`, `rideability: tracker
+  overdrive` — identifiers for the engine's own use — and never once said what to do differently.
+  `plan/doctrine/lexicon.ts` gives each of the sixteen a title, a *why* and a **fix**, and rewrites
+  a finding's evidence from **only** the metrics that check recorded (returning nothing, so the
+  caller shows the original, when it cannot). It grades nothing: a lexicon that could disagree with
+  the catalogue would be a second rubric, and `01 §A.3` admits one. Surfaced through
+  `explain <check-id>`'s new `rider` block and consumed by the chapter gallery. Related finding,
+  settled and **not** a defect: a fifty-pencing line draws six turn-point markers (the
+  marker-from-event law is record-wide) while `single_input` reports three (it counts inside the
+  corner window, and the line left the road at 23.8 m of a corner spanning 12–30.9 m). Both numbers
+  are right; the scope is named in the lexicon rather than in the check's `message`, because that
+  message rides inside the hashed verdict and rewording it moved every committed `result_hash` in
+  the golden roster. **Evidence text is not the place to fix a reading problem.** Specified in
+  `01 §A.3` (unchanged, cited), `08 §5.2`.
+
 ---
 
 ## 3. Build phasing (normative)

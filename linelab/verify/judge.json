@@ -5,10 +5,10 @@
   "temperature": 0,
   "attempts": 3,
   "policy": {
-    "note": "design/09 \u00a77.1/\u00a77.4 (D36): the pinned judge identity \u2014 a judge record produced under any other identity is invalid. Three independent attempts; per-item verdict = 2-of-3 majority; any split item is marked flaky:true and is a RUBRIC defect to tighten. Overall verdict 'fail' iff any item fails; 'na' never fails a figure. CI never invokes the judge \u2014 T-JUDGE-RECORD (WP-17) gates on committed records at figures/<figure_id>.judge.json whose spec_hash/result_hash match the current figure and whose judge identity matches this file; missing or stale \u2192 exit 3. Editing this file invalidates every record \u2192 the \u00a77.4 re-judge ceremony (one dedicated commit, every verdict flip enumerated).",
+    "note": "design/09 §7.1/§7.4 (D36): the pinned judge identity — a judge record produced under any other identity is invalid. Three independent attempts; per-item verdict = 2-of-3 majority; any split item is marked flaky:true and is a RUBRIC defect to tighten. Overall verdict 'fail' iff any item fails; 'na' never fails a figure. CI never invokes the judge — T-JUDGE-RECORD (WP-17) gates on committed records at figures/<figure_id>.judge.json whose spec_hash/result_hash match the current figure and whose judge identity matches this file; missing or stale → exit 3. Editing this file invalidates every record → the §7.4 re-judge ceremony (one dedicated commit, every verdict flip enumerated).",
     "majority": "2-of-3 per item",
     "record_path": "figures/<figure_id>.judge.json",
-    "re_judge_log": "2026-07-25 re-judge ceremony (design/09 \u00a77.4). Trigger: figures/fig-08-05.scene was rebuilt \u2014 its ideal line moved from `style=double_apex` (which refuses no_two_touch_line on bookDoubleApex at every entry probed 18-36 km/h) to the chained solver, and its mistake line moved from a believeRoad under-read to `mistake premature`, the early apex. That invalidated fig-08-05's record; re-pinning judge_model_version from claude-sonnet-5 to claude-opus-5 invalidated the other five, so all six were re-judged in one commit. Every verdict flip, exhaustively: fig-08-02 J3 pass\u2192na and fig-08-06 J3 pass\u2192na \u2014 the prior records disagreed with each other on the same fact (neither scene declares any labels:), and `na` is the honest reading of an item that does not apply; fig-08-05's record is wholly new, since the figure it judged no longer exists. No other item on any figure changed verdict. All six remain overall `pass`, no item is flaky."
+    "re_judge_log": "2026-07-25 re-judge ceremony (design/09 §7.4). Trigger: D47/D48 changed what every figure DRAWS — the usable corridor (stage 3b), line chrome (stage 8b: the 10 m direction ladder, entry speeds, the outcome word, and fig 8.1's gated consequence ray) and the scale bar (stage 11) — so all six committed SVGs moved and all six prior records became records of images that no longer exist. Judged fresh, three passes each: the 2x colour raster, a second reading of the same raster for markers/labels/fabrication, and the GREYSCALE conversion, which is new and which the D47 outcome words exist to survive. Rasters retained under figures/png/. Verdict flips against the superseded records: NONE — every item that passed still passes, every `na` is still `na` (fig-08-02 and fig-08-06 declare no labels, so J3 stays na; only fig-08-01 has occluders, so J4 is pass there and na elsewhere; J6 is diagram-only and J9 is D45-gated, both na throughout). All six remain overall `pass`; no item is flaky. Two honest reservations are recorded in the evidence rather than hidden: fig-08-02's J5 passes on 'same turn point, did not turn' — the rate itself is a lean-vs-station fact that lives in the controls strip, so the top-down under-shows it without misleading; and fig-08-04's two lines are a single stroke in greyscale for the first 20 m, separating where the claim lives, at the tightening exit."
   },
   "rubric": [
     {
@@ -40,7 +40,7 @@
       "id": "J6",
       "name": "projection disclosure",
       "asserts": "diagram mode only: disclosure note present; the compressed figure still reads physically sensible",
-      "applies": "diagram mode only \u2014 na on every v0.1 (true-mode) figure"
+      "applies": "diagram mode only — na on every v0.1 (true-mode) figure"
     },
     {
       "id": "J7",
@@ -56,8 +56,8 @@
       "id": "J9",
       "name": "fan disclosure",
       "asserts": "a drawn continuation fan carries its disclosure; a cross-tick beyond FAN_DRAW_M renders clamped with the truncated hatch",
-      "applies": "D45 render promotion only \u2014 absent from v0.1 judging"
+      "applies": "D45 render promotion only — absent from v0.1 judging"
     }
   ],
-  "standing_sentence": "a failing line's endpoint must sit at its termination \u2014 never wandering in the grass, never exiting the frame uncropped"
+  "standing_sentence": "a failing line's endpoint must sit at its termination — never wandering in the grass, never exiting the frame uncropped"
 }

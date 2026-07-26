@@ -1948,6 +1948,40 @@ against pixels:
 - Marker-collapse golden — two lines sharing a turn-in with both marked → one
   glyph, topmost-draw-order colour.
 
+**Reader-facing gates (D47/D48/D49).** These pin the properties whose ABSENCE
+the 2026-07-25 learner reading found — each one is written against the defect,
+not against the ink that fixed it:
+
+- `A-CORRIDOR-DRAWN` — every baked figure strokes both usable-corridor edges
+  (stage 3b), and those edges lie strictly inside the carriageway strokes by the
+  bike margin. *(The reason the band exists: a verdict card saying "ran wide"
+  with nothing on the page to be wide of.)*
+- `A-RUNOFF-ON-EDGE` — every `off_road` terminal glyph sits on the drawn
+  carriageway edge, within one bracketing step (measured 2–4 cm across the six).
+  This is `06 §3.1` stage 8's own claim, and it is now mechanical rather than
+  asserted.
+- `A-LADDER-AND-ENTRY` — every drawn line carries a 10 m direction ladder and an
+  entry-speed annotation; `A-OUTCOME-WORD` — every line states its outcome in a
+  word from the closed set `{clean, caution, ran wide, ran off, crashed,
+  stopped}`, which is what makes a verdict survive greyscale or red-green
+  reading; `A-SCALE-BAR` — every figure carries a scale bar and the lane width.
+- `A-CONSEQUENCE-GATED` — the consequence ray appears in exactly the figures
+  whose scene asks for it, carries no arrowhead and no verdict colour.
+- `A-POV-NO-SKY-ROAD` — over every sampled station of `bookEsses`, no projected
+  ground point of the road surface or the lane lines lies above the horizon, and
+  every road quad is a simple four-corner patch. *(A flat world cannot appear
+  above eye level; the folded ring did.)*
+- `A-POV-ROLL` — under `roll: lean` the horizon tilts by `phi`; under `level` it
+  is flat to floating-point and `phi_deg` is still reported, with the dial and
+  the HUD data attributes present. Lean is never lost, only moved.
+- `A-STRIP-FITS` — every controls panel title ends inside the strip's viewBox,
+  the header holds exactly one text, and `grip` is drawn on its fixed 0…1 range
+  with the out-of-grip band shaded.
+- `A-LEXICON-TOTAL` — the rider lexicon covers `CHECK_IDS` exactly; no
+  rider-facing sentence contains a check id or a field name; `riderMessage`
+  declines (returns nothing) when the metrics it would need are absent, so a
+  rewrite can never assert what a check did not measure.
+
 ---
 
 ## 6. Interactive-surface and result-contract tests (new)

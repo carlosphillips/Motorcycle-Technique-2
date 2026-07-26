@@ -58,6 +58,12 @@ ViewSpec = {
   look?: "heading" | "limit_point",     // POV camera aim; default "heading";
                                         // consumed by every renderer that draws
                                         // a POV frame, ignored elsewhere (07 §5.2)
+  roll?: "lean" | "level",              // POV frame roll (D48); default "lean" —
+                                        // the horizon tilts with phi. "level"
+                                        // holds it flat and moves lean to the
+                                        // HUD dial (07 §5.3). POV-only
+  consequence?: "on" | "off",           // stage 8b's consequence ray (D47);
+                                        // default "off". Top-down only
   rays?: "auto" | "off" | "all_turn_ins",
                                         // sight-ray selection; default "auto"
                                         // (§3.1 stage 7)
@@ -294,6 +300,19 @@ renderer is **projection-agnostic**: it consumes a `DrawnScene` and cannot tell
 3. Lane markings — centreline and edge lines per the road spec.
    `use_full_width: true` (03 §6) suppresses the centreline marking and keeps
    the edge lines — the book's track-framed roads carry no centreline.
+
+**Stage 3b — the usable corridor (D47).** The two edges of the band `f` runs on:
+the rider's lane inset by `bike_margin_m`, from `road/corridor.ts`'s
+`corridorEdgeOffsets` (the renderer re-derives no corridor arithmetic). Drawn as
+a finely dotted neutral pair — road furniture, never a verdict colour, never
+arrowheaded, so it cannot read as a trajectory. Omitted only when the corridor
+and the carriageway coincide (`use_full_width` with a zero margin).
+
+Why it is a stage and not a nicety: `off_road` fires at the CARRIAGEWAY edge and
+stage 8's terminal glyph lands there, but every check that grades a line as
+running *wide* — `exit_containment`, `chain_containment`, and the apex
+percentages, all measured in `f` — grades against this inner band. Without it a
+verdict card says "ran wide" and the figure shows nothing to be wide of.
 4. Surface patches — gravel as explicit stippled circles (carried rule: no SVG
    `<pattern>`; explicit elements rasterize predictably everywhere).
 5. Occluder glyphs — one schematic glyph per occluder kind from `03`'s
@@ -354,6 +373,18 @@ the fan's drawn end with the `truncated` hatch.
    | `stopped` | transverse bar (a "full stop" tick) at the final sample |
    | `max_time` / `max_dist` | plain arrowhead; the manifest records the guard (a guard ending in ink would be a bug surfaced by the vision judge) |
 
+**Stage 8b — line chrome (D47).** Presentation ink derived from the drawn
+polyline and its true stations — deliberately NOT stage 9, which is the
+marker-from-event law and admits no glyph without an event behind it. Four
+elements, none of which invents geometry (every one sits on a drawn sample):
+
+   | element | rule |
+   |---|---|
+   | direction chevron | one every `LADDER_EVERY_M = 10.0 m` of true station, in the line's colour, pointing along travel; numbered **on the ideal line only**, so one figure carries one distance scale |
+   | entry annotation | a filled cap at the line's first drawn sample plus its entry speed in km/h; lines sharing an entry split across the line so two stamps never collide |
+   | outcome word | `clean` / `caution` / `ran wide` / `ran off` / `crashed` / `stopped`, beside the terminal glyph, in the line's colour with a halo. **This is the redundancy that makes a verdict survive a greyscale print or a red-green reader** — §5's palette is untouched, a second channel is added |
+   | consequence ray | gated on `view.consequence` (§2.1, default off). Past an `off_road` terminal only: the final heading extrapolated at constant heading, cut at the first occluder it meets or at `CONSEQUENCE_LEN_M = 8.0 m` (TUNING). **Neutral hatched ink, no arrowhead, never a verdict colour** — the engine did not integrate it, so §3.2's "no line the engine did not produce" is honoured by making it visibly not a line |
+
 9. **Markers — the marker-from-event law.** A marker is the glyph of an event:
    for each line, the renderer draws one glyph per trajectory event whose kind
    maps to an enabled marker class (per the line's effective `MarkSpec`, owned
@@ -386,10 +417,14 @@ the fan's drawn end with the `truncated` hatch.
     simple candidate-position scoring pass, preferring the aspect-floor padding
     (§2.4). Leader ink per §5.2.
 11. **Margin chrome and placards** — the disclosure footnote (§2.7), the entry
-    annotation (§2.4), the legend (§5.3), and figure-level placard boxes: this
-    stage is the single slot for honest-limitation placards (01 §8) and the
-    version-skew divergence placard (05 §8.4). Placards are rendered elements,
-    never errors.
+    annotation (§2.4), the legend (§5.3), figure-level placard boxes, and the
+    **scale bar (D47)**: a round distance (5/10/20/25/50/100 m, the one nearest
+    a fifth of the frame) captioned in metres AND feet, plus the lane width.
+    Drawn space is true metres in v0.1, so the bar is literal. Without it no
+    distance in the figure — how early the turn-in was, how much road the
+    mistake ate — carries a unit. This stage is the single slot for
+    honest-limitation placards (01 §8) and the version-skew divergence placard
+    (05 §8.4). Placards are rendered elements, never errors.
 
 ### 3.2 What the renderer refuses
 
@@ -422,6 +457,20 @@ shaded band, so the reader can always relate compressed drawing to true distance
 - **Neutral palette** (carried hard rule): channel colours never reuse the
   green/amber/red verdict palette, so nothing in the strip reads as a line
   verdict.
+- **Captions are riding words, channel keys are field names (D47).** A panel is
+  titled for the rider — *Speed*, *Lean — asked for, and delivered*, *Brake and
+  throttle — commanded, and what the tyre allowed*, *Grip in reserve*, *Can you
+  stop inside what you can see?*, *Stand-up* — while each trace keeps its engine
+  channel name in the panel key and in `data-channel`, so nothing
+  machine-readable is traded for readability. The sight panel's rider-path basis
+  disclosure (D16) is normative and rides in the title.
+- **The strip is sized around its captions, not only its plot.** Plot width is
+  `max(MIN_PLOT_WIDTH, span × PX_PER_M, widest title)`: a strip that sizes itself
+  from the plot alone clips every caption on a short line. Channels with a fixed
+  meaningful range (`grip`, 0…1) are drawn against that range with the
+  out-of-range band shaded, never auto-scaled to their own extent — a line that
+  kept a third of its grip in reserve otherwise draws exactly like one that ran
+  out of road.
 - **Phase bands:** the vertical bands are exactly `05` §4.1's phase partition
   (`approach | turning | midcorner | exiting | done`, D41) — one band per phase
   span, labelled with the phase token verbatim. The strip defines no partition
