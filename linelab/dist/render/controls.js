@@ -65,16 +65,50 @@ const PANEL_GAP = 16;
 const AXIS_HEIGHT = 30;
 const MIN_PLOT_WIDTH = 160;
 const CHIP_HEIGHT = 13;
+const TITLE_FONT_PX = 9;
+/**
+ * Width of one character at `TITLE_FONT_PX` in the sans stack, near enough for
+ * layout. The strip sized its viewBox from the PLOT alone, so a title longer
+ * than the plot ran off the edge of the SVG and was cut mid-word — on a 26 m
+ * line every panel caption was truncated. There is no text metric in a pure
+ * string builder, so the estimate is the mechanism; it only ever adds width.
+ */
+const TITLE_CHAR_W_PX = TITLE_FONT_PX * 0.58;
 /** the six channel panels of 06 §4, in the doc's order */
 const PANEL_IDS = ["v", "lean", "commands", "grip", "sight", "standup"];
+/**
+ * Panel titles, in riding words.
+ *
+ * The strip is the one place a reader can see WHY a line went wrong — and it
+ * was captioned `phi vs cmd_lean`, `cmd_a split by sign · a_long overlaid where
+ * clipped`, `su_sustained + su_transient`. Those are the engine's own field
+ * names: correct, and unreadable to the rider the figures are for. The channel
+ * keys at each panel's corner (and every trace's `data-channel`) still carry
+ * the field names, so nothing machine-readable was lost.
+ */
 const PANEL_TITLES = Object.freeze({
-    v: "v (km/h)",
-    lean: "phi vs cmd_lean (deg)",
-    commands: "cmd_a split by sign · a_long overlaid where clipped (m/s²)",
-    grip: "grip",
-    sight: "sight_ride_m vs ssd_m (m) — same rider-path basis (05 §2.1); the gap is the sight margin",
-    standup: "stand-up: su_sustained + su_transient (deg/s)"
+    v: "Speed (km/h)",
+    lean: "Lean — asked for, and delivered (°)",
+    commands: "Brake and throttle — commanded, and what the tyre allowed (m/s²)",
+    grip: "Grip in reserve (1 = untouched · 0 = at the limit)",
+    // the "same rider-path basis" clause is NORMATIVE (06 §4, D16): sight and
+    // stopping distance are only comparable because they are measured along the
+    // same path, and the strip has to say so. It rides after the rider's question.
+    sight: "Can you stop inside what you can see? (m) — same rider-path basis (05 §2.1)",
+    standup: "Stand-up — lean handed back mid-corner (°/s)"
 });
+/**
+ * Panels whose quantity has a fixed, meaningful range get a fixed axis, so the
+ * limit is on the page even when the line never approaches it. Auto-scaling
+ * `grip` to its own extent hid the only number that matters: a line whose grip
+ * never drops below 0.37 was drawn touching the panel floor, exactly like one
+ * that ran out of road.
+ */
+const PANEL_FIXED_EXTENT = Object.freeze({
+    grip: { min: 0, max: 1 }
+});
+/** Grip below this is the "nearly out" band, shaded so it reads before the numbers do. */
+const GRIP_DANGER = 0.15;
 // Neutral channel palette. 06 §4's hard rule: never the verdict palette
 // (#1f6f43 / #b07d1e / #b32e2e — render/constants.ts QUALITY_COLOUR).
 const INK_PRIMARY = "#2f4b7c";
@@ -255,12 +289,42 @@ function polylineRuns(samples, values, gate, x, y) {
         runs.push(current.join(" "));
     return runs;
 }
+/**
+ * A y-axis extreme, rounded for reading. `53.865 km/h` is three digits of
+ * precision the rider has no use for and the integrator does not claim.
+ */
+function axisLabel(v) {
+    const r = Math.abs(v) >= 10 ? Math.round(v) : Math.round(v * 10) / 10;
+    return `${Object.is(r, -0) ? 0 : r}`;
+}
 function panelSvg(panel, samples, x, y0, plotWidth) {
     const series = seriesFor(panel, samples);
     const all = series.secondary !== undefined ? [...series.primary.values, ...series.secondary.values] : series.primary.values;
-    const ext = extentOf(all);
+    const ext = PANEL_FIXED_EXTENT[panel] ?? extentOf(all);
     const y = (v) => y0 + PANEL_HEIGHT - ((v - ext.min) / (ext.max - ext.min)) * PANEL_HEIGHT;
     let out = open("g", { class: `panel panel-${panel}`, "data-panel": panel });
+    if (panel === "grip") {
+        // the "nearly out of grip" band — neutral ink, never a verdict colour
+        out += leaf("rect", {
+            x: LEFT_MARGIN,
+            y: n3(y(GRIP_DANGER)),
+            width: plotWidth,
+            height: n3(y(0) - y(GRIP_DANGER)),
+            fill: INK_BAND_B,
+            class: "limit-band",
+            "data-limit-band": "grip"
+        });
+        out += leaf("line", {
+            x1: LEFT_MARGIN,
+            y1: n3(y(GRIP_DANGER)),
+            x2: n3(LEFT_MARGIN + plotWidth),
+            y2: n3(y(GRIP_DANGER)),
+            stroke: INK_ZERO,
+            "stroke-width": 0.8,
+            "stroke-dasharray": "4 3",
+            class: "limit-rule"
+        });
+    }
     out += leaf("rect", {
         x: LEFT_MARGIN,
         y: y0,
@@ -272,7 +336,7 @@ function panelSvg(panel, samples, x, y0, plotWidth) {
     });
     out += textEl({ x: 6, y: y0 - 3, "font-family": "sans-serif", "font-size": 9, fill: INK_AXIS, class: "panel-title" }, PANEL_TITLES[panel]);
     // y extremes, so the reader can read a number off the trace
-    out += textEl({ x: LEFT_MARGIN - 5, y: y0 + 8, "font-family": "sans-serif", "font-size": 8, fill: INK_AXIS, "text-anchor": "end" }, `${n3(ext.max)}`);
+    out += textEl({ x: LEFT_MARGIN - 5, y: y0 + 8, "font-family": "sans-serif", "font-size": 8, fill: INK_AXIS, "text-anchor": "end" }, axisLabel(ext.max));
     out += textEl({
         x: LEFT_MARGIN - 5,
         y: y0 + PANEL_HEIGHT,
@@ -280,7 +344,7 @@ function panelSvg(panel, samples, x, y0, plotWidth) {
         "font-size": 8,
         fill: INK_AXIS,
         "text-anchor": "end"
-    }, `${n3(ext.min)}`);
+    }, axisLabel(ext.min));
     if (series.zeroRule && ext.min < 0 && ext.max > 0) {
         const yz = n3(y(0));
         out += leaf("line", {
@@ -514,14 +578,17 @@ function cursorSvg(cursorS, line, x, panelTop, bodyBottom) {
  * `quality` is the sole colour source, and it is READ off the verdict, never
  * recomputed here). Everything else on the strip is neutral ink.
  */
-function identityChipSvg(line, width) {
+function identityChipSvg(line) {
     const q = line.verdict.quality;
     const outcome = line.verdict.outcome;
     const text = `${line.label} — ${line.role} · ${q}` + (q !== "good" ? ` (${outcome})` : "");
     return (open("g", { class: "line-identity", "data-line-id": line.line_id, "data-quality": q }) +
         leaf("rect", { x: 6, y: 7, width: 18, height: 3, fill: QUALITY_COLOUR[q], class: "quality-swatch" }) +
+        // The header used to carry a right-anchored "controls strip · true station"
+        // caption as well. On any line whose identity ran long the two texts
+        // overlapped into an unreadable smear — and the caption was already spelled
+        // out under the axis, where the station numbers it describes actually are.
         textEl({ x: 30, y: 12, "font-family": "sans-serif", "font-size": 10, fill: INK_AXIS }, text) +
-        textEl({ x: n3(width - 6), y: 12, "font-family": "sans-serif", "font-size": 8, fill: INK_SECONDARY, "text-anchor": "end" }, "controls strip · true station") +
         "</g>");
 }
 // ---------------------------------------------------------------------------
@@ -545,7 +612,10 @@ export function renderControls(lineResult, window, cursor) {
         const sMin = samples[0].s;
         const sMax = Math.max(samples[samples.length - 1].s, lineResult.trajectory.terminated.s);
         const span = Math.max(sMax - sMin, 1e-9);
-        const plotWidth = Math.max(MIN_PLOT_WIDTH, span * PX_PER_M);
+        // the plot is at least as wide as the widest thing written across it: the
+        // panel titles start at x=6 and must end inside the frame
+        const titleWidth = Math.max(...PANEL_IDS.map((p) => PANEL_TITLES[p].length * TITLE_CHAR_W_PX)) + 12;
+        const plotWidth = Math.max(MIN_PLOT_WIDTH, span * PX_PER_M, titleWidth - LEFT_MARGIN - RIGHT_MARGIN);
         const x = (s) => LEFT_MARGIN + ((s - sMin) / span) * plotWidth;
         const width = LEFT_MARGIN + plotWidth + RIGHT_MARGIN;
         const panelTop = HEADER_HEIGHT + BAND_HEIGHT + 10;
@@ -564,7 +634,7 @@ export function renderControls(lineResult, window, cursor) {
             "data-line-id": lineResult.line_id
         });
         out += leaf("rect", { x: 0, y: 0, width: n3(width), height: n3(height), fill: "#ffffff" });
-        out += identityChipSvg(lineResult, width);
+        out += identityChipSvg(lineResult);
         out += phaseBandsSvg(phaseBandsOf(lineResult), x, HEADER_HEIGHT);
         if (window !== undefined) {
             out += windowBandSvg(window, sMin, sMax, x, panelTop, bodyHeight);

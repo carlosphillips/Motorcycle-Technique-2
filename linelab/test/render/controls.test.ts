@@ -301,3 +301,52 @@ describe("the cursor hook (design/06 §4)", () => {
     expect(xs.length).toBe(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Layout: the strip has to fit what it writes on itself
+
+describe("the strip sizes itself around its captions, not only its plot", () => {
+  it("every panel title ends inside the viewBox", () => {
+    const width = Number(/viewBox="0 0 ([\d.]+) [\d.]+"/.exec(svg)![1]);
+    const titles = [...svg.matchAll(/<text[^>]*class="panel-title"[^>]*>([^<]*)</g)].map((m) => m[1]!);
+    expect(titles).toHaveLength(6);
+    for (const t of titles) {
+      // the same estimate the renderer lays out with, plus the x=6 origin
+      const end = 6 + t.length * 9 * 0.58;
+      expect(end, `panel title "${t.slice(0, 40)}…" runs past the ${width} px frame`).toBeLessThan(width);
+    }
+  });
+
+  it("the header carries the line identity and nothing that can collide with it", () => {
+    const header = /<g class="line-identity"[\s\S]*?<\/g>/.exec(svg)![0];
+    expect((header.match(/<text/g) ?? []).length).toBe(1);
+    // the axis, not the header, is where the station basis is disclosed
+    expect(svg).toContain("station s (m, true");
+  });
+
+  it("grip is drawn against its own fixed 0..1 range, with the out-of-grip band shaded", () => {
+    // a line that keeps 0.37 in reserve must NOT be drawn touching the floor
+    expect(svg).toContain('data-limit-band="grip"');
+    const grip = /<g class="panel panel-grip"[\s\S]*?<\/g>\s*(?=<g class="panel|<g class="axis|<\/svg>)/.exec(svg)?.[0] ?? "";
+    expect(grip).toContain(">1<");
+    expect(grip).toContain(">0<");
+  });
+});
+
+// Riding words, not field names — the reader of a figure is a rider.
+describe("panel titles read as riding, and keep the machine names on the traces", () => {
+  it("no panel title is an engine identifier", () => {
+    const titles = [...svg.matchAll(/<text[^>]*class="panel-title"[^>]*>([^<]*)</g)].map((m) => m[1]!);
+    for (const banned of ["phi vs cmd_lean", "cmd_a split by sign", "su_sustained + su_transient"]) {
+      expect(titles.join(" | ")).not.toContain(banned);
+    }
+    expect(titles.join(" | ")).toContain("Speed (km/h)");
+    expect(titles.join(" | ")).toContain("Grip in reserve");
+  });
+
+  it("the engine's own channel names still ride on every trace", () => {
+    for (const channel of ["v", "phi", "cmd_lean", "cmd_a", "grip", "sight_ride_m", "ssd_m", "su_sustained"]) {
+      expect(svg, `channel ${channel} lost its machine name`).toContain(`data-channel="${channel}"`);
+    }
+  });
+});

@@ -381,7 +381,12 @@ function stageLines(scene: DrawnScene, pxScale: number): string {
       "data-line-id": line.line_id,
       "data-role": line.role,
       "data-quality": line.quality,
-      "data-outcome": line.outcome
+      "data-outcome": line.outcome,
+      // the true station of each drawn point, same order. A consumer that wants
+      // "where is s = 24 m on this line" — the chapter gallery's station
+      // toggle — reads it here instead of re-deriving geometry the projection
+      // already resolved.
+      "data-stations": line.stations.map((s) => Math.round(s * 100) / 100).join(" ")
     });
     s += terminalGlyphSvg(line, pxScale);
   }

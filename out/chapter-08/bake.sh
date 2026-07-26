@@ -47,8 +47,9 @@ fi
 
 for n in 01 02 03 04 05 06; do
   id="fig-08-$n"
-  rm -rf "$BAKE/$id" "$BAKE/views-$n"
-  mkdir -p "$BAKE/$id" "$BAKE/views-$n"
+  rm -rf "$BAKE/$id" "$BAKE/views-$n" "$BAKE/stations-$n"
+  mkdir -p "$BAKE/$id" "$BAKE/views-$n" "$BAKE/stations-$n"
+  rm -f "$HERE/$id".*.turnin.pov.svg "$HERE/$id".*.apex.pov.svg "$HERE/$id".*.exit.pov.svg
 
   node "$CLI" figure "$SCENES/$id.scene" --mode true --out "$BAKE/$id" \
     > "$BAKE/$id.stdout.json" 2> "$BAKE/$id.stderr"
@@ -59,15 +60,43 @@ for n in 01 02 03 04 05 06; do
     > "$BAKE/render-$n.json" 2>&1
   note_exit "$id topdown+controls" $?
 
-  # one POV per drawn line — the comparison IS the view
-  for line in $(node -e "
+  # POVs: one per drawn line — the comparison IS the view — and one per station
+  # within each line. A single frame is a picture; three frames at the turn-in,
+  # the apex and the exit are the corner as the rider met it. The stations are
+  # the line's OWN recorded events, so a line that never apexed contributes no
+  # apex frame rather than a fabricated one.
+  for pair in $(node -e "
     const e = require('$env');
     const v = e.value ?? e;
-    console.log((v.lines ?? []).filter(l => l.ok !== false || !l.error).map(l => l.line_id).join(' '));
+    const out = [];
+    for (const l of (v.lines ?? []).filter(l => l.ok !== false || !l.error)) {
+      const ev = (l.trajectory?.events ?? []);
+      const first = (k) => ev.filter(x => x.kind === k).map(x => x.s).sort((a,b) => a-b)[0];
+      const last  = (k) => ev.filter(x => x.kind === k).map(x => x.s).sort((a,b) => b-a)[0];
+      const stations = { turnin: first('turn_in'), apex: first('apex'), exit: last('exit') };
+      for (const [tag, s] of Object.entries(stations)) {
+        if (s !== undefined) out.push(l.line_id + ':' + tag + ':' + Math.round(s));
+      }
+      out.push(l.line_id + ':default:');
+    }
+    console.log(out.join(' '));
   "); do
-    node "$CLI" render "$env" --views pov --line "$line" --mode true --look limit_point --roll level \
-      --out "$BAKE/views-$n" > "$BAKE/pov-$n-$line.json" 2>&1
-    note_exit "  $id pov --line $line" $?
+    line=${pair%%:*}
+    rest=${pair#*:}
+    tag=${rest%%:*}
+    station=${rest#*:}
+    if [ "$tag" = "default" ]; then
+      node "$CLI" render "$env" --views pov --line "$line" --mode true --look limit_point --roll level \
+        --out "$BAKE/views-$n" > "$BAKE/pov-$n-$line.json" 2>&1
+      note_exit "  $id pov --line $line" $?
+    else
+      node "$CLI" render "$env" --views pov --line "$line" --mode true --look limit_point --roll level \
+        --s "$station" --out "$BAKE/stations-$n" > "$BAKE/pov-$n-$line-$tag.json" 2>&1
+      note_exit "  $id pov --line $line @$tag (s=$station)" $?
+      # station frames take the EVENT's name, not its metre mark: the reader
+      # thinks "at the apex", never "at s = 24"
+      mv "$BAKE/stations-$n/$id.$line.s$station.pov.svg" "$HERE/$id.$line.$tag.pov.svg" 2>/dev/null
+    fi
   done
 
   # The committed artefacts. The top-down and its manifest come from the FIGURE

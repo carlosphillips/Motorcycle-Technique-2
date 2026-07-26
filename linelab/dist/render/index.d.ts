@@ -26,6 +26,13 @@ export interface RenderViewsInput {
     readonly marks?: MarkSpec;
     readonly target?: RenderTarget;
     readonly style?: RenderStyle;
+    /**
+     * `target: "pov"` only — the true station to put the camera at. Absent, the
+     * POV picks its own default cursor (the first corner's midpoint). The book's
+     * three-station comparison (turn-in / apex / exit) is exactly this parameter
+     * called three times.
+     */
+    readonly station?: number;
 }
 export interface RenderViewsResult {
     readonly scene: DrawnScene;

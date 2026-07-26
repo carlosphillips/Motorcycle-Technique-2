@@ -75,6 +75,13 @@ export interface RenderViewsInput {
   readonly marks?: MarkSpec;
   readonly target?: RenderTarget;
   readonly style?: RenderStyle;
+  /**
+   * `target: "pov"` only — the true station to put the camera at. Absent, the
+   * POV picks its own default cursor (the first corner's midpoint). The book's
+   * three-station comparison (turn-in / apex / exit) is exactly this parameter
+   * called three times.
+   */
+  readonly station?: number;
 }
 
 export interface RenderViewsResult {
@@ -103,7 +110,7 @@ export function renderViews(input: RenderViewsInput): Result<RenderViewsResult> 
     if (!base.ok) return base;
     const look: PovLook = isRecord(input.viewSpec) && input.viewSpec["look"] === "limit_point" ? "limit_point" : "heading";
     const roll: PovRoll = isRecord(input.viewSpec) && input.viewSpec["roll"] === "level" ? "level" : "lean";
-    const svg = renderPovForFigure(input.road, input.lines, look, roll);
+    const svg = renderPovForFigure(input.road, input.lines, look, roll, input.station);
     return ok({ scene: base.value, svg });
   }
 

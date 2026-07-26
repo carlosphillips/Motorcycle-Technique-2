@@ -137,9 +137,22 @@ export function renderVerb(input: RenderVerbInput): VerbOutcome {
       focus = [found];
       suffix = `.${found.line_id}`;
     }
-    const rendered = renderViews({ road: envelope.road, lines: focus, viewSpec, marks, target: "pov" });
+    // `--s <m>` puts the camera at a chosen true station instead of the default
+    // cursor — the same flag the controls view uses for its cursor, so one
+    // station names one moment across both views. The station rides in the
+    // filename so three stations of one line can sit side by side.
+    const station = parsed.value.s;
+    const stationSuffix = station !== undefined && Number.isFinite(station) ? `.s${Math.round(station)}` : "";
+    const rendered = renderViews({
+      road: envelope.road,
+      lines: focus,
+      viewSpec,
+      marks,
+      target: "pov",
+      ...(station !== undefined ? { station } : {})
+    });
     if (!rendered.ok) return errOutcome(rendered.error);
-    const povPath = `${outDir}/${envelope.figure_id}${suffix}.pov.svg`;
+    const povPath = `${outDir}/${envelope.figure_id}${suffix}${stationSuffix}.pov.svg`;
     writes.push({ path: povPath, content: rendered.value.svg });
     report["pov"] = povPath;
   }

@@ -886,10 +886,22 @@ function trendAt(line: LineResult, sample: Sample): SightTrend {
  * emit a self-contained SVG. `null`-safe — an empty/sampleless line yields a
  * `fallbackSvg` (never throws).
  */
-export function renderPovForFigure(road: ComposedRoad, lines: readonly LineResult[], look: PovLook, roll: PovRoll = "lean"): string {
+export function renderPovForFigure(
+  road: ComposedRoad,
+  lines: readonly LineResult[],
+  look: PovLook,
+  roll: PovRoll = "lean",
+  station?: number
+): string {
   const line = povFocusLine(lines);
   if (line === undefined) return fallbackSvg("pov: no drawable line");
-  const sample = povDefaultSample(road, line);
+  // an explicit station puts the camera at the nearest RECORDED sample to it —
+  // never at an interpolated pose, which would be a state the engine never
+  // computed (the same rule the controls cursor follows).
+  const sample =
+    station !== undefined && Number.isFinite(station)
+      ? line.trajectory.samples.reduce((a, b) => (Math.abs(b.s - station) < Math.abs(a.s - station) ? b : a))
+      : povDefaultSample(road, line);
   if (sample === undefined) return fallbackSvg("pov: focused line has no samples");
   const occluders = line.resolved_scenario.occluders ?? [];
   return renderPov({ road, occluders, line, sample, look, roll, trend: trendAt(line, sample) });

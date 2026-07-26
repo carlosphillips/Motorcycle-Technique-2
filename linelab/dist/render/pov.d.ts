@@ -136,5 +136,5 @@ export declare function povDefaultSample(road: ComposedRoad, line: LineResult): 
  * emit a self-contained SVG. `null`-safe — an empty/sampleless line yields a
  * `fallbackSvg` (never throws).
  */
-export declare function renderPovForFigure(road: ComposedRoad, lines: readonly LineResult[], look: PovLook, roll?: PovRoll): string;
+export declare function renderPovForFigure(road: ComposedRoad, lines: readonly LineResult[], look: PovLook, roll?: PovRoll, station?: number): string;
 export {};
