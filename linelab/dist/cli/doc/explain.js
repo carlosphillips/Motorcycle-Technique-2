@@ -13,6 +13,7 @@
 // main.ts; by the time this pure function runs, the caller has already
 // decided whether `input` is a parsed envelope or a bare vocabulary target.
 import { CHECK_IDS } from "../../plan/doctrine/checks.js";
+import { CHECK_LEXICON } from "../../plan/doctrine/lexicon.js";
 import { loadShippedRubricPack, rubricString } from "../../plan/doctrine/pack.js";
 import { CONFIG_RUBRIC_DEFAULT } from "../../plan/constants.js";
 import { STANDING_RUNGS, STANDING_GLOSS, standingPlacard } from "../../solve/standing.js";
@@ -141,7 +142,8 @@ export function explain(input, opts) {
                 teaches: row?.teaches ?? "",
                 book_ref: row?.book_ref ?? "",
                 scope: row?.scope ?? "",
-                severity: row?.severity ?? ""
+                severity: row?.severity ?? "",
+                rider: CHECK_LEXICON[target]
             }
         };
     }

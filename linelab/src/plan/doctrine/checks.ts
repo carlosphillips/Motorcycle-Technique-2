@@ -375,6 +375,15 @@ const evaluators: Record<CheckId, Evaluator> = {
         corner_id: c.id,
         pair: null,
         band,
+        // The count is scoped to the CORNER WINDOW: fig 8.3's fifty-pencing
+        // line draws six turn-point markers (the marker-from-event law is
+        // record-wide) while this check reads 3 — the three that fell inside c1
+        // before the line left the road. Both numbers are right, and the
+        // apparent contradiction is a PRESENTATION problem: the message rides
+        // inside the hashed verdict, so naming the scope here would move every
+        // committed result_hash for a wording change. plan/doctrine/lexicon.ts
+        // says "inside this corner" where a reader can act on it, and the
+        // instance's own `corner_id` carries the scope for machines.
         message: `${count} steering input(s), ${allowed} allowed`,
         metrics: { count, allowed }
       };

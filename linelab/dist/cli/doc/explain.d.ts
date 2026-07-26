@@ -11,6 +11,17 @@ export interface ExplainCheckDoc {
     readonly book_ref: string;
     readonly scope: string;
     readonly severity: string;
+    /**
+     * The same check said to a rider (plan/doctrine/lexicon.ts): what it is
+     * about, why it matters on a road, and what to do differently. `teaches` is
+     * the rubric pack's own sentence about the CHECK; `rider.fix` is the only
+     * field that tells someone what to change.
+     */
+    readonly rider: {
+        readonly title: string;
+        readonly why: string;
+        readonly fix: string;
+    };
 }
 export interface ExplainErrorCodeDoc {
     readonly kind: "error_code";

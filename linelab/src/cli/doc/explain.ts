@@ -14,6 +14,7 @@
 // decided whether `input` is a parsed envelope or a bare vocabulary target.
 
 import { CHECK_IDS, type CheckId } from "../../plan/doctrine/checks.js";
+import { CHECK_LEXICON } from "../../plan/doctrine/lexicon.js";
 import { loadShippedRubricPack, rubricString } from "../../plan/doctrine/pack.js";
 import { CONFIG_RUBRIC_DEFAULT } from "../../plan/constants.js";
 import { STANDING_RUNGS, STANDING_GLOSS, standingPlacard } from "../../solve/standing.js";
@@ -47,6 +48,13 @@ export interface ExplainCheckDoc {
   readonly book_ref: string;
   readonly scope: string;
   readonly severity: string;
+  /**
+   * The same check said to a rider (plan/doctrine/lexicon.ts): what it is
+   * about, why it matters on a road, and what to do differently. `teaches` is
+   * the rubric pack's own sentence about the CHECK; `rider.fix` is the only
+   * field that tells someone what to change.
+   */
+  readonly rider: { readonly title: string; readonly why: string; readonly fix: string };
 }
 
 export interface ExplainErrorCodeDoc {
@@ -263,7 +271,8 @@ export function explain(
         teaches: row?.teaches ?? "",
         book_ref: row?.book_ref ?? "",
         scope: row?.scope ?? "",
-        severity: row?.severity ?? ""
+        severity: row?.severity ?? "",
+        rider: CHECK_LEXICON[target as CheckId]
       }
     };
   }
