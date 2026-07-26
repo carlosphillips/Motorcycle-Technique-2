@@ -29,7 +29,8 @@ import {
   povDefaultSample,
   POV_LOOK_MODES,
   POV_MARKER_STATES,
-  type PovLook
+  type PovLook,
+  type Pt
 } from "../../src/render/pov.js";
 import {
   POV_EYE_HEIGHT_M,
@@ -385,5 +386,129 @@ describe("POV self-contained SVG law (design/06 §6)", () => {
     expect(svg.startsWith("<svg")).toBe(true);
     expect(svg).toContain('data-view="pov"');
     expect((svg.match(/data-marker="limit_point"/g) ?? []).length).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The near-plane split (§5.2) and the roll toggle (design/07 §5.3)
+
+/**
+ * bookEsses is the road that broke the old projector: at any mid-chain station,
+ * the 140 m lookahead runs out of sight and back again, and vertices dropped at
+ * the near plane were being rejoined across the gap — the road folded into a
+ * spike and the rider's line looped back through it (the fig-08-06 POV).
+ */
+function esses(): FigureResult {
+  const r = run(
+    { road: "bookEsses", entry_kmh: 32, mistake: { kind: "premature", at: "all" } },
+    { engine_semver: ENGINE_SEMVER, figure_id: "F-POV-ESSES" }
+  );
+  if (!r.ok) throw new Error("bookEsses fixture failed to solve");
+  return r.value;
+}
+
+describe("the road surface: per-station quads, never one folded ring (§5.2)", () => {
+  const segmentsCross = (a: Pt, b: Pt, c: Pt, d: Pt): boolean => {
+    const side = (p: Pt, q: Pt, r: Pt): number => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+    const d1 = side(a, b, c);
+    const d2 = side(a, b, d);
+    const d3 = side(c, d, a);
+    const d4 = side(c, d, b);
+    return d1 * d2 < 0 && d3 * d4 < 0;
+  };
+  /** A closed polygon crosses itself iff some pair of non-adjacent edges intersects. */
+  const selfIntersects = (poly: readonly Pt[]): boolean => {
+    const n = poly.length;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 2; j < n; j++) {
+        if (i === 0 && j === n - 1) continue; // adjacent through the closing edge
+        if (segmentsCross(poly[i]!, poly[(i + 1) % n]!, poly[j]!, poly[(j + 1) % n]!)) return true;
+      }
+    }
+    return false;
+  };
+
+  it("the surface is per-station quads, and not one ring that folds through itself", { timeout: 600_000 }, () => {
+    const env = esses();
+    const line = firstLine(env, "solved");
+
+    for (const sample of line.trajectory.samples.filter((_, i) => i % 7 === 0)) {
+      const frame = povFrame({
+        road: env.road,
+        occluders: line.resolved_scenario.occluders,
+        line,
+        sample,
+        look: "limit_point"
+      });
+
+      // (a) what ships now: every quad is a simple four-corner patch
+      for (const quad of frame.road) {
+        expect(quad).toHaveLength(4);
+        expect(selfIntersects(quad), `a road quad folds through itself at s=${sample.s.toFixed(1)}`).toBe(false);
+      }
+      // a run is a drawable piece, never a stranded point
+      for (const runPts of [...frame.laneLines, ...(frame.path?.runs ?? [])]) {
+        expect(runPts.length).toBeGreaterThanOrEqual(2);
+      }
+
+      // (b) the mechanical signature of the defect: a FLAT road cannot appear
+      // above eye level, so every drawn ground point must sit below the
+      // horizon. The folded ring rose into the sky — that spike is what every
+      // reader of the old fig-08-06 POV described as a mountain.
+      const levelFrame = povFrame({
+        road: env.road,
+        occluders: line.resolved_scenario.occluders,
+        line,
+        sample,
+        look: "limit_point",
+        roll: "level"
+      });
+      const horizonY = levelFrame.height / 2;
+      for (const quad of levelFrame.road) {
+        for (const p of quad) {
+          expect(p.y, `road drawn ${(horizonY - p.y).toFixed(1)} px above the horizon at s=${sample.s.toFixed(1)}`).toBeGreaterThan(horizonY);
+        }
+      }
+      for (const runPts of levelFrame.laneLines) {
+        for (const p of runPts) expect(p.y).toBeGreaterThan(horizonY);
+      }
+    }
+  });
+});
+
+describe("roll: the frame carries lean, or the dial does (design/07 §5.3)", () => {
+  it("roll=lean tilts the horizon by phi; roll=level holds it flat and still reports the lean", { timeout: 300_000 }, () => {
+    const env = book90();
+    const line = firstLine(env, "solved");
+    const sample = midCornerSample(line, env.road.corners[0]!.s_mid);
+    expect(Math.abs(sample.phi)).toBeGreaterThan(5); // a pose with real lean to see
+
+    const leaned = povFrame({ road: env.road, occluders: [], line, sample, look: "heading", roll: "lean" });
+    const level = povFrame({ road: env.road, occluders: [], line, sample, look: "heading", roll: "level" });
+
+    // the ground polygon's first edge IS the horizon
+    const horizonDeg = (f: typeof leaned): number => {
+      const [a, b] = [f.ground[0]!, f.ground[1]!];
+      return (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+    };
+    expect(Math.abs(horizonDeg(level) % 180)).toBeLessThan(1e-6);
+    expect(Math.abs(horizonDeg(leaned) % 180)).toBeGreaterThan(1);
+    // lean is never lost — only moved to another channel
+    expect(level.phi_deg).toBe(sample.phi);
+    expect(level.roll).toBe("level");
+  });
+
+  it("the level frame still draws a lean dial, and the HUD carries its numbers as data", { timeout: 300_000 }, () => {
+    const env = book90();
+    const line = firstLine(env, "solved");
+    const sample = midCornerSample(line, env.road.corners[0]!.s_mid);
+    const svg = renderPov({ road: env.road, occluders: [], line, sample, look: "heading", roll: "level" });
+    expect(svg).toContain("data-lean-dial=");
+    expect(svg).toMatch(/data-sight-m="[-\d.]+"/);
+    expect(svg).toMatch(/data-ssd-m="[-\d.]+"/);
+    // rider words, not engine spelling
+    expect(svg).toMatch(/lean \d+° (left|right)|upright/);
+    expect(svg).toContain("to stop");
+    expect(svg).not.toContain("ssd ");
   });
 });

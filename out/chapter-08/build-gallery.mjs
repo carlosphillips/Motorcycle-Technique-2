@@ -570,7 +570,9 @@ const noCautionContainmentFail = cautionDetail.every((d) =>
 const povHud = (n, line) => {
   const p = `${BAKE}/views-0${n}/fig-08-0${n}.${line}.pov.svg`;
   if (!existsSync(p)) return null;
-  const m = readFileSync(p, 'utf8').match(/sight ([\d.]+) m \/ ssd ([\d.]+) m/);
+  // read the HUD's data attributes, never its prose — the words are written for
+  // a rider and are free to change; the numbers are the contract
+  const m = readFileSync(p, 'utf8').match(/data-sight-m="([-\d.]+)" data-ssd-m="([-\d.]+)"/);
   return m ? { sight: Number(m[1]), ssd: Number(m[2]) } : null;
 };
 const sightGood = povHud(1, 'good');

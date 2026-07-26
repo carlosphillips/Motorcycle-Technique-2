@@ -476,6 +476,22 @@ export const FLAG_TABLE: readonly FlagSpec[] = [
     }
   },
   {
+    // design/07 §5.3: `--roll <lean|level>` chooses whether the POV frame is
+    // rotated by the recorded lean (the default, and the design's signature
+    // honesty) or held level with the lean shown on a HUD dial instead. The
+    // book bakes `level`: a reader of a still figure has no vestibular sense to
+    // cancel a 30° roll with, so the tilt reads as a falling road rather than a
+    // leaning bike.
+    field: "view.roll", scene_key: "view.roll", flag: "--roll", arity: "value", group: "View",
+    apply: (d, v, at) => {
+      if (v !== "lean" && v !== "level") {
+        return err(schemaErr(at, 'roll must be "lean" or "level"', "roll_unknown"));
+      }
+      d.view = { ...(d.view ?? {}), roll: v };
+      return ok(undefined);
+    }
+  },
+  {
     field: "config.rubric", scene_key: "", flag: "--rubric", arity: "value", group: "Config",
     apply: (d, v, at) => {
       if (v !== "parks-street") {

@@ -4,6 +4,21 @@ import type { Sample, ResolvedOccluder, OccluderKind, SightTrend } from "../core
 /** design/07 §5.2 — the `look` camera toggle, a closed two-value set. */
 export declare const POV_LOOK_MODES: readonly ["heading", "limit_point"];
 export type PovLook = (typeof POV_LOOK_MODES)[number];
+/**
+ * design/06 §2.1 / design/07 §5.3 — how the frame carries lean.
+ *
+ * `lean` is the engine default and the design's signature honesty: the whole
+ * image rotates with `phi`, so the horizon angle IS the lean readout.
+ *
+ * `level` keeps the camera upright and moves lean into a HUD dial instead.
+ * That is the BOOK's setting, for a reason that is about the reader and not
+ * about the physics: a learner reading a still figure has no vestibular sense
+ * to cancel the roll with, so a 30° tilt does not read as "I am leaning", it
+ * reads as "the road is falling out of the frame". Both modes draw the same
+ * lean; they differ only in which channel carries it.
+ */
+export declare const POV_ROLL_MODES: readonly ["lean", "level"];
+export type PovRoll = (typeof POV_ROLL_MODES)[number];
 /** design/07 §5.3 item 7 — the limit-point marker's presentation state (closed set; rides the frame draw list). */
 export declare const POV_MARKER_STATES: readonly ["placed", "clamped"];
 export type MarkerState = (typeof POV_MARKER_STATES)[number];
@@ -36,27 +51,38 @@ export interface PovFrame {
     readonly width: number;
     readonly height: number;
     readonly look: PovLook;
+    readonly roll: PovRoll;
     /** the resolved camera yaw (deg) — `psi` under `heading`; `psi + clamp(wrapDeg(bearing−psi), ±LOOK_MAX_DEG)` under `limit_point` (§5.2). */
     readonly yaw_deg: number;
-    /** the frame roll (deg) = the recorded lean `phi`, both modes (§5.2 — "the horizon angle IS the lean readout"). */
+    /** the recorded lean (deg). Under roll `lean` the frame is rotated by it — the horizon angle IS the lean readout (§5.2); under `level` the HUD dial carries it instead. */
     readonly phi_deg: number;
     readonly eye: Pt;
     readonly focal_px: number;
     readonly principal: Pt;
     /** stage 1 — the ground polygon below the rolled horizon (sky is the frame fill above it). */
     readonly ground: readonly Pt[];
-    /** stage 2 — the road-surface polygon (roadOuter ahead + roadInner reversed), near-clipped; null if fully behind the near plane. */
-    readonly road: readonly Pt[] | null;
-    /** stage 3 — centreline + lane-edge polylines (near-clipped). */
+    /** stage 2 — the road surface as per-station quads, far→near; empty when no span is in front of the camera. */
+    readonly road: readonly (readonly Pt[])[];
+    /** stage 3 — centreline + lane-edge polylines, split into contiguous visible runs. */
     readonly laneLines: readonly (readonly Pt[])[];
-    /** stage 5 (partial) — the "what you can see" surface tint from the station to `s + sight_m`; null if none projects. */
-    readonly sightBand: readonly Pt[] | null;
+    /** stage 5 (partial) — the "what you can see" surface, as quads over the station span the rider can see. */
+    readonly sightBand: readonly (readonly Pt[])[];
     /** stage 4 — occluder quads, sorted far→near (occlusion by paint order). */
     readonly occluders: readonly PovOccluder[];
-    /** stage 6 — the focused line's path ahead of the cursor, in verdict colour. */
+    /**
+     * stage 6 — the focused line's path ahead of the cursor, in verdict colour,
+     * as visible runs. `offFrame` is non-null exactly when NO run touches the
+     * frame: the rider is looking somewhere their line does not go, and the
+     * marker on the frame edge says which way it went.
+     */
     readonly path: {
-        readonly points: readonly Pt[];
+        readonly runs: readonly (readonly Pt[])[];
         readonly colour: string;
+        readonly offFrame: {
+            readonly at: Pt;
+            readonly dx: number;
+            readonly dy: number;
+        } | null;
     } | null;
     /** stage 7 — the limit-point marker (unconditional: exactly one per frame, D40). */
     readonly limit: PovLimitMarker;
@@ -79,6 +105,8 @@ export interface PovFrameInput {
     /** the cursor's resolved Sample — the camera pose and the recorded limit point. */
     readonly sample: Sample;
     readonly look: PovLook;
+    /** frame roll; defaults to `lean` (the engine default — design/07 §5.3). */
+    readonly roll?: PovRoll;
     readonly width?: number;
     readonly height?: number;
     /** presentation trend badge for the limit marker; default "steady". */
@@ -108,5 +136,5 @@ export declare function povDefaultSample(road: ComposedRoad, line: LineResult): 
  * emit a self-contained SVG. `null`-safe — an empty/sampleless line yields a
  * `fallbackSvg` (never throws).
  */
-export declare function renderPovForFigure(road: ComposedRoad, lines: readonly LineResult[], look: PovLook): string;
+export declare function renderPovForFigure(road: ComposedRoad, lines: readonly LineResult[], look: PovLook, roll?: PovRoll): string;
 export {};

@@ -65,7 +65,7 @@ for n in 01 02 03 04 05 06; do
     const v = e.value ?? e;
     console.log((v.lines ?? []).filter(l => l.ok !== false || !l.error).map(l => l.line_id).join(' '));
   "); do
-    node "$CLI" render "$env" --views pov --line "$line" --mode true --look limit_point \
+    node "$CLI" render "$env" --views pov --line "$line" --mode true --look limit_point --roll level \
       --out "$BAKE/views-$n" > "$BAKE/pov-$n-$line.json" 2>&1
     note_exit "  $id pov --line $line" $?
   done

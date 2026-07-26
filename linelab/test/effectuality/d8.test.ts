@@ -545,6 +545,9 @@ const BUILDERS: Readonly<Record<string, () => Obs>> = {
   "cli:--legend": () => pair(svgOf(rdr(["--mode", "true", "--legend", "on"], envText())), svgOf(rdr(["--mode", "true", "--legend", "off"], envText()))),
   "cli:--orient": () => pair(svgOf(rdr(["--mode", "true", "--orient", "0"], envText())), svgOf(rdr(["--mode", "true", "--orient", "90"], envText()))),
   "cli:--look": () => pair(svgOf(rdrPov(["--look", "heading"], occEnvText())), svgOf(rdrPov(["--look", "limit_point"], occEnvText()))),
+  // roll `lean` rotates the frame by phi, `level` holds it upright and puts the
+  // lean on the HUD dial — a POV-only render effect, like --look
+  "cli:--roll": () => pair(svgOf(rdrPov(["--roll", "lean"], occEnvText())), svgOf(rdrPov(["--roll", "level"], occEnvText()))),
   "cli:--rubric": () => rejectOf((rv(["--rubric", "parks-track"], rideText).stdout as { ok: boolean; error?: LinelabError }) as never),
   "cli:--checks-version": () => rejectOf((rv(["--checks-version", "1"], rideText).stdout as { ok: boolean; error?: LinelabError }) as never)
 };

@@ -1,5 +1,5 @@
 {
-  "note": "design/09 §8.1 (D8) — the committed effectuality witness table: one row per field path the `schema` verb prints on the v0.1 INPUT surfaces (the row schema's closed 10-surface set; the schema's `envelope` and `rubric` sections describe outputs and pack data, not accepted input). test/effectuality/d8.test.ts implements effectAt() beside this table, re-derives the enumeration from buildSchemaDoc() (T-D8-EXHAUSTIVE), and OBSERVES every row: `effect` rows run the named witness fixture with and without the perturbation and assert the per-class difference; `reject:<CODE>/<reason>` rows assert the typed code + detail.reason (deferred-token rows: the `deferred` member). The schema's `figure` section rides surface `scene` (D30 — scene text and FigureSpec JSON are one identity).",
+  "note": "design/09 \u00a78.1 (D8) \u2014 the committed effectuality witness table: one row per field path the `schema` verb prints on the v0.1 INPUT surfaces (the row schema's closed 10-surface set; the schema's `envelope` and `rubric` sections describe outputs and pack data, not accepted input). test/effectuality/d8.test.ts implements effectAt() beside this table, re-derives the enumeration from buildSchemaDoc() (T-D8-EXHAUSTIVE), and OBSERVES every row: `effect` rows run the named witness fixture with and without the perturbation and assert the per-class difference; `reject:<CODE>/<reason>` rows assert the typed code + detail.reason (deferred-token rows: the `deferred` member). The schema's `figure` section rides surface `scene` (D30 \u2014 scene text and FigureSpec JSON are one identity).",
   "rows": [
     {
       "id": "scenario:spec",
@@ -1259,6 +1259,18 @@
       "perturbation": {
         "from": "heading",
         "to": "limit_point"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "cli:--roll",
+      "surface": "cli",
+      "field": "--roll",
+      "fixture": "FX-VIEW-OCC",
+      "perturbation": {
+        "from": "lean",
+        "to": "level"
       },
       "effect_class": "render",
       "expect": "effect"

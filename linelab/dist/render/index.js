@@ -60,7 +60,8 @@ export function renderViews(input) {
         if (!base.ok)
             return base;
         const look = isRecord(input.viewSpec) && input.viewSpec["look"] === "limit_point" ? "limit_point" : "heading";
-        const svg = renderPovForFigure(input.road, input.lines, look);
+        const roll = isRecord(input.viewSpec) && input.viewSpec["roll"] === "level" ? "level" : "lean";
+        const svg = renderPovForFigure(input.road, input.lines, look, roll);
         return ok({ scene: base.value, svg });
     }
     const base = project(input.road, input.lines, input.viewSpec);

@@ -202,6 +202,7 @@ function sampleValueFor(field: string): string {
   if (field.startsWith("view.legend")) return "on";
   if (field.startsWith("view.orient")) return "90";
   if (field.startsWith("view.look")) return "limit_point";
+  if (field.startsWith("view.roll")) return "level";
   if (field === "config.rubric") return "parks-street";
   if (field === "config.checks_version") return "2";
   if (field === "bike_margin_m") return "0.4";

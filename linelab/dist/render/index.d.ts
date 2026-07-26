@@ -16,7 +16,7 @@ export type { ProportionMetrics, ProportionGateResult, GateVerdict } from "./gat
 export { buildManifestRecord } from "./manifest.js";
 export type { ManifestRecord } from "./manifest.js";
 export { renderPov, povFrame, renderPovForFigure, povFocusLine, povDefaultSample, povYawDeg, POV_LOOK_MODES, POV_MARKER_STATES } from "./pov.js";
-export type { PovLook, MarkerState, PovFrame, PovFrameInput, PovLimitMarker, Pt } from "./pov.js";
+export type { PovLook, PovRoll, MarkerState, PovFrame, PovFrameInput, PovLimitMarker, Pt } from "./pov.js";
 export type RenderTarget = "topdown" | "pov";
 export interface RenderViewsInput {
     readonly road: ComposedRoad;

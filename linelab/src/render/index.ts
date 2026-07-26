@@ -29,7 +29,7 @@ import type { DrawnScene, DrawnMarker, DrawnLabel } from "./scene.js";
 import { renderTopdown } from "./topdown.js";
 import type { RenderStyle } from "./topdown.js";
 import { renderPovForFigure } from "./pov.js";
-import type { PovLook } from "./pov.js";
+import type { PovLook, PovRoll } from "./pov.js";
 
 export type { DrawnScene } from "./scene.js";
 export { project } from "./project.js";
@@ -59,7 +59,7 @@ export {
   POV_LOOK_MODES,
   POV_MARKER_STATES
 } from "./pov.js";
-export type { PovLook, MarkerState, PovFrame, PovFrameInput, PovLimitMarker, Pt } from "./pov.js";
+export type { PovLook, PovRoll, MarkerState, PovFrame, PovFrameInput, PovLimitMarker, Pt } from "./pov.js";
 
 export type RenderTarget = "topdown" | "pov";
 
@@ -102,7 +102,8 @@ export function renderViews(input: RenderViewsInput): Result<RenderViewsResult> 
     const base = project(input.road, input.lines, input.viewSpec);
     if (!base.ok) return base;
     const look: PovLook = isRecord(input.viewSpec) && input.viewSpec["look"] === "limit_point" ? "limit_point" : "heading";
-    const svg = renderPovForFigure(input.road, input.lines, look);
+    const roll: PovRoll = isRecord(input.viewSpec) && input.viewSpec["roll"] === "level" ? "level" : "lean";
+    const svg = renderPovForFigure(input.road, input.lines, look, roll);
     return ok({ scene: base.value, svg });
   }
 
