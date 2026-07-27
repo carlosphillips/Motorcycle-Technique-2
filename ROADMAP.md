@@ -7,13 +7,29 @@ record is still `design/*.md` (D1–D46); nothing here overrides it.
 
 ## CLOSED — extend past Chapter 8
 
-**Status: done, 2026-07-27. The answer is no, and that is the deliverable.**
+**Status: done, 2026-07-27. The answer is no, and the heading was the wrong question.**
 Full record: **`figures/SCOPE.md`**. Deviations found on the way:
 `linelab/DEVIATIONS.md` § "Post-v1.0 — corpus-extension pass".
 
-The corpus does not grow. **81 book figures adjudicated, 0 survive**; every extracted
-image is reconciled (87 = 6 shipped + 81 adjudicated). The starting-hypothesis table
-that used to live here was a skim, and three of its rows are overturned:
+**Chapter 8 is the only chapter in the book that contains lines.** *Total Control* has
+exactly six line-choice diagrams — figs 8.1–8.6 — and all six are built, shipped, green
+and re-baking byte-identical. Chapter 8's prose references those six and no others; no
+other chapter contains a line-selection diagram. So the printed line-selection corpus
+was already complete at v1.0, which is precisely what `design/01 §2` G7 asks for. There
+was never a seventh line diagram to reach, and "extend past Chapter 8" implied
+otherwise.
+
+What this pass actually settled is the weaker question the heading smuggled in: is
+there anything **outside** line selection that linelab can grade honestly? No.
+**81 figures adjudicated, 0 survive**; every extracted image is reconciled (87 = 6
+shipped + 81 adjudicated). None of the 81 is a line diagram — they are 39 photographs,
+24 suspension/chassis-setup diagrams, tyre physics, a shifting sequence and a throttle
+timing chart. The nearest misses are the nine Chapter 15 plan-views (§2 bucket I):
+fig 15.16 draws an "intended path of travel" against an "actual path of travel", which
+looks like a line diagram, but the deviation's cause is a machine fault and the
+intended path is an **authored** ideal — G1 forbids drawing a path nobody rode.
+
+Three rows of the starting-hypothesis table are overturned:
 
 | chapter | was | is | why |
 |---|---|---|---|
@@ -48,26 +64,21 @@ when torn", a defence was run afterwards on the three closest refusals. It moved
 verdicts: 2.9 conceded on its own analysis, 9.1 conceded parity outright, and 11.TB
 stayed OUT while usefully refuting two of its own four grounds.
 
-### What actually blocks the three honest artifacts
+### What blocked the three honest artifacts — and what has since changed
 
-Two STOPs, in order. Both are decisions, not bugs, and neither may be worked around by
-changing engine code to make a figure pass.
+The pass found three artifacts that were honest but unauthorized, and stopped on two
+STOPs rather than authoring them.
 
-- **S12 — may linelab author non-parity *doctrine* figures at all?** Three independent
-  routes converged on the same honest-but-unauthorized artifact: a figure that
-  illustrates Chapter 8/9 prose rather than reproducing a printed diagram. Under the
-  current remit ("every other book *figure*"), none is authorized.
+- **S12 — may linelab author non-parity *doctrine* figures at all?**
+  **Since GRANTED**, scoped to Chapter 8 doctrine — see the NEXT section below. At the
+  time of the pass the remit read "every other book *figure*", so none was authorized.
 - **S15 — nothing renders a placard, so a doctrine figure cannot disclaim parity.**
-  Verified: the scene `note:` survives into `meta.caption` in the envelope but reaches
-  neither the SVG nor the manifest, and no committed SVG carries placard ink — while
-  design/06 §11 lists figure-level placard boxes and the honest-limitation placards
-  (01 §8) as required margin chrome. **S15 must land before S12 can be answered yes**,
-  or the disclaimer lives somewhere the reader of the figure never looks.
+  **Still open, and now the single gating item.** Verified: the scene `note:` survives
+  into `meta.caption` in the envelope but reaches neither the SVG nor the manifest, and
+  no committed SVG carries placard ink — while design/06 §11 lists figure-level placard
+  boxes and the honest-limitation placards (01 §8) as required margin chrome.
 
-The queue if both are granted, in priority order: (1) `good`-vs-`chop` on `book90` →
-`fig-08-07`; (2) `fig-11-TB` retitled to the stand-up ceiling; (3) `overread` with
-de-claimed labels. `fig-08-07` is deliberately left unclaimed. Full scene text for all
-three is preserved in `figures/SCOPE.md` §3 so it need not be re-derived.
+Neither may be worked around by changing engine code to make a figure pass.
 
 ### What did not need doing
 
@@ -77,28 +88,7 @@ caller is speculative work; the note stays here so the decision is visible rathe
 silently skipped. The determinism gate *was* run: two consecutive full Chapter 8 bakes
 moved zero tracked artefacts.
 
-### NEXT — decide S12, after landing S15
-
-There is no authoring work to pick up until two decisions are made, in this order.
-Both are recorded in full in `figures/SCOPE.md` §4.
-
-**1. Land S15 — give a figure somewhere to state a limitation.** The caption already
-survives lowering (`meta.caption`); it simply never reaches the SVG or the manifest,
-and no committed figure carries placard ink. design/06 §11 already specifies the
-surface (figure-level placard boxes + the 01 §8 honest-limitation placards) — this is
-an implementation gap, not a design question. It is also the cheapest item on this
-page and it unblocks the next one.
-
-**2. Then decide S12 — may linelab author non-parity doctrine figures?** This one is
-the design owner's call and nobody else's, because it changes what the corpus *is*.
-If yes, three artifacts are ready to author (scene text preserved in `SCOPE.md` §3)
-and each must carry an S15 placard disclaiming book-figure parity. If no, the corpus
-is closed at six and this page's figure work is finished permanently.
-
-Do not answer S12 by authoring a figure and seeing whether it looks convincing. That
-is the exact failure mode the whole adjudication was built to catch.
-
-### Also worth fixing (found by the corpus pass, independent of S12)
+### Also worth fixing (found by the corpus pass)
 
 - **`check` doesn't apply the out-of-scope validation** that `figure`/`run` apply, so
   the lint green-lights a super-tight road the bake then refuses. Wrong direction for
@@ -108,6 +98,78 @@ is the exact failure mode the whole adjudication was built to catch.
   exiting into the oncoming lane. Nothing visible moves, which is why it survived.
 
 Both are written up in `linelab/DEVIATIONS.md` § "Post-v1.0 — corpus-extension pass".
+
+---
+
+## NEXT — a figure for every Chapter 8 doctrine surface, printed or not
+
+**Status: the goal, decided 2026-07-27. Not started.**
+
+The book stops at six line diagrams; linelab's *doctrine* does not. Chapter 8 teaches
+blind corners, hairpins and half the mistake catalogue in prose that carries no figure
+at all — and `bookBlind` and `bookHairpin` are shipped presets that no scene uses. **The
+target is a figure for every Chapter 8 doctrine surface the engine actually computes,
+whether or not Parks printed a diagram of it.**
+
+This **grants S12**, which the corpus pass had to leave open: linelab may author
+non-parity *doctrine* figures. The grant is scoped — Chapter 8 doctrine only — and
+carries one condition, because the reason S12 was open was never bureaucratic:
+
+> **S15 is a hard prerequisite.** A doctrine figure must say, inside the artifact, that
+> it illustrates prose rather than reproducing a printed diagram. Today the caption
+> reaches `meta.caption` and stops — it is in neither the SVG nor the manifest, and no
+> committed figure carries placard ink, though design/06 §11 lists figure-level placard
+> boxes as required margin chrome. Land S15 first. A doctrine figure that cannot
+> disclaim parity is exactly the "plausible fake" design/01 §8 refuses.
+
+### Coverage today: 20 of 47
+
+Derived twice independently — once from the doctrine text, once from the baked
+envelopes — and reconciled: **47 distinct Chapter 8 doctrine surfaces, 20 covered by the
+six figures, 27 uncovered.** The corpus is strong on cornering *geometry* (checks 1, 2,
+3, 4, 9, 13, 14) and on four of eight mistake kinds. It is **completely dark** on:
+
+- **all of §6 visibility doctrine** — `hold_wide_for_sight` is `na` on 22 of 22 rows;
+  no committed line has ever ridden a blind corner, and `blind:false` everywhere
+- **both misjudgment kinds** (`underread`, `overread`) and `premature_contained`, `chop`
+- **almost every `warn` band** — exactly one of the sixteen checks ever warns
+  (`throttle_rule`'s roll-on leg, 7 rows on figs 8.5/8.6, and only as unlabelled chain
+  collateral). The warn bands of `quick_steer`, `lean_ceiling`, `stop_within_sight`,
+  `trail_brake_taper` and `wrong_strategy_for_corner` are all unwitnessed
+- **the sole critical check's fail arm** — `wrong_strategy_for_corner` is 20 `na` /
+  2 `pass` / **0 `fail`**, so fig 8.4's stated reason for existing (design/01 §5: a
+  double-apex *strategy* line that fails check 16) is not what the shipped scene draws;
+  it draws `overspeed` instead, per `adj-fig84`
+
+This is not a new discovery so much as a quantification of one: `A-CATALOGUE-EXERCISED`
+(design/09 §4) is already recorded `needs-decision` in `DEVIATIONS.md` for exactly this
+— *"cannot pass over the committed corpus"*. **Authoring these figures is that item's
+resolution path**, which makes the goal worth more than corpus size: it turns a test
+that cannot currently pass into one that can.
+
+### The candidate list, with what already blocks each
+
+Ordered by value-per-obstacle. Several were already attempted in the corpus pass and hit
+real problems — those are carried forward here so nobody re-derives them. Full detail in
+`figures/SCOPE.md` §3–§4.
+
+| # | figure | carrier | known obstacle |
+|---|---|---|---|
+| 1 | `chop` on `book90` — the throttle chop | `throttle_rule` leg (d) | **None on merit.** Killed only on S12 governance, which this section grants. Admit with `chop:slew_mss=20` (cuts the S26 `rideability` excess 102.95 → 7.36 °/s). Needs S15. Baked scene text already in `SCOPE.md` §3. |
+| 2 | `overread` — the timid line | `out_in_out` exit leg | De-claim the labels: the drafted `exit@timid` asserted "no drive" when `throttle_rule` passes and `a_long` is identical to the ideal's. Needs S15. |
+| 3 | check 16 fail — double-apex strategy on a DR corner | `wrong_strategy_for_corner` | **S28**: §5 wants two *full solved strategies* (`role=alternative`, `accept=best_failing`), and the scene grammar exposes only `ride`/`mistake`. Needs FigureSpec JSON as a corpus convention. `fx-wrong-strategy-dr.json` already produces the fail. |
+| 4 | hairpin at road speed | `late_apex`, `out_in_out` | Redundant as drafted — same bar 50 as `book90`, `lean_ceiling` structurally pinned to pass. Needs a teaching that `book90` doesn't already carry. |
+| 5 | blind corner — hold wide | `hold_wide_for_sight`, `lean_ceiling` | **Hardest.** `fig-08-D1` was killed by both lenses: the carrying check has no visibility content (the 31.45°/35.66° split is `atan(v²/gr)` from radius alone), the split is a 0.66° knife-edge across 27 cm of lane, and check 11's *pass* arm is **engine-unattainable** — S16 shows `release(c)` at 25.0–27.5 m against a feasible turn-in band of 11.0–18.0 m; the intervals never intersect. Also S22, S23(ii). Do not re-bake `fig-08-D1` blind. |
+| 6 | `lean_ceiling` / `traction_ceiling` fail bands | checks 7, 8 | **S27**, the most reusable finding of the pass: the solver clamps commanded lean at `phiReserve`, so a solved line *cannot* warn on check 8. Reachable only at `mu 0.4`, and the scene grammar has no `mu` vocabulary. |
+| 7 | increasing radius (`late_apex` → `na`) | none | **Nothing can host it.** Every preset is a constant arc or the one closing taper. Needs a new preset (`L 9>16 ^130`) — an amendment to design/03 §3.1. |
+
+**The rule that governs all of them**, adopted from S27 and design/01 §A.2: *a check may
+not be named as a figure's carrier until it has been shown capable of a non-`pass`
+verdict on that road.* A check that grades `na`, or passes on every line drawn, teaches
+nothing — and a visibility assertion on a non-blind corner does not fail, it passes
+vacuously, which is worse.
+
+Start at 1 and 2. They are blocked on nothing but S15.
 
 ---
 

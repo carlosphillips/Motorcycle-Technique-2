@@ -1,5 +1,39 @@
 # figures/SCOPE.md — scope adjudication for the figure corpus
 
+## Read this first: Chapter 8 is the only chapter that contains lines
+
+*Total Control* contains **exactly six line-choice diagrams, and they are all in
+Chapter 8** — figures 8.1 through 8.6. Chapter 8's prose references those six and no
+others, and no other chapter's prose contains a line-selection diagram. **All six are
+built, shipped, graded green and re-bake byte-identical.** That is the whole of the
+book's line-selection ink, and linelab covers it 6/6. It is also exactly what
+`design/01 §2` G7 asks for: *"For each line diagram in* Total Control *Chapter 8 (figs
+8.1–8.6), linelab produces an equivalent figure from a scene file."*
+
+Nothing in the refused set below is a line-choice diagram. The 81 refusals are 39
+photographs (body position, gear, fitness, ergonomics), 24 suspension and chassis-setup
+diagrams, tyre/contact-patch/gyroscope physics, one shifting sequence and one throttle
+timing chart. The nearest misses are the nine Chapter 15 plan-views in §2 bucket I —
+fig 15.16 and its family draw an "intended path of travel" against an "actual path of
+travel" through a bend, which *looks* like a line diagram. They are refused because the
+deviation's cause is a machine fault (tyre leaving the ground, suspension), and because
+the intended path is an **authored** ideal, which G1 forbids outright: every line
+linelab draws is an integrated trajectory, so it cannot draw a path nobody rode. The
+rider's line choice is identical in both curves; the machine changes the outcome.
+
+So the corpus is not missing line-selection work, and the ROADMAP heading this pass ran
+under — "extend past Chapter 8" — was misleading. Chapter 8 *is* the line-selection
+chapter, and it was already complete at v1.0. What this file actually answers is the
+weaker question that heading implied: is there anything **outside** line selection that
+linelab can also grade honestly? No.
+
+The live gap is a different one, and it is now the project's stated goal: Chapter 8
+teaches doctrine in **prose** that has no printed figure at all — blind corners,
+hairpins — and `bookBlind` and `bookHairpin` are shipped presets that no figure uses.
+See `ROADMAP.md` for the coverage target.
+
+---
+
 This file decides two questions.
 
 **(a) Can linelab reproduce this printed book figure honestly?** Asked figure by

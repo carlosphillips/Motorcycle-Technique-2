@@ -164,22 +164,26 @@ byte-identical after this run.
 | `fig-08-05` | Fig 8.5 — the double apex (`good` refuses `no_two_touch_line`; `late` solves `runoff`) | 3 | current (re-baked) | **pass** |
 | `fig-08-06` | Fig 8.6 — the esses (chain grades caution) | 3 | current | **pass** |
 
-**Six is the whole corpus, and that is now an adjudicated result rather than a
-backlog item.** A post-v1.0 pass asked whether any other figure in *Total Control*
-could be graded honestly and found none: **81 figures adjudicated, 0 survive**
-(`../figures/SCOPE.md` is the record; every one of the 87 extracted images is
-reconciled). Chapters 9 and 11 — the two the roadmap expected to yield — are refused
-for reasons that are structural rather than cosmetic: fig 9.1 plots brake and throttle
-as two overlapping channels where linelab has one signed `cmd_a`, and fig 11.1 is a
-body-position photograph, which `design/01 §8` refuses by name. A "second Chapter 8
-tranche" on the two unused presets (`bookBlind`, `bookHairpin`) and the four undrawn
-mistake kinds was authored, baked and attacked, and also failed — on merit.
+**These six are every line-choice diagram in the book.** *Total Control* contains
+exactly six, all in Chapter 8; Chapter 8's prose references 8.1–8.6 and no others, and
+no other chapter contains a line-selection diagram. So this table is G7 complete — 6/6
+— not a partial corpus awaiting more chapters.
 
-Three honest non-parity *doctrine* figures do exist in draft, and are blocked on two
-recorded decisions: **S12** (may the corpus contain figures that illustrate prose
-rather than reproduce a printed diagram?) and **S15** (nothing renders a placard, so
-such a figure has nowhere to disclaim parity). See `ROADMAP.md`. The re-bake gate
-still holds: two consecutive full Chapter 8 bakes move zero tracked artefacts.
+A post-v1.0 pass confirmed it the hard way, by adjudicating every other extracted
+figure in the book: **81 adjudicated, 0 survive** (`../figures/SCOPE.md` is the record,
+reconciling all 87 extracted images). None of the 81 is a line diagram — they are
+photographs, suspension-setup diagrams, tyre physics, a shifting sequence and a
+throttle timing chart. Chapters 9 and 11, the two expected to yield, are refused
+structurally: fig 9.1 plots brake and throttle as two overlapping channels where
+linelab has one signed `cmd_a`, and fig 11.1 is a body-position photograph, which
+`design/01 §8` refuses by name.
+
+**The corpus is still meant to grow — just not from printed figures.** Chapter 8
+teaches doctrine in prose that has no figure attached (blind corners, hairpins), and
+`bookBlind` and `bookHairpin` are shipped presets no figure uses. The project's goal is
+now a figure for every Chapter 8 doctrine surface linelab computes, printed or not; the
+coverage matrix and its blockers are in `ROADMAP.md`. The re-bake gate holds meanwhile:
+three consecutive full Chapter 8 bakes move zero tracked artefacts.
 
 ## Phase status
 
