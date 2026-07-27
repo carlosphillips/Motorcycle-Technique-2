@@ -6,8 +6,9 @@
 //
 // Grammar (design/04 §7, copied verbatim in the file-level comments below each
 // section): top-level keys at column 0 (`road lines occluders hazards marks
-// labels view note`); `lines:`/`labels:` entries indented; `#` comments outside
-// double quotes; every rejection is a typed `SCHEMA`/`UNKNOWN_ID`/`BAD_RANGE`
+// labels view note placards`); `lines:`/`labels:`/`placards:` entries indented;
+// `#` comments outside double quotes; every rejection is a typed
+// `SCHEMA`/`UNKNOWN_ID`/`BAD_RANGE`
 // error naming the offending token and the 1-based scene-text line number
 // (`at` = "line <n>: <token-ish description>").
 //
@@ -531,7 +532,7 @@ function parseViewSpec(value: string, at: string): Result<Record<string, string>
 // ---------------------------------------------------------------------------
 // Top-level scanning: column-0 keys, `lines:`/`labels:` children indented.
 
-const TOP_LEVEL_KEYS = ["road", "lines", "occluders", "hazards", "marks", "labels", "view", "note"] as const;
+export const TOP_LEVEL_KEYS = ["road", "lines", "occluders", "hazards", "marks", "labels", "view", "note", "placards"] as const;
 type TopLevelKey = (typeof TOP_LEVEL_KEYS)[number];
 
 interface TopEntry {
@@ -624,7 +625,7 @@ export function lowerScene(sceneText: string): Result<FigureSpec> {
     else list.push(e);
   }
 
-  const SINGLETON_KEYS: readonly TopLevelKey[] = ["road", "lines", "marks", "labels", "view", "note"];
+  const SINGLETON_KEYS: readonly TopLevelKey[] = ["road", "lines", "marks", "labels", "view", "note", "placards"];
   for (const key of SINGLETON_KEYS) {
     const list = byKey.get(key);
     if (list !== undefined && list.length > 1) {
@@ -795,6 +796,43 @@ export function lowerScene(sceneText: string): Result<FigureSpec> {
     note = dq;
   }
 
+  // -- placards: (optional) ------------------------------------------------------
+  // design/06 §3.1 stage 11's "figure-level placard boxes": an ORDERED list of
+  // author-supplied strings, one complete double-quoted string per indented
+  // line, each rendered as its own box. Unlike every other placard the letter
+  // names (§2.7's continuation, 05 §8.4's divergence, 04 §4b.7's save-window)
+  // this text is the AUTHOR's, not a design-owned verbatim string — which is
+  // the point: a doctrine figure has to be able to state its own limitation
+  // where a reader sees it (01 §8; figures/SCOPE.md §1).
+  //
+  // Deliberately NOT a `view:` key: `view` rides the hashed spec, so adding one
+  // to an existing scene would move its `spec_hash`. A new top-level key that
+  // no committed scene uses is the only additive spelling.
+  let placards: string[] | undefined;
+  const placardsEntry = byKey.get("placards")?.[0];
+  if (placardsEntry !== undefined) {
+    if (placardsEntry.inlineValue.length > 0) {
+      return err(schemaErr(lineAt(placardsEntry.lineNo), '"placards:" takes no inline value — entries are indented below it', "scene_unexpected_indent"));
+    }
+    placards = [];
+    for (const child of placardsEntry.children) {
+      const at = lineAt(child.lineNo);
+      if (hasUnterminatedQuote(child.text)) {
+        return err(schemaErr(at, `unterminated quoted placard ${child.text}`, "scene_unterminated_quote"));
+      }
+      const toks = splitRespectingQuotes(child.text);
+      const dq = toks.length === 1 ? dequote(toks[0]!) : undefined;
+      if (dq === undefined || dq.trim().length === 0) {
+        return err(schemaErr(at, "each placards: entry must be a single non-empty double-quoted string", "scene_placard_malformed"));
+      }
+      placards.push(dq);
+    }
+    // D8: an empty block would be accepted-and-ignored — rejected instead.
+    if (placards.length === 0) {
+      return err(schemaErr(lineAt(placardsEntry.lineNo), '"placards:" declares no entries — omit the key instead', "scene_placard_empty"));
+    }
+  }
+
   const spec: Figure = {
     road: road.value,
     ...(occluders.length > 0 ? { occluders } : {}),
@@ -803,7 +841,8 @@ export function lowerScene(sceneText: string): Result<FigureSpec> {
     ...(labels !== undefined ? { labels } : {}),
     ...(marks !== undefined ? { marks } : {}),
     ...(view !== undefined ? { view } : {}),
-    ...(note !== undefined ? { note } : {})
+    ...(note !== undefined ? { note } : {}),
+    ...(placards !== undefined ? { placards } : {})
   };
   return ok(Object.freeze(spec));
 }

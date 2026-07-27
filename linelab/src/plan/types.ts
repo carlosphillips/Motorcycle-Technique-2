@@ -328,6 +328,14 @@ export interface Figure {
   /** projection hook — vocabulary owned by render/ (opaque here, ARCHITECTURE §4) */
   readonly view?: unknown;
   readonly note?: string;
+  /**
+   * design/06 §3.1 stage 11's figure-level placard boxes — an ORDERED list of
+   * author-supplied strings, each drawn as its own box in the margin band.
+   * OMITTED (never `[]`) when the figure declares none: `spec_hash` is fnv-1a
+   * over the lowered form, so a defaulted key would move every committed stamp.
+   * Distinct from `note?`, which is a caption (05 §7 `meta`) and never ink.
+   */
+  readonly placards?: readonly string[];
 }
 
 /** D30: FigureSpec JSON is the canonical figure spelling; scene text is sugar. */

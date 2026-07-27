@@ -658,7 +658,10 @@ export function project(road: ComposedRoad, lines: readonly LineResult[], viewSp
     markers: [],
     labels: [],
     legend,
-    footnote: null
+    footnote: null,
+    // stage 11's placard boxes are FIGURE-level, and `project()` is given only
+    // (road, lines, viewSpec) — renderViews attaches them (`withPlacards`).
+    placards: []
   };
   return ok(scene);
 }

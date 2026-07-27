@@ -1615,7 +1615,7 @@ of lines:
 ```
 Figure = { road (+ occluders/hazards),
            lines: [ { name, role, spec } … ],     // 1..N, no cap
-           labels?, marks?, view?, note? }
+           labels?, marks?, view?, note?, placards? }
 
 role ∈ ideal | alternative | mistake | reference          // labels only (D9)
 spec = ride-spec | mistake-spec | explicit plan            // 04 owns ride-spec grammar
@@ -1642,6 +1642,15 @@ spec = ride-spec | mistake-spec | explicit plan            // 04 owns ride-spec 
   `apex:<id>` sugar resolves post-solve (`04-solver-and-authoring.md`). `view` is
   the projection hook — mode, window, orientation — owned by
   `06-rendering-and-projection.md`.
+- `placards` is an **ordered list of strings**, each an author-supplied
+  figure-level placard box drawn by stage 11 of the fixed draw order
+  (`06-rendering-and-projection.md` §3.1) and recorded in the export manifest
+  (§7 there). It is the figure's own voice for the placard policy of
+  `01-scope-and-doctrine.md` §8 — distinct from `note`, which is a caption
+  (`05-result-contract-and-inspection.md` §7's `meta`) and never becomes ink.
+  Optional and **omitted when unused**, never `[]`: `spec_hash` covers the
+  lowered form (D30), so a defaulted key would move every existing figure's
+  identity. Empty lists and non-string members are rejected `SCHEMA` (D8).
 - The scene text format that authors this object in ≤6 lines, and the solver calls
   each `spec` compiles into, are specified in `04-solver-and-authoring.md`.
 

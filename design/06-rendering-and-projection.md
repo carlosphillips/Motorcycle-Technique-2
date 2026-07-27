@@ -425,6 +425,18 @@ elements, none of which invents geometry (every one sits on a drawn sample):
     mistake ate — carries a unit. This stage is the single slot for
     honest-limitation placards (01 §8) and the version-skew divergence placard
     (05 §8.4). Placards are rendered elements, never errors.
+    Placard text is normally design-owned and verbatim (§2.7's continuation,
+    stage 5b's fan-extent split, 05 §8.4's skew, 04 §4b.7's save-window). A
+    **figure-level placard box is the one author-supplied kind**: its strings
+    come from the figure's own `placards` list (03 §8, 04 §7), in declared
+    order, so a figure can state a limitation of *itself* — its provenance, an
+    axis the reader must not compare across — where a reader of the standalone
+    SVG sees it, which neither `note:` nor a scene comment achieves. Author text
+    is bound by the same law as the rest of this stage: neutral ink only (§5.1
+    — a colour is a verdict, and a placard reports none), sited in the frame
+    margin so `scene.frame` and therefore §6's metrics never move, and it never
+    licenses ink that would otherwise misteach (§2.7). Every drawn box is
+    recorded in the export manifest (§7).
 
 ### 3.2 What the renderer refuses
 
@@ -655,18 +667,28 @@ the vision judge still owns legibility and doctrinal reading
   identically dropped into any host page or rasterizer).
 - One file per figure; an export batch writes a `manifest.json` of per-figure
   records: `{figure_id, spec_hash, mode, view: {window, orient, width_exag,
-  straight_compress}, legend: [{line_id, role, quality, outcome}],
+  straight_compress}, legend: [{line_id, role, quality, outcome}], placards?,
   proportion_metrics, gate_verdict, png?}`. `view.orient` is the resolved value
   (§2.4), and the `legend` records mirror the rendered legend rows (§5.3) — the
   amber disambiguation is assertable mechanically in CI, not hoped for in
   pixels.
+- `placards` mirrors the rendered stage-11 placard boxes (§3.1) on exactly the
+  same terms as `legend` mirrors its rows: the **authored strings, in drawn
+  order**, so what the figure says is assertable mechanically in CI rather than
+  read off pixels. It is not optional courtesy but a condition of the ink: the
+  vision rubric's `J7 no fabrication` — *nothing drawn that the manifest doesn't
+  declare* (`09-verification-and-testing.md` §7.2) — fails any placard the
+  manifest omits, and `T-JUDGE-RECORD` makes that a CI gate. The key is
+  **omitted when the figure carries no placard**, never written as `[]`, so a
+  placard-free record is byte-identical to one written before the channel
+  existed.
 - **Parity requirement (acceptance bar):** an exported diagram-mode figure of a
   book-figure scenario must read as an *equivalent of the book's figure* — same
   compact proportions, same marker/colour vocabulary, same annotation devices
   (sight rays, turn points, apexes) — judged by the proportion gate mechanically
   and the vision loop editorially. Equivalence is judged **modulo margin
-  chrome** (the disclosure footnote, the legend) **and the reference role's
-  dotting** — the book's pages carry none of the three.
+  chrome** (the disclosure footnote, the legend, the placard boxes) **and the
+  reference role's dotting** — the book's pages carry none of the four.
 - Rasterization for judging is owned by `09-verification-and-testing.md`; under
   D1 the toolchain is no longer bound to cairosvg, but the SVG conservatism above
   is kept regardless — it is cheap insurance that exports survive any renderer.

@@ -19,9 +19,10 @@ import { ok } from "../core/result.js";
 import { project, rotatePoint } from "./project.js";
 import { deriveMarkers } from "./markers.js";
 import { resolveLabels } from "./labels.js";
-import { withMarkers, withLabels } from "./scene.js";
+import { withMarkers, withLabels, withPlacards } from "./scene.js";
 import { renderTopdown } from "./topdown.js";
 import { renderPovForFigure } from "./pov.js";
+export { wrapPlacard, placardBandHeightPx, PLACARD_WRAP_CHARS } from "./placards.js";
 export { project } from "./project.js";
 export { renderTopdown } from "./topdown.js";
 // v0.2 (00 §3's inspection row): the controls strip with its linked cursor.
@@ -67,6 +68,7 @@ export function renderViews(input) {
     const base = project(input.road, input.lines, input.viewSpec);
     if (!base.ok)
         return base;
+    const withChrome = input.placards !== undefined ? withPlacards(base.value, input.placards) : base.value;
     const markers = deriveMarkers(input.lines, input.marks);
     const labels = resolveLabels(input.lines, input.labels);
     if (!labels.ok)
@@ -79,7 +81,7 @@ export function renderViews(input) {
     // (2) map the surviving anchor points through the SAME §2.4 rigid rotation
     // (scene.pivot + scene.orient) the road/lines went through. Skipping (2) is
     // the fig-08-06 orient=90 "markers scattered in the grass" judge finding.
-    const { window, pivot, orient } = base.value;
+    const { window, pivot, orient } = withChrome;
     const inWindow = (s) => s >= window.from_s && s <= window.to_s;
     const place = (p) => rotatePoint(p, pivot.x, pivot.y, orient);
     const drawnMarkers = markers
@@ -88,7 +90,7 @@ export function renderViews(input) {
     const drawnLabels = labels.value
         .filter((l) => inWindow(l.s))
         .map((l) => ({ ...l, anchor: place(l.anchor) }));
-    const scene = withLabels(withMarkers(base.value, drawnMarkers), drawnLabels);
+    const scene = withLabels(withMarkers(withChrome, drawnMarkers), drawnLabels);
     const svg = renderTopdown(scene, input.style);
     return ok({ scene, svg });
 }

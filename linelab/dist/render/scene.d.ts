@@ -198,8 +198,19 @@ export interface DrawnScene {
     };
     /** null in v0.1 true mode — the disclosure footnote is diagram-mode-only chrome (§2.7). */
     readonly footnote: string | null;
+    /**
+     * design/06 §3.1 stage 11's figure-level placard boxes, in declared order —
+     * a SEPARATE object from `footnote`: the letter enumerates the disclosure
+     * footnote (§2.7), the entry annotation (§2.4), the legend (§5.3), placard
+     * boxes and the scale bar as five distinct members of the same stage, and
+     * only the footnote is diagram-mode-gated. Empty on every figure that
+     * declares none, which is what keeps a placard-free bake byte-identical.
+     */
+    readonly placards: readonly string[];
 }
 /** Pure attach — a new `DrawnScene`, never a mutation of `scene` (markers.ts's `deriveMarkers` output). */
 export declare function withMarkers(scene: DrawnScene, markers: readonly DrawnMarker[]): DrawnScene;
 /** Pure attach — a new `DrawnScene`, never a mutation of `scene` (labels.ts's `resolveLabels` output). */
 export declare function withLabels(scene: DrawnScene, labels: readonly DrawnLabel[]): DrawnScene;
+/** Pure attach — the figure's authored stage-11 placards (design/06 §3.1); `project()` never sees the FigureSpec. */
+export declare function withPlacards(scene: DrawnScene, placards: readonly string[]): DrawnScene;

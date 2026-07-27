@@ -1835,9 +1835,9 @@ One figure per `.scene` file; the declarative source an author or agent edits
 JSON** — `lowerScene(sceneText)` is a pure, total, deterministic lowering, the
 `figure` verb accepts either spelling, and `spec_hash` is computed on the
 lowered form, so a figure's identity is spelling-independent (D30;
-`08-…md` §3). Top-level keys at column 0; `lines:` and `labels:` entries
-indented; `#` comments outside double quotes; typed errors carry the offending
-token and 1-based line number.
+`08-…md` §3). Top-level keys at column 0; `lines:`, `labels:` and `placards:`
+entries indented; `#` comments outside double quotes; typed errors carry the
+offending token and 1-based line number.
 
 ```
 road:      <road-DSL line> | preset <name> [hand=L|R]   # required, exactly one (road-ref token)
@@ -1853,6 +1853,9 @@ labels:                                             # optional callouts, road + 
   entry:c1  "turn in late"
 view:      mode=diagram window=auto                 # optional; vocabulary owned by 06
 note:      "caption text"                           # optional
+placards:                                           # optional figure-level placard boxes, drawn in order
+  "DOCTRINE FIGURE - reproduces no printed figure."
+  "The two controls strips are auto-scaled independently - compare shapes, not magnitudes."
 ```
 
 - **`road:`** takes the shared **road-ref token** — a road DSL one-liner or
@@ -1912,6 +1915,29 @@ first `ideal`-role line, preserving the carried `apex:<id>` sugar. Grammar, wire
 shapes, and the typed `anchor_no_match`/`anchor_ambiguous` errors are owned by
 `03-…md` §8. `view:` speaks the projection vocabulary of
 `06-rendering-and-projection.md` (`mode=`, `window=`, `orient=`, `look=`, …).
+
+`placards:` takes an **ordered list of figure-level placard boxes** — one
+complete double-quoted string per indented line, each rendered as its own box by
+draw stage 11 (`06-…md` §3.1), in declared order. It is the authoring surface for
+the placard policy of `01-…md` §8 on a *standalone exported figure*: a concession
+a reader must see has to be ink, and `note:` is not — `note:` is a caption, it
+lands in the result envelope's `meta` (`05-…md` §7) and reaches no draw stage.
+The two keys are therefore complementary, never alternatives.
+
+Placard text here is **author-supplied**, which is the one respect in which it
+differs from every other placard the design names (§4b.7's save-window placard,
+`06-…md` §2.7's continuation and §3.1's fan-extent split, `05-…md` §6.4's
+standing and §8.4's version skew) — those are design-owned verbatim strings
+pinned by named tests. An author-supplied placard states a limitation of *this
+figure*; it never restates, softens or contradicts a design-owned one, and it
+cannot make a misteaching figure shippable (`06-…md` §2.7: disclosure discloses,
+it does not license ink that would otherwise misteach).
+
+The key is **omitted when unused**, never defaulted to an empty list: `spec_hash`
+is computed over the lowered form (D30), so a defaulted key would move the
+identity of every figure that never asked for one. An empty `placards:` block, an
+unquoted entry, and a blank string are each rejected `SCHEMA` naming the 1-based
+line (D8 — nothing is accepted and ignored).
 
 Baking is pure and deterministic: identical scene text produces identical
 artifacts (`09-verification-and-testing.md` owns the round-trip gates). A

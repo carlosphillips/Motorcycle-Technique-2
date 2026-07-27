@@ -23,6 +23,14 @@ export interface ManifestRecord {
     readonly mode: "true";
     readonly view: ManifestViewRecord;
     readonly legend: readonly ManifestLegendRow[];
+    /**
+     * design/06 §7 (amended for S15) — the authored stage-11 placard strings,
+     * mirrored exactly as `legend` mirrors the rendered rows. OMITTED when the
+     * figure carries none, so the committed records stay byte-identical.
+     * Mandatory when there IS ink: J7 "no fabrication" fails anything drawn that
+     * the manifest does not declare (design/09 §7.2, gated by T-JUDGE-RECORD).
+     */
+    readonly placards?: readonly string[];
     readonly proportion_metrics: ProportionMetrics;
     readonly gate_verdict: GateVerdict;
     readonly png?: string;

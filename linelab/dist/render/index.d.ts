@@ -5,6 +5,7 @@ import type { FigureLabel, MarkSpec } from "../plan/types.js";
 import type { DrawnScene } from "./scene.js";
 import type { RenderStyle } from "./topdown.js";
 export type { DrawnScene } from "./scene.js";
+export { wrapPlacard, placardBandHeightPx, PLACARD_WRAP_CHARS } from "./placards.js";
 export { project } from "./project.js";
 export type { ViewSpec, StationRef } from "./project.js";
 export { renderTopdown } from "./topdown.js";
@@ -24,6 +25,13 @@ export interface RenderViewsInput {
     readonly viewSpec?: unknown;
     readonly labels?: readonly FigureLabel[];
     readonly marks?: MarkSpec;
+    /**
+     * design/06 §3.1 stage 11's figure-level placard boxes, in declared order.
+     * FIGURE-level, so `project()` (road, lines, viewSpec) cannot see them —
+     * they are attached to the `DrawnScene` here. Absent on every figure that
+     * declares none, which is what keeps a placard-free bake byte-identical.
+     */
+    readonly placards?: readonly string[];
     readonly target?: RenderTarget;
     readonly style?: RenderStyle;
     /**

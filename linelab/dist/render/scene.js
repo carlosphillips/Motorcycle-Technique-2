@@ -20,4 +20,8 @@ export function withMarkers(scene, markers) {
 export function withLabels(scene, labels) {
     return { ...scene, labels };
 }
+/** Pure attach — the figure's authored stage-11 placards (design/06 §3.1); `project()` never sees the FigureSpec. */
+export function withPlacards(scene, placards) {
+    return { ...scene, placards };
+}
 //# sourceMappingURL=scene.js.map

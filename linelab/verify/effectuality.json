@@ -928,6 +928,15 @@
       "expect": "effect"
     },
     {
+      "id": "scene:placards",
+      "surface": "scene",
+      "field": "placards",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": "presence",
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
       "id": "cli:--road",
       "surface": "cli",
       "field": "--road",

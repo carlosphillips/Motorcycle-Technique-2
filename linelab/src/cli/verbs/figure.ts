@@ -92,6 +92,9 @@ export function figureVerb(input: FigureVerbInput): VerbOutcome {
       lines,
       viewSpec,
       ...(drawableLabels !== undefined ? { labels: drawableLabels } : {}),
+      // design/06 §3.1 stage 11 — the figure's own placard boxes. Absent unless
+      // authored, so a scene without `placards:` renders exactly as before.
+      ...(spec.placards !== undefined ? { placards: spec.placards } : {}),
       marks: spec.marks ?? "auto"
     });
     if (!rendered.ok) return errOutcome(rendered.error);

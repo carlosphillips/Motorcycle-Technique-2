@@ -10,10 +10,14 @@
 // Deviation (recorded per this package's return): stage 11's "entry
 // annotation" (off-window approach arrow + speed chip) is omitted —
 // `footnote` is `null` in v0.1 true mode (§2.7's disclosure footnote is
-// diagram-mode-only chrome) so stage 11 only draws the legend.
+// diagram-mode-only chrome). Stage 11 draws the legend, the D47 scale bar and
+// (S15) the figure-level placard boxes: five members are enumerated in §3.1,
+// and only the footnote is diagram-mode-gated, so the placard channel does not
+// inherit that gate.
 import { fallbackSvg } from "./fallback.js";
 import { QUALITY_COLOUR, OCCLUSION_ALPHA, NOMINAL_FRAME_PX, GRAVEL_STIPPLE_RADIUS } from "./constants.js";
 import { SIGHT_RAY_INK, LEADER_INK, trajectoryInk, glyphKeepsArrowhead } from "./ink.js";
+import { wrapPlacard, placardBoxHeightPx, placardBandHeightPx, PLACARD_INK, PLACARD_FONT_PX, PLACARD_LINE_PX, PLACARD_PAD_PX, PLACARD_GAP_PX, PLACARD_BAND_PAD_PX, PLACARD_COLUMN_PX } from "./placards.js";
 // ---------------------------------------------------------------------------
 // Tiny well-formed-SVG string helpers (self-closing leaves, explicit closes)
 function esc(s) {
@@ -624,7 +628,57 @@ function stageLabels(scene, pxScale, vbX, vbY, vbW, vbH) {
     s += close("g");
     return s;
 }
-function stageChrome(scene, pxScale, vbX, vbY, vbW, vbH) {
+/**
+ * Stage 11's figure-level placard boxes (design/06 §3.1). Sited in a band BELOW
+ * the content viewBox — never inside `scene.frame`, because §6.2's exemption
+ * list has exactly two entries and margin chrome is not one of them: a placard
+ * that grew the frame would move `road_ink` and `frame_aspect` on every figure
+ * carrying one. The band is viewBox-only, so the gated metrics never see it.
+ *
+ * Ink is the §2.7 footnote's neutral grey (§5.1: a colour is a verdict, and a
+ * placard has none to report). Text is the author's, XML-escaped and otherwise
+ * untouched — the corpus's ASCII-degraded convention is preserved by not
+ * transforming anything.
+ */
+function stagePlacards(placards, pxScale, vbX, bandTop) {
+    if (placards.length === 0)
+        return "";
+    let s = open("g", { "data-placards": placards.length });
+    const x = vbX + pxScale * 6; // the legend/footnote gutter
+    const boxW = (PLACARD_COLUMN_PX + 2 * PLACARD_PAD_PX) * pxScale;
+    let y = bandTop + PLACARD_BAND_PAD_PX * pxScale;
+    for (let i = 0; i < placards.length; i++) {
+        const lines = wrapPlacard(placards[i]);
+        const boxH = placardBoxHeightPx(lines) * pxScale;
+        s += leaf("rect", {
+            x,
+            y,
+            width: boxW,
+            height: boxH,
+            fill: "none",
+            stroke: PLACARD_INK,
+            "stroke-width": pxScale * 0.8,
+            "data-placard-box": i
+        });
+        let ty = y + (PLACARD_PAD_PX + PLACARD_LINE_PX - 3) * pxScale; // first baseline
+        for (let j = 0; j < lines.length; j++) {
+            s += textEl({
+                x: x + PLACARD_PAD_PX * pxScale,
+                y: ty,
+                "font-size": pxScale * PLACARD_FONT_PX,
+                "font-family": "sans-serif",
+                fill: PLACARD_INK,
+                "data-placard": i,
+                "data-placard-line": j
+            }, lines[j]);
+            ty += PLACARD_LINE_PX * pxScale;
+        }
+        y += boxH + PLACARD_GAP_PX * pxScale;
+    }
+    s += close("g");
+    return s;
+}
+function stageChrome(scene, pxScale, vbX, vbY, vbW, vbH, bandTop) {
     let s = open("g", { "data-stage": "11-chrome" });
     if (scene.legend.visible) {
         const lineH = pxScale * 16;
@@ -650,6 +704,9 @@ function stageChrome(scene, pxScale, vbX, vbY, vbW, vbH) {
         s += textEl({ x: vbX + pxScale * 6, y: vbY + pxScale * 6, "font-size": pxScale * 9, "font-family": "sans-serif", fill: "#555555", "data-footnote": "true" }, scene.footnote);
     }
     s += scaleBarSvg(scene, pxScale, vbX, vbY, vbW, vbH);
+    // last in the last stage: the placard band sits below everything else, so no
+    // chrome above it moves when a figure opts in.
+    s += stagePlacards(scene.placards, pxScale, vbX, bandTop);
     s += close("g");
     return s;
 }
@@ -711,16 +768,22 @@ function renderInner(scene, style) {
     const vbX = cx - vbW / 2;
     const vbY = cy - vbH / 2;
     const pxScale = vbW / NOMINAL_FRAME_PX; // "at the nominal 1000 px frame" (design/06 §5.2) → user-unit conversion
-    const pxHeight = Math.round(NOMINAL_FRAME_PX * (vbH / vbW));
+    // Stage 11's placard band (§3.1). It extends the VIEWBOX downward, never
+    // `scene.frame` — the proportion gate (§6) measures the padded frame, so the
+    // band is invisible to every metric. Zero when the figure declares none, so a
+    // placard-free bake is byte-identical to one from before the channel existed.
+    const bandH = placardBandHeightPx(scene.placards) * pxScale;
+    const vbHTotal = vbH + bandH;
+    const pxHeight = Math.round(NOMINAL_FRAME_PX * (vbHTotal / vbW));
     let svg = open("svg", {
         xmlns: "http://www.w3.org/2000/svg",
         width: NOMINAL_FRAME_PX,
         height: pxHeight,
-        viewBox: `${vbX} ${vbY} ${vbW} ${vbH}`,
+        viewBox: `${vbX} ${vbY} ${vbW} ${vbHTotal}`,
         "data-mode": scene.mode
     });
     svg += defsArrowMarkers();
-    svg += stageBackground(vbX, vbY, vbW, vbH, style?.backgroundColour ?? "#e7ecd8");
+    svg += stageBackground(vbX, vbY, vbW, vbHTotal, style?.backgroundColour ?? "#e7ecd8");
     svg += stageRoadSurface(scene);
     svg += stageLaneMarkings(scene, pxScale);
     svg += stageUsableCorridor(scene, pxScale);
@@ -733,7 +796,9 @@ function renderInner(scene, style) {
     svg += stageLineChrome(scene, pxScale);
     svg += stageMarkers(scene, pxScale);
     svg += stageLabels(scene, pxScale, vbX, vbY, vbW, vbH);
-    svg += stageChrome(scene, pxScale, vbX, vbY, vbW, vbH);
+    // every stage but the placard band lays out against the CONTENT rect
+    // (vbH), so opting into a placard moves no existing ink one unit.
+    svg += stageChrome(scene, pxScale, vbX, vbY, vbW, vbH, vbY + vbH);
     svg += close("svg");
     return svg;
 }

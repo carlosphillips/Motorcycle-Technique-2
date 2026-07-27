@@ -302,7 +302,8 @@ const figJson = (over?: Wire, innerSpeed = 70): string =>
     road: { dsl: C30 },
     lines: [{ name: (over?.["lineName"] as string) ?? "a", role: (over?.["lineRole"] as string) ?? "ideal", spec: { ...c30Scen(), id: "inner", rider: { ...(c30Scen()["rider"] as Wire), start: { speed_kmh: innerSpeed, f: 0.9 } } } }],
     ...(over?.["marks"] !== undefined ? { marks: over["marks"] } : {}),
-    ...(over?.["note"] !== undefined ? { note: over["note"] } : {})
+    ...(over?.["note"] !== undefined ? { note: over["note"] } : {}),
+    ...(over?.["placards"] !== undefined ? { placards: over["placards"] } : {})
   });
 function fig(key: string, over?: Wire, innerSpeed = 70): VerbOutcome {
   return memo(`fig:${key}`, () => figureVerb({ loadedText: figJson(over, innerSpeed), argv: ["--out", "out"], engineSemver: "0.1.0" }));
@@ -499,6 +500,9 @@ const BUILDERS: Readonly<Record<string, () => Obs>> = {
   "scene:lines[].spec": () => pair(figEnvelope(fig("base")), figEnvelope(fig("spec-60", undefined, 60))),
   "scene:marks": () => pair(svgOf(fig("base")), svgOf(fig("marks-none", { marks: "none" }))),
   "scene:note": () => pair(figEnvelope(fig("base")), figEnvelope(fig("note", { note: "a teaching note" }))),
+  // design/06 §3.1 stage 11: a placard is DRAWN, so its witness is the svg —
+  // `render` ("a drawn diff of the artifact"), not `envelope`.
+  "scene:placards": () => pair(svgOf(fig("base")), svgOf(fig("placards", { placards: ["DOCTRINE FIGURE - reproduces no printed figure."] }))),
 
   // -- view ------------------------------------------------------------------
   "view:mode": () => {

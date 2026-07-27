@@ -305,7 +305,7 @@ function sceneSection(): SchemaSection {
   return {
     name: "scene",
     prose:
-      "design/04 §7's scene-text grammar (D30 sugar over FigureSpec JSON): top-level keys road/lines/occluders/hazards/marks/labels/view/note; `lines:`/`labels:` entries indented. lowerScene is the pure, total lowering.",
+      "design/04 §7's scene-text grammar (D30 sugar over FigureSpec JSON): top-level keys road/lines/occluders/hazards/marks/labels/view/note/placards; `lines:`/`labels:`/`placards:` entries indented. lowerScene is the pure, total lowering.",
     grammar: [
       { token: "ride-line", form: "<name>: ride entry=<kmh> [turnIn=][style=][vis=][visHold=][visMargin=][believeRoad=][accept=][startF=][constraints=][role=]", example: 'good: ride entry=34 turnIn=auto' },
       { token: "mistake-line", form: "<name>: mistake <mistake-token>", example: "bad: mistake premature" }
@@ -317,13 +317,14 @@ function figureSection(): SchemaSection {
   return {
     name: "figure",
     prose:
-      "design/03 §8/D30 — the canonical FigureSpec JSON: {road, occluders?, hazards?, lines: [{name, role, spec}], labels?, marks?, view?, note?}. Scene text lowers onto this exact shape.",
+      "design/03 §8/D30 — the canonical FigureSpec JSON: {road, occluders?, hazards?, lines: [{name, role, spec}], labels?, marks?, view?, note?, placards?}. Scene text lowers onto this exact shape.",
     fields: [
       field("lines[].name", "string", "line id — 1..N, order = draw order", "figure", { required: true }),
       field("lines[].role", "ideal|alternative|mistake|reference", "legend label only — never gates (D9)", "figure", { required: true }),
       field("lines[].spec", "SolveSpec|MistakeSpec|Scenario", "structurally discriminated by entry_kmh|kind|spec", "figure", { required: true }),
       field("marks", "auto|all|none|MarkClass[]", "marker classes drawn", "figure", { default: "auto" }),
-      field("note", "string", "figure caption", "figure")
+      field("note", "string", "figure caption", "figure"),
+      field("placards", "string[]", "figure-level placard boxes, drawn in order at 06 §3.1 stage 11", "figure")
     ]
   };
 }

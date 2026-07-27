@@ -27,6 +27,14 @@ export interface ManifestRecord {
   readonly mode: "true";
   readonly view: ManifestViewRecord;
   readonly legend: readonly ManifestLegendRow[];
+  /**
+   * design/06 §7 (amended for S15) — the authored stage-11 placard strings,
+   * mirrored exactly as `legend` mirrors the rendered rows. OMITTED when the
+   * figure carries none, so the committed records stay byte-identical.
+   * Mandatory when there IS ink: J7 "no fabrication" fails anything drawn that
+   * the manifest does not declare (design/09 §7.2, gated by T-JUDGE-RECORD).
+   */
+  readonly placards?: readonly string[];
   readonly proportion_metrics: ProportionMetrics;
   readonly gate_verdict: GateVerdict;
   readonly png?: string;
@@ -56,6 +64,9 @@ export function buildManifestRecord(
     // quality law (plan/doctrine/quality.ts) makes "good" ⇔ outcome="contained"
     // by construction, so the fallback below is exact, not a guess.
     legend: scene.legend.rows.map((r) => ({ line_id: r.line_id, role: r.role, quality: r.quality, outcome: r.outcome ?? "contained" })),
+    // the AUTHORED strings, not the wrapped lines: the manifest declares what
+    // the figure says, at the same granularity the legend declares its rows.
+    ...(scene.placards.length > 0 ? { placards: [...scene.placards] } : {}),
     proportion_metrics: metrics,
     gate_verdict: gateVerdict,
     ...(png !== undefined ? { png } : {})

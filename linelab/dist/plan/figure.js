@@ -563,6 +563,28 @@ export function validateFigureSpec(json) {
     if (json["note"] !== undefined && typeof json["note"] !== "string") {
         return err(schemaErr("note", "note must be a string", "type_mismatch"));
     }
+    // design/06 §3.1 stage 11's figure-level placard boxes. The key exists in
+    // BOTH spellings because D30 makes them one identity — and because the
+    // figures that most need a placard (the doctrine candidates of
+    // figures/SCOPE.md §3) are FigureSpec JSON, not scene text (S28).
+    let placards;
+    if (json["placards"] !== undefined) {
+        if (!Array.isArray(json["placards"]))
+            return err(schemaErr("placards", "placards must be an array of strings", "type_mismatch"));
+        const ps = [];
+        for (let i = 0; i < json["placards"].length; i++) {
+            const p = json["placards"][i];
+            if (typeof p !== "string" || p.trim().length === 0) {
+                return err(schemaErr(`placards[${i}]`, "each placard must be a non-empty string", "type_mismatch"));
+            }
+            ps.push(p);
+        }
+        // D8: an empty list would be accepted-and-ignored — and it would also move
+        // `spec_hash` for no ink. Omit the key instead.
+        if (ps.length === 0)
+            return err(schemaErr("placards", "placards must not be empty — omit the key instead", "type_mismatch"));
+        placards = ps;
+    }
     // `view` is deliberately unvalidated beyond presence — render/'s vocabulary
     // (ARCHITECTURE §4); plan/ never depends on render/.
     const spec = {
@@ -573,7 +595,8 @@ export function validateFigureSpec(json) {
         ...(labels !== undefined ? { labels } : {}),
         ...(marks !== undefined ? { marks } : {}),
         ...(json["view"] !== undefined ? { view: json["view"] } : {}),
-        ...(typeof json["note"] === "string" ? { note: json["note"] } : {})
+        ...(typeof json["note"] === "string" ? { note: json["note"] } : {}),
+        ...(placards !== undefined ? { placards } : {})
     };
     return ok(Object.freeze(spec));
 }

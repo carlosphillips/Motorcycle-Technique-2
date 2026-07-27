@@ -18,6 +18,9 @@ export function buildManifestRecord(figureId, specHash, scene, metrics, gateVerd
         // quality law (plan/doctrine/quality.ts) makes "good" ⇔ outcome="contained"
         // by construction, so the fallback below is exact, not a guess.
         legend: scene.legend.rows.map((r) => ({ line_id: r.line_id, role: r.role, quality: r.quality, outcome: r.outcome ?? "contained" })),
+        // the AUTHORED strings, not the wrapped lines: the manifest declares what
+        // the figure says, at the same granularity the legend declares its rows.
+        ...(scene.placards.length > 0 ? { placards: [...scene.placards] } : {}),
         proportion_metrics: metrics,
         gate_verdict: gateVerdict,
         ...(png !== undefined ? { png } : {})

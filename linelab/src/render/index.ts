@@ -24,7 +24,7 @@ import type { FigureLabel, MarkSpec } from "../plan/types.js";
 import { project, rotatePoint } from "./project.js";
 import { deriveMarkers } from "./markers.js";
 import { resolveLabels } from "./labels.js";
-import { withMarkers, withLabels } from "./scene.js";
+import { withMarkers, withLabels, withPlacards } from "./scene.js";
 import type { DrawnScene, DrawnMarker, DrawnLabel } from "./scene.js";
 import { renderTopdown } from "./topdown.js";
 import type { RenderStyle } from "./topdown.js";
@@ -32,6 +32,7 @@ import { renderPovForFigure } from "./pov.js";
 import type { PovLook, PovRoll } from "./pov.js";
 
 export type { DrawnScene } from "./scene.js";
+export { wrapPlacard, placardBandHeightPx, PLACARD_WRAP_CHARS } from "./placards.js";
 export { project } from "./project.js";
 export type { ViewSpec, StationRef } from "./project.js";
 export { renderTopdown } from "./topdown.js";
@@ -73,6 +74,13 @@ export interface RenderViewsInput {
   readonly viewSpec?: unknown;
   readonly labels?: readonly FigureLabel[];
   readonly marks?: MarkSpec;
+  /**
+   * design/06 §3.1 stage 11's figure-level placard boxes, in declared order.
+   * FIGURE-level, so `project()` (road, lines, viewSpec) cannot see them —
+   * they are attached to the `DrawnScene` here. Absent on every figure that
+   * declares none, which is what keeps a placard-free bake byte-identical.
+   */
+  readonly placards?: readonly string[];
   readonly target?: RenderTarget;
   readonly style?: RenderStyle;
   /**
@@ -116,6 +124,7 @@ export function renderViews(input: RenderViewsInput): Result<RenderViewsResult> 
 
   const base = project(input.road, input.lines, input.viewSpec);
   if (!base.ok) return base;
+  const withChrome = input.placards !== undefined ? withPlacards(base.value, input.placards) : base.value;
 
   const markers = deriveMarkers(input.lines, input.marks);
   const labels = resolveLabels(input.lines, input.labels);
@@ -129,7 +138,7 @@ export function renderViews(input: RenderViewsInput): Result<RenderViewsResult> 
   // (2) map the surviving anchor points through the SAME §2.4 rigid rotation
   // (scene.pivot + scene.orient) the road/lines went through. Skipping (2) is
   // the fig-08-06 orient=90 "markers scattered in the grass" judge finding.
-  const { window, pivot, orient } = base.value;
+  const { window, pivot, orient } = withChrome;
   const inWindow = (s: number): boolean => s >= window.from_s && s <= window.to_s;
   const place = (p: { readonly x: number; readonly y: number }): { x: number; y: number } =>
     rotatePoint(p, pivot.x, pivot.y, orient);
@@ -140,7 +149,7 @@ export function renderViews(input: RenderViewsInput): Result<RenderViewsResult> 
     .filter((l) => inWindow(l.s))
     .map((l) => ({ ...l, anchor: place(l.anchor) }));
 
-  const scene = withLabels(withMarkers(base.value, drawnMarkers), drawnLabels);
+  const scene = withLabels(withMarkers(withChrome, drawnMarkers), drawnLabels);
   const svg = renderTopdown(scene, input.style);
   return ok({ scene, svg });
 }
