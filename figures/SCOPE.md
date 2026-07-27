@@ -1,36 +1,84 @@
-# figures/SCOPE.md — scope adjudication for the book-figure corpus
+# figures/SCOPE.md — scope adjudication for the figure corpus
 
-This file decides one question, figure by figure: **can linelab reproduce this
-printed book figure honestly?** Honestly means every claim the reproduction
-makes is one the engine actually computes, and every claim it cannot compute
-earns a typed `{na: reason}` or a rendered placard — never a plausible fake
-(`design/01 §8`, the placard policy). It does **not** decide what linelab should
-model, does not propose engine changes, and does not adjudicate the six Chapter 8
-figures already shipped. It supersedes the starting-hypothesis table in
-`ROADMAP.md` ("NEXT — extend past Chapter 8"), which that document itself labels
-*"a starting hypothesis derived from a skim, not an adjudication"*; three of its
-rows are overturned below. `design/*.md` (D1–D46) remains the design of record
-and wins over everything here.
+This file decides two questions.
 
-**The result: 81 figures adjudicated, 0 survive.** The corpus does not grow.
-Phase 2 of the ROADMAP has nothing to author, and Phase 3 has nothing to bake.
+**(a) Can linelab reproduce this printed book figure honestly?** Asked figure by
+figure, of every printed figure outside the six Chapter 8 scenes already shipped.
+
+**(b) Which Chapter 8 doctrine that the shipped six never exercise can linelab
+draw honestly?** Asked of the two shipped-but-unused presets (`bookBlind`,
+`bookHairpin`) and the four shipped-but-undrawn mistake kinds
+(`premature_contained`, `chop`, `underread`, `overread`).
+
+Honestly, in both questions, means every claim the figure makes is one the engine
+actually computes, and every claim it cannot compute earns a typed `{na: reason}`
+or a rendered placard — never a plausible fake (`design/01 §8`, the placard
+policy). Question (b) carries one additional requirement, because it is not
+anchored to printed ink: the drawn contrast must be one a rider can see, and the
+doctrine named must be what causes it.
+
+This file does **not** decide what linelab should model, does not propose engine
+changes, and does not re-adjudicate the six shipped Chapter 8 figures. It
+supersedes the starting-hypothesis table in `ROADMAP.md` ("NEXT — extend past
+Chapter 8"), which that document itself labels *"a starting hypothesis derived
+from a skim, not an adjudication"*; three of its rows are overturned in §3.
+`design/*.md` (D1–D46) remains the design of record and wins over everything here.
+
+## The headline result
+
+**Question (a) — book-figure parity: 81 figures adjudicated, 0 survive.**
+Unchanged by a later steelman pass that defended the three closest refusals at
+full strength: 3 targets re-examined, 0 verdicts changed (§2, closing
+subsection).
+
+**Question (b) — Chapter 8 doctrine the shipped six never exercise: 6 candidates
+adjudicated in 3 groups, 0 survive.** Three were refused by their own proposer on
+the merits; three reached PARTIAL and were killed on review (§3).
+
+**The corpus does not grow. It remains the six shipped Chapter 8 scenes.**
+Phase 2 of the ROADMAP has nothing to author and Phase 3 has nothing to bake.
 That is the finding, not a failure to find one.
+
+Two of the three steelman defences produced artifacts that are honest but
+reproduce no printed figure, and one killed tranche candidate is the same
+artifact rediscovered independently by a third route. All of them are blocked on
+the same unresolved remit question (§4 S12) and degraded by the same missing
+capability (§4 S15 — nothing renders a placard). That convergence is the sharpest
+input this file has to S12.
 
 ---
 
 ## 1. The surviving corpus
 
-**New figures surviving this adjudication: none.**
+**New figures surviving this adjudication: none.** No pass added a figure.
 
-| figure id | book title | verdict | carrying checks | view | placards |
+| figure id | source | verdict | carrying checks | view | placards |
 |---|---|---|---|---|---|
 | — | — | — | — | — | — |
 
-Every one of the 81 candidate figures is refused in §2. No figure reached IN or
-PARTIAL, so there is no per-figure subsection to write: no scene sketch, no
-"sentence the figure is entitled to teach", no placard set. Where a candidate
-came close, the reason it fell short is recorded in §2 and, where it needs
-something that does not exist, in §4.
+Every one of the 81 printed candidates is refused in §2. Every one of the 6
+doctrine candidates is refused in §3 — three by their proposer, three on review.
+Nothing in any pass reached a surviving IN or PARTIAL, so there is no
+per-figure subsection to write: no scene text is authorized, no "sentence the
+figure is entitled to teach" is adopted, no placard set is adopted. The full
+scene text of the candidates that got closest is preserved in §3, so the work is
+auditable and is not re-proposed from scratch.
+
+The next id in the Chapter 8 sequence, `fig-08-07`, is unclaimed. What would
+claim it, and on what conditions, is recorded in §3 and in §4 S12.
+
+**Standing rule for anything this file ever admits under question (b).** A
+question-(b) candidate is a *doctrine figure*: it illustrates Chapter 8 prose the
+shipped six never exercise. It is **not** a reproduction of a printed book
+figure, and nothing in this corpus may claim parity with a printed diagram that
+does not exist. `bookBlind` and `bookHairpin` are the sharp cases — `design/03
+§3.1` records that `bookBlind` is "no longer fig 8.1's geometry, so it
+illustrates Ch. 8's blind-corner *argument* rather than a specific figure's ink",
+and lists `bookHairpin` as "road-speed hairpin (**no Chapter-8 ink to match**)".
+A reader of a baked SVG sees neither a `#` comment nor a `note:` field (§4 S15),
+so a parity disclaimer that lives only in scene source is asserted and not
+discharged. Any doctrine figure ever admitted here carries its non-parity
+statement on a rendered surface, or it does not ship.
 
 ### The corpus as it already stands (Phase 0 — not re-adjudicated here)
 
@@ -49,7 +97,7 @@ verdict here touches them.
 
 ---
 
-## 2. The refused set
+## 2. Book-figure parity: the refused set
 
 **87 images extracted to `book_images/by-figure/`. 6 are the shipped Chapter 8
 corpus. 81 figures adjudicated in this pass, 0 survive.** Two additional
@@ -383,19 +431,494 @@ lost, and both are OUT.
 | 9.1b | "do any quick flicks before getting hard on the gas" — an ideal line whose flick completes before the roll-on, against a line that gets hard on the gas during the flick | OUT. No mistake kind perturbs the throttle before the steering input completes. No check grades it: `throttle_legs` leg (a) bars a too-early *crack* and leg (c) a too-late *roll-on*; nothing bars an early roll-on, and leg (c)'s onset search starts at `crackIdx + 1` (else `scIdx`, else `w.i0`), so a drive command placed before `steering_complete` is not even seen as the onset. The book's stated mechanism — weight transfer to the rear — is Tier-3. See §4, S2. |
 | 11.TB | a trail-braked corner, brake carried past the turn point and tapered to the apex, graded by `trail_brake_taper` | OUT, and this one is not a capability refusal — the physics is real and was verified. On `lane 3.5 \| S 35 \| R 30 ^90 \| S 25` at entry 70 with a 1.2 m/s² brake tapering past a turn-in, check 6 returns **pass** ("trail brake tapered below stand-up authority"); at 4.5 m/s² it moves to **warn** ("leaned braking ate the stand-up reserve", `ate_reserve_at_s` 35). It is still OUT on four grounds: it is not a book figure (Chapter 11 prints one numbered figure and it is 11.1); it is not authorable in the sanctioned scene form (`schema scene` exposes `ride` and `mistake` only; `SOLVE_STYLES` is `single \| double_apex \| geometric`; the solver completes braking `brake_gap` *before* turn-in by construction); there is no contrast line, because the closed set has no over-braking-at-lean kind and `chop` is deliberately routed away by `action_id` (§A.3 check 5); and the check does not carry the teaching — the line already runs off at 3.0 m/s² while check 6 still reports `pass`, and at 8.0 and 9.5 it only reaches `warn`, because the ellipse clips delivered `−a_long` before it can exceed `a_widen`. The lesson would be carried by `outcome`/`quality`, not by the named check. See §4, S3 and S12. |
 
+### The steelman — three refusals defended at full strength (0 verdicts changed)
+
+The adjudicators above were instructed to *prefer OUT when torn* (§5). A later
+pass tested whether that instruction did too much work. Three defenders were told
+to build the strongest honest case **for** the three closest refusals, run it at
+the CLI rather than reason about it, and then try to break it themselves.
+
+**No verdict changed.** 2.9 and 9.1 remain OUT as printed-figure reproductions;
+11.TB remains OUT. What the defences did produce is recorded here, because two of
+them corrected the record, one refuted two grounds of an existing row, and two
+ended by proposing *non-parity* artifacts that are honest but that this file's
+remit does not authorize (§4 S12).
+
+**2.9 — the counter/direct-steering corner diagram (bucket C). Unchanged: OUT.**
+
+The best case, built and baked before being tested. The refusal over-states its
+own ground: of 2.9's eleven claims, two are fully computed (the entry and exit
+"upright and traveling straight" callouts), three are half-computed (the
+out-tracking, constant-lean and in-tracking bands each have a lean half), and six
+are pure D3. The skeleton is reproduced sample by sample on `preset book90` at
+entry 34: upright and straight to s 6.97; a linear roll at the street profile's
+50 °/s from `turn_in` 6.974 to `steering_complete` 11.987, full −30.474° at
+s 12.5; a plateau flat to five decimal places from s 12.5 to 33.5; the unwind
+from `release` 33.626 to φ = 0 at s ≈ 42.0. Verdict `contained / good`, 10 pass /
+0 fail / 6 na. The plateau even carries a real, non-obvious, fully computed
+teaching: across it `kappa` runs −0.0694 → −0.0350 (path radius 14.4 → 28.6 m) as
+v rises 32.8 → 46.2 km/h, so constant lean is the *mechanism* by which the
+throttle carries the rider from `apex_f` 0.277 to `exit_f` 0.85.
+
+It still fails, on five grounds each established by running the engine.
+
+1. **The partition does not exist.** 2.9's bands are steering-mechanism bands;
+   every partition linelab owns is a plan-action partition. `steer_state` is
+   `commit` continuously from s 7.0 to 33.5, straight across 2.9's green/blue
+   boundary. The five-token phase machine is worse, not better: `exiting` opens
+   at `roll_on` s = 15.306 while lean is still pinned at −30.474° for another
+   18.3 m, so the band that would have to carry 2.9's constant-lean span is
+   labelled `exiting` and starts a third of the way into it.
+2. **Two placeable callouts are unplaceable and one would be a lie.** The label
+   anchor set is closed (`turn_point | apex | exit | release | correction |
+   run_wide_detect | end | sight_ray`). `state --s 38.283`, the `exit` event,
+   returns φ = −12.859° and `steer_state` `unwind`, so 2.9's exit-side "upright
+   and traveling straight" anchored at `exit` would print over 13° of lean.
+   Upright arrives at s ≈ 42.0, where no anchor exists; the entry-side callout
+   has no anchor on the approach straight at all.
+3. **The nominated checks grade nothing.** `single_input` returned
+   `pass {count: 1, allowed: 1}` on all eleven graded lines baked on `book90` —
+   the good line at entries 26/30/32/34 and the `slow_steer`, `chop` and
+   `premature_contained` lines alike — because a `ride style=single` line has
+   exactly one solved turn-in action by construction. `quick_steer` returned
+   `steer_share: 0` on every good line at every solvable entry, because
+   `steering_complete` lands at 11.987 and the corner starts at s0 = 12.000: the
+   roll finishes on the entry straight, at entry 34 by 13 mm. Its printed
+   evidence string "roll-in ate 0% of the corner" is not a report that the roll
+   was quick. Both checks discriminate against exactly `slow_steer` and
+   `fifty_pence` — which are figs 8.2 and 8.3, already shipped.
+4. **Failure mode 3 fires on the main claim, and the placard cannot be drawn.**
+   The section heading over the figure is "Countersteering vs. Direct Steering";
+   the mechanism banding *is* the figure, so a placard conceding the handlebar
+   mechanism concedes it entirely. And there is no rendered placard channel at
+   all: `view: mode=diagram` is rejected `SCHEMA` (deferred, "projection
+   (post-v0.1)"), `render/project.ts` sets `footnote: null` in true mode, and
+   `note:` lands in `meta.caption` and never becomes ink — confirmed by dumping
+   every `<text>` element of the baked SVG. See §4 S15.
+5. **The geometry would misteach.** By G1 linelab draws the doctrinal
+   out-in-out (`ti_f` 1.000, `apex_f` 0.277 at 66.3% of sweep, `exit_f` 0.849)
+   where printed 2.9 deliberately draws a near-constant-offset path with no apex.
+
+The honest remnant — "on a 12 m / 90° corner entered at 34 km/h the solved line
+rolls to 30.5° over about 5 m, holds it for 21 m while the throttle opens the path
+radius from 14.4 to 28.6 m, then unwinds over 8 m, and nothing about what the
+rider did at the handlebars is modelled" — is not 2.9's sentence. Its one novel
+clause *corrects* the printed blue-band caption rather than illustrating it, and
+it is a throttle-doctrine claim (Chapter 9) sited on Chapter 8's road. The
+defender also recorded, as an honest limit, that no mistake kind, constraint or
+second `ride` line produces a lean-phase contrast that is not already fig 8.2 or
+8.3: `chop` fails `rideability` at 102.95 °/s, `overread` is rejected `SCHEMA`
+without an explicit `r_believed`, and `premature_contained` is a turn-in-station
+figure.
+
+**9.1 — the trail-brake / throttle / lean timing chart (bucket K). Parity
+unchanged: OUT.**
+
+Both blockers were re-run and conceded by the defender. The live `Sample` field
+list is exactly 32 fields with one signed longitudinal command; the rendered
+strip has one panel for it. And the exit anticorrelation is contradicted, not
+merely unmodelled: on `book90` at entry 34, `cmd_a` reaches 2.200 at s = 19.5 and
+is bit-identical 2.200 for the remaining 58 samples to road end, while φ holds
+−30.47° to s ≈ 33.6 and only then unwinds — a dead-flat throttle trace across the
+entire lean unwind. Max `cmd_a` is 2.200 on `book90`, `bookDecreasing`,
+`bookHairpin` and `bookEsses` alike: a fixed constant, not a solved profile.
+
+The defence argued instead for a *different* artifact — a `good` vs `chop` pair
+on `book90`, proposed as `fig-09-D1` — and marked it survives **conditional on an
+explicit S12 remit call**, stating plainly that it reproduces no printed figure
+and must never be numbered 9.1. Its discrimination is real (`throttle_rule` pass
+on the ideal line, fail on the chop leg with `discipline: ["chop at s=20.5"]`,
+`diagnosis {cause: "stand_up", channel: "su_transient", su_transient_max_dps
+220.01, cut_at_s 20.31}`), it is attributable in three independent panels of the
+controls strip exactly as `design/06 §4` promises, and no shipped figure has a
+longitudinal-channel mistake at all. The same artifact was rediscovered
+independently in question (b)'s tranche and is killed there on the same remit
+ground (§3). Eight residual dishonesties were recorded; three matter beyond this
+row:
+
+- The ideal line's controls strip draws a flat 2.2 m/s² throttle across the whole
+  lean unwind, which contradicts Chapter 9's own printed text, and the disclosure
+  cannot render inside the SVG (§4 S15). The strip must never ship standalone.
+- Three of `throttle_rule`'s four legs are structurally unfailable in the
+  sanctioned grammar. `vmin_s` was 3.5/7/7.5/8.5 on every line run — ideal,
+  `premature`, `slow_steer`, `fifty_pence`, `overspeed`, `underread`, three
+  `chop` variants, an entry sweep and four presets — with the apex always later,
+  because the solver completes braking before turn-in by construction. The crack
+  leg never once appeared in `missed[]`. Only the chop clause carries. See §4 S27.
+- A pre-existing seam that hits all six shipped Chapter 8 strips identically: the
+  sight panel draws `ssd_m` overtaking `sight_ride_m` at s ≈ 26 and
+  `verdict.sight.margin_min_m` reads −30.95, while `stop_within_sight` passes
+  with `max_deficit_m 0 / min_margin_m 33.95`. `design/06 §4` says "a crossing is
+  a `stop_within_sight` failure staring at the reader" — here it is not. Cause is
+  the open-end carve-out in `linelab/src/plan/doctrine/metrics.ts`. See §4 S24.
+
+**11.TB — the trail-brake taper doctrine figure. Unchanged: OUT — but two of the
+four grounds in its row above are refuted on the facts and are corrected here.**
+
+The row is preserved verbatim because the 81-figure reconciliation is
+load-bearing. Its grounds (a) *not a book figure* and (b) *`parks-street/2` scores
+no benefit for trail braking* were re-verified and are conceded: Chapter 11 prints
+exactly one numbered figure, 11.1, a body-position pair for an upright
+straight-line quick stop on which check 6 returns `na`; and the solver's own
+brake-complete line on the same road at the same entry is `contained/good`, 10
+pass / 0 fail / 6 na, so the one extra pass a trail-braked line earns is only the
+check ceasing to be `na`.
+
+Ground (c), *"not authorable in the sanctioned scene form"*, is half wrong. It is
+true of `.scene` — `tapered: ride entry=60 … brake=3.0` is rejected
+`{"code":"SCHEMA","message":"unknown ride field \"brake\"","detail":
+{"reason":"ride_unknown_key"}}` — and false of the canonical FigureSpec JSON,
+whose `lines[].spec` accepts a wire `Scenario` carrying `rider.plan`
+(`design/03 §8` / D30). The defender baked the two-line figure that way and it
+produced envelope, SVG, manifest and two controls strips. Whether a corpus whose
+six members are all `.scene` may admit a FigureSpec-JSON figure is a corpus
+convention question, now recorded as §4 S28.
+
+Ground (d), *"the check does not carry the teaching"*, is false as a general
+claim. On `lane 3.5 | S 35 | R 30 ^90 | S 25` at entry 60 km/h, two explicit-plan
+lines with **identical** turn-in station (s = 28.788) and **identical** committed
+lean (28.825°), differing only in the longitudinal channel:
+
+- `tapered` (3.0 m/s² from s = 1, `taper_to_s` 50) → `contained`, `good`,
+  11 pass / 0 fail / 5 na, `trail_brake_taper` **pass**, `su_sustained` = 0.000
+  at every station.
+- `held` (3.0 m/s² from s = 14, released at s = 38) → `contained`, `caution`,
+  `trail_brake_taper` **warn**, "leaned braking ate the stand-up reserve",
+  `ate_reserve_at_s` 34, `su_sustained` −8.49 → −8.59 °/s (max 8.594).
+
+8.594 °/s against the street roll budget of 50 °/s is 17.2% of the rider's
+steering authority spent holding the bike down, and it matches
+`K_SU·(b − A_SU_ONSET)` = 0.30·(3.0 − 2.5) rad/s exactly. The antecedent is
+amply live (35 samples at |φ| ≥ 15° with delivered braking), so the pass is not
+vacuous. The `fail` band is reachable too: a 7.5 m/s² brake applied at s = 34 with
+lean settled at 28.8° returns **fail**, "braking hard enough to force stand-up at
+lean", at s = 49.5.
+
+It is nonetheless still OUT, on grounds the original row did not have:
+
+- **The pass band is broad and the green tick over-reads.** A 25-cell sweep
+  (decel 2.5–4.5 × `taper_to_s` 34–50) returned `pass` in 25/25, *including cells
+  whose outcome was `runoff`*; a held 8.0 m/s² brake also passes, because the bike
+  never reaches 15° of lean (φ peaks at ≈ 3.9°) so the leaned legs never fire.
+  `pass` means only "no leaned sample crossed the onset". See §4 S27.
+- **The contrast line is contaminated.** `held` also fails `out_in_out`
+  (`apex_f` −0.029) and `throttle_rule`; the latter is a rubric artefact —
+  check 5 exempts the entry-brake `action_id`, but the brake's release ramp is
+  attributed to the throttle action that supersedes it, so the release of a trail
+  brake is scored as a mid-corner brake at s = 38.5 (§4 S25). A 15-cell search
+  found no line that trips `ate_reserve` without also tripping the discipline leg,
+  so the figure cannot say "check 6 alone separates these".
+- **It needs a bespoke road.** A 24-cell taper grid on `book90` gave `pass` 24/24;
+  a 24-cell grid on `bookDecreasing` produced no `ate_reserve` at all. The band
+  structure only bites at ≈ 60 km/h on r = 30.
+- **The honest placard concedes the main claim.** Chapter 11's four claimed
+  benefits — suspension movement, rake and trail, reaction time, and
+  suspension-mediated line-tightening — are Tier-3 (`design/01 §8`). A placard
+  saying so is a concession of the figure's own subject, which is OUT by the
+  PARTIAL/OUT rule, unless the figure is retitled to be about the *ceiling*
+  rather than the technique. That retitling is not cosmetic.
+
+The baked artifact is preserved in §3 with its four required placards, so it is
+not re-derived.
+
 ---
 
 ## 3. Killed on review
 
-**No adjudicator verdict was killed by an attacker, because no adjudicator
-verdict reached IN or PARTIAL.** The adversarial lenses (engine-capability and
-pedagogy) attack IN and PARTIAL verdicts; all eight groups returned OUT on every
-figure, so the attack pass had nothing to fire at and returned empty for all
-eight. This section is therefore empty of attacker kills, and that fact is itself
-part of the record: **the OUT verdicts in §2 rest on the adjudicators alone and
-have not been adversarially stress-tested from the other direction** — nobody was
-tasked with arguing that a refused figure is in fact reproducible. Where a
-verdict was close, §2 records the evidence that decided it.
+### Question (b): the doctrine tranche — 6 candidates, 0 survive
+
+Every candidate was baked by its proposer, then attacked from two lenses. A
+candidate survives only if **both** attackers leave it standing; where they
+disagree the harsher verdict stands and the disagreement is recorded.
+
+| candidate | proposer | lens 1 | lens 2 | final | downgraded by |
+|---|---|---|---|---|---|
+| `fig-08-D1` blind corner (`bookBlind`) | PARTIAL | OUT | OUT | **OUT** | no visibility content in the carrying check; no drawable contrast |
+| the hairpin (`bookHairpin`) | OUT | — | — | **OUT** | self-refused: redundant with figs 8.1–8.4 |
+| `chop` (Ch. 9 doctrine on `book90`) | PARTIAL | PARTIAL | OUT | **OUT** | §4 S12 remit; the disclaimers reach nobody |
+| `overread` (the timid line) | PARTIAL | PARTIAL | OUT | **OUT** | two of three labels assert what the record refutes |
+| `premature_contained` | OUT | — | — | **OUT** | self-refused: pinned check vacuous; line enters the oncoming lane |
+| `underread` | OUT | — | — | **OUT** | self-refused: fail set identical to fig 8.4's committed red line |
+
+Attackers fire only at IN and PARTIAL, so the three self-refusals drew no attack;
+their grounds are the proposer's own and are recorded below.
+
+#### `fig-08-D1` — the blind corner. PARTIAL → OUT, both lenses.
+
+Two `vis=cautious` lines on `bookBlind` at entry 34 differing only in lane
+position: hold wide (`startF` 1.0, `visHold` 0.9) versus cut in (`startF=0.1
+visHold=0.1`). One check carried it — `lean_ceiling`, `pass` at φ_max 31.45° on
+the hold line and `warn` at 35.66° on the cut line, both with `blind: true` and
+`reserve_deg: 35`, the `BLIND_RESERVE_DEG` cap. Non-redundancy was real and
+independently re-verified by both attackers: every corner of every line of all
+six shipped figures reads `reserve_deg: 40.36, blind: false,
+hold_wide_for_sight: na (not_blind)`, so both the blind cap and check 11 are
+exercised by nothing in the committed corpus, and `review/verify/
+fixture_geometry.py` check 1 discharges §A.2's blind obligation at 187 cells.
+
+```
+# the baked candidate — NOT ADOPTED
+road:      preset bookBlind
+lines:
+  hold:    ride entry=34 turnIn=auto vis=cautious
+  cut:     ride entry=34 turnIn=auto vis=cautious startF=0.1 visHold=0.1 role=alternative
+marks:     turn_point,apex
+view:      mode=diagram window=auto rays=all_turn_ins consequence=on
+note:      "Blind corner: the lean reserve is capped at 35 deg. Held wide the line
+            peaks at 31.5 deg; ridden on the inside it peaks at 35.7 deg and eats
+            the reserve."
+```
+
+**Lens 1 — the carrying check has no visibility content.** Both lines reach peak
+lean at v = 34.00 km/h; the V1 sight governor is inert on both. Path radius is
+14.86 m and 12.67 m, and `atan(v²/(g·r))` reproduces 31.45° and 35.66° exactly.
+No visibility quantity enters either number. The only thing `blind(c)` does in
+the whole figure is move the `lean_ceiling` bar from 40.36° to 35°, so the figure
+teaches "a tighter radius at the same speed needs more lean" — Chapter 2 physics
+— and borrows the blind cap to manufacture a verdict split. §6's fourth bullet is
+nowhere computed: there is no hazard, no demand, no remainder. The split is also
+a knife-edge on a TUNING constant: `startF` 0.1 → 35.66° warn, 0.2 → 35.56° warn,
+**0.3 → 34.99° pass** — one hundredth of a degree under the bar — 0.4 → 34.44°,
+0.7 → 32.87°. Against a 2.7 m usable corridor that is a teaching window of about
+27 cm of lane and 0.66° of lean. The proposal's claim that both knobs are
+load-bearing is false: at `startF=0.1` the `visHold` sweep runs 35.66° → 35.17°
+across 0.1→0.9 with `warn` at every value.
+
+**Lens 2 — the differential is not drawn, and the picture argues the opposite of
+the caption.** The baked SVG carries two `#b07d1e` amber trajectories and two
+terminal words both reading `caution`; the legend rows differ only in
+`ideal`/`alternative`; the engine's own one-line summary is identical on both
+(`"contained — 3 check fails"`). Under colour law v2 (`design/06 §5.1`) `quality`
+is the total colour function and the terminal word is the redundancy that
+survives a greyscale print — both channels report no difference. Searching
+`bake.svg` for `reserve`, `Blind corner`, `35 deg`, `35.7` returns nothing: the
+teaching sentence lives only in `meta.caption` (§4 S15). The two controls strips
+auto-scale independently (lean axes `0.8 … −31` and `0.2 … −36`) and neither
+draws the 35° reserve or the 45° ceiling, so the reserve-eating line is visually
+indistinguishable from the compliant one. And the "doctrinal" hold line's `f`
+runs 1.000 → 0.895 → 1.002: it never comes inside, exits *on* the corridor edge
+at `exit_f` 0.998, and is graded broken by the doctrine it is named after —
+`hold_wide_for_sight [fail] committed while the sight line was still closing`,
+plus `late_apex` and `out_in_out`. `danger_dwell_s` is 0 on both lines, so the
+engine's own exposure channel says the reserve-eating line spent zero seconds
+exposed; `vis=cautious` is inert (both lines hold 34.0 km/h, `sight_ride_m`
+25–37 m against `ssd_m` 15.8–17.0, `stop_within_sight` passing with 13.6 m and
+8.1 m spare). A figure titled "the reserve you keep for what you cannot see"
+whose record says the rider can stop in half of what they *can* see is not a
+repairable caption.
+
+What survives is a verified negative result and four reproducible defects, moved
+to §4: check 11 has no positive fixture and cannot get one on the shipped preset
+(S16), single-station D10 constraints silently pass contradictory bounds (S21), a
+`mistake` line beside a `vis` line returns `INTERNAL` (S22), and `bookBlind` has
+no default ideal line (S23).
+
+#### `chop` — Chapter 9 throttle doctrine on Chapter 8's corner. PARTIAL → OUT.
+
+The strongest candidate in either pass, and the only one both lenses agreed is
+mechanically honest. `throttle_rule` passes on the ideal line and fails on the
+chop line with `discipline: ["chop at s=20.5"]`; the engine names the mechanism,
+channel and station (`diagnosis {cause: "stand_up", at_s: 20.5, channel:
+"su_transient", su_transient_max_dps: 220.01, cut_at_s: 20.31}`); the consequence
+is emergent (`run_wide_detect` 30.93 → `off_road` 32.09 → `runoff`); and the
+departure stays inside the rider's own lane (`d_min` −3.5, `d_max` −1.27). No
+committed figure teaches a longitudinal-channel mistake: `throttle_rule` fails in
+figs 8.5 and 8.6 only as chain collateral, on lines failing eight to eleven other
+checks, with no throttle word in any note or label.
+
+```
+# the baked candidate — NOT ADOPTED
+# Doctrine figure (Ch. 9 throttle rule, drawn on Chapter 8's canonical corner).
+# NOT a reproduction of fig 9.1's ink.
+# DISCLOSURE: the `chopped` line also records `rideability: fail`
+# (max_excess_dps 102.95) — an event-timing seam, not rider behaviour.
+road:      preset book90
+lines:
+  good:    ride entry=34 turnIn=auto
+  chopped: mistake chop
+marks:     turn_point,apex
+labels:
+  apex@good               "roll on from the apex"
+  run_wide_detect@chopped "throttle chopped - the bike stands up and runs off"
+view:      mode=diagram window=auto consequence=on
+note:      "Shut the throttle mid-corner and the bike stands up: lean sheds, the
+            line straightens, and the exit goes off the outside edge."
+```
+
+**Lens 2 (OUT) — governance, and the disclaimers reach nobody.** §4 S12 of this
+file, committed at `a06d4a7`, names this exact artifact: *"a Chapter 9
+good-vs-`chop` pair … All three are OUT here … an explicit remit call."* The
+proposal is that artifact rediscovered, and it cites `design/01` and `design/03`
+without citing the document that governs corpus growth and has already refused
+its category. `design/01 §4.3`'s "Ch. 9 throttle doctrine" cell maps a *mistake
+kind*, not a figure, so it does not override the remit. Separately: every `<text>`
+node of the baked SVG is entry speed, outcome word, distance ladder, labels,
+legend and scale bar. The "NOT book-figure parity" line and the rideability
+disclosure live only in `#` comments in the scene source, which never render
+(§4 S15), so a reader of the SVG cannot know it is not a reproduction.
+
+Two supporting deflations, both accepted: the headline rationale ("its geometry
+is textbook — `late_apex`, `out_in_out`, `single_input`, `quick_steer`,
+`lean_ceiling`, `traction_ceiling` all pass and it still runs off") leans on a
+vacuous pass, because `out_in_out` has no upper bound on `exit_f` and the chopped
+line's pass at `exit_f` 1.02 is *satisfied by the runoff* (§4 S20), while the
+other four are inherited unchanged from the good line by construction — `chop` is
+a one-channel longitudinal perturbation. And the rideability disclosure is wrong
+on its arithmetic: 102.95 °/s comes from the interval [20.0 → 20.5], not
+[20.5 → 21.0] as the scene header states, and re-aligning `su` to the opening
+sample still leaves 17.05 and 19.40 °/s against `RATE_TOL_DPS` = 2.0 — about ten
+times over, versus 3.65 for shipped figs 8.1 and 8.3. It is a sub-sample
+event-timing seam (`crack` fires at s = 20.31, between samples), and it does not
+go away (§4 S26).
+
+**Lens 1 (PARTIAL) — the disagreement, recorded.** The first lens verified every
+number, agreed the contrast is real and non-vacuous, and would have admitted the
+figure with two repairs: strike the "textbook geometry" rationale, and author the
+mistake as `chop:slew_mss=20` rather than the default. That variant bakes exit 0
+(the figure gate reads `row.admissible_outcomes`, so `wide` passes), keeps the
+`throttle_rule` and `exit_containment` fails, drops the spurious
+`stop_within_sight` fail, and cuts the rideability excess from 102.95 to 7.36 °/s
+— within 2× of the shipped corpus's own 3.65 rather than 28×. The precedent it
+cites is real: `fig-08-04.scene` uses `overspeed:by_kmh=2.5` against a TUNING
+default of 26. The proposal's refusal of that variant as "tuning-to-look-clean"
+is unsound. **The harsher verdict stands** — the repairs are at scene level and
+do not touch the remit ground that killed it, so if S12 is ever resolved this
+candidate returns with those repairs already argued.
+
+#### `overread` — the timid line. PARTIAL → OUT.
+
+`contained`/`caution` on `book90` against the ideal line, carrying `out_in_out`'s
+**exit** leg only (`exit_f` 0.307 against the 0.55 bar, `ti_f` and `apex_f`
+passing), with the apex at 87.5% of sweep against the ideal's 66.3%. It would
+have been the corpus's first amber mistake line — all six committed mistake lines
+grade `failing`. Robust across `sweep_believed_deg` ∈ {100, 110, 120, 130, 150}
+and `r_believed` 11; clean at 11.5; `NO_SOLUTION/believed_world_not_clean` at
+≤ 10.5, which is an honest typed refusal.
+
+```
+# the baked candidate — NOT ADOPTED
+road:      preset book90
+lines:
+  good:    ride entry=34 turnIn=auto
+  timid:   mistake overread:sweep_believed_deg=110
+marks:     turn_point,apex
+labels:
+  apex@good   "apex at 66% of sweep - already pointed down the road"
+  apex@timid  "apex at 88% of sweep - still hard on the inside"
+  exit@timid  "exit at f=0.31: no drive, no room to be wrong"
+view:      mode=diagram window=auto
+note:      "Ride the corner as if it were tighter than it is and nothing goes
+            wrong - except the exit, which is thrown away."
+```
+
+**Lens 1 (PARTIAL) — the carrying-check claim is padded and one label asserts
+what no check grades.** `late_apex` returns `pass` on both lines (66.31% and
+87.54%) and `lean_ceiling` returns `pass` on both (30.47° and 28.08°), so exactly
+**one** check carries this figure. The `apex@timid` label asserts that
+over-lateness is the fault; no check in the closed sixteen grades over-lateness,
+and `late_apex` affirmatively ratifies 87.54% as a pass, "past the 50% bar".
+That is a caption-only doctrinal claim the check catalogue actively contradicts.
+
+**Lens 2 (OUT) — the exit label asserts two things the record refutes, in the
+figure's own ink.** *"No drive"*: the timid line runs `a_long` = +2.200 m/s² from
+apex to road end, bit-identical to the ideal line's, and `throttle_rule` reads
+`pass`, "throttle rule held". The genuine consequence is exit speed — 49.5 versus
+53.9 km/h at road end — which the scene does not draw and, per §4's closing note,
+cannot draw. *"No room to be wrong"*: at exit the timid line sits 1.87 m from the
+outer usable edge and 2.27 m from the physical road edge; the ideal line sits
+0.40 m and 0.80 m. The timid rider has 4.7× more room toward the outside, where a
+run-wide goes, plus more lean reserve (28.1° vs 30.5°) and lower ellipse use
+(0.58 vs 0.63). A student with a ruler measures the opposite of the caption. This
+is the ensemble claim the proposal's own unmodelled-claims list bans, made in the
+opposite direction by the author who wrote the ban. Two lesser corrections: the
+scene header presents `source.believed_road` as the DSL string `lane 3.5 | S 12 |
+L 12 ^110 | S 16`, but the envelope carries a segments object with no `dsl` field
+and `verdict.misjudgment` carries only `believed_road_hash: "e7e66e"`; and the
+same governance ground as `chop` applies, since the proposal concedes it is not
+parity.
+
+#### Refused by their own proposer (3)
+
+**The hairpin (`bookHairpin`) — OUT for redundancy.** All three candidate
+differentiators died with a number. *The late bar:* `design/01 §A.3` check 1 puts
+hairpins in `book90`'s bucket verbatim — "constant-radius (**incl. hairpin**) →
+pass iff `apex_pct > 50`" — and the bake agrees (hairpin 66.85% at bar 50,
+`book90` 66.3% at bar 50). *The slower entry:* it has no carrying check by
+explicit design decision (`design/01 §A.4`, "Considered and rejected: a separate
+`entry_speed` check"), and the solver's `NO_SOLUTION`/`empty_band` refusal above
+30.5 km/h is not distinctive — `book90` refuses identically above 34. *The lean
+demand:* real as a number (φ_max 39.17° vs 30.47°, `grip_min` 0.155 vs 0.37,
+`ellipse_max` 0.84 vs 0.63) but `lean_ceiling` is structurally pinned to `pass`
+on this road, because the solver clamps commanded lean at `phiReserve` and the
+maximum observed across the whole entry sweep and all eight mistake kinds is
+40.36° = the reserve exactly (§4 S27). Every mistake kind's fail set on the
+hairpin is a subset of, or identical to, a shipped figure's — `slow_steer`
+reproduces fig 8.2's set exactly, `overspeed:2.5` fig 8.4's. The one apparently
+new lesson, `overspeed:by_kmh=1` grading 9 pass / 1 fail ("you did everything
+right and you are still in the ditch"), was retracted by its own proposer: it is
+`out_in_out`'s off-road arithmetic (§4 S20), already present on shipped fig 8.1's
+`bad` line at `exit_f` 1.148. The scene bakes green and deterministic (SVG SHA1
+identical on re-bake); it is the claim that fails, not the bake.
+
+```
+# the baked candidate — NOT ADOPTED
+road:      preset bookHairpin
+lines:
+  good:    ride entry=30 turnIn=auto
+  fast:    mistake overspeed:by_kmh=1
+marks:     turn_point,apex
+labels:
+  apex@good            "late apex — 66.8% of a 150 degree sweep"
+  run_wide_detect@fast "+1 km/h — the shape held, the road ran out"
+view:      mode=diagram window=auto
+note:      "A hairpin is a 90 degree corner with the reserve spent: same
+            late-apex method, 39.2 degrees of lean against a 40.4 degree reserve."
+```
+
+**`premature_contained` — OUT, and it must not be drawn.** Its design-pinned
+mandatory check is vacuous in exactly §A.2's sense: on its own pinned fixture
+F-ORACLE-90, `late_apex` **passes** at every `early_by_m` from 1 to 8 (61%–80% of
+sweep — *later* than the ideal line's apex), and the engine's own suite ratifies
+the pass (`linelab/test/oracle/oracle.test.ts:368`, SEAM-PC-LATE-APEX), while
+`linelab/src/plan/mistakes.ts:175` freezes `expect_fail: ["late_apex"]` and
+`linelab/src/solve/gate.ts` rule 2 turns it into a hard requirement — so every
+bake exits 3, forever (§4 S17). What kills it outright is the surviving check:
+`out_in_out` fails only because `apex_f` goes negative — the line crosses the
+inner usable edge. With `own = −W/2, oncoming = +W/2`
+(`linelab/src/sight/footprints.ts`) and the measured corridor map d = −0.4 −
+2.7·f, the default line reaches **d = +2.38 m**, past the centre of the oncoming
+lane and through the spot where fig 8.1 parks its oncoming vehicle — and the
+engine still grades it `contained`, because `design/05 §6.1` rules that an
+inside-corridor excursion on pavement never moves outcome (§4 S19). Amber under a
+caption about street reserve would be the most dangerous sentence in the corpus.
+The only settings that stay in lane (`early_by_m` 4–5) grade quality **good** — a
+mistake figure with no mistake.
+
+**`underread` — OUT for redundancy.** Mechanically fine (exit 0, `runoff`
+matching the pin, believed world verified clean and hashed), but on F-ORACLE-DR
+it fails exactly `{late_apex, out_in_out, exit_containment, stop_within_sight}` —
+the identical set fig 8.4's committed red line fails, on the identical road,
+against the identical green line, departing at the identical `exit_f` 1.148.
+Moved to `book90` it collides with fig 8.1; moved to `bookHairpin` the same four
+fire. The teaching that would make it non-redundant — "your plan was clean in a
+world that isn't this one" — is computed in `verdict.misjudgment`, carried by no
+check, not named by `verdict.diagnosis` (null on every `underread` line baked),
+and has no rendering surface at all (§4 S18). Worse, on this fixture the
+divergence block reads `{kind: "radius", believed: 16, actual: 16}` — believed
+equals actual, because the taper's entry radius *is* 16 — and cites
+`kappa_gap.at_s` 38.5 on a line that terminates off-road at s = 35.87.
+
+### Question (a): pass 1 carried no attacker kills
+
+**No pass-1 adjudicator verdict was killed by an attacker, because no pass-1
+verdict reached IN or PARTIAL.** The adversarial lenses attack IN and PARTIAL
+verdicts; all eight groups returned OUT on every figure, so the attack pass had
+nothing to fire at and returned empty for all eight. That fact is part of the
+record: **the OUT verdicts in §2 rest on the adjudicators alone**, with one later
+exception — the steelman pass tasked three defenders with arguing that a refused
+figure is in fact reproducible, and 3 of the 81 (2.9, 9.1, 11.TB) have now been
+pressed from the other direction. All three held. The remaining 78 have not been.
+Where a verdict was close, §2 records the evidence that decided it.
 
 What *was* killed is the ROADMAP's starting hypothesis. Three rows are overturned:
 
@@ -429,6 +952,128 @@ confirmed as skimmed.
   It is almost certainly the book's fig 15.11, which is absent from `FIGURES.tsv`.
   It is a distinct image, not a duplicate of `fig-15.10.jpeg`, and is adjudicated
   on its own in §2 bucket I as 15.10b.
+- **The two lenses split on the `chop` / `overread` tranche: PARTIAL versus OUT.**
+  Lens 1 verified every number, found the contrasts non-vacuous, and would have
+  admitted both figures with scene-level repairs (`chop:slew_mss=20`; cut
+  `overread`'s carrying-check claim to `out_in_out` alone and strip the apex
+  labels' implicature). Lens 2 killed both on the §4 S12 remit and on
+  `overread`'s exit label. The harsher verdict stands and both are OUT, but the
+  disagreement is narrow and worth naming: **lens 1 found no reason to refuse the
+  `chop` pair on the merits, and lens 2 refused it on governance rather than on
+  the merits.** If S12 is resolved in favour of doctrine figures, that candidate
+  re-enters with lens 1's repairs already specified and lens 2's rendered-placard
+  requirement (§4 S15) outstanding.
+- **The steelman and the tranche converged on the same artifact from two
+  directions.** A defender of fig 9.1 and a proposer sweeping the undrawn mistake
+  kinds independently arrived at the same `good`-vs-`chop` pair on `book90`, both
+  labelled it Chapter 9 doctrine rather than parity, and both were refused under
+  the same remit. Three independent passes now agree it is honest and
+  unauthorized. That is the strongest single input to S12.
+
+### Steelman artifacts preserved so they are not re-derived
+
+Neither is adopted. Both are recorded because they were baked and verified, and
+because re-deriving them costs more than storing them.
+
+**`fig-09-D1` — the Chapter 9 doctrine pair (see §2's steelman, 9.1).** Identical
+in structure to the tranche's `chop` candidate above; its note is the fuller
+placard and is preserved for that reason:
+
+```
+road:      preset book90
+lines:
+  good:    ride entry=34 turnIn=auto
+  chop:    mistake chop
+marks:     turn_point,apex
+labels:
+  apex@good             "roll-on already open — lean held to the apex"
+  run_wide_detect@chop  "stood up after the cut — running wide"
+view:      mode=diagram window=auto consequence=on
+note:      "Cut the throttle once the roll-on has begun and the line does not
+            tighten: the bike stands up, hands back lean faster than the rider can
+            steer it down, and runs wide. throttle_rule passes on the ideal line
+            and fails the chop line on its chop leg (chop at s = 20.5 m; cut at
+            20.31, cause stand_up, channel su_transient). Only that one leg
+            carries — crack, v_min-at-apex and roll-on-onset pass on every line
+            the grammar can author, so this figure claims none of them. NOT book
+            fig 9.1: linelab carries one signed longitudinal command, so the
+            brake/throttle overlap fig 9.1 is built around cannot be drawn; and
+            the solved roll-on is a fixed 2.2 m/s2 constant that stays flat
+            through the whole lean unwind, so fig 9.1's exit anticorrelation is
+            contradicted, not reproduced. Chapter 9's own reason for the rule
+            (ground clearance) is out of scope, design/01 section 8; the run-wide
+            consequence linelab models is the book's Chapter 2 and Chapter 11
+            sentences, and its magnitude is a calibrated Tier-1R net effect
+            (design/02 section 5.1), not a measurement. The two controls strips
+            are auto-scaled independently — compare shapes, not magnitudes."
+```
+
+Recorded with it: the variant `mistake chop:slew_mss=10` gives the cleanest
+doctrine story on paper (`contained`/`caution`, `throttle_rule` the only non-pass
+check) but its top-down exits at lane fraction 0.702 against the ideal's 0.849 —
+the mistake line draws *tighter* than the ideal, so the picture argues against the
+check. It is not to be re-proposed.
+
+**`fig-11-TB` — the trail-brake taper figure (see §2's steelman, 11.TB).** Not a
+`.scene`, and that is load-bearing rather than a formatting choice (§4 S28):
+
+```json
+{
+ "road": {"dsl": "lane 3.5 | S 35 | R 30 ^90 | S 25"},
+ "lines": [
+  {"name": "tapered", "role": "ideal",
+   "spec": {"spec": "linelab/1", "id": "tapered",
+     "road": {"dsl": "lane 3.5 | S 35 | R 30 ^90 | S 25"},
+     "rider": {"start": {"speed_kmh": 60, "f": 1}, "profile": "street",
+       "plan": [
+         {"do": "brake",    "id": "b1",    "decel": 3.0, "at_s": 1, "taper_to_s": 50},
+         {"do": "turn_in",  "id": "ti_c1", "at_s": 28.788214525856546,
+                            "target": {"lean_deg": 28.825203306970423}, "hand": "R"},
+         {"do": "throttle", "id": "ro",    "at_s": 53.12328574487435, "accel": 2.2}]}}},
+  {"name": "held", "role": "alternative",
+   "spec": {"spec": "linelab/1", "id": "held",
+     "road": {"dsl": "lane 3.5 | S 35 | R 30 ^90 | S 25"},
+     "rider": {"start": {"speed_kmh": 60, "f": 1}, "profile": "street",
+       "plan": [
+         {"do": "brake",    "id": "b1",    "decel": 3.0, "at_s": 14},
+         {"do": "turn_in",  "id": "ti_c1", "at_s": 28.788214525856546,
+                            "target": {"lean_deg": 28.825203306970423}, "hand": "R"},
+         {"do": "throttle", "id": "k1",    "at_s": 38, "accel": 0},
+         {"do": "throttle", "id": "ro",    "at_s": 58, "accel": 2.2}]}}}],
+ "marks": ["turn_point", "apex"],
+ "labels": [
+  {"feature": "apex", "line": "tapered",
+   "text": "apex 0.67 m clear - taper already at 1.0 m/s2 when lean passed 15 deg; su_sustained 0.0 deg/s"},
+  {"feature": "apex", "line": "held",
+   "text": "apex 0.08 m clear - still 3.0 m/s2 at 15 deg lean; su_sustained 8.6 deg/s of a 50 deg/s budget"}],
+ "view": {"mode": "true", "window": "auto"},
+ "note": "DOCTRINE FIGURE - reproduces no printed figure. Chapter 11's only numbered figure is 11.1, a body-position photo of an upright straight-line quick stop, on which trail_brake_taper returns na. Same road, same 60 km/h entry, same turn-in at s=28.79 and same 28.83 deg commitment; only the brake profile differs."
+}
+```
+
+Its four required placards, verbatim — the figure over-claims without all four,
+and none of them renders today (§4 S15):
+
+> **P1** "This figure makes no claim that trail braking is better. parks-street/2
+> grades the brake-complete baseline: the solver's own line on this road at this
+> entry is contained/good with trail_brake_taper na (brake_complete_baseline). The
+> only thing any shipped check says about a taper is that it did not force
+> stand-up."
+>
+> **P2** "trail_brake_taper: pass means no leaned sample crossed the 2.5 m/s2
+> onset - it does not mean the trail brake helped. Across a 25-cell brake sweep on
+> this road the check returned pass in every cell, including cells that ran off the
+> road, and it returns pass for an 8.0 m/s2 brake because the bike never reaches
+> 15 deg of lean. Read the green line's grade, not its tick."
+>
+> **P3** "Chapter 11's four claimed benefits of trail braking - suspension
+> movement, rake and trail, reaction time, and suspension-mediated line-tightening
+> - are all Tier-3 and out of scope (design/01 §8). None of them is claimed here."
+>
+> **P4** "The alternative line also fails out_in_out and throttle_rule. The
+> throttle_rule fail is a rubric artefact: check 5 exempts the entry-brake action
+> id, but the brake's release ramp belongs to the throttle action that supersedes
+> it, so the release is scored as a mid-corner brake at s=38.5."
 
 ---
 
@@ -529,6 +1174,22 @@ book text **and image**, then write a `.scene`."* *To decide:* an explicit remit
 call. If non-parity figures are authorized, the corpus is not empty; under the
 current remit it is.
 
+*Updated by the steelman and the doctrine tranche.* This is now the load-bearing
+STOP in the file. Three independent passes have converged on the same conclusion
+from three directions: a defender of fig 9.1 (§2 steelman), a defender of 11.TB
+(§2 steelman), and a proposer sweeping the four undrawn mistake kinds (§3) each
+produced an honest artifact that reproduces no printed figure, and each was
+refused on this remit rather than on the merits. One lens explicitly declined to
+refuse the `chop` pair on any other ground. The queue, in order of strength, is:
+(1) the `good`-vs-`chop` pair on `book90` — Chapter 9 doctrine on Chapter 8's
+road, the only candidate in either pass whose mistake lives in the longitudinal
+channel, which would take `fig-08-07`; (2) `fig-11-TB`, conditional on being
+retitled to be about the stand-up ceiling rather than the technique, and on S28;
+(3) `overread`'s timid line, conditional on its labels being cut back to what is
+computed. All three additionally require S15, since each depends on a placard a
+reader can see. *To decide, unchanged:* an explicit remit call, which is the
+design owner's and not an adjudicator's.
+
 **S13 — phase vocabulary: the book's bands are forbidden as labels, and they
 also disagree.** `design/05 §4.1` and `design/06 §4` both state normatively that
 *"the book's entry/mid/exit words stay caption and anchor vocabulary, never band
@@ -546,15 +1207,229 @@ duplicate "15.10"; almost certainly fig 15.11, which `FIGURES.tsv` omits.
 *To decide:* an extraction-hygiene fix, not a design question. Recorded so the
 87-image accounting reconciles.
 
-Also noted, and deliberately **not** raised as a STOP: `.scene` files cannot
-select the `controls` view. The scene `view:` block passes opaque keys to the
-projection (mode/window/orient/rays/legend/look); the view kind is a `render
---views` CLI flag. Any book timing chart would therefore not be a scene in the
-Chapter 8 mould even if S13 were resolved.
+### Added by the steelman and the doctrine tranche (S15–S28)
+
+**S15 — render surface: nothing renders a placard.** *Needed by:* every artifact
+in the S12 queue, the honest refusal form of fig 2.9, and the standing rule in
+§1. In the shipped v0.1 build the only rendered free text is `labels:`, which must
+hang off one of eight closed anchors. `view: mode=diagram` is rejected `SCHEMA`
+(deferred, "projection (post-v0.1)"); `render/project.ts` sets `footnote: null` in
+true mode; `note:` lands in `meta.caption` and never becomes ink; `#` comments in
+a `.scene` never render. Verified by extracting every `<text>` node from baked
+SVGs of both candidates *and* of shipped `fig-08-01` — entry speed, outcome word,
+distance ladder, labels, legend, scale bar, nothing else. The Chapter 8 precedent
+puts notes in `gallery.html` only. *Consequence:* a figure whose honesty depends
+on a concession the student must see is currently undrawable, and the placard
+policy's own failure mode — a refusal the student never sees — is the default.
+*To decide:* whether a rendered placard/footnote channel belongs in `design/06`
+before any doctrine figure is authorized, or whether the gallery page is the
+sanctioned placard surface and figures may never ship as standalone SVGs.
+
+**S16 — fixture: check 11 and the blind lean cap have no positive fixture.**
+*Needed by:* any blind-corner figure. `hold_wide_for_sight` is `na (not_blind)`
+on every line of all six shipped figures, and `lean_ceiling` reads
+`reserve_deg: 40.36, blind: false` on all six, so `BLIND_RESERVE_DEG` = 35 is
+exercised by nothing committed. On `bookBlind` the check is **structurally
+unpassable**: its release leg needs `s(turn_in) ≥ release(c) − 2.0`; measured
+`release(c)` is 25.0–27.5 m on every line baked, while the feasible explicit
+turn-in band is 11.0–18.0 m (18.5 refuses `turn_in_infeasible_early`, 19.5 and
+above `turn_in_infeasible_late`), at every entry 20–36 km/h. The intervals do not
+intersect, so check 11 can only ever return `fail` there. The cause is geometric:
+the 36 m hedge (`-6x36`) spans the whole 29.3 m arc, and the ^140 reshape that
+made `blind(c)` true everywhere is the same reshape that pushed `release` past the
+turn-in band. It *is* passable in principle — `blind: true` **and**
+`hold_wide_for_sight: pass` were reached at `hedge inside c1 -8x10` (release 14.0,
+turn-in 13.02), and at `-8x11`, `-6x8`, `-6x9`, `-10x11`, `-10x12`. *To decide:*
+shorten `bookBlind`'s hedge span (it is design of record, but no committed figure
+uses the preset, so nothing moves), author a separate doctrine road, or record
+that check 11 has no positive fixture and accept it.
+
+**S17 — pin conflict: `premature_contained`'s mandatory check.** `design/01 §A.4`
+and `design/03 §7.1` both pin the kind's mandatory failure as `late_apex`. On the
+pinned fixture F-ORACLE-90 it **passes** at every `early_by_m` from 1 to 8 that
+meets the pinned `contained` outcome (61%–80% of sweep). The engine freezes the
+pin at `linelab/src/plan/mistakes.ts:175` (`expect_fail: ["late_apex"]`),
+`linelab/src/solve/gate.ts` rule 2 turns it into a hard `checks_fail` requirement,
+and `linelab/test/oracle/oracle.test.ts:368` ratifies the pass as SEAM-PC-LATE-APEX
+("premature_contained's taught check is out_in_out on this engine"). Every bake of
+the kind therefore exits 3 with "expected check `late_apex` to fail — it did not".
+Off F-ORACLE-90 the two halves of the pin become mutually exclusive: `bookHairpin`
+and `bookDecreasing` at `early_by_m` 10 do fail `late_apex` (24.8% / 29.4%) but
+grade `runoff`, outside the kind's admissible set. *To decide:* a pin flip is a
+design change (`design/03 §7.1` rule 1, "full stop"), or an engine change. Not
+authorable either way until it is decided.
+
+**S18 — render surface: `verdict.misjudgment` has none.** *Needed by:* any figure
+whose lesson is the belief — `underread` dies on this, and `overread` survives
+only because its lesson is visible in the drawn line without the belief. The
+believed road, `s_divergence_m`, `kappa_gap` and `believed.outcome` are computed
+and in-hash, but `rg "misjudg|believed" linelab/src/render/` returns nothing
+across all render files, `design/06` and `design/07` never mention it, and the
+closed label-anchor set has no divergence feature. `verdict.diagnosis` is `null`
+on every `underread` line baked, so the diagnosis channel does not name the belief
+either. Two lesser defects sit inside the same channel: on F-ORACLE-DR the
+divergence block reads `{kind: "radius", believed: 16, actual: 16}` because the
+taper's entry radius *is* 16, and it cites `kappa_gap.at_s` 38.5 on a line that
+terminates off-road at s = 35.87. *To decide:* whether a believed-road ghost path
+or a divergence-station marker belongs in `design/06`.
+
+**S19 — verdict semantics: `contained` does not mean "in your lane".** With
+`own = −W/2, oncoming = +W/2` (`linelab/src/sight/footprints.ts`) the oncoming
+lane is d ∈ [0, +3.5]; the measured corridor map on `book90` is d = −0.4 − 2.7·f.
+A default `premature_contained` line reaches **d = +2.38 m** — past the centre of
+the oncoming lane, through the spot where fig 8.1 parks its oncoming vehicle — and
+a `bookDecreasing` variant reaches +3.45 m, past its far edge. Both grade
+`contained`, correctly per `design/05 §6.1` ("an inside-corridor excursion on
+pavement never moves outcome"). *To decide:* whether a figure may draw such a line
+at all, and whether the outcome vocabulary needs a term that distinguishes "inside
+your own corridor" from "in the oncoming lane". Recorded as a scope-of-drawing
+question, not as a request to change the outcome rule.
+
+**S20 — rubric arithmetic: `out_in_out` is unbounded above in `exit_f`.** The
+exit leg is `exit_f >= OIO_OUTSIDE_MIN` (0.55) with no upper bound, and the swing
+leg is `max(ti_f, exit_f) − apex_f >= 0.4`, so both get *easier* the further past
+f = 1 a line terminates. Pre-existing in the shipped corpus, not introduced by any
+candidate: fig 8.1's `bad` line is `runoff` with `out_in_out` **pass** at
+`exit_f` 1.148, and fig 8.3's likewise. This produced one retracted headline (the
+hairpin's "nine checks passed and you're off the road") and one struck rationale
+(the `chop` pair's "textbook geometry"). *To decide:* whether an off-road
+termination should suppress the check rather than satisfy it. A rubric change, so
+a design change.
+
+**S21 — engine defect: single-station D10 constraints are silently vacuous.** On
+`preset book90`, `ride entry=34 turnIn=auto constraints="f<=0.05@mid:c1"` returns
+a clean line with `constraints: [{bound: "f_max", value: 0.05, satisfied: true,
+worst: {s: 21.42, value: 0, margin: 0}}]`; so does the contradictory
+`f>=0.95@mid:c1` on the same road, and so does `v_kmh<=10@mid:c1` on a line
+running ≈ 30 km/h. `worst.value` is always 0 — the evaluator never reads the
+sample. Span constraints work correctly (`f<=0.05@s:24..s:26` → `NO_SOLUTION` /
+`constraint_unmet`). This defeats `design/04 §4.5`'s idiom `f>=0.6@entry:c1..mid:c1`
+in its point form and is a `satisfied: true` on an unmet bound — the silent-pass
+class `design/01 §8` forbids. *To decide:* defect or design clarification; found
+incidentally and not fixed here.
+
+**S22 — engine defect: a `mistake` line beside a `vis` line returns `INTERNAL`.**
+`lines: hold: ride entry=34 vis=cautious / fast: mistake overspeed:by_kmh=8` on
+`bookBlind` returns `INTERNAL` at `solve.executeSolvedPlan`: "solver-emitted plan
+failed validate(): position target unreachable in 13.0 m (need ≈ 16.1 m)",
+`{reason: "solved_plan_invalid", inner: {reason: "position_target_unreachable"}}`.
+The V2-generated `position` action is carried into the perturbed plan without
+re-solving its reachability at the raised entry speed. *Consequence:* no
+blind-corner figure can put a mistake line beside a vis-governed line.
+
+**S23 — preset hygiene: two shipped presets have unusable defaults.** (i)
+`bookHairpin`'s design-suggested entry — 28 km/h, in `design/03 §3.1`'s table and
+pinned at `linelab/test/golden/gates.test.ts:183` — produces an ideal line with
+`validity.below_validity_s` = 2.17 and 33 of 98 samples flagged, spanning
+s = 7.5→23.5, i.e. the whole corner, inside `design/01 §8`'s refused low-speed
+regime. Nothing in the pipeline stops it being drawn: the verdict is still
+`contained`/`good`, exit 0. The honest authoring window is entry ∈ [29, 30.5]
+km/h, 1.5 km/h wide, and it excludes the preset's own suggested entry. (ii)
+`bookBlind` has no default ideal line: `ride entry=<any> turnIn=auto` returns
+`NO_SOLUTION`/`empty_band` at every entry 20–36 km/h ("no contained candidate with
+an in-band apex exists", 12 candidates), while an explicit `turnIn=12` produces a
+contained line apexing at 69.9% — so the auto-suggest band search misses lines
+that plainly exist. *To decide:* whether `design/03 §3.1`'s suggested-entry column
+needs a validity note, and whether (ii) is a solver defect.
+
+**S24 — engine/design seam: the sight-deficit open-end carve-out.** The controls
+strip's sight panel draws `ssd_m` overtaking `sight_ride_m` at s ≈ 26 and reaching
+a 30.95 m deficit at road end, and `verdict.sight.margin_min_m` reads −30.95,
+while `stop_within_sight` passes with `max_deficit_m 0 / min_margin_m 33.95`.
+`design/06 §4` says "a crossing is a `stop_within_sight` failure staring at the
+reader" — here it is not. The cause is the open-end carve-out in
+`linelab/src/plan/doctrine/metrics.ts` (`sightDeficit`, the WP-10 seam repair),
+whose own comment records that `verdict.sight.margin_min_m` still reads the
+clamped channel and is a "separate ratification". **This hits the six shipped
+Chapter 8 controls strips identically**, so it is a corpus-wide disclosure
+question, not a candidate defect.
+
+**S25 — rubric artefact: a trail brake's release ramp is scored as a mid-corner
+brake.** Check 5 exempts samples whose `action_id` is the entry brake
+(`metrics.ts`, `entryBrakeId` = last braking sample at/before turn-in), but the
+brake's release *ramp* is attributed to the throttle action that supersedes it, so
+the release of a trail brake trips `throttle_rule`'s discipline leg ("mid-corner
+brake at s=38.5"). A 15-cell start × release grid found no line that trips
+`ate_reserve` without also tripping discipline, so no trail-brake figure can say
+"check 6 alone separates these". *To decide:* together with S3 and S7.
+
+**S26 — engine seam: `chop`'s `rideability` excess.** The `chop` line records
+`rideability: fail` with `max_excess_dps` 102.95, against 3.65 on shipped figs 8.1
+and 8.3 — 28× the corpus's own worst. The two lenses disagree on the diagnosis and
+both readings are recorded: the proposer traced it to a one-sample alignment
+artefact (`su_transient` recorded as a 220.005 °/s spike at the single sample
+s = 20.5 while the 8.335° of lean it sheds lands across s = 20.5→21.0), and the
+attacker recomputed it from [20.0 → 20.5] instead, and showed that re-aligning
+`su` to the opening sample still leaves 17.05 and 19.40 °/s against
+`RATE_TOL_DPS` = 2.0 — about ten times over — making it a **sub-sample
+event-timing** seam (`crack` fires at s = 20.31, between samples) that does not
+vanish under re-alignment. It scales with the disturbance: `chop:slew_mss=20`
+gives 7.36 °/s. *To decide:* whether check 12 should read a rate reconstructed
+across the event station rather than sample-to-sample.
+
+**S27 — vacuity law: extend §A.2 to verdict-pinned checks.** `design/01 §A.2`'s
+normative rule catches an assertion on an *inapplicable* corner (a `na` that reads
+as a pass). Both passes hit the adjacent species repeatedly: a check that fires,
+is applicable, and is **structurally incapable of returning more than one
+verdict** on the road in question. Measured instances: `single_input` returned
+`pass {count: 1, allowed: 1}` on 11 of 11 lines on `book90`, good and mistake
+alike, because a `ride style=single` line has one solved turn-in action by
+construction; `quick_steer` returned `steer_share: 0` on every good line at every
+solvable entry, because the roll finishes on the entry straight (by 13 mm at entry
+34); `lean_ceiling` cannot warn or fail anywhere on `bookHairpin`, because the
+solver clamps commanded lean at `phiReserve` and the maximum observed across the
+whole entry sweep and all eight mistake kinds is 40.36° = the reserve exactly;
+three of `throttle_rule`'s four legs never appeared in `missed[]` on any authorable
+line; and `trail_brake_taper` returned `pass` in 25 of 25 sweep cells including
+cells that ran off the road, and returns `pass` for an 8.0 m/s² brake because the
+bike never reaches 15° of lean. A green tick from any of these reads to a student
+as "graded and good". *To decide:* whether §A.2's obligation ("shown to satisfy
+the antecedent before a test is hosted on it") should be generalised to "shown to
+be capable of a non-pass verdict on this road before a figure names it as a
+carrying check". This is the single most reusable finding of either pass.
+
+**S28 — corpus convention: may a figure be a FigureSpec JSON rather than a
+`.scene`?** *Needed by:* `fig-11-TB`, and by any figure whose lesson is an
+explicit longitudinal plan. `schema scene` exposes exactly two line forms, `ride`
+and `mistake`; `plan[].brake.decel` carries `scene_key ""` and
+`linelab/src/cli/args.ts:89-95` records this in source as "a deviation, since
+design/04 §7's scene grammar genuinely does not carry these keys". The canonical
+FigureSpec JSON does carry it (`lines[].spec` accepts a wire `Scenario` with
+`rider.plan`, `design/03 §8` / D30) and bakes correctly. Admitting such a figure
+means admitting a second authoring form into a corpus whose six members are all
+`.scene` derived from presets. *To decide:* a corpus-convention call, not a
+physics one. A reviewer could refuse 11.TB on this ground alone and be right.
+
+Also noted, and deliberately **not** raised as STOPs:
+
+- `.scene` files cannot select the `controls` view. The scene `view:` block passes
+  opaque keys to the projection (mode/window/orient/rays/legend/look); the view
+  kind is a `render --views` CLI flag. Any book timing chart would therefore not
+  be a scene in the Chapter 8 mould even if S13 were resolved. The doctrine
+  tranche hit the same wall from the other side: `overread`'s real consequence is
+  exit speed (49.5 vs 53.9 km/h), which lives in the strip and not in the plate.
+- Controls strips are auto-scaled per line and per panel — speed 33–54 on one line
+  against 33–36 on another, stand-up ±1 against 0–220 — with only `grip` carrying
+  a fixed range (`design/06 §4`). Two strips side by side compare shapes, not
+  magnitudes, and any figure shipping a pair must say so.
+- `marks:` and `labels:` do not survive into envelope `meta`, so `render
+  <envelope>` drops authored labels; they appear only in the `figure` verb's own
+  SVG. This affects the shipped six equally and is a bake-order fact, not a
+  defect claim.
+- `manifest.gate_verdict` reads `"fail"` for `--mode true` bakes of the shipped
+  figures as well as of every candidate (the book-proportion gate, exempted for
+  true mode by `design/06 §6.2`). It is not a discriminator and was not used as
+  one.
 
 ---
 
 ## 5. Method
+
+Three passes produced this file: the book-figure adjudication, the steelman that
+tested it, and the doctrine tranche. All three are recorded so the verdicts are
+auditable.
+
+### Pass 1 — the book-figure adjudication (question (a))
 
 Eight adjudicator agents were fanned out, one per figure group, covering
 Chapters 1, 2, 3, 4, 9, 10, 11, 12, 13, 15, 17, 18 and 19 plus a residual sweep
@@ -586,9 +1461,9 @@ across taper decelerations (the check-6 pass/warn boundary in the 11.TB row).
 
 **Resolution rule.** A verdict survives only if it survives both adversarial
 lenses — engine capability and pedagogy — and where they disagree the harsher
-verdict stands. No verdict reached IN or PARTIAL, so no attack ran; §3 records
-that, and records that the OUT verdicts consequently carry no adversarial
-counter-pressure.
+verdict stands. No pass-1 verdict reached IN or PARTIAL, so no attack ran; §3
+records that, and records that the OUT verdicts consequently carry no adversarial
+counter-pressure except on the three targets pass A later re-opened.
 
 **Accounting.** 87 images in `book_images/by-figure/`. 6 are the shipped Chapter
 8 corpus, listed in §1 and not re-adjudicated. **81 adjudicated here; 0 survive.**
@@ -596,8 +1471,71 @@ Every one of the 81 appears exactly once in a §2 bucket: A 24, B 8, C 5, D 3,
 E 20, F 1, G 2, H 1, I 9, J 3, K 5 — 81. Two non-printed proposals (9.1b, 11.TB)
 were adjudicated additionally and are also OUT.
 
-**What this file does not claim.** It does not claim the book is wrong anywhere.
-Several figures are refused precisely *because* linelab would contradict the book
-if it drew them (2.4, 2.5, 9.1) — that is the model's limit, not the book's error,
-and `design/01 §3`'s "the book wins" rule governs doctrine disputes, not
-physics-tier boundaries that `design/01 §8` already resolves by refusal.
+### Pass A — the steelman (question (a), re-opened)
+
+Because pass 1's adjudicators were told to *prefer OUT when torn*, a later pass
+tested whether that instruction did the deciding. Three defenders were given the
+three closest refusals — 2.9, 9.1 and 11.TB — and instructed to build the
+strongest honest case **for** reproduction, state it at full strength before
+testing it, run every claim at the CLI rather than reason about it, and then
+attempt to break their own case. Each returned a `survives` boolean, the sentence
+a student would be entitled to take from the strongest honest remnant, and an
+exhaustive list of what would still be faked if the figure were authored anyway.
+
+**Outcome: 3 targets, 0 verdicts changed.** 2.9 returned `survives: false` on its
+author's own analysis. 9.1 conceded parity outright — both blockers re-run and
+confirmed — and returned `survives: true` only for a *different*, explicitly
+non-parity artifact, conditional on an S12 remit call it declined to grant
+itself. 11.TB likewise returned `survives: true` conditional on the same remit
+call plus a retitling, while refuting two of the four grounds in its own §2 row.
+Those refutations are recorded in §2's steelman subsection rather than by editing
+the row, because the 81-figure reconciliation is load-bearing and must survive
+intact.
+
+### Pass B — the doctrine tranche (question (b))
+
+Scope was set by what the shipped six never touch: two shipped-but-unused presets
+(`bookBlind`, `bookHairpin`) and four shipped-but-undrawn mistake kinds
+(`premature_contained`, `chop`, `underread`, `overread`). Three proposer agents
+each baked their candidates — nothing predicted, everything run — and reported
+carrying checks with observed verdicts, the exact sentence the figure would be
+entitled to teach, the scene text, unmodelled claims, and a redundancy baseline
+obtained by re-baking all six shipped scenes. Every candidate that reached IN or
+PARTIAL was then attacked from two lenses, each of which re-baked the proposal
+independently in its own scratch directory before arguing.
+
+**The bar, beyond pass 1's.** A doctrine figure is not anchored to printed ink,
+so it must clear two further tests: the contrast must be *drawn* — visible in the
+plate or the strip, not only in the JSON — and the doctrine named must be what
+causes it. Both killed candidates failed at least one: `fig-08-D1` attributes to
+blindness a lean split that blindness does not cause and draws two identically
+graded amber lines, and `overread`'s labels assert an exit consequence the
+drawing contradicts.
+
+**Resolution rule.** A candidate survives only if **both** attackers leave it
+standing. Where they disagree, the harsher verdict stands and the disagreement is
+recorded (§3): the `chop` and `overread` pair split PARTIAL against OUT, and both
+are OUT.
+
+**Accounting.** 6 doctrine candidates in 3 groups; 3 self-refused by their
+proposer on the merits, 3 reached PARTIAL and were killed on review. **0 survive.
+Nothing was written into the repo by either pass** — all bakes are in
+session scratch directories, and this file is the only artifact.
+
+### What this file does not claim
+
+It does not claim the book is wrong anywhere. Several figures are refused
+precisely *because* linelab would contradict the book if it drew them (2.4, 2.5,
+9.1) — that is the model's limit, not the book's error, and `design/01 §3`'s "the
+book wins" rule governs doctrine disputes, not physics-tier boundaries that
+`design/01 §8` already resolves by refusal.
+
+It does not claim the refused artifacts are dishonest. Three of them are honest
+and were verified as such; they are refused on remit (§4 S12), on a missing
+rendered placard (§4 S15), and in one case on corpus convention (§4 S28). Those
+are decisions for the design owner, and this file does not make them.
+
+It does not claim exhaustiveness for question (b). The tranche covered what the
+shipped six leave untouched in Chapter 8; it did not sweep every road the DSL can
+express, and §4 S16 names one road shape — a shorter blind-corner hedge — on which
+a check with no positive fixture anywhere in the corpus is known to pass.

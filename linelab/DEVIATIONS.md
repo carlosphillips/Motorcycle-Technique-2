@@ -35,6 +35,70 @@ this entry is stale.
 
 ---
 
+## Post-v1.0 — corpus-extension pass (2026-07-27, ROADMAP "extend past Chapter 8")
+
+This pass attempted to grow the figure corpus past Chapter 8. **It did not: 81 book
+figures were adjudicated and 0 survive** (`figures/SCOPE.md` is the record, with a
+28-entry STOP list). No engine code was changed and no figure moved — the six Chapter 8
+bakes were re-run twice end to end and every tracked artefact is byte-identical, so the
+regression baseline holds.
+
+Three deviations were found *while* adjudicating, each verified by hand against the
+shipped build rather than taken from an agent report. They are recorded here because the
+ROADMAP's rule is that a figure blocked by an engine behaviour is a design amendment, not
+a fix: none of these was worked around.
+
+- **[08 §3.1 / 01 §8] `check` does not apply the out-of-scope validation that `figure`
+  and `run` apply.** `needs-decision`. On the scene
+  `road: lane 3.5 | S 10 | R 10 ^180 | S 12` (180° of sweep at r = 10 m — the §8
+  super-tight regime), `check <scene>` returns `{"ok":true,"value":{"valid":true,
+  "spec_hash":"7e6441"}}` and exits 0, while `figure` on that same scene and `run` on
+  that same road both return `OUT_OF_SCOPE` / `super_tight_geometry` and exit 2. design/01
+  §8 says such scenarios are *"rejected `OUT_OF_SCOPE` at validation"*, and design/08
+  documents `check` as the verb that lints *"without solving"* — so the scope test belongs
+  on the lint path, not only past it. The failure direction is the damaging one for G4
+  (agent-first authoring): the lint green-lights a road the bake then refuses. No test
+  pins this today.
+
+- **[06 §11 / 01 §8] The figure caption reaches the data but never the ink, and no
+  placard box is rendered on any committed figure.** `needs-decision`. The scene `note:`
+  survives lowering — `fig-08-01.envelope.json` carries
+  `meta.caption: "Turn in too soon and the geometry points the exit wide …"` — but that
+  string appears in neither `fig-08-01.svg` nor `fig-08-01.manifest.json`, and no
+  committed SVG in `out/chapter-08/` or `figures/` contains placard ink. `labels:` and the
+  legend do render, so this is specific to the caption/placard surface. design/06 §11
+  lists *"figure-level placard boxes"* and the *"honest-limitation placards (01 §8)"*
+  among the renderer's required margin chrome. **This is the pass's load-bearing
+  blocker**, and it is why the STOP list's S12 could not simply be answered "yes": a
+  doctrine figure that illustrates Chapter 8 prose rather than reproducing a printed
+  diagram *must* disclaim parity inside the artefact, and there is currently nowhere in
+  the SVG for that disclaimer to go — a reader of the SVG alone would never see it.
+
+- **[01 §A.3 check 2] `out_in_out` is unbounded above in `exit_f`, so "exit wide" is
+  satisfied by exiting off the road — and this already sits on committed ink.**
+  `needs-decision`. Check 2 passes iff
+  `ti_f ≥ 0.55 ∧ apex_f ≤ 0.45 ∧ exit_f ≥ 0.55 ∧ swing ≥ 0.4`; nothing caps `exit_f`.
+  On the shipped `fig-08-01` the `bad` line — the book's own premature-turn-point red
+  line — records `out_in_out: pass` with `exit_f = 1.148` while its `outcome` is
+  `runoff`: the exit is past the outer usable edge, in the oncoming lane, and the
+  out-in-out check calls that shape met. §A.3's own commentary expects the opposite
+  (*"until termination, a runoff line grades this check on the samples that exist and
+  typically fails the exit leg"*). Nothing visible moves — the line is already
+  `failing`/red by outcome and `exit_containment` fails separately — which is why it has
+  gone unnoticed; but the check does not measure the claim it advertises.
+
+Two further candidate findings were **not** promoted, deliberately:
+
+- `premature_contained`'s missing `late_apex` fail is **already recorded** — it is
+  `adj-corrective` / `SEAM-PC-LATE-APEX` (design/03 §7.1 row below), pinned by
+  `test/oracle/oracle.test.ts`. Re-confirmed this pass (`late_apex` passes at 63.7 %,
+  `out_in_out` and `rideability` fail instead) but it is not a new deviation.
+- A reported `INTERNAL` from `mistake` beside `vis=cautious` **did not reproduce** on the
+  shipped build; the scene bakes clean at exit 0. Recorded as unreproduced rather than
+  filed.
+
+---
+
 ## v1.0 CLOSE — immersion completion + ratification merge (2026-07-24, READ FIRST)
 
 This pass completed v0.3 immersion and closed v1.0. The gate auditor + adversarial review

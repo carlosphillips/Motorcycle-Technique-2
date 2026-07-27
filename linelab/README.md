@@ -24,7 +24,7 @@ cd linelab
 npm install          # dev deps only — zero runtime dependencies, ever (D1)
 npm run build         # tsc -> dist/
 npm run typecheck     # tsc --noEmit
-npm test              # vitest run — 50 files, 1357 passed, 4 todo, 0 red (deterministic)
+npm test              # vitest run — 52 files, 1411 passed, 4 todo, 0 red (deterministic)
 ```
 
 `npm run cli -- <verb> ...` runs the built CLI, but npm's own banner lines
@@ -163,6 +163,23 @@ byte-identical after this run.
 | `fig-08-04` | Fig 8.4 — decreasing radius entered too fast (`bad` → `wide`, `adj-fig84`) | 0 | current (re-baked) | **pass** |
 | `fig-08-05` | Fig 8.5 — the double apex (`good` refuses `no_two_touch_line`; `late` solves `runoff`) | 3 | current (re-baked) | **pass** |
 | `fig-08-06` | Fig 8.6 — the esses (chain grades caution) | 3 | current | **pass** |
+
+**Six is the whole corpus, and that is now an adjudicated result rather than a
+backlog item.** A post-v1.0 pass asked whether any other figure in *Total Control*
+could be graded honestly and found none: **81 figures adjudicated, 0 survive**
+(`../figures/SCOPE.md` is the record; every one of the 87 extracted images is
+reconciled). Chapters 9 and 11 — the two the roadmap expected to yield — are refused
+for reasons that are structural rather than cosmetic: fig 9.1 plots brake and throttle
+as two overlapping channels where linelab has one signed `cmd_a`, and fig 11.1 is a
+body-position photograph, which `design/01 §8` refuses by name. A "second Chapter 8
+tranche" on the two unused presets (`bookBlind`, `bookHairpin`) and the four undrawn
+mistake kinds was authored, baked and attacked, and also failed — on merit.
+
+Three honest non-parity *doctrine* figures do exist in draft, and are blocked on two
+recorded decisions: **S12** (may the corpus contain figures that illustrate prose
+rather than reproduce a printed diagram?) and **S15** (nothing renders a placard, so
+such a figure has nowhere to disclaim parity). See `ROADMAP.md`. The re-bake gate
+still holds: two consecutive full Chapter 8 bakes move zero tracked artefacts.
 
 ## Phase status
 

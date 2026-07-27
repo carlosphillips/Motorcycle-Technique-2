@@ -1,3 +1,7 @@
 /linelab/node_modules
 .gstack/
 /out/chapter-08/.bake/
+
+# Filesystem sync conflict copies ("… 2.svg", "… 3.svg") — byte-identical
+# duplicates of baked output, created by Documents sync, never by the engine.
+* [0-9].svg

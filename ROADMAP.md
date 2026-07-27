@@ -5,88 +5,109 @@ record is still `design/*.md` (D1–D46); nothing here overrides it.
 
 ---
 
-## NEXT — extend past Chapter 8
+## CLOSED — extend past Chapter 8
 
-**Status: next up. Not started.**
+**Status: done, 2026-07-27. The answer is no, and that is the deliverable.**
+Full record: **`figures/SCOPE.md`**. Deviations found on the way:
+`linelab/DEVIATIONS.md` § "Post-v1.0 — corpus-extension pass".
 
-Six `.scene` files exist (`figures/fig-08-0{1..6}.scene`), all Chapter 8 "Line
-Selection". The engine is generic; the corpus is not. This step grows the corpus to
-every other book figure the doctrine can *honestly* grade.
+The corpus does not grow. **81 book figures adjudicated, 0 survive**; every extracted
+image is reconciled (87 = 6 shipped + 81 adjudicated). The starting-hypothesis table
+that used to live here was a skim, and three of its rows are overturned:
 
-**The hard part is scoping, not authoring.** `design/01-scope-and-doctrine.md §"out of
-scope"` already rules out most of the book:
+| chapter | was | is | why |
+|---|---|---|---|
+| **9 Throttle** | in | **OUT** | fig 9.1 plots brake and throttle as two overlapping 0–100 % channels. linelab has one *signed* `cmd_a` (brake < 0, drive > 0), so the caption's "notice how the throttle is applied before the brakes are released" is structurally unrepresentable. Worse, the exit anticorrelation is **contradicted**, not merely unmodelled: the solved roll-on is a flat 2.2 m/s² held through the entire lean unwind. |
+| **11 Braking** | in | **OUT** | conflated a check with a figure. `trail_brake_taper` existing is not the claim that fig 11.1 is reproducible — 11.1 is a body-position photograph, which design/01 §8 refuses by name. |
+| **2 Steering** | partial | **OUT** (all nine) | every callout on 2.9 is a handlebar claim (D3). The one Ch 2 sentence linelab models has no figure attached, and `quick_steer`/`single_input` are already carried by figs 8.2 and 8.3. |
 
-| chapter | figures | verdict |
-|---|---|---|
-| 2 Steering | 2.1–2.9 | **partial** — `quick_steer` / `single_input` grade steering *outcome*; countersteer transients and any handlebar channel are Tier-3, excluded (D3) |
-| 3 Suspension | 3.1–3.10 | out — Tier-3 dynamics |
-| 5/6 Concentration, Attitude | — | out — no gaze model; `{na: "rider gaze behaviour not modelled"}` |
-| **9 Throttle Control** | 9.1 | **in** — `throttle_rule` check already exists (crack → v_min ≤ apex → roll-on, no chop) |
-| 10 Shifting | 10.1, 10.2 | out — no drivetrain model |
-| **11 Braking** | 11.1 | **in** — `trail_brake_taper` check already exists |
-| 12 Body Positioning | 12.1–12.11 | out — "no rider-body model; the book's body-position photographs have no linelab equivalent and none is attempted" |
-| 13 Low-Speed Turns | 13.1 | out — below `v_valid_min_ms` (7.0 m/s); ≥170° sweep at r ≤ 15 m rejects `OUT_OF_SCOPE` |
-| 17/18/19 Ergonomics, Aero, Gear | — | out |
+Two rows the table was silent on also resolve OUT: Ch 15 (24 figures) and Ch 1 + Ch 4
+(9 figures).
 
-That table is a *starting hypothesis derived from a skim, not an adjudication.* The
-first phase of the work is to prove or overturn it against the design docs, then
-author only what survives.
+**The expected "second Chapter 8 tranche" was scoped too, and also failed** — but on
+merit, not on scope. `bookBlind` and `bookHairpin` are shipped presets used by no
+committed figure, and four shipped mistake kinds (`premature_contained`, `chop`,
+`underread`, `overread`) have never been drawn. Each was authored, baked and attacked:
 
-Likely honest yield: **Ch 9 + Ch 11 + possibly Ch 2's outcome-shaped figures**, plus a
-second Chapter 8 tranche of prose-scale roads (which is what forces the deferred
-diagram-mode compression, below). A small, defensible corpus beats a large fake one.
+- **hairpin** — self-refused as redundant: `late_apex` uses the same bar 50 as `book90`,
+  `lean_ceiling` is structurally pinned to pass, and every mistake kind's fail set is a
+  subset of a shipped figure's.
+- **blind corner** (`bookBlind`) — killed by both lenses. Its sole carrying check
+  (`lean_ceiling`) has *no visibility content*: both lines peak at 34.00 km/h, so
+  `atan(v²/gr)` reproduces 31.45°/35.66° from radius alone, and the pass/warn split is a
+  0.66° knife-edge on a TUNING constant across ~27 cm of lane. The line that "held wide"
+  fails `hold_wide_for_sight` itself.
+- **`chop` / `overread` / `premature_contained` / `underread`** — `chop` and `overread`
+  carry a real check differential and are the closest things to honest artifacts this
+  pass found; both died on disclosure, not physics (see S12/S15 below).
+  `premature_contained`'s design-pinned check is vacuous; `underread`'s fail set is
+  byte-identical to fig 8.4's committed red line.
 
-### The prompt to run it
+**A steelman pass changed nothing.** Because the adjudicators were told to "prefer OUT
+when torn", a defence was run afterwards on the three closest refusals. It moved 0
+verdicts: 2.9 conceded on its own analysis, 9.1 conceded parity outright, and 11.TB
+stayed OUT while usefully refuting two of its own four grounds.
 
-Paste this into a fresh Claude Code session in this repo. It explicitly authorizes
-workflows.
+### What actually blocks the three honest artifacts
 
-> Use a workflow. Extend the linelab figure corpus past Chapter 8, and iterate until
-> every new figure is green.
->
-> Read `ROADMAP.md` first, then `linelab/README.md` and `design/00-README.md`.
-> `design/*.md` (D1–D46) is the design of record and it wins over your preference; on
-> a genuine conflict, STOP and escalate rather than improvise.
->
-> **Phase 1 — scope adjudication (fan out, one agent per candidate chapter).** For
-> each of book chapters 2, 9, 10, 11, 12, 13 and the Section-5 figures, decide
-> whether linelab can grade its figures *honestly* — meaning every claim the figure
-> makes is one the engine actually computes, and anything it can't compute earns a
-> typed `{na: reason}` or a placard, never a plausible fake
-> (`design/01 §"The placard policy"`). Cite `design/01`'s out-of-scope list and the
-> live rubric (`node linelab/dist/cli/main.js schema rubric`) by check id. Output per
-> chapter: IN / PARTIAL / OUT, which check ids carry the figure, which claims are
-> unmodelled, and the placard text those claims would need. Then have a second agent
-> adversarially attack every IN and PARTIAL verdict — the failure mode here is
-> authoring a figure that *looks* right and teaches something the engine never
-> computed. Kill any verdict that survives on optimism. Write the surviving set to
-> `figures/SCOPE.md`.
->
-> **Phase 2 — author.** One agent per surviving figure. Read that figure's book text
-> (`book_text/parts/`) and image (`book_images/by-figure/`), then write a `.scene`
-> in `figures/` following the six Chapter 8 scenes exactly as the model for form.
-> Each scene declares an ideal line plus the named mistake the book is actually
-> teaching against. Do not invent mistake kinds — the vocabulary is closed
-> (`schema mistakes`); if the figure needs one that doesn't exist, that is a design
-> question, so STOP and record it rather than inventing.
->
-> **Phase 3 — bake and iterate until green.** Extend `out/chapter-08/bake.sh` into a
-> per-chapter bake (or generalize it — your call, keep it derived from its own
-> location, no absolute paths, no `/tmp` state). Bake, judge, read the failure, fix
-> the *scene*, re-bake. Loop until every new figure either exits 0 or exits 3 for a
-> declared-and-documented reason the way fig-08-05/06 do. A bake that exits 3 with no
-> written justification is a red, not a pass. Then re-bake **twice** and confirm
-> byte-identical output; determinism is a hard gate (D1).
->
-> **Never change engine code to make a figure pass.** If a figure can only pass with
-> an engine change, that is a design amendment: stop, write it up in
-> `linelab/DEVIATIONS.md` with the design section it deviates from, and leave the
-> figure open. Also confirm the six Chapter 8 figures still re-bake byte-identical at
-> the end — they are the regression baseline.
->
-> **Phase 4 — publish.** Rebuild the gallery to cover the new chapters, update
-> `linelab/README.md`'s figure table and `figures/SCOPE.md`. Report what you left out
-> and why, explicitly. Commit per phase.
+Two STOPs, in order. Both are decisions, not bugs, and neither may be worked around by
+changing engine code to make a figure pass.
+
+- **S12 — may linelab author non-parity *doctrine* figures at all?** Three independent
+  routes converged on the same honest-but-unauthorized artifact: a figure that
+  illustrates Chapter 8/9 prose rather than reproducing a printed diagram. Under the
+  current remit ("every other book *figure*"), none is authorized.
+- **S15 — nothing renders a placard, so a doctrine figure cannot disclaim parity.**
+  Verified: the scene `note:` survives into `meta.caption` in the envelope but reaches
+  neither the SVG nor the manifest, and no committed SVG carries placard ink — while
+  design/06 §11 lists figure-level placard boxes and the honest-limitation placards
+  (01 §8) as required margin chrome. **S15 must land before S12 can be answered yes**,
+  or the disclaimer lives somewhere the reader of the figure never looks.
+
+The queue if both are granted, in priority order: (1) `good`-vs-`chop` on `book90` →
+`fig-08-07`; (2) `fig-11-TB` retitled to the stand-up ceiling; (3) `overread` with
+de-claimed labels. `fig-08-07` is deliberately left unclaimed. Full scene text for all
+three is preserved in `figures/SCOPE.md` §3 so it need not be re-derived.
+
+### What did not need doing
+
+Phase 3's "generalize `bake.sh` into a per-chapter bake" was **not** done, because no
+second chapter exists to bake. Generalizing a working script against a hypothetical
+caller is speculative work; the note stays here so the decision is visible rather than
+silently skipped. The determinism gate *was* run: two consecutive full Chapter 8 bakes
+moved zero tracked artefacts.
+
+### NEXT — decide S12, after landing S15
+
+There is no authoring work to pick up until two decisions are made, in this order.
+Both are recorded in full in `figures/SCOPE.md` §4.
+
+**1. Land S15 — give a figure somewhere to state a limitation.** The caption already
+survives lowering (`meta.caption`); it simply never reaches the SVG or the manifest,
+and no committed figure carries placard ink. design/06 §11 already specifies the
+surface (figure-level placard boxes + the 01 §8 honest-limitation placards) — this is
+an implementation gap, not a design question. It is also the cheapest item on this
+page and it unblocks the next one.
+
+**2. Then decide S12 — may linelab author non-parity doctrine figures?** This one is
+the design owner's call and nobody else's, because it changes what the corpus *is*.
+If yes, three artifacts are ready to author (scene text preserved in `SCOPE.md` §3)
+and each must carry an S15 placard disclaiming book-figure parity. If no, the corpus
+is closed at six and this page's figure work is finished permanently.
+
+Do not answer S12 by authoring a figure and seeing whether it looks convincing. That
+is the exact failure mode the whole adjudication was built to catch.
+
+### Also worth fixing (found by the corpus pass, independent of S12)
+
+- **`check` doesn't apply the out-of-scope validation** that `figure`/`run` apply, so
+  the lint green-lights a super-tight road the bake then refuses. Wrong direction for
+  G4. Untested today.
+- **`out_in_out` is unbounded above in `exit_f`** — it scores `pass` with
+  `exit_f = 1.148` on shipped `fig-08-01` ink, i.e. "exit wide" is satisfied by
+  exiting into the oncoming lane. Nothing visible moves, which is why it survived.
+
+Both are written up in `linelab/DEVIATIONS.md` § "Post-v1.0 — corpus-extension pass".
 
 ---
 
