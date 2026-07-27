@@ -35,6 +35,45 @@ this entry is stale.
 
 ---
 
+## Post-v1.0 — S15 + doctrine-figure pass (2026-07-27, ROADMAP "a figure for every Chapter 8 doctrine surface")
+
+S15 landed (see the `[06 §11 / 01 §8]` entry below, now `adjudicated-fixed`). Two
+doctrine figures were then authored onto it, adversarially reviewed, repaired and
+reviewed again; **both were refused**, and the refusals produced three findings about the
+check catalogue that outlast them. Full narrative in `figures/SCOPE.md` §3–§4 (S29–S31).
+
+- **[01 §A.3 check 2] `out_in_out` has two live legs, not four, on any first corner.**
+  `needs-decision`, and it sits on shipped ink. `checks.ts` (~:321-345) requires
+  `ti_f ≥ 0.55 ∧ apex_f ≤ 0.45 ∧ exit_f ≥ 0.55 ∧ max(ti_f, exit_f) − apex_f ≥ 0.40`.
+  **`ti_f = 1` exactly on all twelve committed `c1` rows** (every line of all six
+  figures), because `f = 1.0` is the solver's default start state and the plan grammar's
+  only lateral action is `position`, which neither `ride` nor any `mistake` sugar emits —
+  `ti_f < 1` occurs only at `c2`/`c3`/`c4`. And given `ti_f = 1` the swing leg reduces to
+  `apex_f ≤ 0.60`, strictly weaker than the apex leg's own `apex_f ≤ 0.45`, so it can
+  never bind. Verified by walking all six committed envelopes. Nothing in the corpus
+  moves — figs 8.2 and 8.4 fail the *apex* leg, which is live — but a figure reciting
+  "its other three legs pass" overstates its own precision ~3×. See `SCOPE.md` §4 S29.
+
+- **[01 §A.3 check 2] `out_in_out`'s three bars are `TUNING`-sourced while its siblings
+  are book-sourced.** `needs-decision`. `packs/parks-street.json` gives
+  `OIO_OUTSIDE_MIN` 0.55, `OIO_INSIDE_MAX` 0.45 and `OIO_SWING_MIN` 0.4 each
+  `"source": "TUNING"`, inside a pack whose `doctrine_source` is "Parks, *Total Control*,
+  ch. 8-9" and whose `late_apex` bar carries a real `"source": "book:…"`. The check
+  carries `book_ref "Total Control ch. 8"`, so the check is book-warranted while the
+  number that decides it is not. See `SCOPE.md` §4 S30.
+
+- **[record erratum, `figures/SCOPE.md` §4 S27] "three of `throttle_rule`'s four legs
+  never appeared in `missed[]`" is false on committed ink.** `adjudicated-fixed` (the
+  erratum is now recorded in SCOPE.md itself). `roll_on` appears in `missed[]` on **nine**
+  committed rows — seven `warn`, two `fail` — across figs 8.5 and 8.6, including *both*
+  ideal lines: `fig-08-05 good` c1/c2, `early` c1/c2; `fig-08-06 good` c1/c2/c3, `bad`
+  c1/c2. The true claim is road-specific, not catalogue-wide. A doctrine figure drafted
+  on the wider claim asserted it in rendered ink and was refused for it — which is the
+  first time the placard channel has caught a false claim that scene comments used to
+  hide, and is a point in S15's favour rather than against it.
+
+---
+
 ## Post-v1.0 — corpus-extension pass (2026-07-27, ROADMAP "extend past Chapter 8")
 
 This pass attempted to grow the figure corpus past Chapter 8. **It did not: 81 book
@@ -61,7 +100,30 @@ a fix: none of these was worked around.
   pins this today.
 
 - **[06 §11 / 01 §8] The figure caption reaches the data but never the ink, and no
-  placard box is rendered on any committed figure.** `needs-decision`. The scene `note:`
+  placard box is rendered on any committed figure.** **`adjudicated-fixed` 2026-07-27
+  (commit `84f2320`) — the *placard* half. The *caption* half stands as designed.**
+  Resolved by precedence rather than by a new decision: the "§11" this entry cites is
+  draw-order **stage 11 of design/06 §3.1** (design/06 has no §11 — the doc ends at §8),
+  and stage 11 already required figure-level placard boxes. The channel was specced and
+  unbuilt, so building it was plumbing, not an amendment. What shipped: an opt-in
+  top-level `placards:` scene key + FigureSpec JSON twin → an ordered frozen list on
+  `DrawnScene` → wrapped neutral-ink `<text>` boxes drawn at stage 11 in the **viewBox
+  margin** (never `scene.frame`, so `gateProportions` is untouched) → a `placards` array
+  on the manifest record. Four minimal amendments to the letter: `design/03 §8` (the
+  `Figure` wire shape), `04 §7` (the scene grammar's key list), `06 §3.1` stage 11
+  (author-supplied placard text is a new category — every other placard the letter names
+  is a design-owned verbatim string), `06 §7` (the manifest record). `note:` semantics are
+  **unchanged** and deliberately so: it remains a caption reaching `meta.caption` only,
+  because all six committed scenes carry one and routing it to ink would have moved all
+  six SVGs. Omit-when-absent (never `placards: []`) keeps the six `spec_hash` stamps at
+  rest; verified by fresh bakes of all six against committed bytes, and by two
+  consecutive `bake:ch8` runs moving zero tracked artefacts. Wrapping is a pure
+  character-count rule reusing `render/controls.ts`'s own 0.58 ratio — design/06 §3
+  forbids DOM and IO and §4 states there is no text metric in a pure string builder, so
+  the estimate *is* the mechanism, and it errs by looking wrong rather than by lying.
+  **Known knock-on, `needs-decision`:** `J6` is scored `na` on true-mode bakes because it
+  is defined as the *diagram-mode* disclosure note; a true-mode placard re-opens J6's
+  scoping, and any figure that opts in needs a re-judge. The scene `note:`
   survives lowering — `fig-08-01.envelope.json` carries
   `meta.caption: "Turn in too soon and the geometry points the exit wide …"` — but that
   string appears in neither `fig-08-01.svg` nor `fig-08-01.manifest.json`, and no

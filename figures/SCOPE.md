@@ -1243,9 +1243,24 @@ duplicate "15.10"; almost certainly fig 15.11, which `FIGURES.tsv` omits.
 
 ### Added by the steelman and the doctrine tranche (S15–S28)
 
-**S15 — render surface: nothing renders a placard.** *Needed by:* every artifact
-in the S12 queue, the honest refusal form of fig 2.9, and the standing rule in
-§1. In the shipped v0.1 build the only rendered free text is `labels:`, which must
+**S15 — render surface: nothing renders a placard. RESOLVED 2026-07-27, built
+(commit `84f2320`).** The two-way question below was settled by precedence, not
+by a new decision: `design/06 §3.1` draw-order **stage 11** already listed
+"figure-level placard boxes" among the renderer's required margin chrome and
+closed with "Placards are rendered elements, never errors", and `design/01 §8`
+makes placards part of every renderer's contract. The letter outranks this file,
+so the gallery-only branch was never live. An opt-in top-level `placards:` scene
+key (and its FigureSpec JSON twin) now carries an ordered list of author-supplied
+strings to wrapped neutral-ink `<text>` boxes at stage 11 **and** to a `placards`
+array on the export manifest — the manifest half is mandatory, since `J7` "no
+fabrication" fails ink the manifest does not declare. The key is omitted when
+absent, so all six committed figures still bake byte-identical at their committed
+`spec_hash` stamps. Amended `design/03 §8`, `04 §7`, `06 §3.1` and `06 §7`;
+author-supplied placard text is a new category, every other placard the letter
+names being a design-owned verbatim string. **The original entry is preserved
+below, because the corpus pass's reasoning rests on it.** *Needed by:* every
+artifact in the S12 queue, the honest refusal form of fig 2.9, and the standing
+rule in §1. In the shipped v0.1 build the only rendered free text is `labels:`, which must
 hang off one of eight closed anchors. `view: mode=diagram` is rejected `SCHEMA`
 (deferred, "projection (post-v0.1)"); `render/project.ts` sets `footnote: null` in
 true mode; `note:` lands in `meta.caption` and never becomes ink; `#` comments in
@@ -1414,7 +1429,15 @@ solvable entry, because the roll finishes on the entry straight (by 13 mm at ent
 solver clamps commanded lean at `phiReserve` and the maximum observed across the
 whole entry sweep and all eight mistake kinds is 40.36° = the reserve exactly;
 three of `throttle_rule`'s four legs never appeared in `missed[]` on any authorable
-line; and `trail_brake_taper` returned `pass` in 25 of 25 sweep cells including
+line **— ERRATUM, 2026-07-27: this clause is wrong, and it is wrong on committed
+ink. `roll_on` appears in `missed[]` on nine committed rows — seven `warn`, two
+`fail` — across figs 8.5 and 8.6, including *both* of those figures' ideal lines
+(`fig-08-05 good` c1/c2, `early` c1/c2; `fig-08-06 good` c1/c2/c3, `bad` c1/c2).
+Verified by walking `out/chapter-08/fig-08-0{1..6}.envelope.json`. The true claim
+is narrower and road-specific: on `book90` only the discipline leg separates a
+good line from a `chop` line, both reading `vmin_s 7` and `onset_s 15.5`. A
+doctrine figure drafted on the wider claim was refused for asserting it in ink
+(§3, `fig-09-D1`)** —; and `trail_brake_taper` returned `pass` in 25 of 25 sweep cells including
 cells that ran off the road, and returns `pass` for an 8.0 m/s² brake because the
 bike never reaches 15° of lean. A green tick from any of these reads to a student
 as "graded and good". *To decide:* whether §A.2's obligation ("shown to satisfy
@@ -1433,6 +1456,62 @@ FigureSpec JSON does carry it (`lines[].spec` accepts a wire `Scenario` with
 means admitting a second authoring form into a corpus whose six members are all
 `.scene` derived from presets. *To decide:* a corpus-convention call, not a
 physics one. A reviewer could refuse 11.TB on this ground alone and be right.
+
+### Added by the doctrine-figure pass (S29–S31, 2026-07-27)
+
+**S29 — vacuity: `out_in_out` advertises four legs and has two live ones on any
+first corner.** *Needed by:* `fig-08-D2`, which was refused partly on this, and by
+anything that reads the check's four-leg form as four independent tests. This is
+S27's species, but arithmetic rather than statistical, and it sits on shipped ink.
+`checks.ts` (~:321-345) tests `ti_f ≥ OIO_OUTSIDE_MIN ∧ apex_f ≤ OIO_INSIDE_MAX ∧
+exit_f ≥ OIO_OUTSIDE_MIN ∧ max(ti_f, exit_f) − apex_f ≥ OIO_SWING_MIN`. Two of the
+four cannot bind on a first corner:
+
+- **The turn-in leg is structurally pinned.** `ti_f = 1` *exactly* on all twelve
+  committed `c1` rows — every line of all six figures, good and mistake alike —
+  because `f = 1.0` is the solver's default start state and the plan grammar's only
+  lateral action is `position`, which neither `ride` nor any `mistake` sugar emits.
+  `ti_f < 1` appears only at `c2`/`c3`/`c4` of multi-corner roads.
+- **The swing leg is entailed by the apex leg.** Given `ti_f = 1`, swing reduces to
+  `max(1, exit_f) − apex_f`, so for `exit_f ≤ 1` the leg is `apex_f ≤ 1 −
+  OIO_SWING_MIN = 0.60`, which is strictly *weaker* than the apex leg's own
+  `apex_f ≤ 0.45`. It can never be the binding constraint.
+
+So a single-corner figure naming `out_in_out` is running a two-test check, and a
+placard reciting "its other three legs pass" overstates the surgical precision of
+the fault by about 3×. *To decide:* whether the check's reported evidence should
+mark structurally-pinned legs (an `na`-per-leg, the §8 placard policy at leg
+granularity), or whether this is documentation only. Nothing in the shipped corpus
+moves either way — `fig-08-02` and `fig-08-04` fail the *apex* leg, which is live.
+
+**S30 — carrier provenance: `out_in_out`'s bars are TUNING, its siblings' are
+book-sourced.** *Needed by:* any figure carried by `out_in_out` alone. In
+`linelab/src/plan/doctrine/packs/parks-street.json`, `OIO_OUTSIDE_MIN` (0.55),
+`OIO_INSIDE_MAX` (0.45) and `OIO_SWING_MIN` (0.4) each carry `"source": "TUNING"`,
+inside a pack whose `doctrine_source` reads "Parks, *Total Control*, ch. 8-9" and
+whose `late_apex` bar carries a real `"source": "book:…"` quotation. The check
+itself carries `book_ref "Total Control ch. 8"`, so the *check* is book-warranted
+while the *number that decides it* is not. This is a sharper form of the ground
+that killed `fig-08-D1`, whose verdict split rode on a TUNING constant. *To
+decide:* whether a figure may rest its sole verdict on a TUNING-sourced bar
+provided the placard says so, or whether TUNING-sourced bars are carriers only in
+company. Not blocking the shipped corpus, where `out_in_out` never grades alone.
+
+**S31 — the doctrine-figure disclosure bar may be unreachable by iteration.**
+*Needed by:* the whole `NEXT` goal. Two candidates (`fig-09-D1`, `fig-08-D2`) were
+authored, baked, adversarially reviewed, repaired against every finding, and
+reviewed again by fresh skeptics. Both cleared **merit** decisively — G1 clean,
+S27 satisfied with wide margins, fail sets unique against all twelve committed
+lines, no knife-edges. Both were refused on **disclosure**, twice, and never on the
+same sentence twice: each repair fixed the named defect and exposed a new one of
+the identical species — *a true number carrying a false implication, stated in the
+direction that flatters*. Four independent reviews, four distinct instances. The
+pattern, not any one instance, is the finding: a figure that needs five or six
+placards to be honest has made the placard set itself the artifact, and each added
+sentence is new surface for the same failure. *To decide:* whether the bar is
+reachable at all for a figure whose lesson is not visible in the ink without prose
+— and if so, whether the answer is *fewer* placards on a *simpler* claim rather
+than more placards on this one. Full evidence in §3.
 
 Also noted, and deliberately **not** raised as STOPs:
 
