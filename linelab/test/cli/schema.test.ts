@@ -462,6 +462,131 @@ describe("A-FIGURE-JSON-PARITY", () => {
 });
 
 // ---------------------------------------------------------------------------
+// `check` is validate-only, and "validate" means the SAME validation whichever
+// spelling the road arrives in (design/08 §3's `check` row: "Validate only; no
+// simulation. Exit 0 valid / 2 invalid … Same code path as `figure --check`").
+//
+// THE DEFECT THIS BLOCK EXISTS FOR (figures/SCOPE.md §4, S11). design/01 §8
+// puts the super-tight regime — "≥ 170° of sweep accumulated at local radius
+// ≤ 15 m" — "rejected `OUT_OF_SCOPE` at validation", i.e. at the verb that
+// validates. A wire Scenario carrying such a road duly refused
+// `OUT_OF_SCOPE`/`super_tight_geometry` on `check`, `run` and `figure`. The
+// SAME road spelled as a `.scene` — or as the FigureSpec JSON that scene lowers
+// to (D30) — linted `{"ok":true,"value":{"valid":true,…}}` and refused only
+// when `figure` went on to bake it: the lint green-lit a road the bake then
+// refused, one verb later than the design sentence allows. Both figure
+// spellings deferred the road build to the bake; the world validation is now
+// shared with it (plan/validate.ts's `validateFigureWorld`, the one call
+// solve/run.ts's `composeWorld` also makes), so every spelling reaches the same
+// verdict at the same verb.
+//
+// 180° of sweep at r = 10 m: one corner, wholly below the 15 m U-turn radius.
+const SUPER_TIGHT_DSL = "lane 3.5 | S 20 | R 10 ^180 | S 20";
+
+interface TypedError {
+  readonly code: string;
+  readonly at: string;
+  readonly detail?: { readonly reason?: string };
+}
+
+/** The `ok:false` half of any verb document, spawned or in-process. */
+function errorOf(doc: unknown): TypedError {
+  const d = doc as { ok: boolean; error?: TypedError };
+  expect(d.ok).toBe(false);
+  expect(d.error).toBeDefined();
+  return d.error as TypedError;
+}
+
+function superTightScene(): string {
+  return `# a super-tight U-turn: out of scope by design/01 §8\nroad:      ${SUPER_TIGHT_DSL}\nlines:\n  good:    ride entry=30 turnIn=auto\n`;
+}
+
+function superTightScenario(): string {
+  return JSON.stringify({
+    spec: "linelab/1",
+    id: "super-tight",
+    road: { dsl: SUPER_TIGHT_DSL },
+    rider: { start: { speed_kmh: 30 }, plan: [] }
+  });
+}
+
+describe("check — the super-tight refusal lands at validation, in every spelling (S11)", () => {
+  // The recorded defect, reproduced VERBATIM across the process boundary: the
+  // exit code is half of what design/08 promises ("Exit 0 valid / 2 invalid"),
+  // so this one arm spawns. Everything below it calls the pure verbs, per this
+  // file's convention.
+  it("`check <file.scene>` and `check <scenario.json>` carrying the same road refuse identically, at exit 2", () => {
+    const dir = mkdtempSync(join(tmpdir(), "linelab-s11-"));
+    const scenePath = join(dir, "super-tight.scene");
+    const scenarioPath = join(dir, "super-tight.json");
+    writeFileSync(scenePath, superTightScene());
+    writeFileSync(scenarioPath, superTightScenario());
+
+    const onScene = cli(["check", scenePath]);
+    const onScenario = cli(["check", scenarioPath]);
+    expect(onScenario.exit).toBe(EXIT.BAD_INPUT); // the door that always refused
+    expect(onScene.exit).toBe(EXIT.BAD_INPUT); // the door that used to lint green
+    expect(errorOf(onScene.stdout).code).toBe("OUT_OF_SCOPE");
+    expect(errorOf(onScene.stdout).detail?.reason).toBe("super_tight_geometry");
+    // byte-for-byte the scenario door's refusal: one wording, one `at`
+    expect(onScene.stdout).toEqual(onScenario.stdout);
+  });
+
+  it("the lint agrees with the bake it lints for — `check`, `figure --check` and `figure` return one error", async () => {
+    const { checkVerb } = await import("../../src/cli/verbs/check.js");
+    const { figureVerb } = await import("../../src/cli/verbs/figure.js");
+    const { ENGINE_SEMVER } = await import("../../src/solve/run.js");
+    const scene = superTightScene();
+
+    const lint = checkVerb({ loadedText: scene, argv: [] });
+    const figureLint = figureVerb({ loadedText: scene, argv: ["--check"], engineSemver: ENGINE_SEMVER });
+    const bake = figureVerb({ loadedText: scene, argv: [], engineSemver: ENGINE_SEMVER });
+
+    expect(lint.exit).toBe(EXIT.BAD_INPUT);
+    expect(errorOf(lint.stdout).detail?.reason).toBe("super_tight_geometry");
+    // "Same code path as `figure --check`" (design/08 §3) — so the same document
+    expect(figureLint).toEqual(lint);
+    // and the refusal the lint is standing in for is the one the bake raises
+    expect(errorOf(bake.stdout)).toEqual(errorOf(lint.stdout));
+  });
+
+  it("the lowered FigureSpec refuses too — scene text and FigureSpec JSON are one spelling (D30)", async () => {
+    const { checkVerb } = await import("../../src/cli/verbs/check.js");
+    const { lowerScene } = await import("../../src/plan/scene.js");
+    const lowered = lowerScene(superTightScene());
+    expect(lowered.ok).toBe(true);
+    if (!lowered.ok) return;
+
+    const outcome = checkVerb({ loadedText: JSON.stringify(lowered.value), argv: [] });
+    expect(outcome.exit).toBe(EXIT.BAD_INPUT);
+    expect(errorOf(outcome.stdout).code).toBe("OUT_OF_SCOPE");
+    expect(errorOf(outcome.stdout).detail?.reason).toBe("super_tight_geometry");
+  });
+
+  // The other direction, and the reason this fix is safe: strengthening the
+  // lint moved nothing that already passed. Every committed scene still lints
+  // valid, at the spec_hash its baked manifest record carries.
+  it("the six committed scenes still lint valid at their manifest spec_hash — the fix only ever refuses more", async () => {
+    const { checkVerb } = await import("../../src/cli/verbs/check.js");
+    const { figureVerb } = await import("../../src/cli/verbs/figure.js");
+    const { ENGINE_SEMVER } = await import("../../src/solve/run.js");
+    const figuresDir = resolve(repoRoot, "../figures");
+    const manifest = JSON.parse(readFileSync(join(repoRoot, "figures/manifest.json"), "utf8")) as readonly {
+      readonly figure_id: string;
+      readonly spec_hash: string;
+    }[];
+    expect(manifest).toHaveLength(6);
+    for (const record of manifest) {
+      const scene = readFileSync(join(figuresDir, `${record.figure_id}.scene`), "utf8");
+      const outcome = checkVerb({ loadedText: scene, argv: [] });
+      expect(outcome.exit).toBe(EXIT.OK);
+      expect(outcome.stdout).toEqual({ ok: true, value: { valid: true, spec_hash: record.spec_hash } });
+      expect(figureVerb({ loadedText: scene, argv: ["--check"], engineSemver: ENGINE_SEMVER })).toEqual(outcome);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // A-HAZARD-FLAG — --hazard composes into a resolved hazard the engine sees
 
 describe("A-HAZARD-FLAG", () => {

@@ -1023,3 +1023,56 @@ export function validate(json: unknown): Result<ValidatedScenario> {
     ...(meta !== undefined ? { meta } : {})
   });
 }
+
+// ---------------------------------------------------------------------------
+// The figure-level world — ONE declaration, because two callers must reach the
+// SAME verdict on it: the BAKE (`solve/run.ts`'s `composeWorld`, which needs
+// the resolved value) and the LINT (`check` / `figure --check`, which needs
+// only the verdict).
+//
+// They diverged once, and the divergence is what this section exists to make
+// impossible: a super-tight road (design/01 §8 — "≥ 170° of sweep accumulated
+// at local radius ≤ 15 m … rejected `OUT_OF_SCOPE` at validation") linted
+// `{valid: true}` as a `.scene` and refused only when `figure` went on to bake
+// it, one verb later than that sentence allows, while the same road spelled as
+// a wire Scenario refused here at `check` (figures/SCOPE.md §4, S11). The lint
+// had no road build of its own; now it makes this call, so "the sole rejection
+// point" is one point for figures too.
+
+/**
+ * The world half of a `FigureSpec` (design/03 §8): everything a figure declares
+ * that is decidable before a single line is solved. A structural subset, so
+ * both a whole `Figure` and a bare `{road}` satisfy it.
+ */
+export interface FigureWorldSpec {
+  readonly road: RoadSpec;
+  readonly occluders?: readonly Occluder[];
+  readonly hazards?: readonly Hazard[];
+}
+
+/**
+ * The probe entry speed the figure-world scenario carries. A figure's world is
+ * validated with a rider that plans NOTHING, so no rule downstream of the road
+ * / occluders / hazards can read this value — it exists only because
+ * `rider.start.speed_kmh` is a required wire field. Inside the model-validity
+ * band (02 §7) so the placeholder is never itself the reason for a refusal.
+ */
+const FIGURE_WORLD_PROBE_KMH = 30;
+
+/**
+ * `validate()` applied to a figure's world: its road, its occluders and its
+ * hazards, under a rider that rides nothing. Returns the same
+ * `ValidatedScenario` — resolved occluders/hazards at absolute stations — that
+ * the bake's composed skeleton is built from, and the same typed error the bake
+ * would have raised, at whichever verb asks first.
+ */
+export function validateFigureWorld(fig: FigureWorldSpec): Result<ValidatedScenario> {
+  return validate({
+    spec: "linelab/1",
+    id: "figure",
+    road: fig.road,
+    ...(fig.occluders !== undefined ? { occluders: fig.occluders } : {}),
+    ...(fig.hazards !== undefined ? { hazards: fig.hazards } : {}),
+    rider: { start: { speed_kmh: FIGURE_WORLD_PROBE_KMH }, plan: [] }
+  });
+}

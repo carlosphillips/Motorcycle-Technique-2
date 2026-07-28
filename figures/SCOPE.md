@@ -942,6 +942,79 @@ divergence block reads `{kind: "radius", believed: 16, actual: 16}` — believed
 equals actual, because the taper's entry radius *is* 16 — and cites
 `kappa_gap.at_s` 38.5 on a line that terminates off-road at s = 35.87.
 
+### The minimal-claim round (round 3, 2026-07-28) — 2 candidates, 0 survive
+
+Run to settle S31, which had ended the previous pass on a hypothesis rather than
+an answer. Both candidates were re-authored from scratch in the untried shape —
+**fewer placards on a simpler claim**, a teaching sentence that is exactly what
+the carrier grades — at 2 and 3 placards against the previous round's five and
+six. Attacked by three lenses, ship requiring all three: **merit + remit**,
+**disclosure**, and a new **stranger** lens whose procedure is to read only the
+emitted SVG, write down every belief a rider would form from the ink *before*
+opening any JSON, and then test each belief against the envelope.
+
+| candidate | carrier | merit | disclosure | stranger | final |
+|---|---|---|---|---|---|
+| `fig-08-D3` (chop, 2 placards) | `throttle_rule` discipline leg | — | — | — | **OUT** — self-refused on remit (S32) before attack |
+| `fig-08-D4` (overread, 3 placards) | `out_in_out` exit leg | **cleared** | OUT | OUT | **OUT** |
+
+**`fig-08-D3` — the disclosure repair worked, and the figure died anyway.** The
+sentence both round-2 lenses had killed ("the throttle was shut") was rewritten
+once, on the first attempt, into a claim about the *rate* of withdrawal behind the
+guard the check actually tests — and it held. That is the first repaired-and-held
+disclosure sentence in the project, and it is what answers S31's strong reading.
+The figure was then refused by its own author on **remit**: `throttle_rule` is the
+pack's only Chapter 9 check, the S12 grant is scoped to Chapter 8, and no filename
+for the figure is honest (S32). The author's reasoning is worth preserving:
+*"reading a conflicted licence in the direction that authorises one's own artifact
+is the flattering direction, and the flattering direction is the exact species that
+has killed all six reviews."*
+
+The round's sharpest method finding also came from here: **the repair brief handed
+to the author, written from the round-2 attackers' own recommendations, would
+itself have been the seventh kill.** It proposed *"drive withdrawn at 40 m/s³
+against the 8 m/s³ bar"*. The ideal green line **in the same figure** reaches
+`a_cmd_rate` = −12 m/s³ against that 8 m/s³ bar, and `throttle_rule` grades it
+*"throttle rule held"*. A student told "40 against the 8 bar" concludes "faster
+than 8 fails", and the green line refutes that at 12. The discriminator is the
+**guard** (`|phi| >= SMALL_LEAN_DEG`, and the loop starting at
+`steering_complete`), not the bar. The author caught it and led with the guard.
+
+**`fig-08-D4` — cleared on merit, killed on ink twice.** The merit lens re-baked
+independently and swept **every integer** in the admissible band 99..169: 71/71
+`out_in_out` `fail`, the exit clause the sole violated clause at every one,
+`ti_f` = 1 throughout, crossing verified at 98/99. It also swept `overread`'s
+*other* parameter spelling (`r_believed`, the one that killed `fig-08-D2` in round
+1) and found the claim invariant there too. The road is `design/03 §7.1`'s own
+`overread` oracle fixture. Nothing on merit; and the S30 provenance placard, the
+one clause the previous round had killed, was repaired and **cleared** by the
+disclosure lens.
+
+It died on two things that are not sentences:
+
+- **Its teaching sentence names a standard the check does not enforce.** *"Never
+  comes back out to the outside of the lane: `out_in_out` grades its shape
+  broken"* — true of the amber line, but the colon offers it as the *ground of the
+  verdict*, so the reader learns that the check requires returning to the outside
+  of the lane. The bar is at 53.9% of lane width, the *ideal* line never reaches
+  the outside either, and no drawable line can (S33).
+- **The markers teach the reverse of the record.** The stranger lens's belief B11,
+  written from the ink alone: *"The amber run carries no turn point, apex, release
+  or exit markers. I read that as: it never achieved a clean apex or a clean
+  release — it just stayed bent over."* The record: the mistake line apexed at
+  **87.5%** of sweep against the ideal's 66.3%, f 0.222 against 0.277 — later and
+  deeper — and **passed** `late_apex` (S34).
+
+The stranger lens contradicted four beliefs in total, and two of the four are
+about the shipped corpus rather than this candidate: B10 (the two lines are
+assumed to diverge only at the exit — they differ from the brake marker onward,
+2–5 km/h apart from s ≈ 2) and part of B3 (*"solved 34 km/h"* reads as *the right
+speed for this corner*; 34 is an **input**, and the ideal line peaks at
+53.86 km/h — the one speed printed beside a moving bike is true only at s = 0).
+Neither was raised as a STOP: both are legend/chrome grammar shared by all six
+committed figures, and neither was load-bearing for the verdict. They are recorded
+here because a future doctrine figure will meet them again.
+
 ### Question (a): pass 1 carried no attacker kills
 
 **No pass-1 adjudicator verdict was killed by an attacker, because no pass-1
@@ -1186,8 +1259,8 @@ Banding a line by phase either breaks that law or needs a channel that does not
 exist. *To decide:* not worth deciding for 2.9 alone, which is refused on two
 other grounds regardless.
 
-**S11 — engine/design tension: `check` is weaker on the `.scene` path.**
-Observed, reported, not fixed. `check <file>.scene` on a super-tight road returned
+**S11 — engine/design tension: `check` is weaker on the `.scene` path. RESOLVED
+— adjudicated a defect, and fixed.** `check <file>.scene` on a super-tight road returned
 `{"ok":true,"value":{"valid":true,"spec_hash":"87402f"}}`, while `check
 <scenario>.json` carrying the same road correctly returned
 `OUT_OF_SCOPE`/`super_tight_geometry`, as did `run` and `figure` on both.
@@ -1195,8 +1268,23 @@ Observed, reported, not fixed. `check <file>.scene` on a super-tight road return
 `design/08` specs `check` as validate-only, *"same code path as `figure --check`"*.
 The scene path appears to defer the road build to `figure`, so the typed rejection
 arrives one verb later than the design sentence implies. No fake figure can
-escape — `figure` refuses — but the two paths disagree. *To decide:* whether this
-is a design clarification or a defect; it is neither authored nor patched here.
+escape — `figure` refuses — but the two paths disagree.
+
+*Decided: a defect, not a design question.* Both cited sentences are
+unambiguous, and the FigureSpec JSON spelling was found to share the weakness
+(the scene lowers to it, D30) — so the divergence was between the *figure* door
+and the *scenario* door, not between two file extensions. The lint had no road
+build of its own: `validateFigureSpec`/`lowerScene` are shape-level, and only
+`solve/run.ts`'s `composeWorld` composed the road. The figure world validation
+is now one declaration — `validateFigureWorld` in `linelab/src/plan/validate.ts`,
+called by the bake (`composeWorld`) and by the lint (`lintFigureSpec` in
+`linelab/src/cli/verbs/shared.ts`, which `check` and `figure --check` both call
+and which is now the only thing either of them calls). All spellings of the same
+super-tight road — `check`/`figure --check`/`figure`/`run`, scene text, FigureSpec
+JSON and wire Scenario — now return the identical `OUT_OF_SCOPE`/
+`super_tight_geometry` error at exit 2. The fix only ever refuses more: the six
+committed scenes still lint valid at their manifest `spec_hash` and re-bake
+byte-identical. Regressions live in `linelab/test/cli/schema.test.ts`.
 
 **S12 — remit: may linelab author non-parity doctrine figures?** Three honest
 artifacts exist that reproduce no printed figure: a trail-brake taper scene
@@ -1497,8 +1585,42 @@ decide:* whether a figure may rest its sole verdict on a TUNING-sourced bar
 provided the placard says so, or whether TUNING-sourced bars are carriers only in
 company. Not blocking the shipped corpus, where `out_in_out` never grades alone.
 
-**S31 — the doctrine-figure disclosure bar may be unreachable by iteration.**
-*Needed by:* the whole `NEXT` goal. Two candidates (`fig-09-D1`, `fig-08-D2`) were
+**S31 — the doctrine-figure disclosure bar may be unreachable by iteration.
+RESOLVED 2026-07-28 by experiment. Answer: reachable on a *sentence*, not on a
+*figure*.** The hypothesis this STOP proposed — *fewer placards on a simpler
+claim* — was built and attacked. `fig-08-D3` (2 placards, carrier `throttle_rule`)
+and `fig-08-D4` (3 placards, carrier `out_in_out`) replaced the previous round's
+five and six. Neither ships; eight independent reviews now stand behind that.
+
+The hypothesis is **half right**. A single sentence *can* be repaired and hold:
+`fig-08-D3`'s killed sentence was rewritten once and survived the reversal and
+student-conclusion tests, and `fig-08-D4`'s S30 provenance placard was rewritten
+once and was cleared by the very lens that had killed it. Both firsts. So the
+strong reading of this STOP is false — the bar is not unreachable in principle.
+
+But a **figure** does not converge, because the failure is conserved and
+migrates. Round 3 produced no fourth instance in the same place; it produced
+kills on three surfaces the earlier rounds never reached: the figure's own
+`figure_id` (S32), a placard the previous round had already **cleared**, and the
+renderer's **marker defaults** (S34). **Two of the eight kills are on surfaces no
+placard reaches at all**, which is what ends the iteration argument: a placard
+cannot disclaim a filename, and it cannot disclaim a marker the renderer declined
+to draw. A third, S33, shows the channel cannot even be made *complete* about the
+constants a verdict rests on, because `EPS_EXIT_DEG` lives outside the pack.
+
+*Consequence, adopted:* stop authoring candidates; repair the substrate. Three of
+round 3's four kills are engine or renderer defects, not sentences. See `ROADMAP.md`
+`NEXT`. One method finding worth carrying: **a repair brief written from adversarial
+findings is not evidence.** Round 3's brief proposed *"drive withdrawn at 40 m/s³
+against the 8 m/s³ bar"* — which would have been the seventh kill, since the ideal
+green line in the same figure reaches −12 m/s³ against that 8 m/s³ bar and
+`throttle_rule` grades it *"throttle rule held"*. The bar was never the
+discriminator; the guard was. The author caught it; the brief did not.
+
+*The original entry is preserved below, because the round-3 design rests on it.*
+
+**S31 (original) — the doctrine-figure disclosure bar may be unreachable by
+iteration.** *Needed by:* the whole `NEXT` goal. Two candidates (`fig-09-D1`, `fig-08-D2`) were
 authored, baked, adversarially reviewed, repaired against every finding, and
 reviewed again by fresh skeptics. Both cleared **merit** decisively — G1 clean,
 S27 satisfied with wide margins, fail sets unique against all twelve committed
@@ -1512,6 +1634,86 @@ sentence is new surface for the same failure. *To decide:* whether the bar is
 reachable at all for a figure whose lesson is not visible in the ink without prose
 — and if so, whether the answer is *fewer* placards on a *simpler* claim rather
 than more placards on this one. Full evidence in §3.
+
+### Added by the minimal-claim pass (S32–S34, 2026-07-28)
+
+**S32 — the S12 grant contradicts itself, and `chop` has no honest filename.**
+*Needed by:* candidate 1 (`chop`), and by any figure carried by a check outside
+Chapter 8. Two independent halves, both fatal to that candidate on their own.
+
+*(i) The grant excludes what its own queue admits.* `ROADMAP.md` scopes the S12
+grant to **"Chapter 8 doctrine only"**, and `throttle_rule` is Chapter 9 doctrine
+by every declared source: `packs/parks-street.json` gives it
+`"book_ref": "Total Control ch. 9, Throttle Control"` — the **only** ch-9
+`book_ref` among the pack's sixteen checks, against eleven ch-8 ones —
+`design/01 §4.3`'s mistakes catalogue maps `chop` to *"Ch. 9 throttle doctrine"*,
+and `§A.3` introduces the check as *"(Keith Code Rule #1)"*, the one check in the
+catalogue not attributed to Parks at all. Yet the same roadmap section's candidate
+table names this exact figure as row 1, twice, and cites the SCOPE.md section that
+labels it Chapter 9. The scope sentence and the queue disagree about exactly one
+artifact. *To decide:* whether the grant covers a Chapter 9 carrier drawn on
+Chapter 8's road. An author may not resolve it — reading a conflicted licence in
+the direction that authorises one's own figure is the flattering direction, which
+is the species that has killed every candidate in this file.
+
+*(ii) Neither available name is honest, and no placard reaches a name.*
+`fig-08-*` is the corpus convention for Chapter 8 and is the manifest's
+`figure_id`; `fig-08-D3` is a true token (it *is* on `book90`) carrying a false
+implication (that its doctrine is Chapter 8's). `fig-09-D1` is honest and outside
+the grant on its face. The placard channel (S15) reaches the SVG and the manifest
+`placards` array — it does not reach `figure_id`. *To decide with (i):* whether
+the corpus may hold a `fig-09-*` id at all.
+
+**S33 — `out_in_out`'s exit leg measures neither "wide" nor "at the exit", and
+both halves sit on committed ink.** *Needed by:* candidate 2, and by the
+`out_in_out` adjudication, which this makes a **four**-defect cluster with S20,
+S29 and S30. Verified in the main loop by walking all six committed envelopes.
+
+*(i) The bar is at 53.9% of lane width — mid-lane, not "wide".* With
+`lane_width_m` 3.5, `bike_margin_m` 0.4 and `use_full_width` false, the usable
+corridor is 2.7 m and `f` measures across it, so `OIO_OUTSIDE_MIN` = 0.55 lands at
+**d = −1.885 m**: **13.5 cm past the middle of the rider's own lane** (midline
+−1.75) and 1.615 m short of its outer edge. A line finishing mid-lane satisfies
+"exit wide". And `f` = 1 is itself **0.4 m short of the physical edge**, so *no
+line linelab can draw ever reaches the outside of the lane* — including the ideal
+line, which exits at d = −2.69 on all of figs 8.1/8.2/8.3. A figure whose caption
+paraphrases the check's name therefore teaches a standard that does not exist, and
+the top-down view hands the reader the ruler to check it with (stroked lane edges,
+plus a "lane 3.5 m wide" scale note).
+
+*(ii) The exit fraction is sampled past the corner, and the station is fixed by a
+constant the rubric pack does not own.* Measured on committed ink: every
+single-corner ideal line's `exit.s` is **+7.43 m** past the corner's end
+(38.28 against `s1` 30.85 on figs 8.1–8.3; +8.81 m on fig 8.4), i.e. on the
+following straight — while the mistake lines' exits are sampled **before** it
+(−3.38, −14.24, −7.02, −10.85 m) because they terminate off-road. So the two
+fractions the check compares can be taken more than 20 m apart on the same figure,
+and the ideal line's 0.849 is earned largely by drifting down the straight rather
+than by exiting wide. The station is set by `EPS_EXIT_DEG` = 1.0° in
+`linelab/src/core/constants.ts` ("TUNING. Exit heading-capture deadband"),
+consumed in `core/analyze.ts` — **outside `packs/parks-street.json`**, so a
+provenance placard scoped to the pack (S30's proposed remedy) is *structurally
+incapable* of being complete. *To decide, with S20/S29/S30:* whether the exit leg
+should be evaluated at the corner's own exit boundary, whether the bar should be
+expressed against something a rider can see, and what a figure owes about tuned
+constants the rubric does not own.
+
+**S34 — auto `marks:` draws markers on the ideal line only, and the absence reads
+as a claim.** *Needed by:* candidate 2; on committed ink already. With `marks:`
+unauthored the renderer draws all classes on ideal-role lines only
+(`render/markers.ts`), so figs **8.4 and 8.6 carry no marker at all on their
+mistake lines** (fig 8.2's mistake line likewise carries none under an explicit
+`marks: turn_point`). A reader reads that absence as *"the mistake line never
+apexed"*. On figs 8.2 and 8.4 that inference happens to be near enough true — both
+red lines fail `late_apex` at 2.7% and 1.4% of sweep. On **fig 8.6 it is false**:
+the unmarked red line **passes** `late_apex` at c1, *"apex at 70.0% of sweep, past
+the 50% bar"*. And it was maximally false on `fig-08-D4`, whose mistake line
+apexed **later and deeper than the ideal's** (87.5% against 66.3%, f 0.222 against
+0.277) and passed `late_apex` — so the ink taught the reverse of the record, which
+is `design/01 §8`'s plausible fake exactly. *To decide:* whether a drawn line is
+entitled to its own recorded events, or whether ideal-only marking is a deliberate
+legibility choice that a figure must then disclose. A renderer default, so an
+engine/design question and not a scene-level fix.
 
 Also noted, and deliberately **not** raised as STOPs:
 

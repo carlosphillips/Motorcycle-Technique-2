@@ -35,6 +35,83 @@ this entry is stale.
 
 ---
 
+## Post-v1.0 — S11 fix + the minimal-claim round (2026-07-28, ROADMAP "decide S31")
+
+S31 is answered by experiment (`figures/SCOPE.md` §4 S31, §3 "the minimal-claim round"):
+the disclosure bar is reachable on a **sentence** and not on a **figure**, because the
+failure migrates to surfaces the placard channel cannot reach. Two more candidates
+refused, eight reviews total. One engine defect **fixed**; three findings promoted, all
+three sitting on committed ink.
+
+- **[08 §3.1 / 01 §8] `check` did not apply the out-of-scope validation that `figure` and
+  `run` apply.** **`adjudicated-fixed` 2026-07-28.** Was `needs-decision` in the
+  corpus-extension section below; adjudicated a **defect, not a design question**, because
+  both cited sentences are unambiguous — `design/01 §8` puts the super-tight regime
+  *"rejected `OUT_OF_SCOPE` at validation"* and `design/08` specs `check` as validate-only,
+  *"same code path as `figure --check`"*. **No design amendment was needed or made.**
+
+  The divergence was not between two file extensions: the FigureSpec JSON spelling shared
+  the weakness, since scene text lowers onto it (D30). It was between the *figure* door and
+  the *scenario* door — `validateFigureSpec`/`lowerScene` are shape-level, and only
+  `solve/run.ts`'s `composeWorld` ever composed the road, so the lint had no road build of
+  its own. The figure-world validation is now **one declaration**, `validateFigureWorld` in
+  `plan/validate.ts`, called by the bake (`composeWorld`) and by the lint
+  (`lintFigureSpec` in `cli/verbs/shared.ts`, which `check` and `figure --check` now both
+  call **and which is the only thing either of them calls**). The bake additionally needs
+  the composed value; the lint needs only the verdict; neither owns a second copy of the
+  rule. Since `validate()` composes internally, lint refusals are a strict subset of bake
+  refusals by construction — the two cannot diverge again.
+
+  Verified rather than asserted: three of the four new tests in `test/cli/schema.test.ts`
+  were confirmed **red on a worktree build of `HEAD`** before the fix (`expected +0 to be
+  2`), and the fourth is the guard rail — all six committed scenes still lint `valid` **at
+  the `spec_hash` their baked manifests carry**, and pre-/post-fix bakes of all six produce
+  byte-identical output trees at identical exit codes. The fix only ever refuses more.
+  Suite 53 files / 1430 pass (+4) / 4 todo / 0 red.
+
+- **[01 §A.3 check 2] `out_in_out`'s exit leg measures neither "wide" nor "at the exit".**
+  `needs-decision`, on committed ink, and it makes the `out_in_out` cluster four defects
+  (with S20, S29, S30). Verified by walking all six committed envelopes.
+  *(i)* `f` measures across the **usable** corridor (`lane_width_m` 3.5 − 2 × `bike_margin_m`
+  0.4 = 2.7 m), so `OIO_OUTSIDE_MIN` = 0.55 lands at **d = −1.885 m** — 13.5 cm past the
+  midline of the rider's own lane (−1.75), 1.615 m short of its outer edge, **53.9% of lane
+  width**. A line finishing mid-lane satisfies "exit wide". `f` = 1 is 0.4 m short of the
+  physical edge, so no drawable line ever reaches the outside of the lane — the committed
+  ideal lines exit at d = −2.69.
+  *(ii)* The exit fraction is sampled **past the corner**: `exit.s` = 38.28 against corner
+  `s1` = 30.85 on figs 8.1–8.3 (**+7.43 m**, on the following straight), +8.81 m on fig 8.4,
+  while the mistake lines' exits are sampled *before* it (−3.38 to −14.24 m) because they
+  terminate off-road — so the two fractions the check compares can be taken 20 m apart on
+  one figure, and the ideal's 0.849 is earned largely on the straight. The station is fixed
+  by `EPS_EXIT_DEG` = 1.0° in `core/constants.ts` (`"TUNING. Exit heading-capture
+  deadband"`), consumed in `core/analyze.ts` — **outside `packs/parks-street.json`**, so
+  S30's proposed remedy (a placard declaring the carrier's provenance) is structurally
+  incapable of completeness. See `SCOPE.md` §4 S33.
+
+- **[06 §3.1 stage 9] Auto `marks:` draws markers on the ideal line only, and the absence
+  reads as a claim.** `needs-decision`, on committed ink. `render/markers.ts` draws all
+  classes on ideal-role lines only when `marks:` is unauthored, so figs **8.4 and 8.6 carry
+  no marker at all on their mistake lines** (fig 8.2's likewise, under an explicit
+  `marks: turn_point`). A reader reads that as *"the mistake never apexed"*. On figs 8.2 and
+  8.4 the inference is near enough true (`late_apex` fails at 2.7% and 1.4% of sweep); on
+  **fig 8.6 it is false** — the unmarked red line **passes** `late_apex` at c1, *"apex at
+  70.0% of sweep, past the 50% bar"*. On the refused `fig-08-D4` it was maximally false: the
+  mistake line apexed later and deeper than the ideal (87.5% vs 66.3%) and passed the check.
+  See `SCOPE.md` §4 S34.
+
+- **[infra] The suite is flaky under worker-pool contention.** Not a design deviation;
+  recorded because it will otherwise be misread as a regression. Two of four full `npm test`
+  runs this session went red — 1 and 3 failures — always `Error: Test timed out in 5000ms`
+  on CLI-spawning tests (`A-RECIPE-J` in `test/cli/recipes.test.ts`, `A-EXIT-DECLARED` in
+  `test/cli/schema.test.ts`), always green in isolation and on re-run, and never touching
+  the code under change. The S11 work reduced its own added CLI spawns from ~21 to 2 for
+  this reason (2655 ms → 336 ms), calling the pure `checkVerb`/`figureVerb` in-process
+  wherever the process boundary was not the point. The underlying tests are unchanged and
+  still spawn. *To decide:* whether the 5 s per-test wall is right for tests that spawn a
+  solve, or whether those tests should carry an explicit longer timeout.
+
+---
+
 ## Post-v1.0 — S15 + doctrine-figure pass (2026-07-27, ROADMAP "a figure for every Chapter 8 doctrine surface")
 
 S15 landed (see the `[06 §11 / 01 §8]` entry below, now `adjudicated-fixed`). Two
@@ -88,7 +165,8 @@ ROADMAP's rule is that a figure blocked by an engine behaviour is a design amend
 a fix: none of these was worked around.
 
 - **[08 §3.1 / 01 §8] `check` does not apply the out-of-scope validation that `figure`
-  and `run` apply.** `needs-decision`. On the scene
+  and `run` apply.** **`adjudicated-fixed` 2026-07-28 — see the S11 entry at the top of
+  this file; the original observation is preserved below.** On the scene
   `road: lane 3.5 | S 10 | R 10 ^180 | S 12` (180° of sweep at r = 10 m — the §8
   super-tight regime), `check <scene>` returns `{"ok":true,"value":{"valid":true,
   "spec_hash":"7e6441"}}` and exits 0, while `figure` on that same scene and `run` on
@@ -138,7 +216,9 @@ a fix: none of these was worked around.
 
 - **[01 §A.3 check 2] `out_in_out` is unbounded above in `exit_f`, so "exit wide" is
   satisfied by exiting off the road — and this already sits on committed ink.**
-  `needs-decision`. Check 2 passes iff
+  `needs-decision`. **One of four `out_in_out` defects now recorded (S20 here, plus S29,
+  S30 above and S33 at the top of this file); the ROADMAP calls for them to be adjudicated
+  as one.** Check 2 passes iff
   `ti_f ≥ 0.55 ∧ apex_f ≤ 0.45 ∧ exit_f ≥ 0.55 ∧ swing ≥ 0.4`; nothing caps `exit_f`.
   On the shipped `fig-08-01` the `bad` line — the book's own premature-turn-point red
   line — records `out_in_out: pass` with `exit_f = 1.148` while its `outcome` is

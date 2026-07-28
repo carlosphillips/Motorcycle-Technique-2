@@ -11,7 +11,7 @@ import { isLineRefusal } from "../../solve/envelope.js";
 import { renderViews, computeProportionMetrics, gateProportions, buildManifestRecord } from "../../render/index.js";
 import { EXIT } from "../exit.js";
 import { parseZeroFileFlags } from "../args.js";
-import { errOutcome, okOutcome, looksLikeJson, parseJson } from "./shared.js";
+import { errOutcome, okOutcome, lintFigureSpec, looksLikeJson, parseJson } from "./shared.js";
 function straightLenM(road) {
     return road.segments.filter((s) => s.type === "straight").reduce((sum, s) => sum + s.len_m, 0);
 }
@@ -38,8 +38,10 @@ export function figureVerb(input) {
     if (!lowered.ok)
         return errOutcome(lowered.error);
     const spec = lowered.value.spec;
+    // `--check` lints without solving — the SAME lint the `check` verb runs
+    // (design/08 §3's `check` row: "Same code path as `figure --check`").
     if (parsed.value.check) {
-        return okOutcome({ valid: true, spec_hash: specHash(spec) }, undefined, EXIT.OK);
+        return lintFigureSpec(spec);
     }
     const figureId = parsed.value.out !== undefined ? parsed.value.out.split("/").filter((s) => s.length > 0).pop() ?? "figure" : "figure";
     const result = run(spec, { engine_semver: input.engineSemver, figure_id: figureId });

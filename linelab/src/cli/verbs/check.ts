@@ -1,8 +1,11 @@
 // cli/verbs/check.ts — the `check` verb (design/08 §3): validate only, no
 // simulation. Exit 0 valid / 2 invalid, schema_refs on every error. Shares
-// the figure verb's content sniff + code path for FigureSpec/scene input;
+// the figure verb's content sniff + code path for FigureSpec/scene input
+// (shared.ts's `lintFigureSpec`, the ONE lint `figure --check` also calls);
 // wire Scenario input goes through plan/validate.ts's `validate()` — the sole
-// rejection point (ARCHITECTURE §5).
+// rejection point (ARCHITECTURE §5). Both arms end in that same `validate()`:
+// the figure arm through `validateFigureWorld`, so a road refused at one door
+// is refused at the other, at this verb (figures/SCOPE.md §4, S11).
 //
 // `--standing` (D43, v0.2 inspection): additionally emits the StandingReport
 // for each non-refused line under `value.standing[]` (design/08 §3 / §4.1;
@@ -15,13 +18,13 @@
 // never changes the exit code (exit 0 whatever the rungs say).
 
 import { validate } from "../../plan/validate.js";
-import { validateFigureSpec, specHash } from "../../plan/figure.js";
+import { validateFigureSpec } from "../../plan/figure.js";
 import { lowerScene } from "../../plan/scene.js";
 import { standingAttachment, STANDING_GLOSS } from "../../solve/standing.js";
 import type { LineEntry } from "../../solve/types.js";
 import { EXIT } from "../exit.js";
 import { parseZeroFileFlags, mergeDraftOverLoaded } from "../args.js";
-import { errOutcome, okOutcome, isObject, looksLikeJson, parseJson, schemaErr, type VerbOutcome } from "./shared.js";
+import { errOutcome, okOutcome, isObject, lintFigureSpec, looksLikeJson, parseJson, schemaErr, type VerbOutcome } from "./shared.js";
 import type { LinelabError } from "../../core/result.js";
 
 export interface CheckVerbInput {
@@ -116,7 +119,7 @@ export function checkVerb(input: CheckVerbInput): VerbOutcome {
     if (wantStanding) return errOutcome(ineffectualStanding());
     const lowered = lowerScene(input.loadedText);
     if (!lowered.ok) return errOutcome(lowered.error, EXIT.BAD_INPUT);
-    return okOutcome({ valid: true, spec_hash: specHash(lowered.value) }, undefined, EXIT.OK);
+    return lintFigureSpec(lowered.value);
   }
 
   const j = parseJson(input.loadedText, "input");
@@ -133,7 +136,7 @@ export function checkVerb(input: CheckVerbInput): VerbOutcome {
   if ("lines" in j.value) {
     const fig = validateFigureSpec(j.value);
     if (!fig.ok) return errOutcome(fig.error);
-    return okOutcome({ valid: true, spec_hash: specHash(fig.value) }, undefined, EXIT.OK);
+    return lintFigureSpec(fig.value);
   }
 
   const merged = mergeDraftOverLoaded(j.value, parsed.value.draft);

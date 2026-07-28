@@ -1,6 +1,7 @@
 import type { LinelabError } from "../../core/result.js";
 import type { Result } from "../../core/result.js";
 import type { ComposedRoad } from "../../road/types.js";
+import type { FigureSpec } from "../../plan/types.js";
 import { type ExitCode } from "../exit.js";
 export interface WriteFile {
     readonly path: string;
@@ -26,6 +27,8 @@ export declare function isObject(v: unknown): v is Record<string, unknown>;
 /** design/08 §3's content sniff: leading `{` after trimming → JSON; else scene text (D30). */
 export declare function looksLikeJson(text: string): boolean;
 export declare function schemaErr(at: string, message: string, reason: string, detail?: Record<string, unknown>): LinelabError;
+/** Lint an already-shape-valid figure: its world must validate, then its `spec_hash` is its identity. */
+export declare function lintFigureSpec(spec: FigureSpec): VerbOutcome;
 /** The serialized shape of a road as an envelope discloses it (data members only). */
 export interface DisclosedRoad {
     readonly dsl?: unknown;

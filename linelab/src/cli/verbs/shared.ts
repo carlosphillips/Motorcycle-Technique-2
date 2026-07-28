@@ -7,6 +7,9 @@ import type { LinelabError } from "../../core/result.js";
 import type { Result } from "../../core/result.js";
 import { compose } from "../../road/compose.js";
 import type { ComposedRoad } from "../../road/types.js";
+import { validateFigureWorld } from "../../plan/validate.js";
+import { specHash } from "../../plan/figure.js";
+import type { FigureSpec } from "../../plan/types.js";
 import { exitForErrorCode, EXIT, type ExitCode } from "../exit.js";
 
 export interface WriteFile {
@@ -57,6 +60,31 @@ export function looksLikeJson(text: string): boolean {
 
 export function schemaErr(at: string, message: string, reason: string, detail?: Record<string, unknown>): LinelabError {
   return { code: "SCHEMA", at, message, detail: { reason, ...detail } };
+}
+
+// ---------------------------------------------------------------------------
+// THE figure lint (design/08 §3: `check` is "Validate only; no simulation …
+// Same code path as `figure --check`"). Declared here, once, so that sentence
+// is true of the code and not only of the doc: `check` and `figure --check`
+// both call this and nothing else.
+//
+// Two stages, and the second is the one that was missing. SHAPE — already done
+// by the caller, since scene text and FigureSpec JSON reach shape-validity by
+// different routes (`lowerScene` constructs it, `validateFigureSpec` checks it)
+// and lower to the same value (D30). WORLD — `validateFigureWorld`, the road /
+// occluder / hazard pass the BAKE runs before it solves a line (solve/run.ts's
+// `composeWorld`). Without it the lint knew only that the JSON had the right
+// shape, so a super-tight road passed the lint and was refused a verb later by
+// `figure` (figures/SCOPE.md §4, S11) — while design/01 §8 rejects that regime
+// "at validation" and the scenario door always did. Anything the lint cannot
+// decide without solving stays the bake's business; nothing decidable here is
+// deferred to it.
+
+/** Lint an already-shape-valid figure: its world must validate, then its `spec_hash` is its identity. */
+export function lintFigureSpec(spec: FigureSpec): VerbOutcome {
+  const world = validateFigureWorld(spec);
+  if (!world.ok) return errOutcome(world.error);
+  return okOutcome({ valid: true, spec_hash: specHash(spec) }, undefined, EXIT.OK);
 }
 
 // ---------------------------------------------------------------------------

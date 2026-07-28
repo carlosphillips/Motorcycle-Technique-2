@@ -30,7 +30,7 @@ import type {
 import { OUTCOMES } from "../core/types.js";
 import { compose } from "../road/compose.js";
 import type { Segment } from "../road/types.js";
-import { validate } from "../plan/validate.js";
+import { validate, validateFigureWorld } from "../plan/validate.js";
 import { validateFigureSpec } from "../plan/figure.js";
 import { loadShippedRubricPack, resolveCheckId } from "../plan/doctrine/pack.js";
 import { printMistakeToken, type MistakeKind } from "../plan/mistakes.js";
@@ -307,6 +307,11 @@ export function expectDeclarationsOf(json: unknown): Result<Readonly<Record<stri
 // Composed-world skeleton: one validate() pass over the figure's road +
 // occluders + hazards yields the resolved absolute forms the envelope carries
 // (05 §7) and the resolved road every line's spec_hash recomputation reads.
+//
+// That pass is `plan/validate.ts`'s `validateFigureWorld` — the SAME call the
+// lint makes (`check` / `figure --check`, via cli/verbs/shared.ts's
+// `lintFigureSpec`). The bake additionally needs the composed value; the lint
+// needs only the verdict; neither owns a second copy of the rule (S11).
 
 interface WorldSkeleton {
   readonly road: RoadModel;
@@ -318,14 +323,7 @@ interface WorldSkeleton {
 function composeWorld(fig: FigureSpec): Result<WorldSkeleton> {
   const composed = compose(fig.road);
   if (!composed.ok) return composed;
-  const skeleton = validate({
-    spec: "linelab/1",
-    id: "figure",
-    road: fig.road,
-    ...(fig.occluders !== undefined ? { occluders: fig.occluders } : {}),
-    ...(fig.hazards !== undefined ? { hazards: fig.hazards } : {}),
-    rider: { start: { speed_kmh: 30 }, plan: [] }
-  });
+  const skeleton = validateFigureWorld(fig);
   if (!skeleton.ok) return skeleton;
   const resolved = skeleton.value as unknown as ResolvedScenario;
   return ok({

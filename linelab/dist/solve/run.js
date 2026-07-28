@@ -20,7 +20,7 @@ import { err, ok } from "../core/result.js";
 import { canonicalize, fnv1a } from "../core/hash.js";
 import { OUTCOMES } from "../core/types.js";
 import { compose } from "../road/compose.js";
-import { validate } from "../plan/validate.js";
+import { validate, validateFigureWorld } from "../plan/validate.js";
 import { validateFigureSpec } from "../plan/figure.js";
 import { loadShippedRubricPack, resolveCheckId } from "../plan/doctrine/pack.js";
 import { printMistakeToken } from "../plan/mistakes.js";
@@ -229,14 +229,7 @@ function composeWorld(fig) {
     const composed = compose(fig.road);
     if (!composed.ok)
         return composed;
-    const skeleton = validate({
-        spec: "linelab/1",
-        id: "figure",
-        road: fig.road,
-        ...(fig.occluders !== undefined ? { occluders: fig.occluders } : {}),
-        ...(fig.hazards !== undefined ? { hazards: fig.hazards } : {}),
-        rider: { start: { speed_kmh: 30 }, plan: [] }
-    });
+    const skeleton = validateFigureWorld(fig);
     if (!skeleton.ok)
         return skeleton;
     const resolved = skeleton.value;

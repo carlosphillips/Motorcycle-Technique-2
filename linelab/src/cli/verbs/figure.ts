@@ -15,7 +15,7 @@ import { renderViews, computeProportionMetrics, gateProportions, buildManifestRe
 import type { ComposedRoad } from "../../road/types.js";
 import { EXIT } from "../exit.js";
 import { parseZeroFileFlags } from "../args.js";
-import { errOutcome, okOutcome, looksLikeJson, parseJson, type VerbOutcome, type WriteFile } from "./shared.js";
+import { errOutcome, okOutcome, lintFigureSpec, looksLikeJson, parseJson, type VerbOutcome, type WriteFile } from "./shared.js";
 
 export interface FigureVerbInput {
   readonly loadedText: string;
@@ -54,8 +54,10 @@ export function figureVerb(input: FigureVerbInput): VerbOutcome {
   if (!lowered.ok) return errOutcome(lowered.error);
   const spec = lowered.value.spec;
 
+  // `--check` lints without solving — the SAME lint the `check` verb runs
+  // (design/08 §3's `check` row: "Same code path as `figure --check`").
   if (parsed.value.check) {
-    return okOutcome({ valid: true, spec_hash: specHash(spec) }, undefined, EXIT.OK);
+    return lintFigureSpec(spec);
   }
 
   const figureId = parsed.value.out !== undefined ? parsed.value.out.split("/").filter((s) => s.length > 0).pop() ?? "figure" : "figure";
