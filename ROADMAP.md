@@ -228,7 +228,7 @@ and it cannot disclaim a marker the renderer declined to draw.
 
 **`fig-08-D3` — refused on remit, by its own author, and it exposed a contradiction in
 the granting instrument.** `throttle_rule`'s `book_ref` is `"Total Control ch. 9, Throttle
-Control"` — the **only** ch-9 `book_ref` among the pack's sixteen checks; eleven are ch. 8.
+Control"` — the **only** ch-9 `book_ref` among the pack's sixteen checks; twelve are ch. 8.
 `design/01 §4.3` maps `chop` to "Ch. 9 throttle doctrine", and `§A.3` introduces the check
 as *"(Keith Code Rule #1)"*, the one check in the catalogue not attributed to Parks. So
 S12's grant — *"Chapter 8 doctrine only"* — excludes it. **But this roadmap's own candidate
@@ -313,43 +313,216 @@ worktree build of `HEAD` before the fix. Gates: build ✓ typecheck ✓ 53 files
 
 ---
 
-## NEXT — repair the substrate before authoring another figure
+## NEXT — three work orders, specified
 
-**Status: open, 2026-07-28.** Set by the S31 result above: candidates are not failing for
-want of care, they are failing on defects underneath them.
+**Status: open, specified 2026-07-28.** Set by the S31 result above: candidates are not
+failing for want of care, they are failing on things underneath them. Each item below
+says what it is, what the design letter permits, what a run may do without asking, and
+what "done" looks like. **Work order 1 is the only one that lands code. Do it first — it
+is fully authorized and it is what unblocks candidate 2.**
 
-**1. The `out_in_out` adjudication — now four defects, and it carries two candidates.**
-Do these as one adjudication, not four; they interact, and three of the four sit on
-committed ink.
+### Read this before touching any of them: the authorization rule
 
-| | defect | on shipped ink? |
+These three items are the shape where doing the work correctly can turn **committed,
+shipped, green** ink red. The ordinary guardrail ("never weaken a check to turn something
+green") points the other way and does not cover it. The test is the precedence order:
+
+| the design letter | what you may do |
+|---|---|
+| **decides it normatively**, and the engine deviates | it is a **defect** — fix it, even if figures re-bake and goldens move. `design/00`–`09` outranks the corpus. |
+| **decides it normatively**, and the engine conforms | there is nothing to fix. If you dislike the behaviour, that is a **STOP**, not a bug. |
+| is **silent**, or the sentence you are leaning on is hedged commentary | **STOP.** Land the measurement, not a change. |
+
+*Normative versus descriptive is the whole call, and it is the easiest thing to get wrong
+in the direction that authorizes your own work.* Classify from the letter **before** you
+measure a blast radius — a big blast radius makes a defect feel important, and that is not
+evidence about what the letter says. Template 4 in the `next-steps` skill's
+`references/workflow-templates.md` encodes the procedure.
+
+### Corrections first — three things this roadmap asserted on 2026-07-27 and got wrong
+
+They were written from measurement without checking the letter, which is the same species
+of error this project keeps catching in figures: a true number carrying a false
+implication. Corrected here so nobody executes on them.
+
+- **S33 is two-thirds retracted, and was never a defect.** The exit station sampled 7–9 m
+  past the corner is exactly what `design/01 §A.2` L504-507 defines — *"the sample at the
+  RECORDED exit event (§4.1's heading-capture deadband `EPS_EXIT_DEG` = 1.0°)"* — and the
+  corner window `W_c` (L497) ends at that event, not at `s1`. And `f` = 1 falling 0.4 m
+  short of the physical edge is the bike margin working as specified (`§4.1` L126-127,
+  `§4.2` L149-151: *"the usable corridor is the rider's own lane minus a bike margin,
+  because the outside of the road is the oncoming lane"*). `EPS_EXIT_DEG` living outside
+  the pack is likewise **mandated**, not sloppy: `§A.6` requires that loading a different
+  pack never move samples, events, `outcome` or `spec_hash`, which a pack-bound exit
+  deadband would. **Live remainder: only whether `OIO_OUTSIDE_MIN` = 0.55 is the right
+  bar.** That is a threshold in the normative appendix — a STOP, not a repair.
+- **S34's premise is refuted by our own corpus.** The letter is not silent: `design/04 §7`
+  L1903-1906 says *"`auto` (default) draws all classes on `ideal`-role lines only"*, and
+  `render/markers.ts` implements exactly that. And **an author can already mark a mistake
+  line today, in scene text alone** — a figure-level `marks: all` or class list enables
+  that class on *every* line regardless of role, which is what figs 8.1, 8.3 and 8.5 do on
+  committed ink. This roadmap's "a renderer default, so an engine/design question, not a
+  scene fix" was wrong. S34 is mostly an **authoring guideline**.
+- **fig 8.2 is not an S34 instance at all.** Its `slow_steer` line perturbs roll rate, not
+  turn point, so both lines record `turn_in` at s = 6.974 at the identical drawn point; the
+  documented coincident collapse fires and "ideal wins ties". It is pinned green by
+  `A-FIG82-SINGLEMARK` (`design/09 §5.4`). The parenthetical filing it under S34 was a
+  misattribution.
+- **S30 is resolved against the finding.** `design/01 §A.6` L961-963 forbids the remedy
+  outright: *no threshold marked `TUNING` anywhere in the design of record may carry a
+  `book:` source in any pack.* The pack is byte-correct and there is nothing to fix. What
+  survives is a figure-authoring policy question, folded into work order 2.
+
+---
+
+### Work order 1 — the marker defects. FULLY AUTHORIZED, no permission needed.
+
+**Why first:** it is the only item here where the letter is normative *and* the engine
+deviates, so it is the only one a run may land. It is also the surgical answer to what
+actually killed `fig-08-D4`.
+
+**1a — the coincident-collapse drawn-position test is wrong, and it swallows a mistake
+line's apex on committed ink.** `design/06 §3.1` L404-406 requires markers to collapse only
+when their stations are within `MARK_COINCIDE_EPS_M` = 1.0 m **and** *"whose drawn positions
+overlap within one glyph radius"*. `linelab/src/render/markers.ts:110` uses
+`MARK_COINCIDE_EPS_M` for **both** tests, and the file's own docstring (L76-80) records the
+substitution as a deviation — *"v0.1's stand-in for 'one glyph radius' — no px scale is
+threaded to this file by design"*.
+
+Measured on committed ink, and verified in the main loop: `fig-08-05`'s `early` line
+records **two** apex events (s = 17.5 and s = 25.0) and only **one** apex glyph is drawn.
+The s = 25.0 apex is collapsed into a `good` glyph whose centre is **0.987 m** away, against
+a drawn ring radius of **0.2289 m** — 4.3 radii, nowhere near overlapping. Under the
+letter's rule they do not collapse. Note the fix does *not* merge `good`'s own apexes at
+s = 24.5 and 25.5 either: their centres are 1.041 m apart, so they already survive the 1.0 m
+test and survive a tighter one.
+
+- **Blast radius, exact:** `out/chapter-08/fig-08-05.svg` gains one apex glyph. No other
+  committed SVG changes. No envelope, no verdict, no `result_hash`, no `spec_hash` — this is
+  stage-9 rendering only.
+- **Done when:** the drawn-position test uses a glyph radius in world units; the letter's
+  sentence is quoted at the call site; the docstring's deviation note is removed because it
+  is no longer true; a test pins that `early`'s s = 25.0 apex is drawn and that `good`'s two
+  apexes stay separate; `fig-08-05.svg` is re-baked and the one-glyph delta is stated in the
+  commit. **Do not** widen `MARK_COINCIDE_EPS_M` to make anything pass.
+
+**1b — the per-line `marks=` override is specified in two documents and implemented
+nowhere.** `design/03 §8` L1635 (*"at figure and per-line"*) and `design/04 §7` L1904-1905
+(*"overridable per line with `marks=`"*, listed as a ride key) both specify it;
+`RIDE_KEYS` in `linelab/src/plan/scene.ts:287-290` carries neither `marks` nor `label`, so a
+scene writing `marks=all` on a ride line is rejected `SCHEMA`/`ride_unknown_key`.
+Letter-decisive, and it moves **no committed byte** until a scene uses it.
+
+This is the precise instrument S34 wants: it marks the mistake line's apex *without* also
+putting release chevrons and exit dots on every line, which `marks: all` would.
+
+- **Done when:** `marks=` (and `label=`, specified in the same sentence) parse as ride keys,
+  thread to a per-line `MarkSpec`, and are covered by tests; all six committed figures
+  re-bake byte-identical; `spec_hash` unmoved on all six.
+
+**1c — a stale docstring.** `markers.ts:29-30` names figs 8.4, **8.5** and 8.6 as authoring
+no `marks:`. `figures/fig-08-05.scene:21` authors `marks: turn_point,apex`. Comment-only.
+
+---
+
+### Work order 2 — the `out_in_out` cluster. Produce the owner's packet; change nothing.
+
+**Authorization: you may not change the engine or the pack for any of S20, S29, S30 or
+S33.** On every one of them the engine matches the letter exactly. The deliverable is the
+decision packet, and a measured packet attached to a STOP is a *result*, not a failure —
+it is what lets the owner answer in one sitting.
+
+What the letter actually says, per defect:
+
+| | status after checking the letter | what remains |
 |---|---|---|
-| **S20** | unbounded above in `exit_f` — `pass` at 1.148, "exit wide" satisfied by leaving the road | yes — every mistake line of figs 8.1–8.4 |
-| **S29** | four advertised legs, two live ones on any first corner (`ti_f` = 1 exactly on all twelve committed `c1` rows) | yes |
-| **S30** | all three bars `TUNING`-sourced inside a pack whose `late_apex` bar is `book:`-sourced | yes |
-| **S33** | the exit leg measures neither "wide" nor "at the exit" — the bar sits at 53.9% of lane width, and the station is sampled 7–9 m past the corner's end on the following straight, fixed by `EPS_EXIT_DEG` (a `TUNING` constant **outside the rubric pack**) | yes |
+| **S20** | `§A.3` check 2's predicate has no upper bound and `checks.ts` L338-343 implements it exactly. The DEVIATIONS quotation is **real** (`§A.3` L619-622, *"typically fails the exit leg"*) but it is **hedged and descriptive**, and `§A.4` L845 says of the same class of prose *"coverage evidence, never a pin"*. So `§A.3` check 2 **contradicts itself**; the engine follows the arithmetic half. | owner picks a side. Capping `exit_f` is new arithmetic → `§A.6` `checks_version` bump + re-bless. |
+| **S29** | `ti_f` = 1 on a first corner is the letter's **own** doctrine — `§A.2` L538-539 pins the doctrinal turn-in at `rider.start.f = 1.0`. The dead legs are a redundancy the letter authored. `A-CATALOGUE-EXERCISED` is deliberately scoped per check id, not per leg. | owner decides whether leg-level `na` evidence is wanted (in-hash → six-figure re-bless). Note a bar re-tune only moves *which* leg is dead. |
+| **S30** | **Resolved against the finding** — see the corrections above. | figure-authoring policy only: may a figure rest its sole verdict on a `TUNING` bar, and what must it say? |
+| **S33** | **Two-thirds retracted** — see the corrections above. | is `OIO_OUTSIDE_MIN` = 0.55 (d = −1.885 m, 53.9% of lane width) the right bar? |
 
-S33's second half is the one with teeth beyond this check: because `EPS_EXIT_DEG` lives in
-`core/constants.ts` and not in the pack, **a provenance placard scoped to the pack can never
-be complete** — which is precisely what `fig-08-D4` tried to write. Any answer to S30 has to
-say what a figure is obliged to disclose about constants the rubric does not own.
+**Plus one genuine letter gap, and it is the root of S20's headline number — new, filed as
+S35.** `§A.2` L504-507 says the exit sample for a terminated line with no exit event is
+*"corner end"*. For a line that departs the road **before** `s1`, corner end does not exist
+on the trajectory. `metrics.ts:292` substitutes `Math.min(w.corner.s1, last.s)` — the
+off-road departure sample, at `f` = 1.148. The letter is **silent**, so this is an
+amendment gap rather than disobedience, and it is a far better-posed question than
+"should the check be capped": *what is the exit sample when the line left the road first?*
+Answer that and S20's 1.148 pass resolves as a consequence.
 
-**2. S34 — the auto-`marks:` asymmetry.** With `marks:` unauthored the renderer marks the
-ideal line only, and the absence reads as a claim. It is on committed ink (figs 8.4, 8.6),
-and it bites hardest exactly where a doctrine figure needs it: when the mistake's fault is
-*not* the apex. A renderer default, so an engine/design question, not a scene fix.
+**The blast radius is already measured — do not re-derive it.** Independently recomputed
+twice, the second time by reimplementing the predicate from scratch over the raw samples,
+with zero mismatches against all 19 graded instances:
 
-**3. S32 — the grant contradicts itself, and only the design owner can resolve it.**
-`ROADMAP.md`'s scope sentence says Chapter 8 doctrine only; its candidate table's row 1 is
-carried by the pack's only Chapter 9 check. Until this is answered, `chop` cannot be
-authored under any name — and the answer also decides whether the corpus can hold a
-`fig-09-*` id at all.
+| repair | committed lines that flip | consequence |
+|---|---|---|
+| **R2** — evaluate the exit fraction at `s1` instead of the exit event | **exactly one of twelve**: `fig-08-04` good c1 `pass → fail`, on the exit leg alone | quality `good → caution`, `verdict.ok true → false`, the drawn line turns amber (18 colour tokens), the legend text changes, the figure gate goes exit 0 → 3, and `result_hash` moves on 5 of 12 lines. Golden `G-CORR-WIDE solved` also flips `good → caution`. **A corpus event.** |
+| | **figs 8.1/8.2/8.3 ideal SURVIVE** — `f` at `s1` is 0.5764 (nearest sample) / 0.5627 (interpolated) against the 0.55 bar, a margin of 7.13 cm / 3.42 cm | the earlier worry that repairing the station would fail the book's own good line is **false** — but it is true of fig 8.4, which misses by 35 cm |
+| **R1** — suppress or fail the exit leg on off-road termination | 2 lines (8.1 bad, 8.3 bad) `pass → fail`; 8.2 bad and 8.4 bad already fail | no SVG change — those lines are already red by outcome — but `result_hash` moves |
+| **R3** — re-base the bar | **dead zone**: no committed `exit_f` lies in (0.55, 0.845], so the first bar that changes anything is > 0.845 | a bar chosen to move the corpus would have to be chosen *because* it moves the corpus |
+| **R4** — mark pinned legs `na` in evidence | 0 verdicts | evidence-only, but evidence is in-hash |
 
-Not blocking, found on the way: **the suite is flaky under load.** Two of four full runs
-this session went red, always on CLI-spawning tests timing out at 5000 ms
-(`A-RECIPE-J`, `A-EXIT-DECLARED`), always green in isolation and on re-run, and never
-touching the code under change. A future autonomous run will read that as a regression it
-caused. Recorded in `DEVIATIONS.md`.
+- **Done when:** `figures/SCOPE.md` §4's S20/S29/S30/S33/S35 entries each carry the letter's
+  actual position, the live remainder, and the options with their measured consequence — and
+  `ROADMAP.md` records that the cluster is now an owner decision, not a repair. **No engine
+  or pack change is in scope.** If you find yourself editing `checks.ts`, stop.
+
+---
+
+### Work order 3 — S32, the grant. Owner's call; the packet is below.
+
+**Authorization: none needed to write the packet; the decision itself is the owner's.**
+Note the structural point, which is new: the S12 grant exists only in `ROADMAP.md`, whose
+own header disclaims authority over `design/*.md`. **Whatever is chosen should land in
+`design/01`** (§8 or a new remit section), not only here.
+
+**The conflict is 3-vs-1, not 1-vs-1**, which S32 as originally filed understated. Three
+statements in the grant's own section admit `chop` — the rationale (*"Chapter 8 teaches …
+half the mistake catalogue in prose"*), the coverage arithmetic (which counts `chop` among
+the 47 Chapter 8 doctrine surfaces and lists it uncovered), and the candidate table — while
+one, the scope sentence, excludes it.
+
+**Two independent questions.** Scope: does *"Chapter 8 doctrine only"* mean the chapter of
+the **carrying check's** `book_ref`, or of the **doctrine surface and road** the figure
+teaches? Naming: may the corpus hold an id that is not `fig-08-*`?
+
+| scope option | consequence |
+|---|---|
+| **A — scope by road + doctrine surface** (add one defining sentence; a figure is Chapter 8 doctrine iff its road and teaching sit inside `design/01 §4`–§6) | matches three of the grant's four statements. Strongest supporting fact: `throttle_rule` leg (d) **already fails twice in committed parity ink** (fig 8.5 `early` c1, fig 8.6 `bad` c1), so a carrier-chapter rule retroactively indicts two G7-mandated figures. |
+| **B — scope by carrier chapter, widened to the pack's declared "ch. 8–9"** | its warrant is currently false and must be fixed first: the pack's `doctrine_source` says ch. 8–9, but its sixteen `book_ref`s span ch. 1, 2, 8 (twelve), 9 and 11. |
+| **C — keep carrier-chapter scoping; drop candidate 1 permanently** | cheapest to state, and what the round-3 author defaulted to. Also strikes candidate 6's `traction_ceiling` (ch. 1) and `fig-11-TB` — at least **two** of seven rows plus 11.TB, not the "exactly one artifact" S32 claimed. |
+
+| naming option | consequence |
+|---|---|
+| **D — admit a `fig-09-*` id** | proven near-free: baking `fig-08-01.scene` into an out dir named `fig-09-D1` yields the committed `spec_hash` 57e436 with a **byte-identical SVG**; `figure_id` is derived from the `--out` basename, is in no hash, and appears in no normative shape. |
+| **E — drop chapter numbers from doctrine ids entirely** (e.g. `doctrine-chop-book90`) | removes the half of S32 a placard provably cannot reach, and makes chapter-numbered ids *reserved* for the six parity figures. |
+| either | the real cost of a seventh figure is `gate.test.ts`, which hard-codes the six ids and asserts the baked directory holds exactly six SVGs and six judge records. |
+
+**The strongest argument against candidate 1 is from the book, not from governance**, and
+it should be in front of the owner: Chapter 8's only sentence about reducing throttle
+mid-corner *endorses* it — *"initiating a slight rolling off of the throttle"* as a
+double-apex correction — while the chop prohibition appears verbatim in Chapter 9 and
+nowhere in Chapter 8. So a Chapter-8-branded chop figure teaches against the one Chapter 8
+sentence on its own subject, which `design/01 §3` (the book wins) disfavours regardless of
+how the scope question is answered.
+
+- **Done when:** the packet above is in `figures/SCOPE.md` §4 S32 and the decision is
+  recorded as pending. A run may **not** pick an option.
+
+### Two record errata, found while specifying the above
+
+- The pack has **twelve** ch-8 `book_ref`s, not eleven. Corrected in this file and in
+  `SCOPE.md` §4 S32.
+- `A-FIG82-SINGLEMARK` (`design/09 §5.4`) already pins fig 8.2's single turn-point glyph, so
+  that figure was never evidence of anything.
+
+### Not blocking, but read it before you believe a red gate
+
+**The suite is flaky under load.** Two of four full runs on 2026-07-28 went red — 1 and 3
+failures — always `Error: Test timed out in 5000ms` on CLI-spawning tests (`A-RECIPE-J`,
+`A-EXIT-DECLARED`), always green in isolation and on re-run, and never touching the code
+under change. Re-run the file alone, then the suite, before reporting a regression. Do not
+"fix" it by widening a timeout you have not diagnosed. Recorded in `DEVIATIONS.md`.
 
 ### The original goal, still standing — this is what the substrate work unblocks
 

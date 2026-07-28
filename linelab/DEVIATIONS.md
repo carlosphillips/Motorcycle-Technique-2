@@ -70,8 +70,17 @@ three sitting on committed ink.
   Suite 53 files / 1430 pass (+4) / 4 todo / 0 red.
 
 - **[01 §A.3 check 2] `out_in_out`'s exit leg measures neither "wide" nor "at the exit".**
-  `needs-decision`, on committed ink, and it makes the `out_in_out` cluster four defects
-  (with S20, S29, S30). Verified by walking all six committed envelopes.
+  **RECLASSIFIED 2026-07-28 → `pinned-engine-truth` on two of three claims; only the bar's
+  value remains `needs-decision`.** The entry below was written from measurement without
+  checking the letter, and the letter is explicit on both retracted halves: `§A.2` L504-507
+  defines the exit sample as *"the sample at the RECORDED exit event"* with `W_c` (L497)
+  ending at that event rather than at `s1`, so a station 7–9 m onto the following straight
+  is **conformant**; and `f` = 1 sitting 0.4 m inside the physical edge is the bike margin
+  per `§4.1` L126-127 / `§4.2` L149-151. `EPS_EXIT_DEG` living outside the pack is likewise
+  mandated — `§A.6` requires a pack swap never to move samples, events, `outcome` or
+  `spec_hash`. **Live remainder:** whether `OIO_OUTSIDE_MIN` = 0.55 (d = −1.885 m, 53.9% of
+  lane width) is the right bar — a threshold in the normative appendix, so the owner's.
+  Original text retained below; its numbers are right, its reading was not.
   *(i)* `f` measures across the **usable** corridor (`lane_width_m` 3.5 − 2 × `bike_margin_m`
   0.4 = 2.7 m), so `OIO_OUTSIDE_MIN` = 0.55 lands at **d = −1.885 m** — 13.5 cm past the
   midline of the rider's own lane (−1.75), 1.615 m short of its outer edge, **53.9% of lane
@@ -88,8 +97,68 @@ three sitting on committed ink.
   S30's proposed remedy (a placard declaring the carrier's provenance) is structurally
   incapable of completeness. See `SCOPE.md` §4 S33.
 
+- **[06 §3.1 stage 9 / 04 §7] The coincident-collapse drawn-position test is 1.0 m where
+  the letter says one glyph radius — and it swallows a mistake line's apex on committed
+  ink.** `needs-decision` → **authorized as a defect fix; the letter is normative and the
+  engine deviates.** `design/06 §3.1` L404-406 requires collapse only when stations are
+  within `MARK_COINCIDE_EPS_M` = 1.0 m **and** *"drawn positions overlap within one glyph
+  radius"*. `render/markers.ts:110` applies `MARK_COINCIDE_EPS_M` to both tests, and the
+  file's own docstring (L76-80) records the substitution: *"v0.1's stand-in for 'one glyph
+  radius' — no px scale is threaded to this file by design; recorded as a deviation."*
+  Measured and re-verified in the main loop on `out/chapter-08/fig-08-05`: the `early` line
+  records apex events at s = 17.5 **and s = 25.0** and only one apex glyph is drawn — the
+  s = 25.0 apex collapses into a `good` glyph whose centre is **0.987 m** away against a
+  drawn ring radius of **0.2289 m** (4.3 radii, no overlap). The fix does not merge `good`'s
+  own apexes at s = 24.5 / 25.5 either: 1.041 m apart, so they clear both the old and the
+  new test. **Blast radius: `fig-08-05.svg` gains one apex glyph; no envelope, verdict,
+  `result_hash` or `spec_hash` moves.** This is S34's exact complaint — a mistake line's
+  recorded apex not drawn — produced by the tolerance rather than by the `auto` default.
+
+- **[03 §8 / 04 §7] The per-line `marks=` (and `label=`) override is specified in two
+  documents and implemented nowhere.** `needs-decision` → **authorized as a defect fix.**
+  `design/03 §8` L1635 says the MarkSpec applies *"at figure and per-line"* scope, and
+  `design/04 §7` L1904-1905 says *"at figure level, overridable per line with `marks=`"*,
+  listing `marks=` and `label=` among the ride keys. `plan/scene.ts:287-290`'s `RIDE_KEYS`
+  carries neither, so a scene writing `marks=all` on a ride line is rejected
+  `SCHEMA`/`ride_unknown_key`, and `deriveMarkers(lines, markSpec)` threads a single
+  figure-level spec. Moves no committed byte until a scene uses it. It is the surgical
+  answer to S34: mark the mistake line's apex without also putting release chevrons and
+  exit dots on every line, which a figure-level `marks: all` would.
+
 - **[06 §3.1 stage 9] Auto `marks:` draws markers on the ideal line only, and the absence
-  reads as a claim.** `needs-decision`, on committed ink. `render/markers.ts` draws all
+  reads as a claim.** **PREMISE REFUTED 2026-07-28 → `pinned-engine-truth`.** The letter is
+  not silent: `design/04 §7` L1903-1906 says *"`auto` (default) draws all classes on
+  `ideal`-role lines only"*, which `render/markers.ts` implements exactly. And an author can
+  already mark a mistake line in scene text alone — a figure-level `marks: all` or class
+  list enables that class on every drawn line regardless of role, as figs 8.1, 8.3 and 8.5
+  do on committed ink. The fig 8.2 case was a misattribution: both its lines record
+  `turn_in` at s = 6.974 at the identical drawn point, so the documented coincident collapse
+  fires and "ideal wins ties" — pinned green by `A-FIG82-SINGLEMARK` (`design/09 §5.4`).
+  What survives is an **authoring** question (re-author figs 8.4/8.6 with explicit `marks:`,
+  moving their `spec_hash`, versus amending the default, which moves SVG bytes and no hash).
+  Also stale, and fixable without the owner: `markers.ts:29-30` names fig **8.5** among the
+  figures authoring no `marks:`; `figures/fig-08-05.scene:21` authors
+  `marks: turn_point,apex`. Original text retained below.
+
+- **[01 §A.2] The exit sample is undefined for a line that leaves the road before the corner
+  ends, and the engine's substitute is what produces S20's `exit_f` = 1.148.**
+  `needs-decision` — a **letter gap**, not a deviation. `§A.2` L504-507 says the fallback for
+  a terminated line with no exit event is *"corner end"*, but a line that departs before
+  `s1` has no sample there. `plan/doctrine/metrics.ts:292` substitutes
+  `Math.min(w.corner.s1, last.s)` — the off-road departure sample, which on committed ink
+  sits at the outer usable edge, so every mistake line of figs 8.1–8.4 reports
+  `exit_f = 1.148` and satisfies the exit leg. `§A.3` check 9 `exit_containment` **does**
+  have a rule for the same event (*"If the line terminates off-road before the exit sample
+  exists … fail citing the crossing station"*), so two checks read one termination and only
+  one of them is specified. Answering this may retire S20 without touching the predicate.
+  Filed as `SCOPE.md` §4 S35.
+
+- **[01 §A.3 check 2, S30] The pack is correct; the implied remedy is forbidden.**
+  `adjudicated-fixed` as a record correction. `design/01 §A.6` L961-963 forbids any
+  threshold marked `TUNING` in the design of record from carrying a `book:` source in any
+  pack, mechanized by `A-PACK-PROVENANCE` arm (c). The three `out_in_out` bars are `TUNING`
+  in `§A.3` itself, so `packs/parks-street.json` is byte-correct and no engine or pack
+  change is warranted. Only the figure-authoring half of S30 remains live.
   classes on ideal-role lines only when `marks:` is unauthored, so figs **8.4 and 8.6 carry
   no marker at all on their mistake lines** (fig 8.2's likewise, under an explicit
   `marks: turn_point`). A reader reads that as *"the mistake never apexed"*. On figs 8.2 and

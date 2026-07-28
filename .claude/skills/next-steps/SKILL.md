@@ -90,7 +90,7 @@ quietly fabricate success.
 
 ```sh
 cd linelab
-npm run build && npm run typecheck && npm test   # vitest; baseline ~52 files, 1411 pass, 4 todo, 0 red
+npm run build && npm run typecheck && npm test   # vitest; baseline 53 files, 1430 pass, 4 todo, 0 red
 npm run bake:ch8                                  # then again — see below
 ```
 
@@ -98,6 +98,14 @@ The bake must be run **twice**. After the second run `git status` must show zero
 artefacts under `out/chapter-08/` and `linelab/figures/` — byte-identical re-bakes are
 the determinism guarantee the whole corpus rests on. `figure` exiting 3 is a DEVIATION,
 not a failure: the envelope still wrote, and figs 8.5/8.6 do it on a known seam.
+
+**The suite is flaky under load — re-run before you believe a red.** Two of four full
+runs on 2026-07-28 went red, 1 and 3 failures, *always* `Error: Test timed out in 5000ms`
+on CLI-spawning tests (`A-RECIPE-J` in `test/cli/recipes.test.ts`, `A-EXIT-DECLARED` in
+`test/cli/schema.test.ts`), always green in isolation and on re-run, and never touching
+the code under change. Re-run the file alone, then the suite. Report a red as real only
+once it survives that. Do **not** "fix" it by widening a timeout you did not diagnose —
+it is recorded in `DEVIATIONS.md` as an open question about the 5 s per-test wall.
 
 Report the real numbers. If something is red, say so with the output, and say what you
 did about it.
@@ -121,8 +129,34 @@ These are what make an unattended run safe here. They come from `design/01 §8`,
 - **Zero runtime dependencies, ever (D1).** Dev deps only.
 - **A doctrine figure must disclaim parity inside the artifact.** This is the whole
   content of S15. A figure that illustrates prose but cannot say so is not shippable.
+  But note what S31 settled on 2026-07-28: **a placard is not a general-purpose
+  disclaimer.** It reaches the SVG and the manifest. It does not reach the `figure_id`,
+  it cannot disclaim a marker the renderer declined to draw, and it cannot be made
+  complete about constants that live outside the rubric pack. A figure whose honesty
+  needs one of those is not one placard away — it is blocked on the substrate.
 
 If you find yourself reaching for one of these, that is the signal to write a STOP.
+
+### The one case where changing a check *is* the work
+
+The two rules above point the same way — *do not touch the engine to make something
+pass*. They do not cover the mirror case, and `ROADMAP.md`'s `NEXT` is now full of it: a
+defect in a check or the renderer, where the correct repair turns **committed, shipped,
+green** ink red. Do not read the guardrails as forbidding that, and do not read them as
+licensing it either. The test is the precedence order at the top of this file:
+
+- **The letter decides it, normatively** → it is a defect. Fix it, even if six figures
+  re-bake and a golden moves. `design/00`–`09` outranks the corpus, and the corpus is
+  evidence. Re-bake, re-judge, and write it up as a corpus event.
+- **The letter is silent, or the sentence you are leaning on is descriptive commentary
+  rather than a requirement** → **STOP.** Do not touch the engine on your own authority.
+
+That distinction — normative versus descriptive — is the whole call, and it is the
+easiest thing to get wrong in the direction that authorizes your own work. Classify from
+the letter *before* you measure the blast radius, never after: a large blast radius makes
+a defect feel important, and that is not evidence about what the letter says. Template 4
+in `references/workflow-templates.md` encodes the whole procedure, including what a STOP
+in this shape must carry (a measured blast radius, which is what makes it decidable).
 
 ## Step 4 — Land it
 

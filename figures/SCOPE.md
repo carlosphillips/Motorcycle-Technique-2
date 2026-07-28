@@ -1585,6 +1585,17 @@ decide:* whether a figure may rest its sole verdict on a TUNING-sourced bar
 provided the placard says so, or whether TUNING-sourced bars are carriers only in
 company. Not blocking the shipped corpus, where `out_in_out` never grades alone.
 
+**Narrowed 2026-07-28 — the pack is correct and there is nothing to fix.** The
+implied remedy (give the bars a `book:` source, or mark the check as unwarranted)
+is **forbidden by the letter**: `design/01 §A.6` L961-963 states that no threshold
+whose value is marked `TUNING` anywhere in the design of record may carry a
+`book:` source in any pack, and `A-PACK-PROVENANCE` arm (c) mechanizes it. The
+three bars are `TUNING` in `§A.3` itself, so the pack is byte-correct;
+`book_ref` is declared `explain()` prose and is not a provenance channel. What
+remains is **only** the figure-authoring half of the original question — may a
+figure rest its sole verdict on a `TUNING` bar, and what must it say — which is
+live and unchanged. A run may not touch the pack for this.
+
 **S31 — the doctrine-figure disclosure bar may be unreachable by iteration.
 RESOLVED 2026-07-28 by experiment. Answer: reachable on a *sentence*, not on a
 *figure*.** The hypothesis this STOP proposed — *fewer placards on a simpler
@@ -1645,14 +1656,14 @@ Chapter 8. Two independent halves, both fatal to that candidate on their own.
 grant to **"Chapter 8 doctrine only"**, and `throttle_rule` is Chapter 9 doctrine
 by every declared source: `packs/parks-street.json` gives it
 `"book_ref": "Total Control ch. 9, Throttle Control"` — the **only** ch-9
-`book_ref` among the pack's sixteen checks, against eleven ch-8 ones —
+`book_ref` among the pack's sixteen checks, against **twelve** ch-8 ones
+(*corrected 2026-07-28 — this entry and `ROADMAP.md` both said eleven*) —
 `design/01 §4.3`'s mistakes catalogue maps `chop` to *"Ch. 9 throttle doctrine"*,
 and `§A.3` introduces the check as *"(Keith Code Rule #1)"*, the one check in the
 catalogue not attributed to Parks at all. Yet the same roadmap section's candidate
 table names this exact figure as row 1, twice, and cites the SCOPE.md section that
-labels it Chapter 9. The scope sentence and the queue disagree about exactly one
-artifact. *To decide:* whether the grant covers a Chapter 9 carrier drawn on
-Chapter 8's road. An author may not resolve it — reading a conflicted licence in
+labels it Chapter 9. *To decide:* whether the grant covers a Chapter 9 carrier drawn
+on Chapter 8's road. An author may not resolve it — reading a conflicted licence in
 the direction that authorises one's own figure is the flattering direction, which
 is the species that has killed every candidate in this file.
 
@@ -1664,10 +1675,96 @@ the grant on its face. The placard channel (S15) reaches the SVG and the manifes
 `placards` array — it does not reach `figure_id`. *To decide with (i):* whether
 the corpus may hold a `fig-09-*` id at all.
 
-**S33 — `out_in_out`'s exit leg measures neither "wide" nor "at the exit", and
-both halves sit on committed ink.** *Needed by:* candidate 2, and by the
-`out_in_out` adjudication, which this makes a **four**-defect cluster with S20,
-S29 and S30. Verified in the main loop by walking all six committed envelopes.
+**The decision packet, added 2026-07-28.** Three corrections to this entry as
+filed, then the options. The full version with consequences is in `ROADMAP.md`
+`NEXT` work order 3; it is not duplicated here.
+
+- **The conflict is 3-vs-1, not 1-vs-1.** Three statements in the grant's own
+  section admit `chop` — its rationale (*"Chapter 8 teaches … half the mistake
+  catalogue in prose"*), its coverage arithmetic (which counts `chop` among the 47
+  Chapter 8 doctrine surfaces and lists it uncovered), and its candidate table —
+  against one scope sentence that excludes it.
+- **"Exactly one artifact" undercounts.** A carrier-chapter rule also strikes
+  candidate 6's `traction_ceiling` (`book_ref` ch. 1) and the parked `fig-11-TB`
+  (ch. 11): at least two of seven table rows plus 11.TB.
+- **`figure_id` is pure convention, proven empirically.** Baking
+  `figures/fig-08-01.scene` into an out directory named `fig-09-D1` yields
+  `figure_id: "fig-09-D1"` at the committed `spec_hash` 57e436 with a
+  **byte-identical SVG** carrying no id token; the only differing byte range in any
+  artifact is the manifest's `figure_id` field. It is derived from the `--out`
+  basename (`cli/verbs/figure.ts:63`), is in no hash, is absent from the normative
+  `Figure` shape (`design/03 §8`) and from `export --as figure-spec`, and is
+  validated by no regex. **Half (ii) is therefore cheap**, which materially lowers
+  the stakes of admitting a non-`fig-08-*` id. The real cost of a seventh figure is
+  `test/render/gate.test.ts`, which hard-codes the six ids and asserts the baked
+  directory holds exactly six SVGs and six judge records.
+
+*Scope options:* **A** — scope by road + doctrine surface (matches three of the
+grant's four statements; supported by the fact that `throttle_rule` leg (d)
+**already fails twice in committed parity ink**, fig 8.5 `early` c1 and fig 8.6
+`bad` c1, so a carrier-chapter rule retroactively indicts two G7-mandated figures).
+**B** — scope by carrier chapter widened to the pack's declared "ch. 8–9" (its
+warrant is currently false: the pack's sixteen `book_ref`s span ch. 1, 2, 8, 9 and
+11, so `doctrine_source` must be corrected before B can even be stated). **C** —
+keep carrier-chapter scoping and drop candidate 1 permanently.
+*Naming options:* **D** — admit a `fig-09-*` id. **E** — drop chapter numbers from
+doctrine ids entirely, reserving numbered ids for the six parity figures.
+
+**The strongest argument against candidate 1 is from the book, not from
+governance**, and it survives every scope option: Chapter 8's only sentence about
+reducing throttle mid-corner *endorses* it — *"initiating a slight rolling off of
+the throttle"*, as a double-apex correction — while the chop prohibition appears
+verbatim in Chapter 9 and nowhere in Chapter 8. A Chapter-8-branded chop figure
+would teach against the one Chapter 8 sentence on its own subject, which
+`design/01 §3` (the book wins) disfavours regardless.
+
+**Where the answer belongs:** the S12 grant exists only in `ROADMAP.md`, whose own
+header disclaims authority over `design/*.md`, so the design of record does not
+currently authorize doctrine figures at all. Whatever is decided should land in
+`design/01` — §8 or a new remit section — and not only in the roadmap.
+
+**S33 — TWO-THIRDS RETRACTED 2026-07-28. It was never a defect; only the bar's
+value is still a question.** The entry below was written from measurement without
+checking the design letter, and on two of its three claims the letter is explicit
+and the engine conforms exactly. That is the same species of error this file
+records in figures — a true number carrying a false implication — committed in
+the record itself, so it is corrected in place rather than quietly edited.
+
+- *The exit station is not a defect.* `design/01 §A.2` L504-507 defines the exit
+  sample as *"the sample at the RECORDED exit event (§4.1's heading-capture
+  deadband `EPS_EXIT_DEG` = 1.0°)"*, and the corner window `W_c` (L497) is
+  `[s(turn_in), s(exit event for c, else corner end)]` — it ends at the event,
+  not at `s1`. A station 7–9 m onto the following straight is **conformant**.
+- *The bike margin is not a defect.* `f` = 1 being 0.4 m short of the physical
+  edge is `§4.1` L126-127 (*"`f = 1` outer usable edge"*) plus `§4.2` L149-151
+  (*"the usable corridor is the rider's own lane minus a bike margin, because the
+  outside of the road is the oncoming lane"*). Working as specified.
+- *`EPS_EXIT_DEG` living outside the pack is mandated, not sloppy.* `§A.6`
+  requires that loading a different pack never move samples, events, `outcome` or
+  `spec_hash`; a pack-bound exit deadband would move the recorded exit event. So
+  the claim that "a pack-scoped provenance placard can never be complete" is
+  true, but it is a consequence of a deliberate design rule, and the fix is for a
+  figure to name the constant's owning document — not to move the constant.
+
+**What survives, and it is a real question:** is `OIO_OUTSIDE_MIN` = 0.55 the
+right bar? On the book road it lands at **d = −1.885 m** — 13.5 cm past the
+midline of the rider's own lane, **53.9% of lane width** — so a line finishing
+mid-lane satisfies a leg named "exit wide", and a figure paraphrasing the check's
+name teaches a standard the check does not enforce. That is a threshold in the
+normative appendix (`§A` L446-447), so it is the design owner's. *To decide, with
+S20/S29/S35:* whether the bar is re-based, and what a figure may say about a check
+whose name outruns its arithmetic. **Measured consequence of re-basing:** no
+committed `exit_f` lies in (0.55, 0.845], so the first bar that changes anything
+is above 0.845 — a bar chosen to move the corpus would have to be chosen *because*
+it moves the corpus.
+
+*The original entry follows, retained because the measurements in it are correct
+and were independently re-verified; it is the interpretation that was wrong.*
+
+**S33 (original) — `out_in_out`'s exit leg measures neither "wide" nor "at the
+exit", and both halves sit on committed ink.** *Needed by:* candidate 2, and by the
+`out_in_out` adjudication. Verified in the main loop by walking all six committed
+envelopes.
 
 *(i) The bar is at 53.9% of lane width — mid-lane, not "wide".* With
 `lane_width_m` 3.5, `bike_margin_m` 0.4 and `use_full_width` false, the usable
@@ -1698,8 +1795,60 @@ should be evaluated at the corner's own exit boundary, whether the bar should be
 expressed against something a rider can see, and what a figure owes about tuned
 constants the rubric does not own.
 
-**S34 — auto `marks:` draws markers on the ideal line only, and the absence reads
-as a claim.** *Needed by:* candidate 2; on committed ink already. With `marks:`
+**S34 — PREMISE REFUTED 2026-07-28 on both halves, and the real defect is
+elsewhere in the same file.** Corrected in place, for the same reason S33 is.
+
+- *The letter is not silent.* `design/04 §7` L1903-1906: *"`marks:` takes a
+  MarkSpec — `auto | all | none | <class-list>` … at figure level, overridable per
+  line with `marks=`; `auto` (default) draws all classes on `ideal`-role lines
+  only."* `render/markers.ts` implements that sentence exactly, and its own
+  docstring quotes it. Ideal-only auto marking is a **designed default**;
+  redefining it is an amendment, not a defect fix.
+- *There is already a scene-level escape, and the corpus uses it.* A figure-level
+  `marks: all` or class list enables that class on **every** drawn line regardless
+  of role — figs 8.1, 8.3 and 8.5 do exactly this on committed ink (8.3 carries
+  six hourglasses on its mistake line). This entry's original closing claim, "a
+  renderer default, so an engine/design question and not a scene-level fix", is
+  refuted by our own corpus. **S34 is mostly an authoring guideline**, and far
+  cheaper than it was filed as.
+- *fig 8.2 was a misattribution.* Its `slow_steer` line perturbs roll rate, not
+  turn point, so both lines record `turn_in` at s = 6.974 at the identical drawn
+  point; `design/06 §3.1`'s coincident collapse fires and "ideal wins ties". It is
+  pinned green by `A-FIG82-SINGLEMARK` (`design/09 §5.4`) and stated in the scene's
+  own header. Not an instance of anything.
+
+**What survives as an owner question:** should figs 8.4 and 8.6 — and every future
+doctrine scene whose lesson is not the apex — be re-authored with an explicit
+`marks:`, accepting that `marks` is a `FigureSpec` field and so each edit moves
+that figure's `spec_hash`? Or `auto` amended, or a new MarkSpec value added, or the
+omission placarded? *To decide:* pick one. The measured trade is that re-authoring
+moves `spec_hash` (figure identity) while amending the default moves SVG bytes and
+leaves every `spec_hash` alone.
+
+**What does NOT need that decision, and is letter-decisive** — promoted out of this
+STOP into `ROADMAP.md` `NEXT` work order 1:
+
+1. `markers.ts:110` uses `MARK_COINCIDE_EPS_M` (1.0 m) for the **drawn-position**
+   test, where `design/06 §3.1` L404-406 requires *"drawn positions overlap within
+   one glyph radius"*; the file's docstring records the substitution as a
+   deviation. On committed `fig-08-05` this swallows the **mistake line's** second
+   apex: `early` records apex events at s = 17.5 and s = 25.0 and only one glyph is
+   drawn, the s = 25.0 one collapsing into a `good` glyph **0.987 m** away against
+   a ring radius of **0.2289 m** (4.3 radii). This is S34's exact complaint — a
+   mistake line's recorded apex not drawn — arising from the tolerance rather than
+   the default, and the letter already decides it.
+2. The per-line `marks=` override is specified in two documents (`design/03 §8`
+   L1635, `design/04 §7` L1904-1905, which also lists `label=`) and implemented
+   nowhere: `plan/scene.ts:287-290`'s `RIDE_KEYS` has neither key, so a scene using
+   it is rejected `SCHEMA`/`ride_unknown_key`. It is the surgical instrument this
+   STOP wants — mark the mistake line's apex without putting release chevrons and
+   exit dots on every line.
+
+*The original entry follows; its committed-ink measurements are correct and were
+re-verified, its reading of the letter was not.*
+
+**S34 (original) — auto `marks:` draws markers on the ideal line only, and the
+absence reads as a claim.** *Needed by:* candidate 2; on committed ink already. With `marks:`
 unauthored the renderer draws all classes on ideal-role lines only
 (`render/markers.ts`), so figs **8.4 and 8.6 carry no marker at all on their
 mistake lines** (fig 8.2's mistake line likewise carries none under an explicit
@@ -1714,6 +1863,37 @@ is `design/01 §8`'s plausible fake exactly. *To decide:* whether a drawn line i
 entitled to its own recorded events, or whether ideal-only marking is a deliberate
 legibility choice that a figure must then disclose. A renderer default, so an
 engine/design question and not a scene-level fix.
+
+**S35 — the exit sample is undefined for a line that leaves the road before the
+corner ends, and the engine's substitute is what makes S20's headline number.**
+*Needed by:* the `out_in_out` adjudication; found 2026-07-28 while checking S20
+and S33 against the letter, and it is the better-posed question underneath both.
+
+`design/01 §A.2` L504-507 defines the exit sample as *"the sample at the RECORDED
+exit event … for a terminated line with no exit event, corner end"*. For a line
+that departs the road **before** `s1`, corner end does not exist on the
+trajectory — there is no sample there, because the line stopped first. The letter
+does not say what to do, and it is **silent rather than contradicted**, so this is
+an amendment gap and not disobedience.
+
+`linelab/src/plan/doctrine/metrics.ts:292` substitutes `Math.min(w.corner.s1,
+last.s)` — the off-road departure sample. On committed ink that sample sits at the
+outer usable edge, so **every** mistake line of figs 8.1–8.4 reports
+`exit_f = 1.148` and satisfies the exit leg. That, and not an oversight in the
+predicate, is the mechanism behind S20's *"exit wide is satisfied by leaving the
+road"*: the arithmetic is doing exactly what `§A.3` check 2 says, on a sample the
+letter never nominated.
+
+*To decide, and it subsumes much of S20:* **what is the exit sample when the line
+left the road before the corner ended?** The candidates are the departure sample
+(status quo), no exit sample at all — which makes the leg `na` and the check
+inapplicable — or the crossing station treated as a failure, which is what
+`§A.3` check 9 `exit_containment` already does for the same event (*"If the line
+terminates off-road before the exit sample exists … fail citing the crossing
+station"*). That check 9 precedent is the strongest single argument available here
+and should be in front of the owner: two checks read the same termination and only
+one of them has a rule for it. Answering this may make S20 moot without touching
+the predicate.
 
 Also noted, and deliberately **not** raised as STOPs:
 

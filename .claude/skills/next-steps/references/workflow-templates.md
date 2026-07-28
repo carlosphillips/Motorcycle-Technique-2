@@ -17,6 +17,7 @@ Contents:
 - [1. Capability work](#1-capability-work) — an engine or render capability the roadmap gates on (S15)
 - [2. Figure authoring](#2-figure-authoring) — author, bake, and attack a candidate figure
 - [3. Adjudication sweep](#3-adjudication-sweep) — decide a large candidate set on merit
+- [4. Substrate repair](#4-substrate-repair) — a rubric or renderer change that moves **committed** ink
 
 ---
 
@@ -61,6 +62,31 @@ const VERDICT = {
   properties: {
     refuted: { type: 'boolean', description: 'true if the claim does not hold' },
     reason: { type: 'string', description: 'the specific evidence, with file:line or a measured number' },
+  },
+}
+
+const BUILT = {
+  type: 'object',
+  required: ['claim', 'files', 'tests'],
+  properties: {
+    claim: { type: 'string', description: 'what now works that did not before, in one sentence' },
+    files: { type: 'array', items: { type: 'string' } },
+    tests: { type: 'array', items: { type: 'string' },
+      description: 'test names added, and whether each was CONFIRMED RED before the fix' },
+  },
+}
+
+// For template 4. Every field is a measurement, never an estimate — this object is what
+// a STOP carries when the letter does not authorize the repair.
+const BLAST = {
+  type: 'object',
+  required: ['linesFlipped', 'qualityMoves', 'hashesMove', 'testsAffected', 'verdict'],
+  properties: {
+    linesFlipped: { type: 'string', description: 'figure + line id + direction, exhaustively over the committed corpus' },
+    qualityMoves: { type: 'string', description: 'does the quality word move — and so the drawn colour and terminal word (design/05 §6.1)' },
+    hashesMove: { type: 'string', description: 'result_hash / spec_hash / committed SVG bytes' },
+    testsAffected: { type: 'string', description: 'named tests and goldens needing re-bless' },
+    verdict: { type: 'string', enum: ['small-fix', 'corpus-event', 'no-visible-change', 'unmeasurable'] },
   },
 }
 ```
@@ -216,28 +242,70 @@ const judged = await pipeline(
   (f, c) => f && f.baked && parallel([
     () => agent(
       `Figure ${c.id}. Check rows: ${f.checkRows}\n\n` +
-      `MERIT LENS. Does this figure teach anything the six shipped figures do not? ` +
-      `Is the carrier's verdict a real differential, or a knife-edge on a tuning ` +
-      `constant? Is the fail set byte-identical to an existing figure's? Refute it.`,
+      `MERIT + REMIT LENS. Does this figure teach anything the six shipped figures do ` +
+      `not? Is the carrier's verdict a real differential, or a knife-edge on a tuning ` +
+      `constant? Is the fail set byte-identical to an existing figure's? And is the ` +
+      `carrier inside S12's Chapter-8-scoped grant — decide that from the pack's ` +
+      `per-check book_ref and design/01 §4.3, never from the figure's filename. Refute it.`,
       { label: `attack:merit:${c.id}`, phase: 'Attack', schema: VERDICT }),
     () => agent(
       `Figure ${c.id}. Scene:\n${f.sceneText}\n\n` +
       `DISCLOSURE LENS. If this illustrates prose rather than reproducing a printed ` +
       `diagram, does the ARTIFACT say so — in the SVG a reader actually sees, not just ` +
       `meta.caption? Read the emitted SVG. A figure whose disclaimer reaches nobody is ` +
-      `the plausible fake design/01 §8 refuses. Refute it.`,
+      `the plausible fake design/01 §8 refuses. Then take each rendered sentence and ask ` +
+      `not "is it true" but "what does a student conclude, and does the envelope support ` +
+      `THAT". Refute it.`,
       { label: `attack:disclosure:${c.id}`, phase: 'Attack', schema: VERDICT }),
+    () => agent(
+      `STRANGER LENS — follow this in order, do not skip ahead.\n` +
+      `1. Open ONLY the rendered SVG at ${f.bakeDir}. Do not read the scene, the ` +
+      `envelope, SCOPE.md or ROADMAP.md yet. Read it as a motorcyclist studying a ` +
+      `diagram in a book would: someone who can ride and knows nothing about linelab.\n` +
+      `2. BEFORE opening anything else, write down every factual belief you now hold — ` +
+      `what the rider did, what it caused, what you would do differently. Include the ` +
+      `inferences the ink only implies; those are the ones that matter.\n` +
+      `3. NOW open the envelope and test each belief: supported, contradicted, or ` +
+      `unsupported-either-way, with the JSON pointer.\n` +
+      `4. refuted:true if ANY belief a reasonable rider would form from the ink alone is ` +
+      `CONTRADICTED. An unsupported belief is a warning; a contradicted one is fatal — ` +
+      `a plausible fake is exactly a figure whose reader concludes what the engine did ` +
+      `not compute. Report your step-2 beliefs verbatim before the verdict.`,
+      { label: `attack:stranger:${c.id}`, phase: 'Attack', schema: VERDICT }),
   ]).then(vs => ({ ...f, votes: vs.filter(Boolean),
-                   survives: vs.filter(Boolean).every(v => !v.refuted) })),
+                   survives: vs.filter(Boolean).length === 3 &&
+                             vs.filter(Boolean).every(v => !v.refuted) })),
 )
 
 const out = judged.filter(Boolean)
 return { shipped: out.filter(f => f.survives), killed: out.filter(f => !f.survives) }
 ```
 
-Note the asymmetry: a figure ships only if **both** lenses clear it. Merit and disclosure
-are independent necessary conditions — an honest figure nobody can tell is honest still
+Note the asymmetry: a figure ships only if **all three** lenses clear it. They are
+independent necessary conditions — an honest figure nobody can tell is honest still
 doesn't ship.
+
+**The stranger lens earns its slot.** Added 2026-07-28 after it killed a figure that the
+merit lens had cleared outright and that the disclosure lens killed on a *different*
+ground. Merit and disclosure both read the scene first, so both inherit the author's
+framing; the stranger is the only lens that measures what the artifact actually conveys.
+It is also the only lens that catches claims made by things that are not sentences — in
+its first outing it killed `fig-08-D4` on the *absence* of a marker, which no reading of
+the placards could have surfaced.
+
+Three more things this shape learned the hard way, all of which cost a round each:
+
+- **A repair brief written from adversarial findings is not evidence.** Round 3's brief
+  told the author to state a rate — "40 m/s³ against the 8 m/s³ bar" — and that wording
+  would itself have been the next kill, because the ideal line *in the same figure* sits
+  at −12 m/s³ against that bar and passes. If you hand an author a suggested repair,
+  require them to verify it before adopting it, and treat its refutation as a finding.
+- **A check's bar is often not its discriminator.** Sweep the parameter, then find the
+  clause that actually separates the two lines — frequently a guard, not the threshold.
+- **`selfRefused` must survive your post-processing.** `pipeline`'s later stages return
+  falsy for a self-refused candidate, so a naive `.filter(Boolean)` deletes the most
+  valuable result in the run. Collect self-refusals explicitly, or read them back out of
+  `journal.jsonl`.
 
 ---
 
@@ -311,3 +379,116 @@ Report the reconciliation explicitly in `ROADMAP.md`: *N adjudicated = X in + Y 
 the bucket breakdown. Read the "extend past Chapter 8" section for the register — it is
 the model for how a zero-result pass gets written up as a settled question rather than a
 failure.
+
+---
+
+## 4. Substrate repair
+
+For a defect **in a check, a threshold, or the renderer** — the shape of the `out_in_out`
+cluster and S34. It is the only shape where doing the work correctly can turn *committed,
+shipped, green* ink red, so it is the only shape with its own authorization step.
+
+**Why the ordinary guardrails do not cover it.** "Never weaken a check to turn something
+green" points the other way: these repairs turn things **red**. The hazard here is the
+mirror image — *strengthening a check on your own authority and calling six shipped
+figures wrong.* The discipline that replaces it:
+
+> **Classify from the letter BEFORE you measure, and measure BEFORE you change anything.**
+> Classifying after measuring is how a run talks itself into a corpus event, because a
+> big blast radius makes a defect feel important. The order matters.
+
+The authorization table. It is short, and it is the whole point of the template:
+
+| letter says | committed ink moves | what you may do |
+|---|---|---|
+| decides it (**normative**, not commentary) | no | fix it, land it |
+| decides it (**normative**) | yes | fix it, re-bake, re-judge, and write it up as a corpus event — **the letter outranks the corpus** (`design/00`–`09` is rank 1; `linelab/src/**` is evidence, never authority) |
+| silent or merely descriptive | either | **STOP.** Do not touch the engine. Land the measurement instead — it is what makes the STOP decidable |
+
+The third row is a *result*, not a failure: a measured, reproducible blast radius attached
+to a STOP is exactly the artifact that lets the design owner answer in one sitting.
+
+```js
+export const meta = {
+  name: 'next-steps-substrate',
+  description: 'Classify a substrate defect from the letter, measure its blast radius, and repair only if authorized',
+  phases: [
+    { title: 'Classify', detail: 'what the design letter decides — before any measurement' },
+    { title: 'Measure', detail: 'exactly what moves on committed ink' },
+    { title: 'Repair', detail: 'only the defects the letter already decides' },
+    { title: 'Verify', detail: 'attack the classification in BOTH directions' },
+  ],
+}
+
+const DEFECTS = args.defects   // [{id, statement, sections, candidateFix}]
+
+// Deliberate barrier: no defect is measured until every defect is classified, so a
+// measurement cannot leak back and colour the reading of the letter.
+phase('Classify')
+const classified = (await parallel(DEFECTS.map(d => () => agent(
+  `Read ONLY the design of record: ${d.sections}. Do not read linelab/src — the letter ` +
+  `outranks the code and I want the letter.\n\nDefect: ${d.statement}\n\n` +
+  `Does the letter already decide this? Quote VERBATIM with section numbers. Then the ` +
+  `question that does the real work: is the quoted sentence NORMATIVE (a requirement) or ` +
+  `DESCRIPTIVE (commentary on what typically happens)? Only a normative sentence ` +
+  `authorizes changing engine behaviour. Wanting the work to be authorized is exactly ` +
+  `what makes this easy to get wrong.`,
+  { label: `classify:${d.id}`, phase: 'Classify', schema: {
+    type: 'object', required: ['id', 'classification', 'quote', 'normative'],
+    properties: {
+      id: { type: 'string' },
+      classification: { type: 'string',
+        enum: ['letter-decisive-defect', 'needs-design-amendment', 'needs-stop-design-owner'] },
+      quote: { type: 'string', description: 'verbatim, with file + section + line' },
+      normative: { type: 'boolean', description: 'false if the quote is commentary' },
+    } } })))).filter(Boolean)
+
+phase('Measure')
+const measured = await parallel(DEFECTS.map(d => () => agent(
+  `Measure, in numbers, exactly what would move on COMMITTED ink under: ${d.candidateFix}\n` +
+  `Recompute from out/chapter-08/*.envelope.json by hand. Do NOT edit code to find out.\n` +
+  `Report: which committed lines flip verdict and in which direction; whether the quality ` +
+  `word moves (design/05 §6.1 — quality is a total function, so it moves the drawn colour ` +
+  `and the terminal word); whether result_hash and SVG bytes move; which named tests and ` +
+  `goldens need re-blessing. Measured numbers only — say "unmeasurable" rather than ` +
+  `estimating.`,
+  { label: `measure:${d.id}`, phase: 'Measure', schema: BLAST })))
+
+phase('Repair')
+const authorized = classified.filter(c => c.classification === 'letter-decisive-defect' && c.normative)
+log(`${authorized.length} of ${DEFECTS.length} authorized by the letter; ` +
+    `${DEFECTS.length - authorized.length} become STOPs with a measured blast radius`)
+
+const repaired = await pipeline(authorized,
+  (c) => agent(
+    `Repair ${c.id}. It is authorized because ${c.quote} is normative.\n` +
+    `Write the test first, and confirm it RED before the fix — a test that passes on the ` +
+    `unfixed engine is not evidence. Never delete or loosen an existing test: if one now ` +
+    `fails, that is this repair's blast radius arriving, so re-bless it deliberately and ` +
+    `say so, or stop. Zero runtime dependencies.`,
+    { label: `repair:${c.id}`, phase: 'Repair', schema: BUILT }),
+  (b, c) => b && parallel(['does-it-fix-it', 'did-it-over-refuse'].map(lens => () => agent(
+    `REFUTE "${b.claim}" through the ${lens} lens, against the rebuilt artifact, not the ` +
+    `diff. For over-refusal: does every legal input STILL pass? Check all six committed ` +
+    `scenes explicitly. A repair that refuses more than the letter asks is the same ` +
+    `error as one that refuses less.`,
+    { label: `verify:${lens}:${c.id}`, phase: 'Verify', schema: VERDICT })))
+    .then(vs => ({ ...b, survives: vs.filter(Boolean).every(v => !v.refuted) })))
+
+// The STOPs are deliverables too — each one carries its measurement.
+return {
+  repaired: repaired.filter(Boolean).filter(r => r.survives),
+  stops: classified.filter(c => !(c.classification === 'letter-decisive-defect' && c.normative))
+    .map(c => ({ ...c, blastRadius: measured[DEFECTS.findIndex(d => d.id === c.id)] })),
+}
+```
+
+Two habits that make this shape pay off:
+
+- **Adjudicate a cluster as one job.** Four defects in one check interact — a repair to
+  one can make another unreachable, or double-count its blast radius. `ROADMAP.md` says
+  this about `out_in_out` for exactly that reason.
+- **Verify the classification in both directions.** Over-authorizing lets a run rewrite
+  the corpus on its own say-so; under-authorizing stops safe work dead. Both are
+  expensive, and a single skeptic told only to "check the classification" will drift
+  toward whichever the author already chose.
