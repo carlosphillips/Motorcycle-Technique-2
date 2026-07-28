@@ -5,7 +5,7 @@
 // spelling without solving (the same code path as the `check` verb).
 
 import { lowerScene } from "../../plan/scene.js";
-import { validateFigureSpec, specHash } from "../../plan/figure.js";
+import { validateFigureSpec, specHash, lineMarksOf } from "../../plan/figure.js";
 import type { FigureSpec } from "../../plan/types.js";
 import { run, expectDeclarationsOf } from "../../solve/run.js";
 import { gateFigure } from "../../solve/gate.js";
@@ -97,7 +97,11 @@ export function figureVerb(input: FigureVerbInput): VerbOutcome {
       // design/06 §3.1 stage 11 — the figure's own placard boxes. Absent unless
       // authored, so a scene without `placards:` renders exactly as before.
       ...(spec.placards !== undefined ? { placards: spec.placards } : {}),
-      marks: spec.marks ?? "auto"
+      marks: spec.marks ?? "auto",
+      // design/03 §8's other MarkSpec scope: the per-line overrides. Empty on
+      // every figure that authors none — which is all six committed scenes —
+      // so this changes no baked byte until a line asks for it.
+      lineMarks: lineMarksOf(spec)
     });
     if (!rendered.ok) return errOutcome(rendered.error);
     writes.push({ path: `${outDir}/${envelope.figure_id}.svg`, content: rendered.value.svg });

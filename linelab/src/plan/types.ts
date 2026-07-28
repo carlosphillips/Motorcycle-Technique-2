@@ -298,6 +298,29 @@ export interface FigureLine {
   readonly name: string;
   readonly role: FigureRole;
   readonly spec: LineSpecKind;
+  /**
+   * design/03 §8: the `MarkSpec` is scoped "at figure **and per-line**";
+   * design/04 §7 spells the per-line half as the `ride` key `marks=<MarkSpec>`
+   * — "at figure level, overridable per line with `marks=`". Resolution is
+   * this line's spec if present, else the figure's, else `auto`
+   * (render/markers.ts `enabledClasses`).
+   *
+   * OMITTED (never defaulted to `"auto"`) when the line authors none, for the
+   * same reason design/03 §8 gives for `placards`: `spec_hash` is fnv-1a over
+   * the LOWERED form (D30), so a defaulted key would move the identity of
+   * every figure that never asked for one.
+   */
+  readonly marks?: MarkSpec;
+  /**
+   * design/04 §7's other per-line `ride` key, `label="…"` — the line's legend
+   * text (design/05 §7 types it on the line record as "`label, // legend
+   * text`"; design/06 §5.3's legend row is `<swatch> <name> — <role> ·
+   * <quality>`, and `<name>` is this string). Absent, the line keeps whatever
+   * label its own solver/compiler minted.
+   *
+   * OMITTED when unauthored — same `spec_hash` reason as `marks` above.
+   */
+  readonly label?: string;
 }
 
 /** design/03 §8: `feature[:corner][#n]@line ±m`, closed feature set. */

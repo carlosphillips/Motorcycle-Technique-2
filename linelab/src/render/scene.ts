@@ -206,7 +206,16 @@ export interface DrawnScene {
    */
   readonly occlusionWash: readonly DrawnPoint[] | null;
   readonly lines: readonly DrawnLine[];
-  /** stage 9 output, coincidence-collapsed — empty until markers.ts's `deriveMarkers` attaches them. */
+  /**
+   * design/06 §3.1 stage 9's marker-from-event set — one entry per enabled-class
+   * in-window event, NOT coincidence-collapsed. Collapse opens with the words
+   * "after projection" (L404) and needs a glyph radius, so the renderer applies
+   * it at draw time (`topdown.ts`'s `stageMarkers` → `collapseCoincident`).
+   * Leaving it out of the scene is what makes design/09 §5.4's `P-MARKS-EVENTS`
+   * bijection ("every marker corresponds 1:1 to an in-window event of its
+   * class's kind on its line") hold exactly here. Empty until markers.ts's
+   * `deriveMarkers` attaches them.
+   */
   readonly markers: readonly DrawnMarker[];
   /** stage 10 output — empty until labels.ts's `resolveLabels` attaches them. */
   readonly labels: readonly DrawnLabel[];

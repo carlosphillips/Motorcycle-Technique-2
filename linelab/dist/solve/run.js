@@ -524,7 +524,12 @@ function runFigure(json, engine_semver, opts) {
                 entries.push(buildLineRefusal(line.name, line.role, ran.error));
                 continue;
             }
-            const relabeled = relabel(ran.value.line, line.name, line.role);
+            // design/04 §7's `label="…"` ride key, honoured here because design/05
+            // §7 is where a label lives: `label, // legend text` on the line record.
+            // Absent, the solver's own minted label stands (`relabel`'s `??`).
+            // Either way this moves no hash — "line_id/role/label live outside every
+            // hash" (relabel's own note).
+            const relabeled = relabel(ran.value.line, line.name, line.role, line.label);
             entries.push(relabeled);
             if (firstRideResult === null) {
                 firstRideResult = relabeled;
@@ -562,7 +567,7 @@ function runFigure(json, engine_semver, opts) {
                             ...(line.spec.params !== undefined ? { params: stringifyParams(line.spec.params) } : {}),
                             ...(line.spec.scope !== undefined ? { scope: line.spec.scope } : {})
                         });
-                        entries.push(relabel(withCache(cachedR.value, "hit"), line.name, line.role, label));
+                        entries.push(relabel(withCache(cachedR.value, "hit"), line.name, line.role, line.label ?? label));
                         continue;
                     }
                 }
@@ -575,8 +580,11 @@ function runFigure(json, engine_semver, opts) {
                 line_id: line.name,
                 role: line.role
             });
-            if (compiled.ok)
-                entries.push(compiled.value.line);
+            if (compiled.ok) {
+                // an authored `label=` overrides the mistake token compileMistake
+                // minted; unauthored, the token stands untouched
+                entries.push(line.label !== undefined ? relabel(compiled.value.line, line.name, line.role, line.label) : compiled.value.line);
+            }
             else
                 entries.push(buildLineRefusal(line.name, line.role, compiled.error));
             continue;
@@ -609,7 +617,7 @@ function runFigure(json, engine_semver, opts) {
             entries.push(buildLineRefusal(line.name, line.role, executed.error));
             continue;
         }
-        entries.push(relabel(executed.value, line.name, line.role));
+        entries.push(relabel(executed.value, line.name, line.role, line.label));
     }
     // version skew (05 §8.4) — refusals carry no recomputed identity to compare
     const skewInputs = entries.filter((e) => !isLineRefusal(e)).map((e) => {

@@ -49,11 +49,12 @@ import { ENGINE_SEMVER } from "../../src/solve/run.js";
 import { isLineRefusal } from "../../src/solve/envelope.js";
 import type { FigureResult, LineResult } from "../../src/solve/types.js";
 import { lowerScene } from "../../src/plan/scene.js";
-import { specHash } from "../../src/plan/figure.js";
+import { specHash, lineMarksOf } from "../../src/plan/figure.js";
 import type { FigureSpec } from "../../src/plan/types.js";
 import { renderViews, computeProportionMetrics, gateProportions } from "../../src/render/index.js";
 import type { ManifestRecord } from "../../src/render/index.js";
 import type { DrawnScene } from "../../src/render/scene.js";
+import { MARK_COINCIDE_EPS_M } from "../../src/render/constants.js";
 import type { ComposedRoad } from "../../src/road/types.js";
 import { fnv1a } from "../../src/core/hash.js";
 
@@ -121,7 +122,8 @@ function bake(id: FigureId): Bake {
     lines,
     viewSpec: { ...fileView, mode: "true" },
     ...(drawable !== undefined ? { labels: drawable } : {}),
-    marks: spec.marks ?? "auto"
+    marks: spec.marks ?? "auto",
+    lineMarks: lineMarksOf(spec)
   });
   if (!rendered.ok) throw new Error(`${id}: mirror render refused: ${JSON.stringify(rendered.error)}`);
   // the mirror must reproduce the verb's own bytes, or the scene below is not
@@ -358,6 +360,127 @@ describe("A-FIG81-ENDPOINT (design/09 §7 — the standing rubric sentence, mech
     expect(lastVertex.x).toBeLessThanOrEqual(Math.max(...xs) + pad);
     expect(lastVertex.y).toBeGreaterThanOrEqual(Math.min(...ys) - pad);
     expect(lastVertex.y).toBeLessThanOrEqual(Math.max(...ys) + pad);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// A-MARK-GLYPH-RADIUS — design/06 §3.1 stage 9, L404-406, audited off the
+// COMMITTED ink (§5.2 audit mode: the renderer cannot self-certify).
+//
+//   "Coincident collapse: after projection, markers of the same class whose
+//    true stations lie within MARK_COINCIDE_EPS_M = 1.0 m (TUNING) **and**
+//    whose drawn positions overlap within one glyph radius collapse to one
+//    glyph ... Markers of different classes never collapse."
+//
+// Two tolerances. Reusing the 1.0 m station tolerance for the drawn-position
+// test deletes glyphs the letter keeps: on fig-08-05 the drawn glyph radius is
+// ~0.229 m, and the `early` line's apex at s = 25.0 sits 0.987 m — 4.3 radii —
+// from `good`'s apex at s = 24.5. Two glyphs that never touch.
+
+/** one drawn marker glyph, parsed back out of the stage-9 group. */
+interface Glyph {
+  readonly cls: string;
+  readonly line_id: string;
+  readonly cx: number;
+  readonly cy: number;
+  /** the radius the renderer actually drew with, in drawn units. */
+  readonly r: number;
+}
+
+function svgMarkerGlyphs(svg: string): readonly Glyph[] {
+  const stage = /<g data-stage="9-markers">([\s\S]*?)<\/g>/.exec(svg);
+  if (stage === null) throw new Error("no stage-9 marker group");
+  const body = stage[1]!;
+  const attr = (el: string, name: string): string => {
+    const m = new RegExp(`${name}="([^"]*)"`).exec(el);
+    if (m === null) throw new Error(`glyph has no ${name}: ${el}`);
+    return m[1]!;
+  };
+  const out: Glyph[] = [];
+  let chevronStroke = 0;
+  for (const m of body.matchAll(/<(circle|polygon|line)\b[^>]*?\/>/g)) {
+    const el = m[0];
+    const cls = attr(el, "data-marker-class");
+    const line_id = attr(el, "data-line-id");
+    if (m[1] === "circle") {
+      // `apex` is the full-radius ring; `exit` is a dot at EXIT_DOT_R of it —
+      // the collapse radius is the class's own drawn radius, and collapse is
+      // intra-class, so no cross-class ambiguity arises.
+      out.push({ cls, line_id, cx: Number(attr(el, "cx")), cy: Number(attr(el, "cy")), r: Number(attr(el, "r")) });
+    } else if (m[1] === "polygon") {
+      // `turn_point` hourglass: six points, symmetric about (cx, cy), spanning
+      // cy ± r — so the centroid is the centre and the half-height is r.
+      const pts = attr(el, "points")
+        .split(" ")
+        .map((pair) => {
+          const [x, y] = pair.split(",").map(Number);
+          return { x: x!, y: y! };
+        });
+      const cx = pts.reduce((a, p) => a + p.x, 0) / pts.length;
+      const cy = pts.reduce((a, p) => a + p.y, 0) / pts.length;
+      const r = (Math.max(...pts.map((p) => p.y)) - Math.min(...pts.map((p) => p.y))) / 2;
+      out.push({ cls, line_id, cx, cy, r });
+    } else {
+      // `release` is a double chevron: FOUR <line> strokes per glyph, emitted
+      // consecutively. The first runs (cx − r, cy − r) → (cx, cy), so its far
+      // end is the centre and its x-run is the radius; the other three repeat
+      // the same glyph and are skipped, or the pair scan below would compare a
+      // glyph with itself.
+      if (chevronStroke % 4 === 0) {
+        const cx = Number(attr(el, "x2"));
+        out.push({ cls, line_id, cx, cy: Number(attr(el, "y2")), r: cx - Number(attr(el, "x1")) });
+      }
+      chevronStroke++;
+    }
+  }
+  if (chevronStroke % 4 !== 0) throw new Error(`stage-9 chevron strokes are not a whole number of glyphs: ${chevronStroke}`);
+  return out;
+}
+
+describe("A-MARK-GLYPH-RADIUS — coincident collapse tests DRAWN positions against one glyph radius (design/06 §3.1 stage 9)", () => {
+  it("fig-08-05 draws every recorded apex: `early` keeps both of its in-window apexes, `good` keeps all four", { timeout: 600_000 }, () => {
+    const glyphs = svgMarkerGlyphs(committedSvg("fig-08-05"));
+    const b = bake("fig-08-05");
+    const win = b.scene.window;
+
+    // the counts are not magic numbers: they are the line's own in-window
+    // apex EVENTS (P-MARKS-EVENTS — a marker is the glyph of an event, and no
+    // event that stands alone on the page may go unglyphed).
+    const apexEvents = (line_id: string): number => {
+      const line = b.envelope.lines.find((l) => l.line_id === line_id) as LineResult;
+      return line.trajectory.events.filter((e) => e.kind === "apex" && e.s >= win.from_s && e.s <= win.to_s).length;
+    };
+    expect(apexEvents("early")).toBe(2); // s = 17.5 and s = 25.0
+    expect(apexEvents("good")).toBe(4); // s = 24.5, 25.5, 41.5, 56.0
+
+    const apexes = glyphs.filter((g) => g.cls === "apex");
+    expect(apexes.filter((g) => g.line_id === "early")).toHaveLength(2);
+    expect(apexes.filter((g) => g.line_id === "good")).toHaveLength(4);
+
+    // ...and the reason `early`'s s = 25.0 apex survives is geometric, not a
+    // count: its glyph and `good`'s s = 24.5 glyph do not overlap.
+    const r = apexes[0]!.r;
+    const nearest = apexes
+      .flatMap((a, i) => apexes.slice(i + 1).map((c) => Math.hypot(a.cx - c.cx, a.cy - c.cy)))
+      .reduce((lo, d) => Math.min(lo, d), Infinity);
+    expect(nearest).toBeGreaterThan(r);
+    expect(nearest).toBeLessThan(MARK_COINCIDE_EPS_M); // the pair the old 1.0 m test swallowed
+  });
+
+  it("no two same-class glyphs on any committed figure overlap within one glyph radius — the rule's post-condition", () => {
+    for (const id of FIGURE_IDS) {
+      const glyphs = svgMarkerGlyphs(committedSvg(id));
+      expect(glyphs.length, `${id}: no marker glyphs at all`).toBeGreaterThan(0);
+      for (let i = 0; i < glyphs.length; i++) {
+        for (let j = i + 1; j < glyphs.length; j++) {
+          const a = glyphs[i]!;
+          const c = glyphs[j]!;
+          if (a.cls !== c.cls) continue; // "markers of different classes never collapse"
+          const d = Math.hypot(a.cx - c.cx, a.cy - c.cy);
+          expect(d, `${id}: ${a.cls} glyphs on ${a.line_id}/${c.line_id} overlap — they should have collapsed`).toBeGreaterThan(a.r);
+        }
+      }
+    }
   });
 });
 

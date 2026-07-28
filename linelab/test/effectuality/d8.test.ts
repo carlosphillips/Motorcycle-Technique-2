@@ -300,7 +300,17 @@ function compileErr(kind: string, params: Wire | undefined, base: LineResult, sp
 const figJson = (over?: Wire, innerSpeed = 70): string =>
   JSON.stringify({
     road: { dsl: C30 },
-    lines: [{ name: (over?.["lineName"] as string) ?? "a", role: (over?.["lineRole"] as string) ?? "ideal", spec: { ...c30Scen(), id: "inner", rider: { ...(c30Scen()["rider"] as Wire), start: { speed_kmh: innerSpeed, f: 0.9 } } } }],
+    lines: [
+      {
+        name: (over?.["lineName"] as string) ?? "a",
+        role: (over?.["lineRole"] as string) ?? "ideal",
+        // design/03 §8's per-line MarkSpec + design/05 §7's per-line legend
+        // text, both omitted unless the witness row perturbs them
+        ...(over?.["lineMarks"] !== undefined ? { marks: over["lineMarks"] } : {}),
+        ...(over?.["lineLabel"] !== undefined ? { label: over["lineLabel"] } : {}),
+        spec: { ...c30Scen(), id: "inner", rider: { ...(c30Scen()["rider"] as Wire), start: { speed_kmh: innerSpeed, f: 0.9 } } }
+      }
+    ],
     ...(over?.["marks"] !== undefined ? { marks: over["marks"] } : {}),
     ...(over?.["note"] !== undefined ? { note: over["note"] } : {}),
     ...(over?.["placards"] !== undefined ? { placards: over["placards"] } : {})
@@ -498,6 +508,13 @@ const BUILDERS: Readonly<Record<string, () => Obs>> = {
   "scene:lines[].name": () => pair(figEnvelope(fig("base")), figEnvelope(fig("name-b", { lineName: "b" }))),
   "scene:lines[].role": () => pair(figEnvelope(fig("base")), figEnvelope(fig("role-ref", { lineRole: "reference" }))),
   "scene:lines[].spec": () => pair(figEnvelope(fig("base")), figEnvelope(fig("spec-60", undefined, 60))),
+  // the per-line MarkSpec is DRAWN, so its witness is the svg — the one line
+  // is `ideal`, so the figure-level default `auto` marks it and a per-line
+  // `none` takes those glyphs away (design/03 §8's "figure and per-line" scope)
+  "scene:lines[].marks": () => pair(svgOf(fig("base")), svgOf(fig("line-marks-none", { lineMarks: "none" }))),
+  // the per-line label is the line's legend text (design/05 §7), carried on
+  // the envelope's own line record — so the envelope is its witness
+  "scene:lines[].label": () => pair(figEnvelope(fig("base")), figEnvelope(fig("line-label", { lineLabel: "the racing line" }))),
   "scene:marks": () => pair(svgOf(fig("base")), svgOf(fig("marks-none", { marks: "none" }))),
   "scene:note": () => pair(figEnvelope(fig("base")), figEnvelope(fig("note", { note: "a teaching note" }))),
   // design/06 §3.1 stage 11: a placard is DRAWN, so its witness is the svg —

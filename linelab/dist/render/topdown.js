@@ -16,7 +16,8 @@
 // inherit that gate.
 import { fallbackSvg } from "./fallback.js";
 import { QUALITY_COLOUR, OCCLUSION_ALPHA, NOMINAL_FRAME_PX, GRAVEL_STIPPLE_RADIUS } from "./constants.js";
-import { SIGHT_RAY_INK, LEADER_INK, trajectoryInk, glyphKeepsArrowhead } from "./ink.js";
+import { SIGHT_RAY_INK, LEADER_INK, trajectoryInk, glyphKeepsArrowhead, roleRank } from "./ink.js";
+import { collapseCoincident } from "./markers.js";
 import { wrapPlacard, placardBoxHeightPx, placardBandHeightPx, PLACARD_INK, PLACARD_FONT_PX, PLACARD_LINE_PX, PLACARD_PAD_PX, PLACARD_GAP_PX, PLACARD_BAND_PAD_PX, PLACARD_COLUMN_PX } from "./placards.js";
 // ---------------------------------------------------------------------------
 // Tiny well-formed-SVG string helpers (self-closing leaves, explicit closes)
@@ -45,6 +46,21 @@ const QUALITIES = ["good", "caution", "failing"];
 function points(pts) {
     return pts.map((p) => `${p.x},${p.y}`).join(" ");
 }
+/**
+ * The drawn content's bounding box, which fixes the viewBox and therefore
+ * `pxScale` and therefore the stage-9 glyph radius.
+ *
+ * `scene.markers` here is the PRE-collapse set (collapse is a draw-time step —
+ * see `stageMarkers`), and that ordering is what keeps the two free of
+ * circularity: bounds → pxScale → radius → collapse, never back. It is also
+ * conservative in the only direction that matters, because collapse can only
+ * REMOVE markers, so the box computed here is a superset of the box the kept
+ * glyphs occupy. In practice it is the same box: every marker's `at` is a
+ * sample's own (x, y) and its line's `polyline` is built from those same
+ * samples, so a marker is already a polyline vertex and contributes nothing
+ * of its own (measured: 0 of 36 marker anchors lie outside the road+lines box
+ * on any of the six committed book figures).
+ */
 function boundsOf(scene) {
     const all = [
         ...scene.road.left,
@@ -577,8 +593,30 @@ function markerGlyphSvg(m, pxScale) {
     }
 }
 function stageMarkers(scene, pxScale) {
+    // design/06 §3.1 stage 9, L404-406: "**Coincident collapse:** AFTER
+    // PROJECTION, markers of the same class whose true stations lie within
+    // `MARK_COINCIDE_EPS_M = 1.0 m` (TUNING) **and** whose drawn positions
+    // overlap within ONE GLYPH RADIUS collapse to one glyph, drawn in the colour
+    // of the owning line drawn last in role order (ideal wins ties)."
+    //
+    // The rule is evaluated HERE and nowhere earlier, because here is the first
+    // place both of its operands exist. `scene.markers` are drawn positions (the
+    // projection has cropped and rotated them); `pxScale * MARKER_R_PX` is the
+    // glyph radius — the identical expression `markerGlyphSvg` draws with, so
+    // the predicate and the picture can never drift apart. Deriving the radius
+    // earlier is not merely undesirable, it is circular: `pxScale` comes from
+    // the viewBox, which comes from `boundsOf(scene)`, which reads
+    // `scene.markers`.
+    //
+    // `DrawnMarker.s` carries the TRUE station through the projection, so the
+    // first tolerance still compares honest metres, never drawn ones.
+    const rankOfLineId = (line_id) => {
+        const owner = scene.lines.find((l) => l.line_id === line_id);
+        return owner === undefined ? -1 : roleRank(owner.role);
+    };
+    const kept = collapseCoincident(scene.markers, pxScale * MARKER_R_PX, rankOfLineId);
     let s = open("g", { "data-stage": "9-markers" });
-    for (const m of scene.markers)
+    for (const m of kept)
         s += markerGlyphSvg(m, pxScale);
     s += close("g");
     return s;

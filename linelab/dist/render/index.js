@@ -69,7 +69,7 @@ export function renderViews(input) {
     if (!base.ok)
         return base;
     const withChrome = input.placards !== undefined ? withPlacards(base.value, input.placards) : base.value;
-    const markers = deriveMarkers(input.lines, input.marks);
+    const markers = deriveMarkers(input.lines, input.marks, input.lineMarks);
     const labels = resolveLabels(input.lines, input.labels);
     if (!labels.ok)
         return labels;

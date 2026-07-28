@@ -245,12 +245,18 @@ function parseRoadRefToken(tokens: readonly string[], at: string): Result<RoadSp
 }
 
 // ---------------------------------------------------------------------------
-// The `ride`/`naive`-field key=value grammar (design/04 §7). `role=` is pulled
-// out separately (it decorates the FigureLine, not the SolveSpec).
+// The `ride`/`naive`-field key=value grammar (design/04 §7). Three of the keys
+// design/04 §7 lists — `role=<role>`, `label="…"`, `marks=<MarkSpec>` — are
+// pulled out separately: they decorate the FigureLine, not the SolveSpec. The
+// solver never sees them; they are figure-authoring data (ARCHITECTURE §4).
 
 interface ParsedRideArgs {
   readonly solve: { -readonly [K in keyof SolveSpec]?: SolveSpec[K] };
   readonly role?: FigureRole;
+  /** design/03 §8's per-line MarkSpec scope — the figure-level `marks:` is the fallback. */
+  readonly marks?: MarkSpec;
+  /** design/05 §7's per-line `label` — legend text (design/06 §5.3's `<name>`). */
+  readonly label?: string;
 }
 
 function parseConstraintTokens(value: string, lineName: string, at: string): Result<readonly Constraint[]> {
@@ -286,7 +292,7 @@ function parseConstraintTokens(value: string, lineName: string, at: string): Res
 
 const RIDE_KEYS = [
   "entry", "turnIn", "style", "corner", "vis", "visHold", "visMargin",
-  "believeRoad", "accept", "startF", "constraints", "role"
+  "believeRoad", "accept", "startF", "constraints", "role", "label", "marks"
 ] as const;
 
 function parseRideArgs(argsText: string, lineName: string, at: string): Result<ParsedRideArgs> {
@@ -295,6 +301,8 @@ function parseRideArgs(argsText: string, lineName: string, at: string): Result<P
   }
   const solve: { -readonly [K in keyof SolveSpec]?: SolveSpec[K] } = {};
   let role: FigureRole | undefined;
+  let marks: MarkSpec | undefined;
+  let label: string | undefined;
   for (const tok of splitRespectingQuotes(argsText)) {
     const eq = tok.indexOf("=");
     if (eq <= 0) return err(schemaErr(at, `malformed ride argument "${tok}" (expected key=value)`, "ride_arg_malformed"));
@@ -396,6 +404,28 @@ function parseRideArgs(argsText: string, lineName: string, at: string): Result<P
         role = value as FigureRole;
         break;
       }
+      case "marks": {
+        // design/04 §7: "at figure level, overridable per line with `marks=`".
+        // SAME value language and SAME typed rejections as the figure-level
+        // `marks:` key — one parser, so the two scopes can never diverge.
+        const ms = parseMarkSpec(value, at);
+        if (!ms.ok) return ms;
+        marks = ms.value;
+        break;
+      }
+      case "label": {
+        // design/04 §7 spells this key `label="…"` — quoted, like the two
+        // other quoted ride keys (`believeRoad=`, `constraints=`), because a
+        // legend row is prose and prose has spaces.
+        if (dq === undefined) {
+          return err(schemaErr(at, 'label= needs a double-quoted value', "label_needs_quotes"));
+        }
+        if (value.trim().length === 0) {
+          return err(schemaErr(at, "label= carries no text — omit the key rather than authoring a blank legend row", "label_empty"));
+        }
+        label = value;
+        break;
+      }
     }
   }
   if (solve.vis !== "cautious" && (solve.vis_hold_f !== undefined || solve.vis_margin !== undefined)) {
@@ -406,7 +436,12 @@ function parseRideArgs(argsText: string, lineName: string, at: string): Result<P
       detail: { reason: "vis_knob_without_cautious" }
     });
   }
-  return ok({ solve, ...(role !== undefined ? { role } : {}) });
+  return ok({
+    solve,
+    ...(role !== undefined ? { role } : {}),
+    ...(marks !== undefined ? { marks } : {}),
+    ...(label !== undefined ? { label } : {})
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -677,9 +712,15 @@ export function lowerScene(sceneText: string): Result<FigureSpec> {
       }
       const defaultRole: FigureRole = sawRide ? "alternative" : "ideal";
       sawRide = true;
+      // `marks`/`label` are OMITTED when the line authored neither — never
+      // defaulted. `spec_hash` is fnv-1a over this lowered object (D30), so a
+      // defaulted key would move the identity of every committed figure (the
+      // reason design/03 §8 states verbatim for `placards`).
       figureLines.push({
         name: raw.name,
         role: parsed.value.role ?? defaultRole,
+        ...(parsed.value.marks !== undefined ? { marks: parsed.value.marks } : {}),
+        ...(parsed.value.label !== undefined ? { label: parsed.value.label } : {}),
         spec: { ...parsed.value.solve, road: road.value, entry_kmh: parsed.value.solve.entry_kmh } as SolveSpec
       });
     } else if (raw.kind === "mistake") {

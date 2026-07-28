@@ -75,6 +75,14 @@ export interface RenderViewsInput {
   readonly labels?: readonly FigureLabel[];
   readonly marks?: MarkSpec;
   /**
+   * The PER-LINE half of the MarkSpec's two scopes (design/03 §8: "at figure
+   * and per-line scope"; design/04 §7: "overridable per line with `marks=`"),
+   * keyed by `line_id` — built by `plan/figure.ts`'s `lineMarksOf` from the
+   * FigureSpec's own lines. A line with no entry resolves against `marks`
+   * above, so an absent/empty map is exactly the figure-level-only behaviour.
+   */
+  readonly lineMarks?: ReadonlyMap<string, MarkSpec>;
+  /**
    * design/06 §3.1 stage 11's figure-level placard boxes, in declared order.
    * FIGURE-level, so `project()` (road, lines, viewSpec) cannot see them —
    * they are attached to the `DrawnScene` here. Absent on every figure that
@@ -126,7 +134,7 @@ export function renderViews(input: RenderViewsInput): Result<RenderViewsResult> 
   if (!base.ok) return base;
   const withChrome = input.placards !== undefined ? withPlacards(base.value, input.placards) : base.value;
 
-  const markers = deriveMarkers(input.lines, input.marks);
+  const markers = deriveMarkers(input.lines, input.marks, input.lineMarks);
   const labels = resolveLabels(input.lines, input.labels);
   if (!labels.ok) return labels;
 

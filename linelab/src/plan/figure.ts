@@ -524,7 +524,27 @@ export function validateFigureSpec(json: unknown): Result<FigureSpec> {
     }
     const spec = validateLineSpecShape(raw["spec"], `${at}.spec`);
     if (!spec.ok) return spec;
-    lines.push({ name, role: role as FigureRole, spec: spec.value });
+    // design/03 §8's per-line MarkSpec scope + design/05 §7's per-line
+    // `label` (legend text), in the JSON spelling. Both OMITTED when
+    // unauthored — `spec_hash` covers the lowered form (D30), so defaulting
+    // either would move every committed figure's identity.
+    let lineMarks: MarkSpec | undefined;
+    if (raw["marks"] !== undefined) {
+      const m = validateMarkSpecShape(raw["marks"], `${at}.marks`);
+      if (!m.ok) return m;
+      lineMarks = m.value;
+    }
+    const lineLabel = raw["label"];
+    if (lineLabel !== undefined && (typeof lineLabel !== "string" || lineLabel.trim().length === 0)) {
+      return err(schemaErr(`${at}.label`, "label must be a non-empty string — omit the key rather than authoring a blank legend row", "type_mismatch"));
+    }
+    lines.push({
+      name,
+      role: role as FigureRole,
+      ...(lineMarks !== undefined ? { marks: lineMarks } : {}),
+      ...(typeof lineLabel === "string" ? { label: lineLabel } : {}),
+      spec: spec.value
+    });
   }
 
   let occluders: readonly Occluder[] | undefined;
@@ -604,6 +624,26 @@ export function validateFigureSpec(json: unknown): Result<FigureSpec> {
     ...(placards !== undefined ? { placards } : {})
   };
   return ok(Object.freeze(spec));
+}
+
+/**
+ * `lineMarksOf(fig) → ReadonlyMap<line name, MarkSpec>` — the figure's PER-LINE
+ * MarkSpec overrides, and only those (design/03 §8: the MarkSpec is scoped "at
+ * figure and per-line"; design/04 §7: "at figure level, overridable per line
+ * with `marks=`").
+ *
+ * A line that authored no `marks` contributes NO entry, so the renderer's
+ * lookup misses and falls back to the figure-level spec — the fallback is the
+ * absence itself, never a synthesized `"auto"`. A figure with no per-line
+ * override yields an empty map, which is exactly a no-op at the render seam.
+ *
+ * The one place this mapping is spelled: `cli/verbs/figure.ts` (the bake) and
+ * the gate's mirror render both call it, so the two cannot drift.
+ */
+export function lineMarksOf(fig: FigureSpec): ReadonlyMap<string, MarkSpec> {
+  return new Map(
+    fig.lines.filter((l): l is FigureLine & { marks: MarkSpec } => l.marks !== undefined).map((l) => [l.name, l.marks])
+  );
 }
 
 // ---------------------------------------------------------------------------

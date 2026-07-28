@@ -114,6 +114,29 @@ three sitting on committed ink.
   `result_hash` or `spec_hash` moves.** This is S34's exact complaint — a mistake line's
   recorded apex not drawn — produced by the tolerance rather than by the `auto` default.
 
+  **CLOSED 2026-07-28 — fixed, not amended.** The deviation was not the radius but the
+  PLACE: L404 opens "after projection", so the rule belongs to the renderer, and no number
+  ever had to be threaded backwards (`pxScale` is born from `boundsOf(scene)`, which reads
+  `scene.markers` — asking for it before markers exist is circular). `deriveMarkers` now
+  returns the uncollapsed event set and `collapseCoincident(markers, glyphRadiusDrawn,
+  rankOfLineId)` — same file, so ARCHITECTURE §6.6's module-map line still holds — runs at
+  draw time in `topdown.ts`'s `stageMarkers`, against `pxScale * MARKER_R_PX`: the identical
+  expression `markerGlyphSvg` draws with, so predicate and picture cannot drift. No design
+  text moved, no constant was invented, and `MARK_COINCIDE_EPS_M` still owns the station
+  test at 1.0 m. Measured delta on committed ink: **exactly one `<circle>` appended to
+  fig-08-05's stage-9 group** (30 335 → 30 526 bytes, `svg_fnv1a` e80e05 → 7e1dbd); the
+  other five figures re-bake byte-identical, and `figures/manifest.json` does not move.
+  Two implementation locals recorded per ARCHITECTURE §6.6: "overlap within one glyph
+  radius" is read as centre-to-centre ≤ r (the ≤ 2r reading is byte-identical on this
+  corpus), and "one glyph radius" is the class's own drawn radius (collapse is intra-class).
+  Two further defects fell out with it: the pair test now runs against the cluster SEED
+  rather than `some(member)`, which was letting a marker in transitively and made membership
+  depend on where the forward scan had reached; and collapse now runs AFTER the window crop,
+  so an out-of-window marker can no longer seed a cluster and take in-window glyphs with it.
+  **Still open: `figures/fig-08-05.judge.json` is stale** — its `verdicts` describe the
+  previous image and its `svg_fnv1a` was deliberately left un-restamped, so `T-JUDGE-RECORD`
+  and `test/hash/tripwire.test.ts` are RED on that figure until a vision re-judge lands.
+
 - **[03 §8 / 04 §7] The per-line `marks=` (and `label=`) override is specified in two
   documents and implemented nowhere.** `needs-decision` → **authorized as a defect fix.**
   `design/03 §8` L1635 says the MarkSpec applies *"at figure and per-line"* scope, and
@@ -124,6 +147,29 @@ three sitting on committed ink.
   figure-level spec. Moves no committed byte until a scene uses it. It is the surgical
   answer to S34: mark the mistake line's apex without also putting release chevrons and
   exit dots on every line, which a figure-level `marks: all` would.
+
+  **CLOSED 2026-07-28 — implemented as written, no design text moved.** Both keys are now
+  `RIDE_KEYS` (`plan/scene.ts`), lowered onto `FigureLine.marks?` / `FigureLine.label?`
+  (`plan/types.ts`), accepted in the JSON spelling too (`plan/figure.ts` — D30: one
+  identity, two spellings), and honoured where each one means something: `marks` by
+  `deriveMarkers(lines, markSpec, lineMarks)`, whose third argument carries the per-line
+  overrides keyed by `line_id` (built once by `plan/figure.ts`'s `lineMarksOf`, so the bake
+  and the gate's mirror render cannot drift), with the figure-level spec as the fallback
+  for every line that authored none; `label` by `solve/run.ts`'s `runFigure`, since
+  `design/05 §7` types the per-line label as *"legend text"* and `design/06 §5.3`'s legend
+  row draws it as `<name>` — and `relabel`'s own note records that `line_id`/`role`/`label`
+  live outside every hash, so an authored label moves no `result_hash`. `auto` stays
+  role-scoped at BOTH levels: a per-line `auto` on a mistake line marks nothing, exactly as
+  the figure-level one does. Typed rejections reuse the figure-level vocabulary
+  (`marks_class_unknown`, `marks_malformed`) and add two for the quoted-prose key
+  (`label_needs_quotes`, `label_empty`) — D8: nothing is accepted and ignored, which is
+  also why both keys now carry `verify/effectuality.json` witness rows (`scene:lines[].marks`
+  → render, `scene:lines[].label` → envelope) and appear in the `schema` verb's printed
+  input surface. **Both keys are OMITTED when unauthored, never defaulted** — the reason
+  `design/03 §8` states verbatim for `placards`: `spec_hash` covers the lowered form (D30),
+  so a defaulted key would move the identity of every figure that never asked for one.
+  Measured: all six committed figures re-bake byte-identical and all six `spec_hash`
+  stamps (57e436 / 1bc028 / 09875f / 30fcb5 / 37e73d / 40ae19) are unmoved.
 
 - **[06 §3.1 stage 9] Auto `marks:` draws markers on the ideal line only, and the absence
   reads as a claim.** **PREMISE REFUTED 2026-07-28 → `pinned-engine-truth`.** The letter is

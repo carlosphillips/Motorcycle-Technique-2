@@ -907,6 +907,27 @@
       "expect": "effect"
     },
     {
+      "id": "scene:lines[].marks",
+      "surface": "scene",
+      "field": "lines[].marks",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": {
+        "from": "(absent — figure-level auto governs)",
+        "to": "none"
+      },
+      "effect_class": "render",
+      "expect": "effect"
+    },
+    {
+      "id": "scene:lines[].label",
+      "surface": "scene",
+      "field": "lines[].label",
+      "fixture": "FX-FIG-ONE",
+      "perturbation": "presence",
+      "effect_class": "envelope",
+      "expect": "effect"
+    },
+    {
       "id": "scene:marks",
       "surface": "scene",
       "field": "marks",

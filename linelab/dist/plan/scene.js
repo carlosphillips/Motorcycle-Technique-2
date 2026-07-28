@@ -256,7 +256,7 @@ function parseConstraintTokens(value, lineName, at) {
 }
 const RIDE_KEYS = [
     "entry", "turnIn", "style", "corner", "vis", "visHold", "visMargin",
-    "believeRoad", "accept", "startF", "constraints", "role"
+    "believeRoad", "accept", "startF", "constraints", "role", "label", "marks"
 ];
 function parseRideArgs(argsText, lineName, at) {
     if (hasUnterminatedQuote(argsText)) {
@@ -264,6 +264,8 @@ function parseRideArgs(argsText, lineName, at) {
     }
     const solve = {};
     let role;
+    let marks;
+    let label;
     for (const tok of splitRespectingQuotes(argsText)) {
         const eq = tok.indexOf("=");
         if (eq <= 0)
@@ -374,6 +376,29 @@ function parseRideArgs(argsText, lineName, at) {
                 role = value;
                 break;
             }
+            case "marks": {
+                // design/04 §7: "at figure level, overridable per line with `marks=`".
+                // SAME value language and SAME typed rejections as the figure-level
+                // `marks:` key — one parser, so the two scopes can never diverge.
+                const ms = parseMarkSpec(value, at);
+                if (!ms.ok)
+                    return ms;
+                marks = ms.value;
+                break;
+            }
+            case "label": {
+                // design/04 §7 spells this key `label="…"` — quoted, like the two
+                // other quoted ride keys (`believeRoad=`, `constraints=`), because a
+                // legend row is prose and prose has spaces.
+                if (dq === undefined) {
+                    return err(schemaErr(at, 'label= needs a double-quoted value', "label_needs_quotes"));
+                }
+                if (value.trim().length === 0) {
+                    return err(schemaErr(at, "label= carries no text — omit the key rather than authoring a blank legend row", "label_empty"));
+                }
+                label = value;
+                break;
+            }
         }
     }
     if (solve.vis !== "cautious" && (solve.vis_hold_f !== undefined || solve.vis_margin !== undefined)) {
@@ -384,7 +409,12 @@ function parseRideArgs(argsText, lineName, at) {
             detail: { reason: "vis_knob_without_cautious" }
         });
     }
-    return ok({ solve, ...(role !== undefined ? { role } : {}) });
+    return ok({
+        solve,
+        ...(role !== undefined ? { role } : {}),
+        ...(marks !== undefined ? { marks } : {}),
+        ...(label !== undefined ? { label } : {})
+    });
 }
 // ---------------------------------------------------------------------------
 // labels: block — `feature[:corner][#n]@line [±offset] "text"` (design/03 §8,
@@ -623,9 +653,15 @@ export function lowerScene(sceneText) {
             }
             const defaultRole = sawRide ? "alternative" : "ideal";
             sawRide = true;
+            // `marks`/`label` are OMITTED when the line authored neither — never
+            // defaulted. `spec_hash` is fnv-1a over this lowered object (D30), so a
+            // defaulted key would move the identity of every committed figure (the
+            // reason design/03 §8 states verbatim for `placards`).
             figureLines.push({
                 name: raw.name,
                 role: parsed.value.role ?? defaultRole,
+                ...(parsed.value.marks !== undefined ? { marks: parsed.value.marks } : {}),
+                ...(parsed.value.label !== undefined ? { label: parsed.value.label } : {}),
                 spec: { ...parsed.value.solve, road: road.value, entry_kmh: parsed.value.solve.entry_kmh }
             });
         }

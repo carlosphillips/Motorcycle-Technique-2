@@ -75,10 +75,16 @@ function mkSample(over: Partial<Sample>): Sample {
 }
 
 /** Straight-line samples along +x (d=0) at 10 m spacing — `x === s` makes identity assertions exact. */
-function straightSamples(from_s: number, to_s: number, step = 10): Sample[] {
+/**
+ * A straight run of samples along +x. `y` offsets the whole run laterally —
+ * the only way to build two lines whose events share a STATION but sit at
+ * different DRAWN points, which is exactly the pair the §3.1 stage 9 collapse
+ * rule has to tell apart (station tolerance vs glyph-radius tolerance).
+ */
+function straightSamples(from_s: number, to_s: number, step = 10, y = 0): Sample[] {
   const out: Sample[] = [];
   for (let s = from_s; s <= to_s; s += step) {
-    out.push(mkSample({ s, t: s / 20, x: s, y: 0, psi: 0, limit_x: s + 50, limit_y: 0 }));
+    out.push(mkSample({ s, t: s / 20, x: s, y, psi: 0, limit_x: s + 50, limit_y: y }));
   }
   return out;
 }
@@ -290,41 +296,133 @@ describe("A-FIG82-SINGLEMARK / A-FIG83-MARKS precursors", () => {
 
 // ---------------------------------------------------------------------------
 // marker-collapse golden
+//
+// design/06 §3.1 stage 9, L404-406, verbatim: "**Coincident collapse:** after
+// projection, markers of the same class whose true stations lie within
+// `MARK_COINCIDE_EPS_M = 1.0 m` (TUNING) **and** whose drawn positions overlap
+// within one glyph radius collapse to one glyph, drawn in the colour of the
+// owning line drawn last in role order (ideal wins ties) — deterministic,
+// never a Z-fight. Markers of different classes never collapse."
+//
+// TWO tolerances, not one. The station test is 1.0 m; the DRAWN-position test
+// is one glyph radius — a draw-time quantity (`pxScale × MARKER_R_PX`) that
+// only exists once the projection has fixed the viewBox. So these goldens read
+// the RENDERED glyph set, not `deriveMarkers`'s return, which is also how
+// design/09 §5.4 states the golden: "two lines sharing a turn-in with both
+// marked → **one glyph**, topmost-draw-order colour". The glyph radius is read
+// back OFF the artifact (§5.2 audit mode: the renderer cannot self-certify),
+// so no test here re-declares the presentation constant.
 
-describe("marker-collapse golden", () => {
-  it("two same-class markers within MARK_COINCIDE_EPS_M collapse to one glyph, ideal wins ties", () => {
+/** every apex ring the renderer actually drew: centre, radius, owning line. */
+function apexRings(svg: string): readonly { cx: number; cy: number; r: number; line_id: string }[] {
+  const attr = (el: string, name: string): string => {
+    const m = new RegExp(`${name}="([^"]*)"`).exec(el);
+    if (m === null) throw new Error(`glyph has no ${name}: ${el}`);
+    return m[1]!;
+  };
+  return [...svg.matchAll(/<circle[^>]*?data-marker-class="apex"[^>]*?\/>/g)].map((m) => ({
+    cx: Number(attr(m[0], "cx")),
+    cy: Number(attr(m[0], "cy")),
+    r: Number(attr(m[0], "r")),
+    line_id: attr(m[0], "data-line-id")
+  }));
+}
+
+describe("marker-collapse golden (design/06 §3.1 stage 9, L404-406)", () => {
+  // `all` (not `auto`) — collapse is a cross-LINE rule, so every line has to be
+  // marked for it to have anything to collapse; `auto` marks the ideal line
+  // only (design/04 §7), which is asserted separately below.
+  //
+  // Three apexes, all inside the 1.0 m STATION window of each other:
+  //   mistake1 @ s = 20    → drawn (20, 0)
+  //   ideal1   @ s = 20.4  → drawn (20, 0)    — nearest sample is the same one
+  //   alt1     @ s = 20    → drawn (20, 0.9)  — a laterally offset line
+  // So the station test cannot separate any of them, and only the drawn-
+  // position test can: the first two are the SAME point (they overlap at any
+  // radius), the third is 0.9 m away — several glyph radii clear.
+  function threeApexes(): readonly LineResult[] {
+    const onAxis = straightSamples(0, 40, 5);
+    const offAxis = straightSamples(0, 40, 5, 0.9);
+    return [
+      mkLine({
+        id: "mistake1",
+        role: "mistake",
+        quality: "failing",
+        outcome: "runoff",
+        samples: onAxis,
+        events: [{ kind: "apex", s: 20, t: 1, corner_id: "c1" }]
+      }),
+      mkLine({
+        id: "ideal1",
+        role: "ideal",
+        quality: "good",
+        samples: onAxis,
+        events: [{ kind: "apex", s: 20.4, t: 1, corner_id: "c1" }]
+      }),
+      mkLine({
+        id: "alt1",
+        role: "alternative",
+        quality: "caution",
+        samples: offAxis,
+        events: [{ kind: "apex", s: 20, t: 1, corner_id: "c1" }]
+      })
+    ];
+  }
+
+  it("two apexes at the SAME drawn point collapse to one glyph — ideal wins the tie", () => {
     expect(MARK_COINCIDE_EPS_M).toBe(1.0);
-    const s0 = straightSamples(0, 40, 5);
-    const mistakeLine = mkLine({
-      id: "mistake1",
-      role: "mistake",
-      quality: "failing",
-      outcome: "runoff",
-      samples: s0,
-      events: [{ kind: "apex", s: 20, t: 1, corner_id: "c1" }]
-    });
-    const idealLine = mkLine({
-      id: "ideal1",
-      role: "ideal",
-      quality: "good",
-      samples: s0,
-      events: [{ kind: "apex", s: 20.4, t: 1, corner_id: "c1" }] // within 1.0 m, same drawn xy neighbourhood
-    });
-    // a THIRD, well-separated apex on a third line stays distinct
-    const farLine = mkLine({
-      id: "far1",
-      role: "alternative",
-      samples: s0,
-      events: [{ kind: "apex", s: 5, t: 0.5, corner_id: "c1" }]
-    });
-    // `all` (not `auto`) — collapse is a cross-LINE rule, so every line has to
-    // be marked for it to have anything to collapse; `auto` marks the ideal
-    // line only (design/04 §7), which is asserted separately below.
-    const markers = deriveMarkers([mistakeLine, idealLine, farLine], "all");
-    expect(markers).toHaveLength(2);
-    const collapsed = markers.find((m) => Math.abs(m.s - 20) < 2)!;
-    expect(collapsed.line_id).toBe("ideal1"); // ideal drawn last in role order — wins the tie
-    expect(collapsed.colour).toBe(QUALITY_COLOUR.good);
+    const svg = unwrap(renderViews({ road: STRAIGHT_ROAD, lines: threeApexes(), marks: "all" })).svg;
+    const onAxis = apexRings(svg).filter((g) => Math.abs(g.cy) < 1e-9);
+    expect(onAxis).toHaveLength(1);
+    expect(onAxis[0]!.line_id).toBe("ideal1"); // ideal drawn last in role order
+    expect(svg).toContain(`stroke="${QUALITY_COLOUR.good}" stroke-width`);
+  });
+
+  it("an apex pair inside MARK_COINCIDE_EPS_M but further apart than one glyph radius stays TWO glyphs", () => {
+    const svg = unwrap(renderViews({ road: STRAIGHT_ROAD, lines: threeApexes(), marks: "all" })).svg;
+    const rings = apexRings(svg);
+    // the radius the renderer actually drew with — read back off the artifact,
+    // never re-declared here. 0.9 m has to be several radii clear for this
+    // fixture to be testing what it claims to test.
+    const r = rings[0]!.r;
+    expect(r).toBeGreaterThan(0);
+    expect(r).toBeLessThan(0.9);
+    // |Δs| = 0.0 and 0.4 — both well inside MARK_COINCIDE_EPS_M — so ONLY the
+    // drawn-position test can keep `alt1`'s apex alive. Reusing 1.0 m for that
+    // test (the pre-fix engine) swallows it and leaves one glyph.
+    expect(rings).toHaveLength(2);
+    expect(rings.map((g) => g.line_id).sort()).toEqual(["alt1", "ideal1"]);
+    const offAxis = rings.find((g) => g.line_id === "alt1")!;
+    expect(Math.abs(offAxis.cy - 0.9)).toBeLessThan(1e-9);
+  });
+
+  it("a marker never joins a collapse through a THIRD marker it does not itself overlap", () => {
+    // L404-406 states a PAIRWISE relation: "markers ... whose drawn positions
+    // overlap within one glyph radius collapse to one glyph". A cluster grown
+    // against ANY member already absorbed lets a marker in transitively —
+    // A swallows C, C then drags in B, and B never overlapped the glyph that
+    // remains. Three apexes at the same station, in a chain:
+    //   near @ y = 0.0  (the seed)
+    //   mid  @ y = 0.3  — overlaps `near`
+    //   far  @ y = 0.6  — overlaps `mid`, but NOT `near`
+    const at = (y: number): Sample[] => straightSamples(0, 40, 5, y);
+    const apexAt20 = [{ kind: "apex" as const, s: 20, t: 1, corner_id: "c1" }];
+    const lines = [
+      mkLine({ id: "near", role: "ideal", quality: "good", samples: at(0), events: apexAt20 }),
+      mkLine({ id: "mid", role: "mistake", quality: "failing", outcome: "runoff", samples: at(0.3), events: apexAt20 }),
+      mkLine({ id: "far", role: "alternative", quality: "caution", samples: at(0.6), events: apexAt20 })
+    ];
+    const rings = apexRings(unwrap(renderViews({ road: STRAIGHT_ROAD, lines, marks: "all" })).svg);
+    const r = rings[0]!.r;
+    // the fixture only tests what it claims while the radius separates the
+    // chain: `mid` inside it, `far` outside it.
+    expect(r).toBeGreaterThan(0.3);
+    expect(r).toBeLessThan(0.6);
+    expect(rings).toHaveLength(2);
+    // `near` + `mid` collapse to `near` (ideal is drawn last of the three);
+    // `far` keeps its own glyph, because the only glyph it ever overlapped is
+    // one that no longer exists.
+    expect(rings.map((g) => g.line_id)).toEqual(["near", "far"]);
   });
 
   it("markers of different classes never collapse, even at the identical station", () => {
@@ -338,8 +436,10 @@ describe("marker-collapse golden", () => {
         { kind: "exit", s: 10, t: 1, corner_id: "c1" }
       ]
     });
-    const markers = deriveMarkers([line], "auto");
-    expect(markers.map((m) => m.cls).sort()).toEqual(["apex", "exit"]);
+    const svg = unwrap(renderViews({ road: STRAIGHT_ROAD, lines: [line], marks: "auto" })).svg;
+    expect([...svg.matchAll(/data-marker-class="([a-z_]+)"/g)].map((m) => m[1]).sort()).toEqual(["apex", "exit"]);
+    // and the enable-set law still resolves them without any draw step
+    expect(deriveMarkers([line], "auto").map((m) => m.cls).sort()).toEqual(["apex", "exit"]);
   });
 });
 
@@ -1068,8 +1168,8 @@ describe("turn_point is an HOURGLASS, not a rhombus (design/06 §3.1 stage 9)", 
 
 // ---------------------------------------------------------------------------
 // marks: `auto` is role-scoped (design/04 §7: "`auto` (default) draws all
-// classes on `ideal`-role lines only"). fig 8.4/8.5/8.6 author no `marks:` at
-// all, so this is what those three figures actually get — and reading `auto`
+// classes on `ideal`-role lines only"). fig 8.4 and 8.6 author no `marks:` at
+// all, so this is what those two figures actually get — and reading `auto`
 // as a synonym for `all` is what put a red `apex` ring on fig-08-04's
 // `overspeed` line at its first metre, one of the J2 findings.
 
@@ -1107,6 +1207,41 @@ describe("MarkSpec `auto` is ideal-only (design/04 §7)", () => {
 
   it("`none` marks nothing, whatever the role", () => {
     expect(deriveMarkers(roster(), "none")).toEqual([]);
+  });
+
+  // -------------------------------------------------------------------------
+  // The MarkSpec is scoped at TWO levels — design/03 §8: "at figure and
+  // per-line scope"; design/04 §7: "at figure level, overridable per line with
+  // `marks=`". The third argument carries the per-line overrides, keyed by
+  // line_id; the figure-level spec is the fallback for every line that
+  // authored none.
+
+  describe("per-line MarkSpec overrides the figure-level spec (design/03 §8, design/04 §7)", () => {
+    it("an override SUBTRACTS: `none` on one line survives a figure-level `all`", () => {
+      const markers = deriveMarkers(roster(), "all", new Map([["bad", "none"]]));
+      expect(new Set(markers.map((m) => m.line_id))).toEqual(new Set(["good", "alt", "ref"]));
+    });
+
+    it("an override ADDS: `all` on a mistake line survives a figure-level `auto`, which alone marks the ideal line only", () => {
+      const markers = deriveMarkers(roster(), "auto", new Map([["bad", "all"]]));
+      expect(new Set(markers.map((m) => m.line_id))).toEqual(new Set(["good", "bad"]));
+    });
+
+    it("an override NARROWS: a class list on one line coexists with the figure's wider list", () => {
+      const markers = deriveMarkers(roster(), "all", new Map([["alt", ["turn_point"]]]));
+      expect(new Set(markers.filter((m) => m.line_id === "alt").map((m) => m.cls))).toEqual(new Set(["turn_point"]));
+      expect(new Set(markers.filter((m) => m.line_id === "good").map((m) => m.cls))).toEqual(new Set(["turn_point", "apex"]));
+    });
+
+    it("a per-line `auto` is role-scoped like the figure-level one — on a mistake line it marks nothing", () => {
+      const markers = deriveMarkers(roster(), "all", new Map([["bad", "auto"]]));
+      expect(new Set(markers.map((m) => m.line_id))).toEqual(new Set(["good", "alt", "ref"]));
+    });
+
+    it("lines absent from the override map fall back to the figure-level spec — an empty map changes nothing", () => {
+      expect(deriveMarkers(roster(), "all", new Map())).toEqual(deriveMarkers(roster(), "all"));
+      expect(deriveMarkers(roster(), "auto", new Map([["nosuchline", "all"]]))).toEqual(deriveMarkers(roster(), "auto"));
+    });
   });
 });
 
