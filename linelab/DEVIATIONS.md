@@ -35,6 +35,44 @@ this entry is stale.
 
 ---
 
+## Post-v1.0 — the judge loop cannot be closed (2026-07-28, found landing work order 1)
+
+**`needs-decision`, and it is why the suite is RED at this commit.** Work order 1 changed
+what `fig-08-05` draws — by one glyph, correctly, to match `design/06 §3.1`. That made
+`figures/fig-08-05.judge.json` a record of an image that no longer exists, so
+`T-JUDGE-RECORD` and `test/hash/tripwire.test.ts` both fail with `expected 'e80e05' to be
+'7e1dbd'`. **That red is the tripwire working, not a defect**, and it was left standing
+deliberately: `tools/restamp-figures.mjs` would clear both by rewriting `svg_fnv1a` alone,
+and its own header says that leaves the record *"structurally valid and semantically stale
+on purpose"*. Restamping to go green is the move `design/01 §8` and the roadmap's own
+guardrail forbid.
+
+**The honest path is a re-judge, and it is blocked on a step the design specifies and the
+repo does not contain.** `design/09 §7` step 2 calls for *"a headless-browser rasterizer
+(replacing cairosvg — exported SVG is no longer constrained to cairosvg's feature
+subset)"*. There is none: no `sharp`, `resvg`, `puppeteer`, `playwright` or chromium in
+`linelab/package.json` or on the box, and `out/chapter-08/bake.sh` emits no PNGs. So
+`linelab/figures/png/*.2x.png` and `*.grey.png` — the rasters the 2026-07-25 ceremony
+judged and retained as evidence — **are outputs of a step nobody can re-run.**
+
+Checked in the main loop rather than assumed. The pinned judge identity in
+`verify/judge.json` is `claude-opus-5`, so the *judge* half is executable today. The
+*raster* half is not: the only SVG rasterizer on this machine is macOS `qlmanage`, which
+renders the ink faithfully (verified against committed `fig-08-01.2x.png` — same colours,
+geometry, labels and chrome) but **force-crops to a square**, cutting off the turn point,
+the entry-speed labels and the scale bar — precisely the ink that rubric items J2, J3 and
+J8 grade. Judging a cropped raster and recording the verdict as a judgment of the figure
+would fabricate a record, which is the one thing this repo must never do. It is also
+macOS-only, so enshrining it would trade a portability guarantee for a green tick.
+
+*Consequence, and it generalises well beyond this figure:* **any change to what a figure
+draws now leaves the suite red until a rasterizer exists.** That makes the rasterizer a
+prerequisite for the whole doctrine-figure programme, not a nicety. *To decide:* which
+rasterizer, and whether the committed `png/` rasters stay evidence or become build
+outputs. Filed as `SCOPE.md` §4 S36 and set as the top of `ROADMAP.md` `NEXT`.
+
+---
+
 ## Post-v1.0 — S11 fix + the minimal-claim round (2026-07-28, ROADMAP "decide S31")
 
 S31 is answered by experiment (`figures/SCOPE.md` §4 S31, §3 "the minimal-claim round"):

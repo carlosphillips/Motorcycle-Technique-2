@@ -313,13 +313,65 @@ worktree build of `HEAD` before the fix. Gates: build ✓ typecheck ✓ 53 files
 
 ---
 
-## NEXT — three work orders, specified
+## CLOSED — work order 1: the marker defects. Both landed; the suite is red on purpose.
 
-**Status: open, specified 2026-07-28.** Set by the S31 result above: candidates are not
-failing for want of care, they are failing on things underneath them. Each item below
-says what it is, what the design letter permits, what a run may do without asking, and
-what "done" looks like. **Work order 1 is the only one that lands code. Do it first — it
-is fully authorized and it is what unblocks candidate 2.**
+**Status: shipped 2026-07-28. Read the last paragraph before you touch anything.**
+
+Both defects were letter-decisive and both are fixed, with no design text moved and no
+constant invented.
+
+**The collapse test was in the wrong place, not carrying the wrong number.** The letter's
+sentence opens *"after projection"* (`design/06 §3.1` L404), so the rule belongs to the
+renderer — and `pxScale` is born from `boundsOf(scene)`, which reads `scene.markers`, so
+asking for it during derivation is **circular**. `deriveMarkers` now returns the
+uncollapsed event set, and a new pure `collapseCoincident(markers, glyphRadiusDrawn,
+rankOfLineId)` runs at draw time against `pxScale * MARKER_R_PX` — *the identical
+expression `markerGlyphSvg` draws with*, so the predicate and the picture cannot drift.
+`MARK_COINCIDE_EPS_M` still owns the station test at 1.0 m, untouched.
+
+Measured delta on committed ink: **exactly one `<circle>` appended to `fig-08-05`'s
+stage-9 group** — the `early` line's apex at s = 25.0, which the engine had recorded and
+declined to draw. The other five figures re-bake byte-identical; `manifest.json` and every
+`spec_hash` are unmoved. **Two further defects fell out of the same repair**, neither
+suspected when the work order was written: the pair test now runs against the cluster
+*seed* rather than `some(member)`, which had been admitting markers transitively through
+members they never overlapped; and collapse now runs *after* the window crop, so an
+out-of-window marker can no longer seed a cluster and delete in-window glyphs with it.
+
+**The per-line `marks=` / `label=` override now exists**, exactly as `design/03 §8` and
+`design/04 §7` specify and as nothing implemented. Both keys are omitted when unauthored —
+never defaulted — so all six `spec_hash` stamps are unmoved, on the `placards` precedent.
+And the instrument S34 actually wanted works today, verified by baking it:
+
+```
+lines:
+  good:    ride entry=34 turnIn=auto marks=none
+  bad:     mistake premature:early_by_m=6
+marks:     apex
+```
+
+→ one glyph, on the mistake line. You do *not* write `marks=` on the mistake line — scene
+text puts `key=value` args on `ride` entries only — you enable the class at figure level
+and silence it on the ride line. A reviewer tested the wrong idiom and reported the
+capability unreachable; it is reachable, and this is how.
+
+**Gates: build ✓ typecheck ✓ 54 files / 1460 pass (+30) / 4 todo / 2 red · bake ×2
+byte-identical ✓.** The two reds are one fact, and they are the tripwire working:
+`fig-08-05`'s picture changed by one glyph, so `figures/fig-08-05.judge.json` is now a
+record of an image that no longer exists. It was left un-restamped **deliberately** —
+`tools/restamp-figures.mjs` would clear both by rewriting `svg_fnv1a` alone, and its own
+header says that leaves the record *"structurally valid and semantically stale on
+purpose"*. Going green that way is the move the guardrails forbid. Clearing it honestly
+needs a re-judge, which is blocked on **S36** — the new top of `NEXT`.
+
+---
+
+## NEXT — close the judge loop first; then the two owner packets
+
+**Status: open, 2026-07-28.** Reordered by what landing work order 1 discovered. Each item
+says what it is, what the design letter permits, what a run may do without asking, and what
+"done" looks like. **Work order 1 shipped; its successor, item 0, is now the gate on
+everything that changes a figure.**
 
 ### Read this before touching any of them: the authorization rule
 
@@ -338,6 +390,52 @@ in the direction that authorizes your own work.* Classify from the letter **befo
 measure a blast radius — a big blast radius makes a defect feel important, and that is not
 evidence about what the letter says. Template 4 in the `next-steps` skill's
 `references/workflow-templates.md` encodes the procedure.
+
+### Work order 0 — build the rasterizer and re-judge fig-08-05. THE GATE ON EVERYTHING ELSE.
+
+**Why it is first, ahead of two items that were ahead of it yesterday:** the suite is red
+until it is done, and *any* future change to what a figure draws will re-red it. That
+includes the rest of S34, the whole doctrine-figure programme, and — if the owner ever
+answers work order 2 in a way that moves a verdict — the `out_in_out` cluster too. This is
+no longer a nicety attached to one figure; it is the prerequisite for changing pictures at
+all.
+
+`design/09 §7` step 2 specifies *"a headless-browser rasterizer (replacing cairosvg —
+exported SVG is no longer constrained to cairosvg's feature subset)"*. **It was never
+built.** There is no `sharp`, `resvg`, `puppeteer`, `playwright` or chromium in
+`linelab/package.json` or on the machine, and `out/chapter-08/bake.sh` emits no PNGs — so
+`linelab/figures/png/*.2x.png` and `*.grey.png`, the rasters the 2026-07-25 ceremony judged
+and retained as its evidence, **are outputs of a step nobody can re-run.**
+
+What is already settled, so nobody re-derives it: the *judge* half works —
+`verify/judge.json` pins the identity to `claude-opus-5`, which is available, and the
+9-item rubric and 2-of-3 majority are specified and unambiguous. Only the *raster* half is
+missing. The one rasterizer on this machine, macOS `qlmanage`, was tested against committed
+`fig-08-01.2x.png` and renders the ink faithfully — same colours, geometry, labels, chrome
+— but **force-crops to a square**, cutting off the turn point, the entry-speed labels and
+the scale bar, i.e. exactly what rubric items J2, J3 and J8 grade. It is also macOS-only.
+Judging a cropped raster and recording the verdict as a judgment of the figure would
+fabricate a record; using a platform-specific tool would trade the corpus's reproducibility
+guarantee for a green tick. **Neither is acceptable, which is why this is a work order and
+not a workaround.**
+
+- **Constraints:** D1 confines it to a **dev** dependency. It must be deterministic and
+  portable, because byte-identical reproducibility is the property the whole corpus rests
+  on. It must produce the full figure at the committed convention (2000 px wide,
+  aspect-preserved) plus the greyscale conversion the D47 outcome words exist to survive.
+- **Then re-judge `fig-08-05`, scoped to one figure.** `verify/judge.json`'s identity
+  fields are untouched, so this is **not** a `§7.4` six-figure ceremony. Three independent
+  attempts against the 9-item rubric, per-item 2-of-3 majority, verdict flips against the
+  superseded record enumerated explicitly, `svg_fnv1a` updated to `7e1dbd`, and an entry
+  appended to `policy.re_judge_log` in the voice of the 2026-07-25 one — including **which
+  rasterizer produced the images**, since the previous entry could take that for granted
+  and this one cannot.
+- **Done when:** `npm test` is 0 red with no test, threshold or golden weakened; the
+  rasterizer is reproducible by a second run; and `figures/png/fig-08-05.*` are regenerated
+  rather than left as rasters of an image that no longer exists.
+- **Do NOT** clear the red by restamping. If the rasterizer turns out to need a design
+  amendment (e.g. `figures/png/` becoming a build output rather than committed evidence),
+  that is a STOP — write it and stop, with the red still standing and still honest.
 
 ### Corrections first — three things this roadmap asserted on 2026-07-27 and got wrong
 
@@ -375,7 +473,10 @@ implication. Corrected here so nobody executes on them.
 
 ---
 
-### Work order 1 — the marker defects. FULLY AUTHORIZED, no permission needed.
+### ~~Work order 1 — the marker defects.~~ SHIPPED 2026-07-28 — see the CLOSED section above.
+
+*Kept for its evidence, which the CLOSED section does not repeat. The measurements below
+were all confirmed on committed ink before the fix.*
 
 **Why first:** it is the only item here where the letter is normative *and* the engine
 deviates, so it is the only one a run may land. It is also the surgical answer to what

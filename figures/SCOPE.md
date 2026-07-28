@@ -1864,6 +1864,59 @@ entitled to its own recorded events, or whether ideal-only marking is a delibera
 legibility choice that a figure must then disclose. A renderer default, so an
 engine/design question and not a scene-level fix.
 
+**S34 — SUPERSEDED IN PART 2026-07-28: the instrument now exists, and the idiom
+is verified.** Work order 1 landed the per-line `marks=` override the letter had
+specified and nobody had built (`design/03 §8` L1635, `design/04 §7` L1904-1905).
+A doctrine figure can now mark **only** its mistake line's apex, in scene text,
+today — verified by baking it in the main loop:
+
+```
+lines:
+  good:    ride entry=34 turnIn=auto marks=none
+  bad:     mistake premature:early_by_m=6
+marks:     apex
+```
+→ one glyph, `data-marker-class="apex" data-line-id="bad"`.
+
+The composition is the point, and it is worth stating because a reviewer tested
+the wrong idiom and concluded the capability was unreachable: a `mistake` line
+takes no `key=value` args in scene text (`design/04 §7` puts `marks=`/`label=`
+under the `ride` bullet only), so you do **not** put `marks=` on the mistake line
+— you enable the class at figure level and silence it on the ride line. Since the
+ideal line of every figure in this corpus is a `ride` line, the key is always
+available where it is needed. *Recorded so it is not rediscovered as a blocker.*
+
+What is still open from S34 is only the corpus question: should figs 8.4 and 8.6
+be **re-authored** with explicit `marks:` — moving their `spec_hash`, since `marks`
+is a `FigureSpec` field — or the `auto` default amended, which moves SVG bytes and
+no hash? Note that after S36 the two costs are no longer symmetric: **either
+choice now also costs a re-judge**, because both change what those figures draw.
+
+**S36 — the visual-judge loop cannot be closed: the rasterizer `design/09 §7`
+specifies does not exist.** *Needed by:* every future change to what any figure
+draws — which now includes the rest of S34, and the whole doctrine-figure
+programme. Found landing work order 1, and it is why the suite is red.
+
+`design/09 §7` step 2 calls for *"a headless-browser rasterizer (replacing
+cairosvg)"*. The repo contains none, and `out/chapter-08/bake.sh` emits no PNGs,
+so `linelab/figures/png/*.2x.png` and `*.grey.png` — the rasters the 2026-07-25
+ceremony judged and retained as evidence — are outputs of a step nobody can
+re-run. The *judge* half is fine: `verify/judge.json` pins the identity to
+`claude-opus-5`, which is available. Only the raster half is missing, and the one
+rasterizer on this machine (macOS `qlmanage`) renders faithfully but force-crops
+to a square, cutting off the turn point, the entry-speed labels and the scale bar
+— exactly what rubric items J2, J3 and J8 grade. Judging a cropped raster would
+fabricate a record.
+
+*Consequence:* `fig-08-05`'s record is stale and `T-JUDGE-RECORD` +
+`test/hash/tripwire.test.ts` are RED until this is built. **Do not clear them by
+restamping** — `tools/restamp-figures.mjs` rewrites `svg_fnv1a` alone and its own
+header says that leaves the record *"structurally valid and semantically stale on
+purpose"*. *To decide:* which rasterizer (it must be deterministic and portable,
+since the corpus's whole value is byte-identical reproducibility, and D1 confines
+it to a dev dependency), and whether `figures/png/` stays committed evidence or
+becomes a build output.
+
 **S35 — the exit sample is undefined for a line that leaves the road before the
 corner ends, and the engine's substitute is what makes S20's headline number.**
 *Needed by:* the `out_in_out` adjudication; found 2026-07-28 while checking S20
