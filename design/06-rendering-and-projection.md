@@ -413,11 +413,39 @@ elements, none of which invents geometry (every one sits on a drawn sample):
     (`feature[:corner][#n]@line ±m`), up to three leader lines per box. Leader
     endpoints attach to the owning line's projected sample at the resolved
     station (road anchors without `@` lead to the road centreline point) —
-    never to empty space. Label boxes repel each other and the road ink by a
-    simple candidate-position scoring pass, preferring the aspect-floor padding
-    (§2.4). Leader ink per §5.2.
+    never to empty space.
+
+    **Tag and column (D50, design owner 2026-07-29 — supersedes the
+    box-repel sentence this stage carried until then).** A callout is drawn in
+    two pieces. On the diagram sits a **tag**: a small numbered disc in neutral
+    ink, numbered `1..n` in the figure's declared label order, sited at its
+    resolved anchor. The callout's **sentence does not appear on the diagram at
+    all** — it goes to the callout column in the margin band (stage 11), keyed
+    by the same number. A leader (solid, neutral, `W_LEADER` — §5.2's ink row)
+    is drawn only when a tag has to be displaced off its anchor to obey the rule
+    below; a tag resting on its own anchor needs none.
+
+    **A tag may not sit on other ink.** The obstacle set is *all drawn ink of
+    stages 1–9 and every other tag* — not the two members the superseded
+    sentence named. Placement searches outward from the anchor and takes the
+    nearest clear position; ties break by the fixed candidate order, so the pass
+    is deterministic and never a Z-fight (stage 9's law, at tag granularity).
+    **If no clear position exists within the frame, that is a typed failure and
+    not a silently overlapped tag** (§2.6's degradation clause governs). The old
+    sentence's preference for the aspect-floor padding (§2.4) does not carry
+    over: it named a region no committed figure has, and the sentence it
+    belonged to is retired.
+
+    *Why the object changed rather than the search.* The superseded rule asked a
+    46-character sentence to find clear space on a plan view whose road fills
+    25–60 % of the frame (§6.1) and whose every anchor is by construction on a
+    line on that road. It could not be satisfied, and the engine's stand-in did
+    not try: 9 of 9 committed callouts lay on the road surface and one buried a
+    direction-ladder numeral outright. A tag is one glyph, so the constraint
+    becomes satisfiable and can therefore be enforced.
 11. **Margin chrome and placards** — the disclosure footnote (§2.7), the entry
-    annotation (§2.4), the legend (§5.3), figure-level placard boxes, and the
+    annotation (§2.4), the legend (§5.3), figure-level placard boxes, the
+    **callout column (D50)**, and the
     **scale bar (D47)**: a round distance (5/10/20/25/50/100 m, the one nearest
     a fifth of the frame) captioned in metres AND feet, plus the lane width.
     Drawn space is true metres in v0.1, so the bar is literal. Without it no
@@ -437,6 +465,17 @@ elements, none of which invents geometry (every one sits on a drawn sample):
     margin so `scene.frame` and therefore §6's metrics never move, and it never
     licenses ink that would otherwise misteach (§2.7). Every drawn box is
     recorded in the export manifest (§7).
+
+    **The callout column (D50).** One row per stage-10 tag, in tag-number order:
+    the number, then the callout's sentence verbatim as the figure's label set
+    declared it. The renderer neither writes nor edits the sentence — a callout
+    is authored data (03 §8), and this stage moves it, it does not paraphrase
+    it. The column is neutral ink like the rest of this stage, and it sits in the
+    same margin band as the placards, **below the content viewBox**, so
+    `scene.frame` and every §6 metric are unmoved by a figure gaining or losing a
+    callout. A tag with no column row, or a column row with no tag, is a bug the
+    export manifest surfaces: every tag and every row is recorded there (§7),
+    which is what lets J7's no-fabrication arm reach them.
 
 ### 3.2 What the renderer refuses
 

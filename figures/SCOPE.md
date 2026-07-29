@@ -2127,7 +2127,44 @@ and should be in front of the owner: two checks read the same termination and on
 one of them has a rule for it. Answering this may make S20 moot without touching
 the predicate.
 
-**S37 — REFRAMED 2026-07-29, same day as filing. The collision is real and
+**S37 — RESOLVED 2026-07-29 by the design owner, together with S38, and by an
+option that was not on the list.** *Decision: **D50** — a callout becomes a small
+numbered **tag** on the diagram plus its sentence in a **callout column** in the
+margin band, and **a tag may not sit on other ink**.* Landed in `design/00-README`
+§2 D50 and `design/06 §3.1` stages 10 and 11; the design of record, not this file,
+is where it now lives.
+
+The decision **replaces the object rather than the search**, which is why it
+escapes the trap the census measured: a 46-character sentence cannot find clear
+space on a plan view whose road fills 25–60 % of the frame and whose every anchor
+is by construction on a line on that road — but a one-glyph tag can, so the "not on
+other ink" rule becomes satisfiable and can therefore be *enforced* rather than
+approximated. It also settles S38's hardest sub-question in the strict direction:
+the obstacle set is **all drawn ink of stages 1–9 plus every other tag**, not the
+two members the superseded sentence named. Options (a), (b) and (c) below are all
+declined — (b) and (c) are moot, and (a)'s underdetermined pass is retired rather
+than built.
+
+*What this costs, and it is a corpus event:* every callout-bearing figure moves —
+**figs 8.1, 8.3, 8.4 and 8.5**, a re-bake and a re-judge each. Figs 8.2 and 8.6
+carry no callouts and do not move. `spec_hash` is unmoved on all six (renderer
+only). `fig-08-05`'s recorded J8 `fail` is cleared *by the picture changing*, which
+is the honest way to clear it.
+
+*What the decision does not reach, and no run may invent:* **the `fig-08-06`
+`90 m` case is untouched** — a stage-9 marker disc eating a stage-8b label on a
+figure with zero callouts is not a callout-placement problem, and D50's obstacle
+set governs tags, not the ladder. That case stays open. Two further questions are
+implementer-level within D50's letter and should be settled in the build, not
+guessed at silently: the tag's radius and font relative to `MARKER_R_PX`, and
+whether a displaced tag's leader is drawn at every displacement or only past some
+distance.
+
+*The census and the option costing below are retained*, because they are what made
+the decision decidable and because option (a)'s measurements are the evidence that
+the retired sentence was unbuildable.
+
+**S37 (superseded framing) — REFRAMED 2026-07-29, same day as filing. The collision is real and
 measured; the reason given for it was wrong, and there is no repulsion pass to
 extend.** The entry below was filed hours earlier from the judge's evidence and
 placed the burial outside the letter's obstacle set. Two measurements taken since
@@ -2390,7 +2427,22 @@ one figure and leaves the mechanism live for the next. The blast radius of (a) i
 reads *"Not hard-required to be `pass` — failed criteria are honest findings"* — so
 the suite is green with a failing figure on the record, which is the correct shape.
 
-**S38 — `design/06 §3.1` stage 10's candidate-position scoring pass was never
+**S38 — RESOLVED 2026-07-29 by the design owner: the sentence is retired, not
+built.** *Decision: **D50**, recorded in `design/00-README` §2 and `design/06 §3.1`
+stages 10 and 11 — see S37 above.* Of the three answers this entry put up, the
+owner took the second and amended the third: `design/06 §3.1` stage 10's
+candidate-position box-repel sentence is **retired**, replaced by a tag-and-column
+rule whose obstacle set is **all drawn ink**, which is stricter than the sentence it
+replaces and — because the placed object is now one glyph rather than a sentence —
+actually satisfiable. The engine's one-candidate stand-in is *not* thereby made
+conformant: it is superseded, and stage 10 is now a build item rather than a
+deviation. `linelab/DEVIATIONS.md`'s `needs-decision` entry is answered.
+
+*The statement below is retained as the evidence base* — the 9-of-9 road-surface
+overlap and the empty aspect-floor destination are why the old sentence could not
+be built, and they are the argument for D50.
+
+**S38 (original) — `design/06 §3.1` stage 10's candidate-position scoring pass was never
 built, and the deviation is recorded nowhere but a source docstring.** *Needed by:*
 S37, whose option (a) is this question and not a smaller one; and by every future
 figure that carries a callout. Found 2026-07-29 while costing S37.

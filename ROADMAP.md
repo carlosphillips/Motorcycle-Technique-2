@@ -528,34 +528,82 @@ hard-codes the six ids — in **four** places, not one (`:66`, `:236-240`, `:71-
 
 ---
 
-## NEXT — the owner's desk, then the ceremony
+## DECIDED — D50: a callout is a tag on the diagram and a sentence in a column beside it
 
-**Status: open, 2026-07-29.** Everything below needs a decision this project's runs are
-not authorized to make. **Nothing in `NEXT` is buildable by a run today** — that is the
-honest state, not an oversight, and it is what three measured packets bought.
+**Design owner, 2026-07-29. This answers S37 and S38 together, with an option that was
+not on the list.** Landed in the design of record — `design/00-README` §2 **D50** and
+`design/06 §3.1` stages 10 and 11 — because that is where a rendering rule belongs;
+`figures/SCOPE.md` §4 S37/S38 are marked resolved and point at it.
 
-1. **S38 — is stage 10's pass built, amended, or retired?** The prior question to all of
-   S37. Three answers are on the table: amend `design/06 §3.1` to specify a buildable pass
-   (candidate set, score, weights, order, tie-break, fallback, constants); retire the
-   sentence in favour of the one-candidate placement the engine ships, which makes
-   `stageLabels` conformant and closes S37 option (a) outright; or keep the sentence and pin
-   the property mechanically, which needs the export manifest to record callout boxes first.
-2. **S37 — then the mechanism, (a) / (b) / (c),** with the costs above. Note that no option
-   reaches the `fig-08-06` marker-over-chrome case.
-3. **S39 + the five-figure 2×-raster re-judge as one `§7.4` ceremony.** A human arbiter is
-   required on any pass→fail flip, so a run cannot perform it.
-4. **S35 — what is the exit sample when the line left the road before the corner ended?**
-   Answer this before S20; it subsumes most of it. Check 9 `exit_containment` already has a
-   rule for the same termination, which is the strongest argument available.
-5. **The figure-authoring placard rule** shared by S29, S30 and S33: may a figure rest its
-   verdict on a `TUNING` bar, what must it say, and may it recite leg counts it did not
-   measure?
-6. **S32 — the grant's scope (A/B/C) and naming (D/E),** and it must land in `design/01`,
-   not only here.
+The rule: **a callout is drawn as a small numbered tag at its anchor, its sentence moves
+to a callout column in the stage-11 margin band keyed by the same number, and a tag may
+not sit on other ink** — obstacle set *all drawn ink of stages 1–9 plus every other tag*,
+with a typed failure rather than a silent overlap if no clear position exists.
 
-If the owner is not answering yet, the unblocked work is in `Backlog` — item 1 (author real
-roads) and item 2 (the four deferred design-letter items) are both buildable without any of
-the above.
+**Why this escapes what the census measured.** It replaces the *object*, not the search.
+A 46-character sentence cannot find clear space on a plan view whose road fills 25–60 % of
+the frame and whose every anchor is by construction on a line on that road — which is why
+9 of 9 committed callouts sit on the road surface and one buried a ladder numeral. A
+one-glyph tag can. So the strict rule becomes enforceable instead of aspirational, and
+`design/06`'s unbuildable box-repel sentence is retired rather than specified.
+
+Consequences, recorded so nobody rediscovers them:
+
+- **A corpus event.** Figs **8.1, 8.3, 8.4, 8.5** each re-bake and re-judge; figs 8.2 and
+  8.6 carry no callouts and do not move. `spec_hash` is unmoved on all six — this is
+  renderer-only. `fig-08-05`'s recorded J8 `fail` clears *because the picture changes*,
+  which is the honest way to clear it.
+- **It does not reach `fig-08-06`'s `90 m`** — a stage-9 marker disc eating a stage-8b
+  ladder label on a figure with zero callouts is not a callout-placement problem. Still
+  open, recorded in S37.
+- **Two implementer-level questions stay open inside D50's letter** and should be settled
+  in the build rather than guessed at silently: the tag's radius and font relative to
+  `MARKER_R_PX`, and whether a displaced tag draws its leader at every displacement or only
+  past some distance.
+
+**Not scheduled.** The decision authorizes the work; the owner put the two tracks below
+ahead of it. Say the word and it moves to the top — it is the item that clears the one
+`fail` on the committed record.
+
+---
+
+## NEXT — two buildable tracks, by the owner's instruction (2026-07-29)
+
+Neither needs a decision from anyone. Both were named by the design owner as the work to
+do next, ahead of the D50 build.
+
+### Track 1 — the backlog items that need no decision
+
+In the order they are specified in `Backlog` below:
+
+1. **The four deferred design-letter items** (`Backlog` §2) — the best-specified of the
+   three, and the closest to shovel-ready: diagram-mode compression **and its disclosure
+   note**, the POV red deficit band and POV ghost paths (both need `stateAt.derived`
+   wiring), and static CLI POV `--at` / `--every` frame selection, which `07 §5.5` calls
+   its own "future rasterizer seam" — and the rasterizer now exists, so that seam is real.
+2. **Author real roads at prose scale** (`Backlog` §1) — the stated trigger for the
+   deferred diagram-mode projection (`design/00 L620`), i.e. the same item as (1)
+   approached from the other end. Doing (1) first is what makes (2) checkable.
+3. **A non-terminal front door** (`Backlog` §3) — a thin UI over the existing `serve`.
+   Independent of the other two; take it if the first two stall.
+
+### Track 2 — the D45 continuation-envelope spike
+
+**Build the gate, not the feature.** `design/09 §3.4a`'s `S-CONT-SEPARATION-v2` is an
+arithmetic spike that must pass before any continuation code is written, and its gate list
+is pre-written in that section. The spike is buildable today and is the only D45 work that
+is. If it fails, that is a result and D45 stays deferred — which is the outcome the
+deferral was designed to test for. **Do not build the envelope itself on a passing spike
+without coming back**: promotion lands in two tranches (report-only, then rendering), each
+with its own gate list.
+
+### Still on the owner's desk, and not blocking either track
+
+S39 + the five-figure 2×-raster re-judge as one `§7.4` ceremony (a human arbiter is
+required on any pass→fail flip, so a run cannot perform it); **S35** — the exit sample for
+a line that left the road before the corner ended, which subsumes most of S20 and should be
+answered before it; the **figure-authoring placard rule** shared by S29, S30 and S33; and
+**S32**, the grant's scope (A/B/C) and naming (D/E), which must land in `design/01`.
 
 ---
 

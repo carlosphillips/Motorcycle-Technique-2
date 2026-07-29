@@ -588,6 +588,29 @@ Sibling documents must conform to all of them.
   the golden roster. **Evidence text is not the place to fix a reading problem.** Specified in
   `01 §A.3` (unchanged, cited), `08 §5.2`.
 
+- **D50 — A callout is a small tag on the diagram and its sentence in a column beside it; a tag
+  may not sit on other ink.** *Design owner's decision, 2026-07-29, answering `figures/SCOPE.md`
+  §4 S37 and S38.* Stage 10 shipped as a stand-in: each callout's full sentence was placed as a
+  text box at a fixed diagonal offset from its anchor, with **no overlap test against anything**.
+  Measured consequence on committed ink — **9 of 9 callouts lie on the road surface**, five of
+  them at ≥ 99.67 %, and on `fig-08-05` a 46-character callout completely buried the `30 m`
+  direction-ladder numeral, which the first true-2× judging caught and recorded as a `fail`.
+  The sentence the stage was built against (*"Label boxes repel each other and the road ink by a
+  simple candidate-position scoring pass"*) could not be built as written: it names no candidate
+  set, no score, no weights, no order, no tie-break and no all-overlap fallback, and its one named
+  destination — `§2.4`'s aspect-floor padding — exists on **no** committed figure, all six
+  `frame_aspect` values sitting inside `§6.1`'s band. **The decision replaces the object rather
+  than the search.** A long sentence cannot be placed on a busy plan view without covering
+  something; a tag can. So the anchored object becomes a **small numbered tag**, and the sentence
+  moves to a **callout column in the margin band**, keyed by the same number — the band stage 11
+  already uses for placards, so `scene.frame` and every `§6` metric stay where they are. And the
+  obstacle set is settled in the direction the old sentence dodged: a tag must clear **all drawn
+  ink**, not merely other boxes and the road polygon. That is a far stronger rule than the one it
+  replaces and is nonetheless tractable, because a tag is one glyph — the same shape of problem
+  stage 9 already solves for markers. **This moves committed ink on every callout-bearing figure
+  (figs 8.1, 8.3, 8.4, 8.5) — a re-bake and a re-judge each, and a corpus event.** Figs 8.2 and
+  8.6 carry no callouts and do not move. Specified in `06 §3.1` stages 10 and 11.
+
 ---
 
 ## 3. Build phasing (normative)

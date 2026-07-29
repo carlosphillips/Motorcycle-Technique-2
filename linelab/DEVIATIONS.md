@@ -37,7 +37,21 @@ this entry is stale.
 
 ## Post-v1.0 — the S37 census (2026-07-29, ROADMAP work order 0b)
 
-**`needs-decision` — `design/06 §3.1` stage 10's candidate-position scoring pass was never
+**`adjudicated-fixed` (decided 2026-07-29; the build is queued, not done) —
+`design/06 §3.1` stage 10's candidate-position scoring pass was never built, and the design
+owner has retired the sentence rather than ordering it built.** **D50** replaces it: a
+callout is a small numbered **tag** on the diagram plus its sentence in a **callout column**
+in the margin band, and **a tag may not sit on other ink** — an obstacle set of *all drawn
+ink*, stricter than the retired sentence's two members and satisfiable because the placed
+object is one glyph. Stage 10 is therefore a **build item**, not a deviation: until it
+lands, `stageLabels` is superseded code rather than non-conformant code. Two docstrings
+still cite the retired sentence — `src/render/topdown.ts:683-692` and
+`src/render/labels.ts:7-12` — and were deliberately left alone, because the D50 build
+rewrites both functions and a comment-only edit now would only muddy that diff. The
+statement of the original deviation follows, kept because it is the evidence that made the
+decision.
+
+**(original) — `design/06 §3.1` stage 10's candidate-position scoring pass was never
 built, and until this entry the deviation was recorded nowhere but a source docstring.**
 The letter, inside a stage list whose heading calls the order *fixed*, says *"Label boxes
 repel each other and the road ink by a simple candidate-position scoring pass, preferring
