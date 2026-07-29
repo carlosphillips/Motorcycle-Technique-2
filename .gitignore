@@ -2,6 +2,8 @@
 .gstack/
 /out/chapter-08/.bake/
 
-# Filesystem sync conflict copies ("… 2.svg", "… 3.svg") — byte-identical
+# Filesystem sync conflict copies ("… 2.svg", "… 10.svg") — byte-identical
 # duplicates of baked output, created by Documents sync, never by the engine.
-* [0-9].svg
+# The digit run must be open-ended: "[0-9]" alone missed the two-digit copies
+# once sync reached "… 10.svg", and 24 of them were committed before anyone noticed.
+* [0-9]*.svg
