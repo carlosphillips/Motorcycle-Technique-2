@@ -35,6 +35,73 @@ this entry is stale.
 
 ---
 
+## Post-v1.0 — the judge loop is closed (2026-07-29, ROADMAP work order 0)
+
+**Supersedes the section immediately below, which was written the day before and is kept
+for its measurements.** The rasterizer exists, `fig-08-05` is re-judged on its output, and
+the two reds are cleared without restamping anything.
+
+**`adjudicated-fixed` — the rasterizer.** `design/09 §7` step 2 (*"a headless-browser
+rasterizer"*) and `§9` L2360 (*"moves from cairosvg to a headless browser"*) both name the
+mechanism, so *which rasterizer* was decided by the letter and not by taste — `resvg` and
+`sharp` were excluded on precedence, not on merit. `linelab/tools/rasterize-figures.mjs`
+drives **puppeteer 25.4.0** (a `devDependency`; `linelab/package.json` has no
+`dependencies` key at all, and nothing under `src/` or `dist/` imports it) and its
+version-pinned Chrome for Testing, `browser.version()` = `"Chrome/151.0.7922.47"`. All
+arithmetic that can be done without a browser lives in `tools/raster-core.mjs` and is
+covered by 54 pure tests in `test/tools/raster-core.test.ts`. The driver is invoked by hand
+like `tools/restamp-figures.mjs`, **not** from `bake.sh`: Chrome's PNG encoder being
+byte-stable is a property this repo had never measured, and hanging the determinism
+ceremony on it would weaken that gate. It also takes figure ids as required arguments with
+no default list, so a bare invocation cannot destroy the other five figures' judge evidence.
+
+**`adjudicated-fixed` — "2× scale" is a scale, not a pixel width.** The first cut targeted
+a fixed 2000 px. On this corpus that *is* 2× (every figure declares the 1000 px nominal
+frame), but `src/render/fallback.ts` declares 400×120, which the fixed target would have
+enlarged 5× and written out as `.2x.png` — a file name asserting a scale the file does not
+have. `RASTER_SCALE = 2` is now the input and 2000 px is the pinned consequence. No pixel
+moved: both `fig-08-05` rasters re-render byte-identical across the change.
+
+**`needs-decision` — the committed rasters were never 2× rasters, and J8 was graded at 1×.**
+Measured, not inferred: the committed `fig-08-05.2x.png` is a 2000×2774 canvas whose ink
+stops at (999, 1386); the new one reaches (1999, 2773). The same holds for `fig-08-01`
+(ink stops at 999×1146 of 2000×2294). So the prior, unreproducible step rendered at 1×
+onto a 2× canvas, and rubric item J8 — *"lines distinguishable and text readable at the 2×
+raster"* — was graded throughout the 2026-07-25 ceremony on an image at half the linear
+size the rubric names. **This is a reservation about the old evidence, not a finding
+against the other five SVGs**, which are unchanged; and a bigger raster cannot turn a
+passing legibility item into a failing one, so it does not by itself invalidate them.
+Only `fig-08-05`'s rasters were regenerated — replacing the other five would destroy the
+evidence their still-valid records were judged on. *To decide:* whether the other five are
+re-judged on true 2× rasters, which is a `§7.4` ceremony and was not in this work order's
+scope.
+
+**`needs-decision` — `fig-08-05` now records `verdict: "fail"`, and that is the honest
+answer.** The re-judge found a real defect on committed ink: a callout completely swallows
+the `30 m` direction-ladder label. Filed as `figures/SCOPE.md` §4 **S37**, as a STOP rather
+than a repair, because `design/06 §3.1` stage 10's repulsion rule covers label boxes and
+road ink and says nothing about stage-8b line chrome — the letter is silent, so the fix is
+the owner's call. `T-JUDGE-RECORD` permits a failing record by design (*"failed criteria
+are honest findings"*), so the suite is green with a failing figure on the record.
+
+**`needs-decision` — two rubric items came back flaky, which `§9 §7.4` makes rubric defects
+to tighten.** J5 split pass/pass/`na` — the rubric never says J5 applies to every figure
+drawing a mistake-role line, so a pass may decline it without ground. J8 split
+pass/fail/fail — the rubric does not say **at what magnification** "readable" is decided,
+which is exactly the ambiguity the 1×-ink raster hid.
+
+**`needs-decision` — `fig-08-05`'s scene says one mode and its manifest says another.**
+`figures/fig-08-05.scene:26` authors `view: mode=diagram` and the envelope's
+`meta.view.mode` carries that verbatim, while `bake.sh` renders `--mode true` and the
+manifest declares `"mode": "true"`. A reader of `meta` alone is told the wrong mode. J6 is
+`na` only because the manifest and the SVG's `data-mode` agree against `meta`.
+
+**Correction to the section below:** its sentence *"no `sharp`, `resvg`, `puppeteer`,
+`playwright` or chromium in `linelab/package.json` or on the box"* was true when written
+and is now false.
+
+---
+
 ## Post-v1.0 — the judge loop cannot be closed (2026-07-28, found landing work order 1)
 
 **`needs-decision`, and it is why the suite is RED at this commit.** Work order 1 changed

@@ -13,11 +13,13 @@
     "test:watch": "vitest",
     "cli": "node --enable-source-maps dist/cli/main.js",
     "bless": "node --enable-source-maps dist/cli/bless.js",
-    "bake:ch8": "bash ../out/chapter-08/bake.sh"
+    "bake:ch8": "bash ../out/chapter-08/bake.sh",
+    "raster": "node tools/rasterize-figures.mjs"
   },
   "devDependencies": {
     "typescript": "~5.7.0",
     "vitest": "^3.0.0",
-    "@types/node": "^20.17.0"
+    "@types/node": "^20.17.0",
+    "puppeteer": "^25.4.0"
   }
 }

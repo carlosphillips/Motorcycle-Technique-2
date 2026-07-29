@@ -1,7 +1,7 @@
 {
   "figure_id": "fig-08-05",
   "spec_hash": "37e73d",
-  "svg_fnv1a": "e80e05",
+  "svg_fnv1a": "7e1dbd",
   "judge_identity": {
     "judge_model": "claude",
     "judge_model_version": "claude-opus-5",
@@ -49,7 +49,7 @@
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 1 — full 2000x2774 colour raster. The chained ideal line is AMBER and its legend row reads \"chained 30 km/h — ideal · caution (contained)\", which is the manifest's own verdict for it; the mistake line is red/failing (runoff) (J1 — amber here is the colour law working, not a defect). Rings, hourglasses and release chevrons sit on their own lines through all three corners (J2). All three labels resolve: \"first touch\" on the ideal's first apex ring, \"early apex - hard on the inside of c1\" on the mistake's ring, \"no geometry left for c2 - off the outside edge\" at the runoff (J3). No occluders (J4 na). The mistake line touches the inside of c1 visibly earlier, then has nothing left for c2 and departs the outside edge before c3 — the compound-corner lesson is legible in the geometry alone (J5)."
+        "evidence": "Pass 1 of the re-render of fig-08-05, judged on the current colour raster at linelab/figures/png/fig-08-05.2x.png (2000x2774, sha e1858c4d\u2026), against the manifest's declared legend (early = mistake/failing/runoff, good = ideal/caution/contained), the envelope's recorded events, and the emitted SVG's own element inventory. I confirmed the two stroke colours are the only line hues present and that they match the declared verdict classes under D9 \u2014 the amber ideal line is the colour law working, since the manifest itself declares caution. I counted markers in the image and reconciled them one-for-one with the envelope's turn_ins and apexes: 5 turn-points and 6 apexes, including the previously collapsed red c2 apex at s=25, which is now drawn and sits centred on the red stroke rather than floating. All three declared callouts anchor with visible leaders, 'first touch' correctly on the earlier of the two adjacent amber rings. Occluders and hazards are declared empty and none are drawn, so J4 is na; the render is data-mode=\"true\" with null skew so J6 is na, though I note the authored scene and envelope still say view mode=diagram; D45 is not built so J9 is na. On the standing sentence I measured the red line's final vertex at 0.023 m outside the road polygon \u2014 sitting exactly at the outside edge where it ran off, not wandering in the grass and not exiting the frame. The mistake reads in the geometry alone: earlier turn-in, an apex ring hard on the inner corridor edge, then a steady drift out to the pavement edge before the third corner exists. Nine items: six pass, three na, no fails; the one blemish worth recording is the third callout's text crossing the amber stroke, which degrades neither label nor line."
       },
       {
         "attempt": 2,
@@ -84,14 +84,14 @@
           },
           {
             "id": "J8",
-            "verdict": "pass"
+            "verdict": "fail"
           },
           {
             "id": "J9",
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 2 — same raster, read for fabrication. Every marker corresponds to a recorded event of the chained line or the mistake; the amber line's outcome word is \"caution\" and the red line's \"ran off\", each matching its verdict; no glyph is drawn for a corner the mistake never reached (J7)."
+        "evidence": "Pass 2 of the fig-08-05 re-judge, an independent reading of the same 2x colour raster weighted toward markers, labels and fabrication, taken from the six per-label direction-ladder crops and the four full-resolution quadrants. Overall: FAIL, on J8 alone. fig-08-05 is otherwise clean - colours match the manifest's declared verdict classes (amber on the ideal line is correct because the manifest declares 'caution'), all eleven marker glyphs sit on their own lines and match the SVG's declared 3+4 on 'good' / 2+2 on 'early' (the re-rendered apex ring on the red 'early' line is present and correctly placed at its hard-inside c1 touch), all three callouts resolve to their anchors, the red line terminates at the outer edge under 'ran off' rather than wandering or leaving the frame, and nothing undeclared is drawn. The single defect: the 'no geometry left for c2 - off the outside edge' callout is laid over the position of the 30 m direction-ladder label and completely swallows it - the label exists in the SVG but zero glyphs of it survive in the raster, while 10/20/40/50/60 m are all crisply readable. This is a label-collision defect between stage 8b line chrome and stage 10 callout layout, not a physics or colour problem."
       },
       {
         "attempt": 3,
@@ -114,7 +114,7 @@
           },
           {
             "id": "J5",
-            "verdict": "pass"
+            "verdict": "na"
           },
           {
             "id": "J6",
@@ -126,14 +126,14 @@
           },
           {
             "id": "J8",
-            "verdict": "pass"
+            "verdict": "fail"
           },
           {
             "id": "J9",
             "verdict": "na"
           }
         ],
-        "evidence": "Pass 3 — greyscale. This is the hardest case for hue-free reading, because amber and red converge to nearly the same grey — and it holds: the ideal line is the wider stroke, is captioned \"caution\" at its arrowhead, and the mistake is captioned \"ran off\". Without the outcome words the two would be hard to separate in grey, which is exactly why they are drawn (J8)."
+        "evidence": "Pass 3 of the fig-08-05 re-judge, read from the genuinely 2x, full-bleed greyscale conversion at linelab/figures/png/fig-08-05.grey.png (2000x2774, grey8, sha256 ab0f9c49\u2026), with the declared facts taken from out/chapter-08/fig-08-05.manifest.json, the envelope, and figures/fig-08-05.scene, and the SVG element inventory used only to confirm what the picture shows. The renderer fix is real and visible: the early line's c1 apex ring (s=17.5, clearance 0.06 m) is now drawn, centred on the dark stroke, hard against the inner corridor edge, with its callout anchored to it \u2014 J2 and J3 hold, and the glyph counts (6 apex, 5 turn-point, no exit) match the engine record and the marks setting exactly. Without colour the verdicts still read: the outcome words 'ran off' and 'caution' sit at their terminal arrowheads and the legend spells both classes out, so J1 survives the greyscale test, and the failing line's arrowhead sits exactly at its recorded off_road termination on the outside edge, inside the frame, satisfying the standing sentence. What the 1x grading of the superseded record could not have caught, and what I am recording as the honest failure, is J8: the '30 m' direction-ladder label is completely overprinted by the c2 callout and renders as an illegible smear between 'outside' and 'edge' \u2014 present in both the grey and the colour raster \u2014 and, as a lesser reservation in the fig-08-04 house style, the two lines share a single stroke for the first ~3.4 m of the 68 m window before the early line lifts away. Overall verdict for this pass: fail, on J8 alone."
       }
     ],
     "items": [
@@ -155,7 +155,8 @@
       },
       {
         "id": "J5",
-        "verdict": "pass"
+        "verdict": "pass",
+        "flaky": true
       },
       {
         "id": "J6",
@@ -167,13 +168,14 @@
       },
       {
         "id": "J8",
-        "verdict": "pass"
+        "verdict": "fail",
+        "flaky": true
       },
       {
         "id": "J9",
         "verdict": "na"
       }
     ],
-    "verdict": "pass"
+    "verdict": "fail"
   }
 }

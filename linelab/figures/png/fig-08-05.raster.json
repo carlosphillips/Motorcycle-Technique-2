@@ -1,0 +1,32 @@
+{
+  "figure_id": "fig-08-05",
+  "svg_fnv1a": "7e1dbd",
+  "rasterizer": {
+    "engine": "puppeteer",
+    "puppeteer_version": "25.4.0",
+    "chrome_version": "Chrome/151.0.7922.47",
+    "scale": 2,
+    "background": "#ffffff",
+    "greyscale": "rec709-luma"
+  },
+  "outputs": [
+    {
+      "kind": "colour",
+      "svg": "figures/fig-08-05.svg",
+      "path": "figures/png/fig-08-05.2x.png",
+      "width": 2000,
+      "height": 2774,
+      "colour_type": "rgb8",
+      "sha256": "e1858c4d546d0c6af4889e85f9f4dd1de9b73a40f78bebea6e12b974e21fbbd6"
+    },
+    {
+      "kind": "grey",
+      "svg": "figures/fig-08-05.svg",
+      "path": "figures/png/fig-08-05.grey.png",
+      "width": 2000,
+      "height": 2774,
+      "colour_type": "grey8",
+      "sha256": "ab0f9c4977de9e6b85d5b6ffc339755bf6ae00bbca3c745a9873382595bfc937"
+    }
+  ]
+}

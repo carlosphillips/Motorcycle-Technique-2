@@ -1892,9 +1892,25 @@ is a `FigureSpec` field — or the `auto` default amended, which moves SVG bytes
 no hash? Note that after S36 the two costs are no longer symmetric: **either
 choice now also costs a re-judge**, because both change what those figures draw.
 
-**S36 — the visual-judge loop cannot be closed: the rasterizer `design/09 §7`
-specifies does not exist.** *Needed by:* every future change to what any figure
-draws — which now includes the rest of S34, and the whole doctrine-figure
+**S36 — RESOLVED IN PART 2026-07-29. The rasterizer is built and the loop is
+closed; one sentence of the "to decide" survives.** The half that mattered — *which
+rasterizer* — was never really the owner's to decide, because `design/09 §7` step 2
+and `§9` L2360 both name the mechanism (*"a headless-browser rasterizer"*), and the
+letter outranks convenience. Built as `linelab/tools/rasterize-figures.mjs`:
+puppeteer (**dev** dependency, D1) driving the version-pinned Chrome for Testing it
+downloads, 2× on white, a manifest naming its own engine, non-zero exit on any
+render failure. `fig-08-05` was re-judged on its output and the two reds cleared
+honestly — see the 2026-07-29 entry in `verify/judge.json`'s `re_judge_log`.
+**Still open, and it is the whole remainder:** does `figures/png/` stay committed
+evidence or become a build output? It stayed committed this pass because that
+needed no amendment. Note also that the rasters are byte-identical run-to-run *on
+one machine with one pinned Chrome*; cross-machine byte-identity is unproven,
+because text rasterization depends on the host font stack and the Chrome pin does
+not cover it. The original entry follows, unedited.
+
+**S36 (original) — the visual-judge loop cannot be closed: the rasterizer
+`design/09 §7` specifies does not exist.** *Needed by:* every future change to what
+any figure draws — which now includes the rest of S34, and the whole doctrine-figure
 programme. Found landing work order 1, and it is why the suite is red.
 
 `design/09 §7` step 2 calls for *"a headless-browser rasterizer (replacing
@@ -1947,6 +1963,49 @@ station"*). That check 9 precedent is the strongest single argument available he
 and should be in front of the owner: two checks read the same termination and only
 one of them has a rule for it. Answering this may make S20 moot without touching
 the predicate.
+
+**S37 — a callout completely swallows a direction-ladder label on committed ink,
+and the letter's repulsion rule does not reach the collision.** *Needed by:*
+`fig-08-05`, whose re-judge this fails; and by every future figure, because the
+mechanism is generic. Found 2026-07-29 by the first judging ever performed on a
+genuinely 2× raster.
+
+On `figures/fig-08-05.svg` the `30 m` direction-ladder label sits at
+`x=23.865 y=-12.881`, and the callout *"no geometry left for c2 - off the outside
+edge"* sits at `x=24.735 y=-12.887` with `text-anchor="end"` — the same baseline to
+within 0.006 user units, and the callout is long enough to span the label's whole
+width. **Zero glyphs of `30 m` survive in the raster**, while `10/20/40/50/60 m` are
+all crisply readable. Verified in the main loop by cropping the raster at the
+label's own projected pixel position, not inferred from the SVG.
+
+*This is why the rasterizer mattered.* The label is drawn and then buried, so no
+element-inventory check can see it — only a picture can, and until 2026-07-29 the
+only pictures anyone had were the 1×-ink rasters, on which the ladder numerals are
+half-size and the 2026-07-25 ceremony graded J8 `pass`. Two of the three 2026-07-29
+passes graded it `fail`; the one that passed it read the ladder at overview scale.
+
+*Why it is a STOP and not a repair.* `design/06 §3.1` stage 10 is normative and
+says label boxes *"repel each other and the road ink by a simple candidate-position
+scoring pass"*. The `30 m` label is neither: it is **stage 8b line chrome** (D47's
+direction ladder), drawn from the line rather than the road, and stage 10's
+repulsion pass is not told about it. The letter is therefore **silent on this
+collision** — which is the row of the roadmap's authorization table that forbids
+touching the renderer on a run's own authority.
+
+*To decide:* does stage 10's repulsion set include stage-8b chrome? The options are
+not equal in cost, and none is free: (a) extend the repulsion set — the natural
+reading, but it moves callout positions and therefore **SVG bytes on any figure
+where a box currently sits near a ladder label**, which is a re-bake plus a re-judge
+of every figure that moves; (b) let the ladder suppress a label that a callout
+covers — cheaper to implement and it deletes information the figure is supposed to
+carry; (c) treat it as an authoring collision and move this one callout, which fixes
+one figure and leaves the mechanism live for the next. The blast radius of (a) is
+**not yet measured** and should be before the owner answers.
+
+*Meanwhile the honest record stands:* `fig-08-05.judge.json` carries
+`verdict: "fail"` on J8. `T-JUDGE-RECORD` permits that by design — its own comment
+reads *"Not hard-required to be `pass` — failed criteria are honest findings"* — so
+the suite is green with a failing figure on the record, which is the correct shape.
 
 Also noted, and deliberately **not** raised as STOPs:
 

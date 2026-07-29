@@ -315,7 +315,10 @@ worktree build of `HEAD` before the fix. Gates: build ✓ typecheck ✓ 53 files
 
 ## CLOSED — work order 1: the marker defects. Both landed; the suite is red on purpose.
 
-**Status: shipped 2026-07-28. Read the last paragraph before you touch anything.**
+**Status: shipped 2026-07-28.** *The red this section describes was cleared on 2026-07-29
+by work order 0's re-judge — see the CLOSED section above. Everything below is left as
+written, including its closing instruction, because its reasoning is why the red was allowed
+to stand for a day rather than be restamped away.*
 
 Both defects were letter-decisive and both are fixed, with no design text moved and no
 constant invented.
@@ -366,12 +369,75 @@ needs a re-judge, which is blocked on **S36** — the new top of `NEXT`.
 
 ---
 
-## NEXT — close the judge loop first; then the two owner packets
+## CLOSED — work order 0: the rasterizer is built and the judge loop is closed.
 
-**Status: open, 2026-07-28.** Reordered by what landing work order 1 discovered. Each item
-says what it is, what the design letter permits, what a run may do without asking, and what
-"done" looks like. **Work order 1 shipped; its successor, item 0, is now the gate on
-everything that changes a figure.**
+**Status: shipped 2026-07-29. The suite is green — and `fig-08-05` now records a
+`fail`. Those two facts are the same fact, and the second is the point.**
+
+`design/09 §7` step 2's headless-browser rasterizer existed in the design and nowhere
+else. It exists now: `linelab/tools/rasterize-figures.mjs`, **puppeteer 25.4.0** driving
+the version-pinned Chrome for Testing it downloads (`browser.version()` =
+`"Chrome/151.0.7922.47"`), 2× on white, a manifest that names its own engine, non-zero
+exit on any render failure. **Which rasterizer was never the owner's call** — §7 step 2
+and `§9` L2360 both say *headless browser*, and the letter outranks convenience, so
+`resvg` and `sharp` were excluded on precedence rather than on taste. D1 holds: it is a
+`devDependency`, `linelab/package.json` has no `dependencies` key at all, and nothing
+under `src/` or `dist/` imports it. Everything decidable without a browser lives in
+`tools/raster-core.mjs` behind 54 pure tests; the driver is invoked by hand like
+`restamp-figures.mjs` rather than from `bake.sh`, because Chrome's PNG encoder being
+byte-stable is a property this repo had never measured and the determinism ceremony must
+not come to depend on it.
+
+**The rasterizer's first act was to indict its own predecessor.** Measured, not inferred:
+the committed `fig-08-05.2x.png` is a 2000×2774 canvas whose ink stops at (999, 1386);
+`fig-08-01`'s stops at (999, 1146) of 2000×2294. The prior, unreproducible step rendered
+at **1× onto a 2× canvas**, so rubric item J8 — *"lines distinguishable and text readable
+at the 2× raster"* — was graded throughout the 2026-07-25 ceremony on an image at half the
+linear size the rubric names. Only `fig-08-05`'s rasters were regenerated; replacing the
+other five would destroy the evidence their still-valid records were judged on.
+
+**And judging a real 2× raster immediately found a defect three days of green had hidden.**
+`fig-08-05`'s `30 m` direction-ladder label is **completely swallowed** by the callout *"no
+geometry left for c2 - off the outside edge"* — same baseline to within 0.006 user units,
+`text-anchor="end"`, zero glyphs surviving, while `10/20/40/50/60 m` are all crisp.
+Confirmed in the main loop by cropping the raster at the label's own projected pixel
+position. The label is *drawn and then buried*, so no element-inventory check could ever
+have seen it; only a picture can. Two of three passes graded J8 `fail`, so the record
+carries `verdict: "fail"` — which `T-JUDGE-RECORD` permits by design (*"failed criteria are
+honest findings"*). **Filed as S37, as a STOP and not a repair**, because `design/06 §3.1`
+stage 10 makes label boxes repel *"each other and the road ink"* and says nothing about
+stage-8b line chrome: the letter is silent, which is the row of the authorization table
+that forbids touching the renderer.
+
+Two rubric items came back **flaky**, which `§7.4` makes rubric defects rather than figure
+defects: J5 (pass/pass/`na` — the rubric never says J5 applies to every figure drawing a
+mistake line) and J8 (pass/fail/fail — the rubric never says *at what magnification*
+"readable" is decided, which is exactly the ambiguity the 1× raster hid). Both are
+recorded rather than smoothed.
+
+One further defect was caught and fixed inside this work order: "2×" had been implemented
+as a fixed 2000 px target. On this corpus that *is* 2×, but `src/render/fallback.ts`
+declares 400×120, which the fixed target would enlarge 5× and write out as `.2x.png` — a
+file name asserting a scale the file does not have. `RASTER_SCALE = 2` is the input now and
+2000 px the pinned consequence; both rasters re-render byte-identical across the change.
+
+**Gates: build ✓ typecheck ✓ · `T-JUDGE-RECORD` green on all six · `tripwire` green ·
+`test/tools/raster-core.test.ts` 54/54 · bake ×2 byte-identical ✓** (zero moved artefacts
+under `out/chapter-08/` and `linelab/figures/`). Nothing was restamped, and no test,
+threshold or golden was weakened. **Read the flakiness note below before you believe any
+red**: this pass hit 600 s timeouts on the two heaviest CLI bakes at a load average of 23,
+with two unrelated macOS daemons pegged near 100 % — the same class the note describes, an
+order of magnitude worse. The bake itself then ran clean twice.
+
+---
+
+## NEXT — S37 first; then the two owner packets
+
+**Status: open, 2026-07-29.** Each item says what it is, what the design letter permits,
+what a run may do without asking, and what "done" looks like. **Work orders 0 and 1 have
+both shipped — the judge loop is closed, so changing what a figure draws is no longer
+blocked.** What replaced work order 0 at the top is the defect that closing the loop
+found: S37, which is a genuine owner decision and whose blast radius nobody has measured.
 
 ### Read this before touching any of them: the authorization rule
 
@@ -391,51 +457,36 @@ measure a blast radius — a big blast radius makes a defect feel important, and
 evidence about what the letter says. Template 4 in the `next-steps` skill's
 `references/workflow-templates.md` encodes the procedure.
 
-### Work order 0 — build the rasterizer and re-judge fig-08-05. THE GATE ON EVERYTHING ELSE.
+### Work order 0b — S37, the swallowed ladder label. Measure the blast radius; change nothing.
 
-**Why it is first, ahead of two items that were ahead of it yesterday:** the suite is red
-until it is done, and *any* future change to what a figure draws will re-red it. That
-includes the rest of S34, the whole doctrine-figure programme, and — if the owner ever
-answers work order 2 in a way that moves a verdict — the `out_in_out` cluster too. This is
-no longer a nicety attached to one figure; it is the prerequisite for changing pictures at
-all.
+**Authorization: none to touch the renderer.** `design/06 §3.1` stage 10 says label boxes
+*"repel each other and the road ink by a simple candidate-position scoring pass"*. The
+buried `30 m` label is neither: it is **stage-8b line chrome** (D47's direction ladder),
+drawn from the line rather than the road. The letter is **silent on this collision**, which
+is the third row of the table above. The deliverable is a measured packet, and a measured
+packet attached to a STOP is a result.
 
-`design/09 §7` step 2 specifies *"a headless-browser rasterizer (replacing cairosvg —
-exported SVG is no longer constrained to cairosvg's feature subset)"*. **It was never
-built.** There is no `sharp`, `resvg`, `puppeteer`, `playwright` or chromium in
-`linelab/package.json` or on the machine, and `out/chapter-08/bake.sh` emits no PNGs — so
-`linelab/figures/png/*.2x.png` and `*.grey.png`, the rasters the 2026-07-25 ceremony judged
-and retained as its evidence, **are outputs of a step nobody can re-run.**
+Full statement in `figures/SCOPE.md` §4 S37. What a run may land:
 
-What is already settled, so nobody re-derives it: the *judge* half works —
-`verify/judge.json` pins the identity to `claude-opus-5`, which is available, and the
-9-item rubric and 2-of-3 majority are specified and unambiguous. Only the *raster* half is
-missing. The one rasterizer on this machine, macOS `qlmanage`, was tested against committed
-`fig-08-01.2x.png` and renders the ink faithfully — same colours, geometry, labels, chrome
-— but **force-crops to a square**, cutting off the turn point, the entry-speed labels and
-the scale bar, i.e. exactly what rubric items J2, J3 and J8 grade. It is also macOS-only.
-Judging a cropped raster and recording the verdict as a judgment of the figure would
-fabricate a record; using a platform-specific tool would trade the corpus's reproducibility
-guarantee for a green tick. **Neither is acceptable, which is why this is a work order and
-not a workaround.**
+- **The measurement, which is the missing piece.** For each of the three options S37
+  names — (a) extend stage 10's repulsion set to stage-8b chrome, (b) let the ladder
+  suppress a label a callout covers, (c) treat it as an authoring collision and move this
+  one callout — how many committed figures move an SVG byte? Recompute by hand from the
+  committed SVGs: for every ladder label on all six, does any callout box overlap it?
+  `fig-08-05` is known; **the other five are unmeasured**, and that number is what decides
+  whether (a) is a one-figure fix or a corpus event. Remember what a move costs now: an SVG
+  byte moving means a re-bake **and** a re-judge of that figure.
+- **Do NOT pick an option, and do not edit `render/` to try one.** If you find yourself
+  changing the label-layout pass, stop.
+- **Done when:** S37 carries the per-figure overlap census and a cost per option, and this
+  roadmap records the cluster as an owner decision.
 
-- **Constraints:** D1 confines it to a **dev** dependency. It must be deterministic and
-  portable, because byte-identical reproducibility is the property the whole corpus rests
-  on. It must produce the full figure at the committed convention (2000 px wide,
-  aspect-preserved) plus the greyscale conversion the D47 outcome words exist to survive.
-- **Then re-judge `fig-08-05`, scoped to one figure.** `verify/judge.json`'s identity
-  fields are untouched, so this is **not** a `§7.4` six-figure ceremony. Three independent
-  attempts against the 9-item rubric, per-item 2-of-3 majority, verdict flips against the
-  superseded record enumerated explicitly, `svg_fnv1a` updated to `7e1dbd`, and an entry
-  appended to `policy.re_judge_log` in the voice of the 2026-07-25 one — including **which
-  rasterizer produced the images**, since the previous entry could take that for granted
-  and this one cannot.
-- **Done when:** `npm test` is 0 red with no test, threshold or golden weakened; the
-  rasterizer is reproducible by a second run; and `figures/png/fig-08-05.*` are regenerated
-  rather than left as rasters of an image that no longer exists.
-- **Do NOT** clear the red by restamping. If the rasterizer turns out to need a design
-  amendment (e.g. `figures/png/` becoming a build output rather than committed evidence),
-  that is a STOP — write it and stop, with the red still standing and still honest.
+**A cheaper question worth answering in the same pass, because it is the same census:** the
+rubric flake on J8 is that *"readable"* names no magnification. `§7.4` calls a flaky item a
+rubric defect to tighten. Tightening it is a `verify/judge.json` edit, which invalidates
+every record and triggers a **full `§7.4` six-figure ceremony** — so it should be batched
+with the other five figures' re-judge on true 2× rasters (see the CLOSED section), not done
+alone. Say so explicitly when you file it; the batching *is* the recommendation.
 
 ### Corrections first — three things this roadmap asserted on 2026-07-27 and got wrong
 
