@@ -431,9 +431,139 @@ order of magnitude worse. The bake itself then ran clean twice.
 
 ---
 
-## NEXT — S37 first; then the two owner packets
+## CLOSED — work orders 0b, 2 and 3. Three packets landed; nothing was built, and that was the job.
 
-**Status: open, 2026-07-29.** Each item says what it is, what the design letter permits,
+**Status: done, 2026-07-29.** All three items were measure-and-record items whose
+authorization row forbade an engine change, and none was taken. **No file under
+`linelab/src`, `linelab/test`, `linelab/verify`, `figures/*.scene` or any committed
+SVG / envelope / judge record was touched, and nothing was re-baked or re-judged.**
+The deliverables are `figures/SCOPE.md` §4 (S20, S29, S32, S37 re-stated; S38 and S39
+new) and a new `linelab/DEVIATIONS.md` section.
+
+### 0b — the S37 census. One collision in eighty pairs, and the entry's own reason was wrong.
+
+The census the roadmap asked for exists. All six committed SVGs, stage-8b chrome
+(`data-ladder-label` / `data-entry-label` / `data-outcome-word`) against stage-10
+callouts: **56 chrome texts, 32 ladder numerals, 9 callouts, 80 pairs → 1 buried, 0
+grazed, 0 near, 79 clear.** Measured four times independently — two census agents, an
+adversarial recount that re-derived the box model from scratch, and a main-loop script —
+with every per-figure bucket matching. The one burial is the filed one. **`fig-08-02` and
+`fig-08-06` emit `<g data-stage="10-labels"></g>` empty**, so two of the six zeros are
+arithmetic rather than evidence that the placer succeeded.
+
+Three findings outrank the count:
+
+1. **S37's stated reason is refuted.** The entry said the letter is *silent* because a
+   ladder label is stage-8b chrome and not in stage 10's obstacle set. But the buried
+   numeral's whole span and the burying callout's anchored end both sit **inside the
+   stage-2 road-surface polygon**, and `design/06 §6.1` gives *"road ink"* its only defined
+   referent as that polygon. The collision is reachable through the letter's **own** second
+   obstacle member. It is still a STOP — for a stronger reason.
+2. **There is no repulsion pass to extend.** `render/topdown.ts:683-692` says so in its own
+   docstring; the entire layout is two booleans and one fixed diagonal step with no overlap
+   test against anything, and `render/labels.ts:7-12` disclaims it from the other side. Each
+   file defers to the other. Measured consequence: **9 of 9 committed callouts overlap the
+   road surface**, five of them at ≥ 99.67 %. On the letter's stated obstacle set the engine
+   is at 0 % compliance. Filed as **S38**, `needs-decision` in `DEVIATIONS.md` — and *not*
+   fixed, because the letter names no candidate set, no score, no weights, no order, no
+   tie-break, no fallback and **zero TUNING constants**, and its one named destination
+   (`§2.4` aspect-floor padding) exists on **no committed figure** — all six `frame_aspect`
+   values sit inside `§6.1`'s band. Conformance entails the boxes move; it does not say
+   where they land.
+3. **The class is wider than the question.** On `fig-08-06` the `90 m` label's unit glyph is
+   half-eaten by a **stage-9 marker disc**, on a figure with **zero callouts**. Found in
+   pixels, confirmed by a marker-aware probe, invisible to any `<text>`-vs-`<text>` census
+   and unreachable by *any* stage-10 obstacle set. Option (a) fixes one of the two observed
+   cases.
+
+Cost per option, measured: **(a)** ceiling 4 of 6 figures, 0–4 re-bakes + 0–4 re-judges, 0
+`spec_hash` moves, exact count **unmeasurable** because the letter does not determine the
+pass; **(b)** deletes exactly 1 of 32 numerals, 1 re-bake + 1 re-judge, breaks nothing
+mechanical, but punches a hole in the figure's single distance scale; **(c)** one scene
+token (`-2` offset — the grammar already supports it, the burial is exactly one sample
+wide), and it is the **only** option that moves a `spec_hash` (37e73d → bcec5c) and
+`figures/manifest.json`. A run may not pick one.
+
+The J8 magnification flake is filed as **S39** with the batching recommendation: tightening
+it bumps `rubric_version`, invalidates every record and triggers a full `§7.4` six-figure
+ceremony — which the five 1×-ink figures already need for an unrelated reason, so the two
+should ride one commit instead of paying the six-figure price twice. A free result fell out
+of the raster cross-check: `fig-08-05`'s two committed PNGs are **SHA-256 identical** to a
+fresh rasterizer run, so that output is byte-stable on this machine.
+
+### 2 — the `out_in_out` cluster. S20 and S29 brought to the same bar as S30/S33/S35.
+
+Both are now three-part entries — what the letter says, the live remainder, the options
+with their measured consequence — and both were **re-classified by checking the letter**,
+which is the point of the exercise:
+
+- **S20 is not a defect.** `§A.3` check 2's predicate (L613-616) has no upper bound on
+  `exit_f` and `checks.ts:338-343` implements it term for term. Its own prose four lines
+  later (L619-622, *"typically fails the exit leg"*) predicts the opposite — so **check 2
+  contradicts itself**, and the engine follows the arithmetic half, which `§A` L446-447 calls
+  the appendix's normative content. The owner picks a half. Corrected reach: **all four**
+  mistake lines of figs 8.1–8.4 carry `exit_f = 1.148`, not the two the entry named. And
+  **answer S35 first** — it is the cause, and it resolves the headline number without
+  touching the predicate.
+- **S29 is not vacuity.** `§A.2` L538-539 pins the doctrinal turn-in at `rider.start.f =
+  1.0`, so `ti_f = 1` on a first corner is the letter's own picture, and the dead legs are a
+  **redundancy the letter authored**. Two supports: check 2 waives legs where it means to
+  (L617-619, chain mode) and does not waive this one; and `A-CATALOGUE-EXERCISED` is scoped
+  per check **id**, which `out_in_out` satisfies. Nothing mechanical is broken. What survives
+  is the **placard** question, which is S30's and S33's surviving half too — the three should
+  be answered together.
+
+### 3 — S32. The packet is complete and the decision is recorded pending.
+
+Audited clause by clause against the "Done when". Four gaps closed: option **A** now carries
+its operative defining sentence (*a figure is Chapter 8 doctrine iff its road and teaching
+sit inside `design/01 §4`–§6*) — which is also what would land in `design/01`; **C** and **E**
+carried no consequence at all and now do (E is the only option that answers half (ii) without
+admitting a `fig-09-*` token); **D**'s consequence was displaced into a corrections bullet.
+The deferral sentence pointing the reader at `ROADMAP.md` for the consequences is deleted —
+that was the Done-when's specific complaint, and it pointed at a file whose own header
+disclaims authority. All three load-bearing empirical claims were re-verified: `throttle_rule`
+is the only ch-9 `book_ref`, exactly **twelve** of sixteen are ch. 8, and `gate.test.ts`
+hard-codes the six ids — in **four** places, not one (`:66`, `:236-240`, `:71-76`, `:203-208`).
+
+---
+
+## NEXT — the owner's desk, then the ceremony
+
+**Status: open, 2026-07-29.** Everything below needs a decision this project's runs are
+not authorized to make. **Nothing in `NEXT` is buildable by a run today** — that is the
+honest state, not an oversight, and it is what three measured packets bought.
+
+1. **S38 — is stage 10's pass built, amended, or retired?** The prior question to all of
+   S37. Three answers are on the table: amend `design/06 §3.1` to specify a buildable pass
+   (candidate set, score, weights, order, tie-break, fallback, constants); retire the
+   sentence in favour of the one-candidate placement the engine ships, which makes
+   `stageLabels` conformant and closes S37 option (a) outright; or keep the sentence and pin
+   the property mechanically, which needs the export manifest to record callout boxes first.
+2. **S37 — then the mechanism, (a) / (b) / (c),** with the costs above. Note that no option
+   reaches the `fig-08-06` marker-over-chrome case.
+3. **S39 + the five-figure 2×-raster re-judge as one `§7.4` ceremony.** A human arbiter is
+   required on any pass→fail flip, so a run cannot perform it.
+4. **S35 — what is the exit sample when the line left the road before the corner ended?**
+   Answer this before S20; it subsumes most of it. Check 9 `exit_containment` already has a
+   rule for the same termination, which is the strongest argument available.
+5. **The figure-authoring placard rule** shared by S29, S30 and S33: may a figure rest its
+   verdict on a `TUNING` bar, what must it say, and may it recite leg counts it did not
+   measure?
+6. **S32 — the grant's scope (A/B/C) and naming (D/E),** and it must land in `design/01`,
+   not only here.
+
+If the owner is not answering yet, the unblocked work is in `Backlog` — item 1 (author real
+roads) and item 2 (the four deferred design-letter items) are both buildable without any of
+the above.
+
+---
+
+## The three items above, as they were specified before they closed
+
+**Status: superseded 2026-07-29 by the CLOSED section above.** Kept for the authorization
+rule, which still governs, and for the specification each item was executed against.
+Each item says what it is, what the design letter permits,
 what a run may do without asking, and what "done" looks like. **Work orders 0 and 1 have
 both shipped — the judge loop is closed, so changing what a figure draws is no longer
 blocked.** What replaced work order 0 at the top is the defect that closing the loop
@@ -457,7 +587,7 @@ measure a blast radius — a big blast radius makes a defect feel important, and
 evidence about what the letter says. Template 4 in the `next-steps` skill's
 `references/workflow-templates.md` encodes the procedure.
 
-### Work order 0b — S37, the swallowed ladder label. Measure the blast radius; change nothing.
+### ~~Work order 0b — S37, the swallowed ladder label.~~ DONE 2026-07-29 — census landed; see the CLOSED section above.
 
 **Authorization: none to touch the renderer.** `design/06 §3.1` stage 10 says label boxes
 *"repel each other and the road ink by a simple candidate-position scoring pass"*. The
@@ -577,7 +707,7 @@ no `marks:`. `figures/fig-08-05.scene:21` authors `marks: turn_point,apex`. Comm
 
 ---
 
-### Work order 2 — the `out_in_out` cluster. Produce the owner's packet; change nothing.
+### ~~Work order 2 — the `out_in_out` cluster.~~ DONE 2026-07-29 — S20/S29 packets landed; see the CLOSED section above.
 
 **Authorization: you may not change the engine or the pack for any of S20, S29, S30 or
 S33.** On every one of them the engine matches the letter exactly. The deliverable is the
@@ -621,7 +751,7 @@ with zero mismatches against all 19 graded instances:
 
 ---
 
-### Work order 3 — S32, the grant. Owner's call; the packet is below.
+### ~~Work order 3 — S32, the grant.~~ DONE 2026-07-29 — packet completed, decision recorded pending; see the CLOSED section above.
 
 **Authorization: none needed to write the packet; the decision itself is the owner's.**
 Note the structural point, which is new: the S12 grant exists only in `ROADMAP.md`, whose

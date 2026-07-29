@@ -1422,7 +1422,84 @@ at all, and whether the outcome vocabulary needs a term that distinguishes "insi
 your own corridor" from "in the oncoming lane". Recorded as a scope-of-drawing
 question, not as a request to change the outcome rule.
 
-**S20 — rubric arithmetic: `out_in_out` is unbounded above in `exit_f`.** The
+**S20 — RE-STATED 2026-07-29: the engine is exactly conformant, `§A.3` check 2
+contradicts itself, and S35 may make the whole question moot.** The entry below is
+correct in its arithmetic and was filed before the design letter had been checked
+against it. Checking it changes the classification: this is not a defect a run may
+repair, it is a contradiction inside the normative appendix that only the design
+owner can resolve.
+
+*(i) What the letter actually says.* `design/01 §A.3` check 2 L613-616 states the
+predicate in full — *"pass iff `ti_f ≥ OIO_OUTSIDE_MIN (0.55 TUNING) ∧ apex_f ≤
+OIO_INSIDE_MAX (0.45 TUNING) ∧ exit_f ≥ OIO_OUTSIDE_MIN ∧ max(ti_f, exit_f) − apex_f
+≥ OIO_SWING_MIN (0.4 TUNING)`"* — and there is **no upper bound on `exit_f` in it**.
+`linelab/src/plan/doctrine/checks.ts` L338-343 implements that conjunction term for
+term. So the arithmetic half of the letter and the engine agree exactly, and the
+engine is not deviating.
+
+But four lines later the same check says, of the same situation, L619-622:
+*"Requires the exit sample to exist, which the lean-unwind machinery guarantees on
+completed corners (`02-physics-model.md` §3.1); until termination, a runoff line
+grades this check on the samples that exist and **typically fails the exit leg**."*
+That quotation — carried in `linelab/DEVIATIONS.md` — is **real**, but it is hedged
+("typically") and descriptive, and `§A.4` L845 rules on exactly this class of prose,
+saying of `late_apex`/`out_in_out` failing on the `premature` fixture that it is
+*"coverage evidence, never a pin"*. **So `§A.3` check 2 contradicts itself:** its
+arithmetic admits an unbounded `exit_f` and its prose predicts the opposite outcome.
+The engine follows the arithmetic half, which is the half `§A` L446-447 calls the
+appendix's normative content (*"ids, severity, scope, applicability, arithmetic, and
+thresholds"*). A run may not pick between the two halves.
+
+*Two corrections to the original entry's reach, from S35's measurement.* The
+original names two lines. In fact **all four** mistake lines of figs 8.1–8.4 report
+`exit_f = 1.148`; 8.1 `bad` and 8.3 `bad` therefore pass `out_in_out` outright,
+while 8.2 `bad` and 8.4 `bad` carry the same satisfied exit leg but fail the check
+on the *apex* leg. The mechanism is wider than the two passes make it look. And the
+root is not the predicate at all — see S35.
+
+*(ii) The live remainder.* Two questions, and only the first is really S20's:
+
+- **Which half of check 2 is normative?** Either the prose is decoration and the
+  predicate stands as written, or the prose is the intent and the predicate needs an
+  upper bound (or an off-road suppression rule). Whichever way it goes, the losing
+  half should be edited so `§A.3` stops contradicting itself.
+- **S35 may make this moot, and the link now runs both ways.** S35 asks the
+  better-posed question underneath: *what is the exit sample when the line left the
+  road before the corner ended?* `§A.2` L506-507 defines it only as *"for a
+  terminated line with no exit event, corner end"*, and corner end does not exist on
+  a trajectory that stopped first; `metrics.ts:292` substitutes the departure sample,
+  which **is** the 1.148. Answer S35 and the headline number resolves without
+  touching the predicate. S35 already says it *"subsumes much of S20"*; this
+  back-link completes the pair. **Answer S35 first.**
+
+*(iii) The options, with their measured consequence.* Flip counts carried from the
+blast-radius measurement, independently recomputed twice, the second time by
+reimplementing the predicate from scratch over the raw samples, with zero mismatches
+against all 19 graded instances. **Do not re-derive them.**
+
+| option | committed lines that flip | consequence |
+|---|---|---|
+| **R2 — evaluate the exit fraction at `s1` instead of at the exit event** | **exactly one of twelve**: `fig-08-04` good c1 `pass → fail`, on the exit leg alone | quality `good → caution`, `verdict.ok true → false`, the drawn line turns amber (18 colour tokens), the legend text changes, the figure gate goes exit 0 → 3, `result_hash` moves on 5 of 12 lines, and golden `G-CORR-WIDE solved` flips `good → caution`. **A corpus event.** Counter-fact worth having in front of the owner: figs 8.1/8.2/8.3 ideal **survive** — `f` at `s1` is 0.5764 (nearest sample) / 0.5627 (interpolated) against the 0.55 bar, a margin of 7.13 cm / 3.42 cm. The old worry that this repair would fail the book's own good line is **false**; it is true only of fig 8.4, which misses by 35 cm. |
+| **R1 — suppress or fail the exit leg on off-road termination** | 2 lines (8.1 `bad`, 8.3 `bad`) `pass → fail`; 8.2 `bad` and 8.4 `bad` already fail | **no SVG change** — those lines are already red by outcome — but `result_hash` moves. |
+| **R3 — re-base `OIO_OUTSIDE_MIN`** | **0**: no committed `exit_f` lies in the dead zone (0.55, 0.845], so the first bar that changes anything is above 0.845 | a bar chosen to move the corpus would have to be chosen *because* it moves the corpus. This is S33's surviving question, not S20's. |
+| **do nothing; answer S35 instead** | 0 until S35 is answered | costs nothing and is the only option that addresses the cause rather than the symptom. |
+
+*The price of any of R1/R2, stated once so it is not discovered at the bump.*
+Capping or suppressing `exit_f` is **new arithmetic**, and `§A.6` L925-927 is
+explicit that *"A pack **cannot introduce arithmetic**; wanting a new metric = a
+`checks_version` bump (a code change with a re-bless migration)"*. `design/09 §3.3`
+L523-527 prices the rest: a `checks_version` bump *"or any change to a pack's
+thresholds, bands, severities, or applicability, **re-blesses every `standing`
+golden**"*, with the commit message enumerating the moved `standing` rows alongside
+the moved check vectors. **(entailment, not measurement)** Because `result_hash`
+moves on both R1 and R2, every committed judge record also goes stale under
+`T-JUDGE-RECORD` (`design/09 §7.4` L2219-2222: *"missing or stale → exit 3"*), so a
+six-figure re-judge rides along even on R1, which changes no SVG byte.
+
+*The original entry follows, retained because its arithmetic is correct and was
+independently re-verified; it is the classification and the reach that were wrong.*
+
+**S20 (original) — rubric arithmetic: `out_in_out` is unbounded above in `exit_f`.** The
 exit leg is `exit_f >= OIO_OUTSIDE_MIN` (0.55) with no upper bound, and the swing
 leg is `max(ti_f, exit_f) − apex_f >= 0.4`, so both get *easier* the further past
 f = 1 a line terminates. Pre-existing in the shipped corpus, not introduced by any
@@ -1547,7 +1624,73 @@ physics one. A reviewer could refuse 11.TB on this ground alone and be right.
 
 ### Added by the doctrine-figure pass (S29–S31, 2026-07-27)
 
-**S29 — vacuity: `out_in_out` advertises four legs and has two live ones on any
+**S29 — RE-STATED 2026-07-29: not vacuity. The dead legs are a redundancy the
+letter itself authored, and nothing mechanical is violated.** The measurements below
+are correct and were re-verified. The word "vacuity" is not: it implies a check that
+escaped its designer, and on the turn-in leg the opposite is true — the pin is
+doctrine.
+
+*(i) What the letter actually says.* `design/01 §A.2` L538-539 pins the doctrinal
+turn-in itself: *"**On the hold-wide line, at the doctrinal turn-in
+(`rider.start.f = 1.0`, turning in at `s0`), no 90° corner in the proportion band is
+blind at any legal margin**"*. `f = 1.0` at turn-in is not the solver's accident, it
+is the letter's picture of a correctly-ridden first corner; the original entry's
+mechanism (default start state, `position` the only lateral action) explains *how*
+the engine gets there, but the *why* is doctrinal. A leg that a correctly-ridden
+first corner satisfies by construction is a **redundancy the letter authored**, not
+a check that fails to bind.
+
+Two further things the letter says, both of which cut against reading this as a
+defect:
+
+- **`§A.3` check 2 already knows how to declare a leg inapplicable, and does so
+  exactly once.** L617-619: *"**Chain-mode corners: the two exit legs are waived** —
+  pass iff `ti_f ≥ 0.55 ∧ apex_f ≤ 0.45`, evidence noting 'exit leg waived
+  (chained)'."* The letter waives legs where it means to waive them, and it does not
+  waive the turn-in leg on a first corner. Its silence there is a choice, not an
+  oversight.
+- **The dead-doctrine instrument is scoped per check id, not per leg —
+  deliberately.** `design/09`: *"`A-CATALOGUE-EXERCISED` — every one of the 16 ids
+  has ≥ 1 committed fixture where it *fails* and ≥ 1 where it *passes* — a check that
+  cannot fail is dead doctrine (D8's spirit at the catalogue level)."* `out_in_out`
+  fails on committed ink (figs 8.2 and 8.4, apex leg), so it satisfies the
+  instrument. **No named check anywhere in `design/09` asserts leg-level liveness.**
+  Nothing is currently broken.
+
+*(ii) The live remainder.* The half that survives is not about the check, it is
+about what a figure may **say** about it:
+
+- **Does the owner want leg-level `na` evidence?** That is a record-shape and
+  evidence question, not an arithmetic one — the verdicts do not move either way.
+- **The placard half is the sharper question and it is live.** A placard reciting
+  "its other three legs pass" overstates the surgical precision of the fault by
+  about 3×, and `design/01 §8`'s placard policy bites the **placard**, not the check.
+  This is the same question S33 leaves open in its own words — *what a figure may say
+  about a check whose name outruns its arithmetic* — and S30's surviving
+  figure-authoring half. **The three should be answered together.**
+- **A bar re-tune only moves *which* leg is dead.** Given `ti_f = 1`, swing reduces
+  to `1 − apex_f ≥ OIO_SWING_MIN`; retuning `OIO_SWING_MIN` upward past 0.55 would
+  make swing bind and the apex leg redundant instead. The turn-in pin is untouchable
+  by any bar, because it is `§A.2` doctrine and not a threshold.
+- **S35's answer cannot move this.** Because `ti_f = 1` on every committed `c1` row,
+  `max(ti_f, exit_f) = 1` regardless of what the exit sample turns out to be, so
+  whatever S35 decides changes the **exit** leg only and leaves the swing leg's
+  redundancy exactly where it is on a first corner.
+
+*(iii) The options, with their measured consequence.*
+
+| option | committed verdicts that flip | consequence |
+|---|---|---|
+| **documentation only** (status quo; record the redundancy here and in the check's prose) | **0** | zero cost — no hash, no byte, no re-bless, no re-judge. `A-CATALOGUE-EXERCISED` is already satisfied. Leaves the placard risk to be handled as an authoring rule. |
+| **R4 — mark structurally-pinned legs `na` in evidence** | **0 verdicts** | but **evidence is in-hash**, so `result_hash` moves on every graded `c1` row → a **six-figure re-bless** under `design/09 §3.3`. **(entailment)** Because `result_hash` moves, every committed judge record also goes stale under `T-JUDGE-RECORD` → a **six-figure re-judge** rides along, even though not one SVG byte changes. **(entailment)** A per-leg `na` is also a `CheckResult` shape change, owned by `05 §6.2` per `§A` L448-449 — so it needs an amendment there as well as code, and is not a pack edit. |
+| **re-tune a bar to make every leg live** | **0** within the measured dead zone — no committed `exit_f` lies in (0.55, 0.845] (R3) | cannot achieve the stated goal: the turn-in pin is doctrine, not a bar, so re-tuning can only trade which of swing/apex is the dead one. Not recommended as an answer to S29. |
+| **placard rule only** — a figure may not recite leg counts it did not measure | **0** | costs nothing mechanical; lands in figure-authoring policy alongside S30's and S33's surviving halves. This is the option that actually addresses the harm the original entry found. |
+
+*The original entry follows, retained because its arithmetic is correct and was
+independently re-verified; it is the classification — "vacuity", "S27's species" —
+that was wrong.*
+
+**S29 (original) — vacuity: `out_in_out` advertises four legs and has two live ones on any
 first corner.** *Needed by:* `fig-08-D2`, which was refused partly on this, and by
 anything that reads the check's four-leg form as four independent tests. This is
 S27's species, but arithmetic rather than statistical, and it sits on shipped ink.
@@ -1649,12 +1792,16 @@ than more placards on this one. Full evidence in §3.
 ### Added by the minimal-claim pass (S32–S34, 2026-07-28)
 
 **S32 — the S12 grant contradicts itself, and `chop` has no honest filename.**
+**DECISION: PENDING as of 2026-07-29 — the packet below is complete and the choice
+is the design owner's; no run may pick an option.** Both questions stay open
+together: a scope answer (A/B/C) and a naming answer (D/E) are independent, and
+neither may be inferred from the other.
 *Needed by:* candidate 1 (`chop`), and by any figure carried by a check outside
 Chapter 8. Two independent halves, both fatal to that candidate on their own.
 
 *(i) The grant excludes what its own queue admits.* `ROADMAP.md` scopes the S12
 grant to **"Chapter 8 doctrine only"**, and `throttle_rule` is Chapter 9 doctrine
-by every declared source: `packs/parks-street.json` gives it
+by every declared source: `linelab/src/plan/doctrine/packs/parks-street.json` gives it
 `"book_ref": "Total Control ch. 9, Throttle Control"` — the **only** ch-9
 `book_ref` among the pack's sixteen checks, against **twelve** ch-8 ones
 (*corrected 2026-07-28 — this entry and `ROADMAP.md` both said eleven*) —
@@ -1675,9 +1822,10 @@ the grant on its face. The placard channel (S15) reaches the SVG and the manifes
 `placards` array — it does not reach `figure_id`. *To decide with (i):* whether
 the corpus may hold a `fig-09-*` id at all.
 
-**The decision packet, added 2026-07-28.** Three corrections to this entry as
-filed, then the options. The full version with consequences is in `ROADMAP.md`
-`NEXT` work order 3; it is not duplicated here.
+**The decision packet, added 2026-07-28; completed here 2026-07-29** — the options
+below previously deferred their consequences to `ROADMAP.md`, a file whose own
+header disclaims authority over the design of record, which is precisely what the
+work order forbade. Three corrections to this entry as filed, then the options.
 
 - **The conflict is 3-vs-1, not 1-vs-1.** Three statements in the grant's own
   section admit `chop` — its rationale (*"Chapter 8 teaches … half the mistake
@@ -1699,16 +1847,31 @@ filed, then the options. The full version with consequences is in `ROADMAP.md`
   `test/render/gate.test.ts`, which hard-codes the six ids and asserts the baked
   directory holds exactly six SVGs and six judge records.
 
-*Scope options:* **A** — scope by road + doctrine surface (matches three of the
-grant's four statements; supported by the fact that `throttle_rule` leg (d)
-**already fails twice in committed parity ink**, fig 8.5 `early` c1 and fig 8.6
-`bad` c1, so a carrier-chapter rule retroactively indicts two G7-mandated figures).
-**B** — scope by carrier chapter widened to the pack's declared "ch. 8–9" (its
-warrant is currently false: the pack's sixteen `book_ref`s span ch. 1, 2, 8, 9 and
-11, so `doctrine_source` must be corrected before B can even be stated). **C** —
-keep carrier-chapter scoping and drop candidate 1 permanently.
-*Naming options:* **D** — admit a `fig-09-*` id. **E** — drop chapter numbers from
-doctrine ids entirely, reserving numbered ids for the six parity figures.
+*Scope options:* **A** — scope by road + doctrine surface. *Operatively:* add one
+defining sentence — **a figure is Chapter 8 doctrine iff its road and its teaching
+sit inside `design/01 §4`–§6** — which is also the sentence that would land in
+`design/01`. It matches three of the grant's four statements, and is supported by
+the fact that `throttle_rule` leg (d) **already fails twice in committed parity
+ink**, fig 8.5 `early` c1 and fig 8.6 `bad` c1, so a carrier-chapter rule
+retroactively indicts two G7-mandated figures. **B** — scope by carrier chapter
+widened to the pack's declared "ch. 8–9" (its warrant is currently false: the pack's
+sixteen `book_ref`s span ch. 1, 2, 8, 9 and 11, so `doctrine_source` must be
+corrected before B can even be stated). **C** — keep carrier-chapter scoping and
+drop candidate 1 permanently. *Consequence:* cheapest to state, and what the round-3
+author defaulted to; but it also strikes candidate 6's `traction_ceiling` (ch. 1)
+and the parked `fig-11-TB` (ch. 11) — see the "*'Exactly one artifact' undercounts*"
+correction above, which is C's price stated as a count.
+*Naming options:* **D** — admit a `fig-09-*` id. *Consequence:* proven near-free —
+`figure_id` is derived from the `--out` basename, is in no hash and no normative
+shape, and the probe above reproduces the committed `spec_hash` with a
+byte-identical SVG. **E** — drop chapter numbers from doctrine ids entirely (e.g.
+`doctrine-chop-book90`). *Consequence:* it removes the half of S32 a placard
+provably cannot reach, and makes chapter-numbered ids **reserved** for the six
+parity figures — E is the only option that answers half (ii) without ever admitting
+a `fig-09-*` token. Under either naming option the real cost of a seventh figure is
+`gate.test.ts`, which hard-codes the six ids (`:66`), `toEqual`s the whole baked
+directory listing (`:236-240`), and pins a per-id exit code (`:71-76`) and a per-id
+metric row (`:203-208`) — four hard-codings, not one.
 
 **The strongest argument against candidate 1 is from the book, not from
 governance**, and it survives every scope option: Chapter 8's only sentence about
@@ -1964,8 +2127,228 @@ and should be in front of the owner: two checks read the same termination and on
 one of them has a rule for it. Answering this may make S20 moot without touching
 the predicate.
 
-**S37 — a callout completely swallows a direction-ladder label on committed ink,
-and the letter's repulsion rule does not reach the collision.** *Needed by:*
+**S37 — REFRAMED 2026-07-29, same day as filing. The collision is real and
+measured; the reason given for it was wrong, and there is no repulsion pass to
+extend.** The entry below was filed hours earlier from the judge's evidence and
+placed the burial outside the letter's obstacle set. Two measurements taken since
+overturn that: the callout box sits **partly on the road surface**, which the
+letter's obstacle set names explicitly, and stage 10 **has no repulsion pass of any
+kind** to extend. So this is not the roadmap's silent-letter row for the reason
+given — though it is still a STOP, for a different and stronger one. Corrected in
+place rather than quietly edited.
+
+*What the census measured, and how.* All six committed SVGs at
+`linelab/figures/fig-08-0{1..6}.svg` (byte-identical to `out/chapter-08/`, verified
+by diff). Two independent passes plus an adversarial recount plus a main-loop
+recount, all four agreeing. Stage-8b chrome = every `<text>` carrying
+`data-ladder-label`, `data-entry-label` or `data-outcome-word`; stage-10 callouts =
+every `<text>` inside `<g data-stage="10-labels">`, extracted by `<g>`/`</g>` depth
+counting. Box width = `chars × font-size × 0.58`, anchored per the element's own
+`text-anchor`, then widened by its own halo `stroke-width` on each side (half that,
+vertically); vertical extent = `baseline − 0.8·fs … baseline + 0.2·fs`. `buried` =
+intersection ÷ **chrome** box area ≥ 0.90.
+
+| figure | 8b chrome texts | ladder numerals | callouts | pairs | buried | grazed | near |
+|---|---|---|---|---|---|---|---|
+| fig-08-01 | 8 | 4 | 2 | 16 | 0 | 0 | 0 |
+| fig-08-02 | 8 | 4 | **0** | 0 | 0 | 0 | 0 |
+| fig-08-03 | 8 | 4 | 2 | 16 | 0 | 0 | 0 |
+| fig-08-04 | 9 | 5 | 2 | 18 | 0 | 0 | 0 |
+| fig-08-05 | 10 | 6 | 3 | 30 | **1** | 0 | 0 |
+| fig-08-06 | 13 | 9 | **0** | 0 | 0 | 0 | 0 |
+| **total** | **56** | **32** | **9** | **80** | **1** | **0** | **79 clear** |
+
+The one burial is the filed one: `30 m` at `x=23.86488 y=-12.88080` under *"no
+geometry left for c2 - off the outside edge"* at `x=24.73487 y=-12.88655`,
+`text-anchor="end"` — chrome box `23.3606…24.3691` strictly inside callout box
+`12.6890…24.8265` on both axes, `coveredFraction = 1.0000`, penetration `-0.4456`
+user units. **`fig-08-02` and `fig-08-06` emit `<g data-stage="10-labels"></g>`
+empty**, so their zeros are arithmetic and are not evidence that the placer
+succeeded there.
+
+*Where the census halves and the raster disagree — recorded, not smoothed.*
+
+- **The raster read and the geometry disagree on `fig-08-06`, and the pixels win.**
+  Text-vs-text geometry calls `90 m` clear, correctly: no text overlaps it. The
+  pixels show its unit glyph half-eaten by `<circle cx="11.333929" cy="50.959021"
+  r="0.219380" fill="#b07d1e" data-marker-class="exit" data-line-id="good"/>` —
+  **stage-9 marker ink, not text**, painted after the label. The numeral `90` is
+  crisp; the `m` is damaged and still legible. A marker-aware geometric probe finds
+  it independently and fires exactly once across all six figures. Any
+  `<text>`-vs-`<text>` census is structurally blind to this, and `fig-08-06` has
+  **zero callouts**, so no stage-10 obstacle set can ever reach it. This is the
+  single most consequential disagreement in the packet: the class is wider than the
+  question S37 originally asked.
+- **The raster report's own summary miscounts.** It states "37 ladder labels
+  inspected"; its per-figure lists are 4+4+4+5+6+9 = **32**, which matches
+  `rg -c data-ladder-label` on the committed SVGs exactly. Treat 32 as the count.
+- **The 0.58 width ratio is borrowed and inflated, and it changes nothing.**
+  `render/controls.ts:95` and `render/placards.ts:36` are the viewer-HUD and placard
+  ratios; `render/labels.ts`, the actual stage-10 placer, does **no width estimation
+  at all**. True advance widths measured with `getComputedTextLength()` under the
+  same puppeteer 25.4.0 run 0.377–0.556, median 0.441 — 0.58 over-estimates by 4.6%
+  (`"30 m"`) to 53.8% (`"first of six inputs"`). Re-running the whole census on
+  measured widths yields byte-identical buckets `{buried 1, grazed 0, near 0,
+  clear 79}`; a ratio sweep finds the first bucket change at 0.04 downward and 0.77
+  upward. The inflation does manufacture one false positive nobody scored: on
+  `fig-08-06` the two `32 km/h` entry labels (`x=61.4682` and `x=58.4262`, shared
+  baseline `y=-13.7644`) overlap by 0.1123 u at 0.58 and clear by +0.2405 u under
+  measured advance — and every census here is blind to 8b-vs-8b pairs anyway.
+- **The two halves' "closest clear pair" claims are scope-local, not
+  contradictory.** Part 1 (figs 8.1–8.3) flags `34 km/h` at 0.679 u = 1.52
+  callout-em; part 2 (figs 8.4–8.6) flags `ran off` at 0.8095 u = 1.77 callout-em.
+  Each is the closest within its own three figures.
+
+*The premise of the original entry is refuted.* Point-in-polygon against the
+72-vertex stage-2 road-surface polygon in `fig-08-05.svg` puts the buried numeral's
+whole span `x ∈ [23.44, 24.29]` at `y = -12.8866` **inside the road polygon**,
+together with the callout's anchored end (tested at 21 / 23.44 / 24.29 / 24.73 —
+all inside). The callout's far end is not: 12.79 / 15 / 18 test outside, so the box
+**straddles the road edge**, with 47–48 % of its area on the road surface (0.4719
+by polygon clipping, 0.4821 by area sampling — the gap is the box-extent
+convention). `design/06 §6.1` L633 gives *"road ink"* its only defined referent —
+`road_ink` = road surface area / frame area, i.e. the stage-2 polygon. So the
+collision **is** reachable through the letter's own second obstacle member, with no
+extension to stage-8b chrome required. The original entry's *"the letter is
+therefore silent on this collision"* is wrong.
+
+*The stronger reason it is still a STOP: there is no pass to extend.*
+`linelab/src/render/topdown.ts:683-692` says so itself — `stageLabels` is *"a
+deterministic one-candidate stand-in for the candidate-scoring box-repel pass
+(§3.1 stage 10)"*. The whole of the layout is two booleans and one fixed diagonal
+step: `rightHalf = anchor.x > vbX + vbW/2`, `topQuarter = anchor.y < vbY + vbH*0.25`
+(`:699-700`), `boxX = anchor.x ∓ pxScale*22`, `boxY = anchor.y ± pxScale*22`
+(`:701-702`). **No overlap test against anything.** `render/labels.ts:7-12`
+disclaims it from the other side — the box-repel layout *"is presentation-only and
+left to `topdown.ts`'s draw pass"*. Each file defers to the other; nobody
+implements it. Filed separately as **S38**, because the missing pass is a deviation
+from a normative sentence in its own right. Consequently **option (a) below is not
+"extend a set" — it is "build the pass", whose specification is incomplete.**
+
+*Cost per option, measured.* No option is free, and two of the three numbers below
+are ranges because the letter does not determine them.
+
+**(a) Build the pass.** Hard ceiling first: callouts per figure are 2 / 0 / 2 / 2 /
+3 / 0 and `fig-08-02` and `fig-08-06` emit the group empty, so **under any obstacle
+set and any weights the maximum blast radius is 4 of 6 figures**.
+
+- *Boxes repel each other* (member 1): six candidate pairs corpus-wide, **zero
+  overlaps**, minimum clearance 4.1315 u = **9.02 callout-em**; the rest are 5.25 /
+  9.68 / 12.18 / 14.45 / 17.04 em. Box-vs-box moves **0 figures** at any repulsion
+  radius under 9 em.
+- *Boxes repel the road ink* (member 2): clipped against the stage-2 polygon
+  (Sutherland-Hodgman + shoelace), **all 9 callouts overlap it**. Fraction of each
+  box on the road surface — 8-01: 1.0000 / 0.6435; 8-03: 1.0000 / 0.9967; 8-04:
+  0.5406 / 0.3733; 8-05: 1.0000 / 1.0000 / 0.4719. Minimum 0.3733; five of nine are
+  ≥ 0.9967. The engine violates the letter's stated obstacle set on **100 % of
+  committed callouts in 4 of 6 figures** — `fig-08-05` is not the exception, it is
+  the one case where the violation was visible.
+- *Where do they go?* `frame_aspect` from `figures/manifest.json` is 0.8716 /
+  0.8716 / 0.8716 / 0.7720 / 0.7208 / 0.7367 — **all six inside `§6.1`'s
+  `[0.55, 1.8]` band, none on a bound**, so `§2.4`'s aspect-floor padding was
+  applied to no figure. *"Preferring the aspect-floor padding (§2.4)"* has nothing
+  to prefer on this corpus. On `fig-08-05`'s collision row the road spans
+  `x ∈ [-0.84, 26.03]` of a frame `[-3.19, 27.33]`, leaving 2.35 + 1.30 units of
+  off-road width against a box 11.95 units wide: **no zero-road-overlap candidate
+  exists on that row.** Half 1 therefore moves between **0 and 4** figures and the
+  exact count is **unmeasurable** — the letter supplies no candidate set, no score
+  weights, no placement order, no tie-break and no all-candidates-overlap fallback.
+- *Adding stage-8b chrome as a third obstacle* is the only half with a countable
+  increment. Every callout↔chrome clearance in the corpus, in callout-em: 8-05
+  `30 m` **−0.97** (buried); 8-01 `34 km/h` +1.53; 8-03 `34 km/h` +1.53; 8-05
+  `ran off` +1.77; 8-03 `34 km/h` +2.82; 8-04 `20 m` +6.10; 8-03 `ran off` +6.69.
+  Additional figures moved, by clearance target: overlap-only → **+1** (8-05);
+  ≤ 2 em → **+3** (8-01, 8-03, 8-05); ≤ 3 em → +3; ≤ 7 em → **+4** (every
+  callout-bearing figure). The letter names no such constant, so this is **1 to 4
+  figures** and unmeasurable as a single number.
+- *Gap it does not close:* `fig-08-06`'s `90 m`, eaten by a stage-9 marker on a
+  figure with zero callouts. Option (a) fixes one of the two observed cases.
+- *Hash cost:* renderer-only, so **`spec_hash` moves on 0 figures and
+  `figures/manifest.json` does not move at all** (precedent `DEVIATIONS.md`, the
+  stage-9 collapse fix). Each figure whose bytes move takes `svg_fnv1a` with it →
+  `T-JUDGE-RECORD` exit 3 → re-bake plus re-judge. `verify/judge.json` untouched →
+  **no `rubric_version` bump and no `design/09 §7.4` six-figure ceremony from the
+  fix itself.** Total: **0–4 re-bakes + 0–4 re-judges, 0 `spec_hash` moves.**
+
+**(b) Let the ladder suppress a numeral a callout covers.** Deletes **exactly 1 of
+32 ladder numerals corpus-wide (3.1 %)**; the next-worst chrome↔callout pair is
+1.53 em clear, so no threshold below 1.5 em adds a second casualty. **1 figure's
+SVG bytes move**; the other five bake byte-identical. What is deleted: numerals are
+emitted only on the ideal line (`topdown.ts:509`), so `fig-08-05`'s ladder goes
+10/20/30/40/50/60 → **10/20/40/50/60**. The `30 m` **chevron survives** — it is a
+separate `<polyline data-ladder-station>`, and the figure carries 9 chevrons
+against 6 numerals — so the tick and the direction arrow remain and only the
+distance reading is lost, at the rung nearest the c2 transition, on the figure
+whose whole lesson is *where* the early line runs out of geometry. Weigh that
+against `design/06 §3.1` stage 8b's own reason for the numerals: they are drawn
+*"on the ideal line only, so one figure carries one distance scale"* — suppression
+punches a hole in the figure's single distance scale. Breaks nothing mechanical:
+`rg 'data-ladder-label|10-labels|LABEL_FONT_PX|stageLabels'` over `linelab/test`,
+`linelab/verify` and `linelab/tools` returns **zero hits**, and `A-LADDER-AND-ENTRY`
+as implemented (`test/render/chrome.test.ts:116-125`) asserts `data-ladder-station`
++ `data-line-id` — the chevron, not the numeral — so suppression cannot fail it.
+*Hash cost:* `spec_hash` and `manifest.json` unmoved; **1 re-bake + 1 re-judge**, no
+ceremony. *Uncosted side:* it still needs a text-box measurement to know a label is
+covered, so it imports the same unauthorized `0.58 × font-px` estimate option (a)
+would, and it removes ink rather than placing it — the reverse of what stage 10
+says to do.
+
+**(c) Treat it as an authoring collision and move the one callout.** One token in
+`figures/fig-08-05.scene`: `run_wide_detect@early "no geometry left for c2 - off
+the outside edge"` → `run_wide_detect@early -2 "…"`. The grammar is capable today,
+no code change: `design/03 §8`'s `feature[:corner][#n]@line ±m` is implemented at
+`src/plan/scene.ts:448` and `parseLabelEntry` `:485-525` carries `offset_m` through
+to the `FigureLabel`. The anchor is the `early` line's drawn sample at station
+**29.50 m** (leader `x1/y1 = 25.52844, -12.12351`, exact hit on sample #59); samples
+are 0.5 m apart and the line spans 0…30.78 m. Sweeping the offset through
+`stageLabels`' own arithmetic on the committed ink — a label offset cannot change
+the projection, since the auto-window is computed on road lines and the orient pivot
+is fixed — **the burial is exactly one sample wide**: `off = 0` buries; `-0.5`
+clears by 0.0005 u (0.00 em) and `+0.5` by 0.0752 u (0.16 em), both grazing rather
+than fixed; `-1.0` clears `30 m` by 1.14 em; **`-2.0` clears `30 m` by 3.37 em,
+`first touch` by 4.50 em and `ran off` by 6.19 em with the box still in frame** —
+the first offset with a real margin. Every offset from −29.5 to −0.5 clears the
+label and stays inside the viewBox. **Shortening the text cannot do it**: the
+callout is end-anchored at `x=24.7349` (box right edge 24.8265 with halo) against a
+`30 m` box of `23.3607…24.3691`; swept 46 → 1 characters, the text would have to be
+**1 character** to clear. *Hash cost, and it is the one option that moves a
+`spec_hash`* — measured with the shipped `lowerScene` + `specHash`, not inferred:
+baseline reproduces the committed **37e73d** and a comment-only edit stays 37e73d
+(control); `-0.5` → **f278b1**, `+0.5` → **87d7fc**, `-1` → **ae0afe**, `-2` →
+**bcec5c**, `-6` → **954570**, text cut to 23 chars → **e2a4e2**. `spec_hash` rides
+`figures/manifest.json`, is stamped in `fig-08-05.judge.json`, is recomputed by
+`test/hash/tripwire.test.ts:115`, and sits **inside** the `result_hash` input
+(`src/cli/verbs/export.ts:80-83`). So (c) = **1 re-bake + 1 manifest stamp move + 1
+judge-record restamp + 1 re-judge**, and unlike (a) and (b) it moves
+`figures/manifest.json`. It buys the figure, not the class: 9 of 9 callouts still
+sit on the road surface the letter says they repel, and `fig-08-06` is untouched.
+
+*What the committed record already asserts, so it is not in dispute.*
+`verify/judge.json` rubric **J8** asserts *"lines distinguishable and text readable
+at the 2x raster"* — unscoped by stage and by element class — and it fired:
+`fig-08-05.judge.json` records J8 attempts pass/fail/fail → item `"verdict":
+"fail", "flaky": true`, overall `"verdict": "fail"`. **J3 does not reach it**:
+`design/09` L2184-2185 scopes J3 to *"every **callout** anchored at its declared
+anchor; none floating, clipped, or swallowed"*, and the same judge graded J3 `pass`
+on the same figure. J8 binds the picture; it does not choose the mechanism — (a),
+(b) and (c) satisfy it equally, which is exactly why the choice is the owner's.
+`T-JUDGE-RECORD` permits the committed failure by design — its own comment reads
+*"Not hard-required to be `pass` — failed criteria are honest findings"* — so the
+suite is green with a failing figure on the record, which is the correct shape.
+J8's own flake is filed as **S39**.
+
+*To decide, and it is wider than the original question:* **what is stage 10's
+obstacle set, and what is the pass?** The three options above are the mechanism
+choice; S38 is the prior question of whether the pass the letter names gets built
+at all, and neither reaches the `fig-08-06` marker-over-chrome case, which no
+stage-10 pass can see. A run may not pick an option.
+
+*The original entry follows, retained because its measurements are correct and were
+independently re-verified in pixels; it is the reason it gave that was wrong.*
+
+**S37 (original) — a callout completely swallows a direction-ladder label on
+committed ink, and the letter's repulsion rule does not reach the collision.**
+*Needed by:*
 `fig-08-05`, whose re-judge this fails; and by every future figure, because the
 mechanism is generic. Found 2026-07-29 by the first judging ever performed on a
 genuinely 2× raster.
@@ -2006,6 +2389,118 @@ one figure and leaves the mechanism live for the next. The blast radius of (a) i
 `verdict: "fail"` on J8. `T-JUDGE-RECORD` permits that by design — its own comment
 reads *"Not hard-required to be `pass` — failed criteria are honest findings"* — so
 the suite is green with a failing figure on the record, which is the correct shape.
+
+**S38 — `design/06 §3.1` stage 10's candidate-position scoring pass was never
+built, and the deviation is recorded nowhere but a source docstring.** *Needed by:*
+S37, whose option (a) is this question and not a smaller one; and by every future
+figure that carries a callout. Found 2026-07-29 while costing S37.
+
+`design/06 §3.1` L416-418 is inside the stage list the heading calls *fixed*
+(L296, echoed by `03 §8` L1646's *"the fixed draw order"*) and reads in full:
+*"Label boxes repel each other and the road ink by a simple candidate-position
+scoring pass, preferring the aspect-floor padding (§2.4)."* Nothing answering to
+that description exists. `linelab/src/render/topdown.ts:683-692` says so in its own
+docstring — `stageLabels` is *"a deterministic one-candidate stand-in for the
+candidate-scoring box-repel pass (§3.1 stage 10)"* — and the entire layout is two
+booleans and one fixed diagonal step (`:699-702`), with **no overlap test against
+anything**. `linelab/src/render/labels.ts:7-12` disclaims it in the opposite
+direction: the box-repel layout *"is presentation-only and left to `topdown.ts`'s
+draw pass"*. Each file defers to the other.
+
+*Measured consequence on committed ink.* Clipping every callout box against the
+stage-2 road-surface polygon: **9 of 9 callouts overlap the road surface**, at
+fractions 1.0000 / 0.6435 (8-01), 1.0000 / 0.9967 (8-03), 0.5406 / 0.3733 (8-04),
+1.0000 / 1.0000 / 0.4719 (8-05) — five of nine ≥ 0.9967, minimum 0.3733. On the
+letter's own second obstacle member the engine is at 0 % compliance across every
+callout-bearing figure. Box-vs-box, by contrast, is compliant by accident: six
+pairs, zero overlaps, minimum clearance **9.02 callout-em**.
+
+*Why it is a STOP and not a defect fix.* This is `ROADMAP.md`'s **normative +
+engine deviates** row, which authorizes a repair — but the letter does not
+determine the repair. It fixes two obstacles and one preference and supplies **no
+candidate set, no score function or weights, no box geometry, no placement order or
+tie-break, no fallback when every candidate overlaps, and zero TUNING constants** —
+uniquely among `§3.1`'s stages, which name `FAN_ALPHA`, `OCCLUSION_ALPHA`,
+`MARK_COINCIDE_EPS_M`, `LADDER_EVERY_M`, `CONSEQUENCE_LEN_M` and `W_LEADER`.
+Contrast stage 9's L405-409 *"deterministic, never a Z-fight … ideal wins ties"*
+and `§2.6`'s L239-247 typed failure with `degraded: true` — both are the clauses
+stage 10 lacks. Worse, the one destination it names is empty: `frame_aspect` is
+0.8716 / 0.8716 / 0.8716 / 0.7720 / 0.7208 / 0.7367, **all six inside `§6.1`'s
+`[0.55, 1.8]` band**, so `§2.4`'s aspect-floor padding exists on no committed
+figure. And `design/03 §8` owns only the anchor grammar — no box geometry, no size,
+no font — so the deferral does not fill the gap. The codebase's only text metric is
+the `0.58 × font-px` estimate at `controls.ts:95` / `placards.ts:36`, borrowed from
+the viewer-HUD and placard subsystems; measured advance widths run 0.377–0.556.
+Conformance entails the boxes move; it does not say where they land, and where they
+land must be invented. That is authoring design, against `ARCHITECTURE.md`'s
+constants discipline.
+
+*Not recorded anywhere it should be — until now.* `linelab/DEVIATIONS.md`, whose
+charter is *"every place the shipped engine reads differently than the
+design-of-record letter"*, had **no entry** for it;
+`rg "candidate-position|box-repel|scoring pass" linelab/DEVIATIONS.md` returned zero
+hits, the only repo hits being this file and the two source docstrings. The entry
+is filed by this pass as `needs-decision`. Filing it is documentary and is
+authorized; deciding the pass is not.
+
+*To decide:* is `design/06 §3.1` stage 10 amended to specify a buildable pass —
+candidate set, score, weights, order, tie-break, all-overlap fallback, and the
+constants — or is the sentence retired in favour of the deterministic one-candidate
+placement the engine actually ships, which would make `stageLabels` conformant and
+close S37's option (a) entirely? A third answer is available and cheap: keep the
+sentence, and pin the property mechanically the way `design/09` pins the D47 gates
+*"against the defect, not against the ink that fixed it"* — today **no named check
+in `09` asserts label-box non-overlap** (the label checks are `P-PROJ-MARKER`,
+`P-PROJ-LEADER`, `A-LABEL-ANCHORS`, `A-ANCHOR-ERRORS`) and the `06 §7` export
+manifest does not record callout boxes at all, so there is no mechanical handle to
+build one on without also amending the manifest. A run may not pick an option.
+
+**S39 — J8 does not say at what magnification "readable" is decided, it flaked on
+the one figure that tested it, and `§7.4` makes that a rubric defect to tighten.**
+*Needed by:* every re-judge, including S37's and the five figures still carrying
+1×-ink evidence. Found 2026-07-29 in the scoped re-judge of `fig-08-05`.
+
+`verify/judge.json` rubric **J8** asserts *"lines distinguishable and text readable
+at the 2x raster"*. On `fig-08-05` the three attempts split **pass / fail / fail**,
+and the record carries `{"id": "J8", "verdict": "fail", "flaky": true}`; the
+`re_judge_log` entry states the cause in its own words — *"the rubric does not say
+at what magnification 'readable' is decided, which is precisely the ambiguity the
+1x-ink raster hid for three days"*. `design/09 §7.4`: *"any split item is marked
+`flaky: true` and is a **rubric defect** to tighten (a checklist item that flakes is
+under-operationalized)"*. The letter's remedy direction is to tighten the item —
+never to loosen or drop it. **J5 is flaky on the same record by the same clause**
+(pass / pass / na — the rubric does not say J5 always applies to a figure drawing a
+mistake-role line), and should ride whatever ceremony J8 does.
+
+*Why it cannot be fixed alone.* `rubric_version` lives **inside**
+`verify/judge.json` (`design/09 §7.1`: *"A judge record produced under any other
+identity is invalid"*), so tightening J8's wording bumps it and invalidates **every**
+record, triggering `§7.4`'s ceremony: *"one dedicated commit re-judging all figures
+and enumerating every verdict flip; a pass→fail flip on an unchanged figure is a
+finding (figure or rubric) resolved by human arbiter before the commit lands."*
+Scope is all six figures, not the one that flaked.
+
+*The batching, and it is the recommendation.* Five figures already need re-judging
+on true 2× rasters for an unrelated reason: the committed rasters carry 1× ink on a
+2× canvas, and the ink bounds measure it — `fig-08-01/02/03` `x[0..999] y[0..1146]`
+of 2000×2294, `fig-08-04` `x[0..999] y[0..1294]` of 2000×2590, `fig-08-06`
+`x[0..999] y[0..1356]` of 2000×2714, against `fig-08-05` alone at `x[0..1999]
+y[0..2773]` of 2000×2774. The **canvas sizes were always correct** — every committed
+PNG matches a fresh rasterizer run exactly, and `fig-08-05`'s two PNGs are SHA-256
+identical to a fresh run, which is a free reproducibility result — so the defect is
+ink extent, and it means J8 was in fact graded at 1× for five figures. Those five
+must be re-graded on genuine 2× rasters regardless. That re-grade is already the
+`§7.4` ceremony's scope, so **tightening J8 (and J5) in the same dedicated commit
+costs one ceremony instead of two**; filing the rubric fix separately would pay the
+six-figure price twice. A run may not pick the tightened wording, and a run may not
+perform the ceremony on its own authority — `§7.4` puts a human arbiter on any
+pass→fail flip.
+
+*To decide:* what magnification J8 is graded at, and whether it is stated as a scale
+(*"at 1:1 pixels of the 2× raster"*), as a crop rule, or as a per-item minimum glyph
+height; the same question for J5's applicability; and whether the tightening rides
+the five-figure 2×-raster re-judge as one `§7.4` ceremony, which is what this entry
+recommends.
 
 Also noted, and deliberately **not** raised as STOPs:
 

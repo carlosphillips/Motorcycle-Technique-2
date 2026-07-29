@@ -35,6 +35,55 @@ this entry is stale.
 
 ---
 
+## Post-v1.0 — the S37 census (2026-07-29, ROADMAP work order 0b)
+
+**`needs-decision` — `design/06 §3.1` stage 10's candidate-position scoring pass was never
+built, and until this entry the deviation was recorded nowhere but a source docstring.**
+The letter, inside a stage list whose heading calls the order *fixed*, says *"Label boxes
+repel each other and the road ink by a simple candidate-position scoring pass, preferring
+the aspect-floor padding (§2.4)."* Nothing answering to that exists.
+`src/render/topdown.ts:683-692` says so itself — `stageLabels` is *"a deterministic
+one-candidate stand-in for the candidate-scoring box-repel pass (§3.1 stage 10)"* — and the
+whole layout is two booleans and one fixed diagonal step (`:699-702`) with **no overlap test
+against anything**; `src/render/labels.ts:7-12` disclaims it from the other side, as
+*"presentation-only and left to `topdown.ts`'s draw pass"*. Each file defers to the other.
+
+*Measured on committed ink:* clipping every callout box against the stage-2 road-surface
+polygon, **9 of 9 callouts overlap the road surface** — 1.0000 / 0.6435 (8-01), 1.0000 /
+0.9967 (8-03), 0.5406 / 0.3733 (8-04), 1.0000 / 1.0000 / 0.4719 (8-05). On the letter's own
+second obstacle member the engine is at 0 % compliance across every callout-bearing figure.
+Box-vs-box is compliant only by accident: six pairs, zero overlaps, minimum clearance 9.02
+callout-em.
+
+*Why this is `needs-decision` and not a repair a run may land.* It sits in the
+**normative + engine deviates** row, which would authorize a fix — but the letter does not
+determine the fix. It names two obstacles and one preference and supplies no candidate set,
+no score function or weights, no box geometry, no placement order or tie-break, no
+all-candidates-overlap fallback, and **zero TUNING constants**, uniquely among `§3.1`'s
+stages. And its one named destination is empty: `frame_aspect` is 0.8716 / 0.8716 / 0.8716 /
+0.7720 / 0.7208 / 0.7367, all six inside `§6.1`'s `[0.55, 1.8]` band, so `§2.4`'s
+aspect-floor padding exists on no committed figure. Conformance entails the boxes move; it
+does not say where they land. Filed in full as `figures/SCOPE.md` §4 **S38**.
+
+**Correction to the section below.** Its S37 paragraph says the letter *"says nothing about
+stage-8b line chrome — the letter is silent"*. That reasoning is **wrong**, and the
+correction was measured this pass: the buried `30 m` numeral's whole span, and the
+anchored end of the callout that buries it, both lie **inside** the stage-2 road-surface
+polygon (the callout box straddles the edge, 47–48 % of its area on the road), and
+`design/06 §6.1` gives *"road ink"* its only defined referent as that polygon. So the
+collision **is** reachable through the letter's own second obstacle member without any
+extension to stage-8b chrome. S37 remains a STOP, on the stronger ground that there is no
+pass to extend.
+
+**`needs-decision` — a stage-9 marker glyph damages a stage-8b label, and no stage-10
+obstacle set can ever reach it.** On `fig-08-06` the `exit` marker disc of the `good` line
+(`cx=11.333929 cy=50.959021 r=0.219380`) is painted after the `90 m` ladder label and eats
+the unit glyph's arch and stem; the numeral survives, the `m` is damaged and still legible.
+`fig-08-06` carries **zero callouts**, so this is a different collision class from S37's,
+found by pixels and invisible to any `<text>`-vs-`<text>` census. Recorded inside S37.
+
+---
+
 ## Post-v1.0 — the judge loop is closed (2026-07-29, ROADMAP work order 0)
 
 **Supersedes the section immediately below, which was written the day before and is kept
@@ -81,7 +130,8 @@ answer.** The re-judge found a real defect on committed ink: a callout completel
 the `30 m` direction-ladder label. Filed as `figures/SCOPE.md` §4 **S37**, as a STOP rather
 than a repair, because `design/06 §3.1` stage 10's repulsion rule covers label boxes and
 road ink and says nothing about stage-8b line chrome — the letter is silent, so the fix is
-the owner's call. `T-JUDGE-RECORD` permits a failing record by design (*"failed criteria
+the owner's call. **(That reasoning is refuted — see the section above. The collision does
+sit on road ink; S37 stays a STOP for a different reason.)** `T-JUDGE-RECORD` permits a failing record by design (*"failed criteria
 are honest findings"*), so the suite is green with a failing figure on the record.
 
 **`needs-decision` — two rubric items came back flaky, which `§9 §7.4` makes rubric defects
